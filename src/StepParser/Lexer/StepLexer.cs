@@ -33,7 +33,7 @@ public class LexerPathFactory : IObjectFactory<LexerPath>
 /// Maintains the same API as the original StepLexer while internally using
 /// zero-copy infrastructure for superior performance.
 /// </summary>
-public class StepLexer
+public class StepLexer : IDisposable
 {
     // Zero-copy infrastructure (private, hidden from users)
     private readonly MemoryArena _arena;
@@ -476,5 +476,6 @@ public class StepLexer
     {
         _pathPool?.Dispose();
         _arena?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

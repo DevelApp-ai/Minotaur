@@ -101,7 +101,7 @@ public class ParserPath : IPoolableObject
     }
 
     /// <inheritdoc/>
-    public void Reset()
+    public virtual void Reset()
     {
         _parserPathId = 0;
         _lexerPathId = 0;

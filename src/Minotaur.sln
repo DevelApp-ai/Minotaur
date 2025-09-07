@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepParser", "StepParser\StepParser.csproj", "{8F034CC3-CF13-4C8C-B901-54DA3E1F32F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepParser.Tests", "StepParser.Tests\StepParser.Tests.csproj", "{F0E55FF7-41DD-4D74-B1A3-53DF818F7E80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepParser.Demo", "StepParser.Demo\StepParser.Demo.csproj", "{7041E96E-A9A3-44DF-B023-388D1D6B2BF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{8F034CC3-CF13-4C8C-B901-54DA3E1F32F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F034CC3-CF13-4C8C-B901-54DA3E1F32F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F034CC3-CF13-4C8C-B901-54DA3E1F32F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0E55FF7-41DD-4D74-B1A3-53DF818F7E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0E55FF7-41DD-4D74-B1A3-53DF818F7E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0E55FF7-41DD-4D74-B1A3-53DF818F7E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0E55FF7-41DD-4D74-B1A3-53DF818F7E80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7041E96E-A9A3-44DF-B023-388D1D6B2BF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7041E96E-A9A3-44DF-B023-388D1D6B2BF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7041E96E-A9A3-44DF-B023-388D1D6B2BF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7041E96E-A9A3-44DF-B023-388D1D6B2BF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
