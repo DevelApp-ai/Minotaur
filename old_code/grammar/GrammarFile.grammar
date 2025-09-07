@@ -1,0 +1,10 @@
+﻿Grammar: CEBNF
+TokenSplitter: None
+
+<grammar contents> ::= <start-lines> <EOL> <additional lines>
+<start-lines>      ::= <first-line> [<second-line>]
+<first-line>       ::= "Grammar:" <opt-whitespace> <word> <opt-whitespace> <EOL>
+<second-line>      ::= "TokenSplitter:" <opt-whitespace> ( "None" | "Space" | <regex> ) <opt-whitespace> <EOL>
+<regex>            ::= "\"" <text> "\""
+<text>             ::= ("a-zA-Z0-9" | "_" | "-" | "(" | ")" | "*" | ".")+
+<additional lines> ::= TOKEN* <EOL>

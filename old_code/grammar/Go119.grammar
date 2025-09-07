@@ -1,0 +1,691 @@
+/*
+ * Go 1.19 Grammar Specification
+ * 
+ * This grammar is designed for parsing the Go 1.19+ programming language and is suitable for a grammar marketplace.
+ * It covers the full language specification, including generics (type parameters), interfaces, goroutines, channels,
+ * packages, modules, and all modern Go features up to version 1.19. This grammar is based on the official Go Language
+ * Specification and includes all language features available in Go 1.19+ including workspace mode, performance
+ * improvements, and enhanced toolchain support.
+ */
+
+Grammar: CEBNF
+TokenSplitter: Space
+Keywords: break, case, chan, const, continue, default, defer, else, fallthrough, for, func, go, goto, if, import, interface, map, package, range, return, select, struct, switch, type, var
+
+<source_file> ::= <package_clause> ";" <import_decl_list> <top_level_decl_list>
+
+<package_clause> ::= "package" <package_name>
+
+<package_name> ::= <identifier>
+
+/* Import declarations */
+<import_decl_list> ::= { <import_decl> ";" }
+
+<import_decl> ::= "import" ( <import_spec> | "(" { <import_spec> ";" } ")" )
+
+<import_spec> ::= [ "." | <package_name> ] <import_path>
+
+<import_path> ::= <string_lit>
+
+/* Top-level declarations */
+<top_level_decl_list> ::= { <top_level_decl> ";" }
+
+<top_level_decl> ::= <declaration> | <function_decl> | <method_decl>
+
+<declaration> ::= <const_decl> | <type_decl> | <var_decl>
+
+/* Constant declarations */
+<const_decl> ::= "const" ( <const_spec> | "(" { <const_spec> ";" } ")" )
+
+<const_spec> ::= <identifier_list> [ [ <type> ] "=" <expression_list> ]
+
+/* Type declarations */
+<type_decl> ::= "type" ( <type_spec> | "(" { <type_spec> ";" } ")" )
+
+<type_spec> ::= <alias_decl> | <type_def>
+
+<alias_decl> ::= <identifier> "=" <type>
+
+<type_def> ::= <identifier> <type_parameters> <type>
+
+/* Variable declarations */
+<var_decl> ::= "var" ( <var_spec> | "(" { <var_spec> ";" } ")" )
+
+<var_spec> ::= <identifier_list> ( <type> [ "=" <expression_list> ] | "=" <expression_list> )
+
+/* Function declarations */
+<function_decl> ::= "func" <function_name> <type_parameters> <signature> [ <function_body> ]
+
+<function_name> ::= <identifier>
+
+<function_body> ::= <block>
+
+/* Method declarations */
+<method_decl> ::= "func" <receiver> <method_name> <type_parameters> <signature> [ <function_body> ]
+
+<receiver> ::= <parameters>
+
+<method_name> ::= <identifier>
+
+/* Type Parameters (Generics - Go 1.18+) */
+<type_parameters> ::= [ "[" <type_param_list> [ "," ] "]" ]
+
+<type_param_list> ::= <type_param_decl> { "," <type_param_decl> }
+
+<type_param_decl> ::= <identifier_list> <type_constraint>
+
+<type_constraint> ::= <type_element>
+
+/* Function signatures */
+<signature> ::= <parameters> [ <result> ]
+
+<result> ::= <parameters> | <type>
+
+<parameters> ::= "(" [ <parameter_list> [ "," ] ] ")"
+
+<parameter_list> ::= <parameter_decl> { "," <parameter_decl> }
+
+<parameter_decl> ::= [ <identifier_list> ] [ "..." ] <type>
+
+<identifier_list> ::= <identifier> { "," <identifier> }
+
+/* Types */
+<type> ::= <type_name> | <type_lit> | "(" <type> ")"
+
+<type_name> ::= <identifier> | <qualified_ident>
+
+<type_lit> ::= <array_type> | <struct_type> | <pointer_type> | <function_type> | <interface_type> | <slice_type> | <map_type> | <channel_type>
+
+/* Array types */
+<array_type> ::= "[" <array_length> "]" <element_type>
+
+<array_length> ::= <expression>
+
+<element_type> ::= <type>
+
+/* Slice types */
+<slice_type> ::= "[" "]" <element_type>
+
+/* Struct types */
+<struct_type> ::= "struct" "{" { <field_decl> ";" } "}"
+
+<field_decl> ::= ( <identifier_list> <type> | <embedded_field> ) [ <tag> ]
+
+<embedded_field> ::= [ "*" ] <type_name> | <interface_type_name>
+
+<interface_type_name> ::= <type_name>
+
+<tag> ::= <string_lit>
+
+/* Pointer types */
+<pointer_type> ::= "*" <base_type>
+
+<base_type> ::= <type>
+
+/* Function types */
+<function_type> ::= "func" <signature>
+
+/* Interface types */
+<interface_type> ::= "interface" "{" { <method_elem> ";" } "}"
+
+<method_elem> ::= <method_spec> | <interface_type_name> | <type_element>
+
+<method_spec> ::= <method_name> <signature>
+
+<type_element> ::= <type_term> { "|" <type_term> }
+
+<type_term> ::= <type> | <underlying_type>
+
+<underlying_type> ::= "~" <type>
+
+/* Map types */
+<map_type> ::= "map" "[" <key_type> "]" <element_type>
+
+<key_type> ::= <type>
+
+/* Channel types */
+<channel_type> ::= ( "chan" | "chan" "<-" | "<-" "chan" ) <element_type>
+
+/* Blocks */
+<block> ::= "{" <statement_list> "}"
+
+<statement_list> ::= { <statement> ";" }
+
+/* Statements */
+<statement> ::= <declaration> | <labeled_stmt> | <simple_stmt> | <go_stmt> | <return_stmt> | <break_stmt> | <continue_stmt> | <goto_stmt> | <fallthrough_stmt> | <block> | <if_stmt> | <switch_stmt> | <select_stmt> | <for_stmt> | <defer_stmt>
+
+<simple_stmt> ::= <empty_stmt> | <expression_stmt> | <send_stmt> | <inc_dec_stmt> | <assignment> | <short_var_decl>
+
+<empty_stmt> ::= 
+
+<labeled_stmt> ::= <label> ":" <statement>
+
+<label> ::= <identifier>
+
+<expression_stmt> ::= <expression>
+
+<send_stmt> ::= <channel> "<-" <expression>
+
+<channel> ::= <expression>
+
+<inc_dec_stmt> ::= <expression> ( "++" | "--" )
+
+<assignment> ::= <expression_list> <assign_op> <expression_list>
+
+<assign_op> ::= [ <add_op> | <mul_op> ] "="
+
+<short_var_decl> ::= <identifier_list> ":=" <expression_list>
+
+/* If statements */
+<if_stmt> ::= "if" [ <simple_stmt> ";" ] <expression> <block> [ "else" ( <if_stmt> | <block> ) ]
+
+/* Switch statements */
+<switch_stmt> ::= <expr_switch_stmt> | <type_switch_stmt>
+
+<expr_switch_stmt> ::= "switch" [ <simple_stmt> ";" ] [ <expression> ] "{" { <expr_case_clause> } "}"
+
+<expr_case_clause> ::= <expr_switch_case> ":" <statement_list>
+
+<expr_switch_case> ::= "case" <expression_list> | "default"
+
+<type_switch_stmt> ::= "switch" [ <simple_stmt> ";" ] <type_switch_guard> "{" { <type_case_clause> } "}"
+
+<type_switch_guard> ::= [ <identifier> ":=" ] <primary_expr> "." "(" "type" ")"
+
+<type_case_clause> ::= <type_switch_case> ":" <statement_list>
+
+<type_switch_case> ::= "case" <type_list> | "default"
+
+<type_list> ::= <type> { "," <type> }
+
+/* For statements */
+<for_stmt> ::= "for" [ <condition> | <for_clause> | <range_clause> ] <block>
+
+<condition> ::= <expression>
+
+<for_clause> ::= [ <init_stmt> ] ";" [ <condition> ] ";" [ <post_stmt> ]
+
+<init_stmt> ::= <simple_stmt>
+
+<post_stmt> ::= <simple_stmt>
+
+<range_clause> ::= [ <expression_list> "=" | <identifier_list> ":=" ] "range" <expression>
+
+/* Go statements */
+<go_stmt> ::= "go" <expression>
+
+/* Select statements */
+<select_stmt> ::= "select" "{" { <comm_clause> } "}"
+
+<comm_clause> ::= <comm_case> ":" <statement_list>
+
+<comm_case> ::= "case" ( <send_stmt> | <recv_stmt> ) | "default"
+
+<recv_stmt> ::= [ <expression_list> "=" | <identifier_list> ":=" ] <recv_expr>
+
+<recv_expr> ::= <expression>
+
+/* Return statements */
+<return_stmt> ::= "return" [ <expression_list> ]
+
+/* Break statements */
+<break_stmt> ::= "break" [ <label> ]
+
+/* Continue statements */
+<continue_stmt> ::= "continue" [ <label> ]
+
+/* Goto statements */
+<goto_stmt> ::= "goto" <label>
+
+/* Fallthrough statements */
+<fallthrough_stmt> ::= "fallthrough"
+
+/* Defer statements */
+<defer_stmt> ::= "defer" <expression>
+
+/* Expressions */
+<expression> ::= <unary_expr> | <expression> <binary_op> <expression>
+
+<unary_expr> ::= <primary_expr> | <unary_op> <unary_expr>
+
+<binary_op> ::= "||" | "&&" | <rel_op> | <add_op> | <mul_op>
+
+<rel_op> ::= "==" | "!=" | "<" | "<=" | ">" | ">="
+
+<add_op> ::= "+" | "-" | "|" | "^"
+
+<mul_op> ::= "*" | "/" | "%" | "<<" | ">>" | "&" | "&^"
+
+<unary_op> ::= "+" | "-" | "!" | "^" | "*" | "&" | "<-"
+
+/* Primary expressions */
+<primary_expr> ::= <operand> | <conversion> | <method_expr> | <primary_expr> <selector> | <primary_expr> <index> | <primary_expr> <slice> | <primary_expr> <type_assertion> | <primary_expr> <arguments>
+
+<selector> ::= "." <identifier>
+
+<index> ::= "[" <expression> "]"
+
+<slice> ::= "[" [ <expression> ] ":" [ <expression> ] "]" | "[" [ <expression> ] ":" <expression> ":" <expression> "]"
+
+<type_assertion> ::= "." "(" <type> ")"
+
+<arguments> ::= "(" [ ( <expression_list> | <type> { "," <type> } ) [ "..." ] [ "," ] ] ")"
+
+/* Operands */
+<operand> ::= <literal> | <operand_name> | "(" <expression> ")"
+
+<literal> ::= <basic_lit> | <composite_lit> | <function_lit>
+
+<basic_lit> ::= <int_lit> | <float_lit> | <imaginary_lit> | <rune_lit> | <string_lit>
+
+<operand_name> ::= <identifier> | <qualified_ident>
+
+<qualified_ident> ::= <package_name> "." <identifier>
+
+/* Composite literals */
+<composite_lit> ::= <literal_type> <literal_value>
+
+<literal_type> ::= <struct_type> | <array_type> | "[" "..." "]" <element_type> | <slice_type> | <map_type> | <type_name>
+
+<literal_value> ::= "{" [ <element_list> [ "," ] ] "}"
+
+<element_list> ::= <keyed_element> { "," <keyed_element> }
+
+<keyed_element> ::= [ <key> ":" ] <element>
+
+<key> ::= <field_name> | <expression> | <literal_value>
+
+<field_name> ::= <identifier>
+
+<element> ::= <expression> | <literal_value>
+
+/* Function literals */
+<function_lit> ::= "func" <signature> <function_body>
+
+/* Conversions */
+<conversion> ::= <type> "(" <expression> [ "," ] ")"
+
+/* Method expressions */
+<method_expr> ::= <receiver_type> "." <method_name>
+
+<receiver_type> ::= <type>
+
+/* Expression lists */
+<expression_list> ::= <expression> { "," <expression> }
+
+/* Identifiers */
+<identifier> ::= <letter> { <letter> | <unicode_digit> }
+
+/* Literals */
+<int_lit> ::= <decimal_lit> | <binary_lit> | <octal_lit> | <hex_lit>
+
+<decimal_lit> ::= "0" | ( "1" … "9" ) [ [ "_" ] <decimal_digits> ]
+
+<binary_lit> ::= "0" ( "b" | "B" ) [ "_" ] <binary_digits>
+
+<octal_lit> ::= "0" [ "o" | "O" ] [ "_" ] <octal_digits>
+
+<hex_lit> ::= "0" ( "x" | "X" ) [ "_" ] <hex_digits>
+
+<decimal_digits> ::= <decimal_digit> { [ "_" ] <decimal_digit> }
+
+<binary_digits> ::= <binary_digit> { [ "_" ] <binary_digit> }
+
+<octal_digits> ::= <octal_digit> { [ "_" ] <octal_digit> }
+
+<hex_digits> ::= <hex_digit> { [ "_" ] <hex_digit> }
+
+<float_lit> ::= <decimal_float_lit> | <hex_float_lit>
+
+<decimal_float_lit> ::= <decimal_digits> "." [ <decimal_digits> ] [ <decimal_exponent> ] |
+                        <decimal_digits> <decimal_exponent> |
+                        "." <decimal_digits> [ <decimal_exponent> ]
+
+<decimal_exponent> ::= ( "e" | "E" ) [ "+" | "-" ] <decimal_digits>
+
+<hex_float_lit> ::= "0" ( "x" | "X" ) <hex_mantissa> <hex_exponent>
+
+<hex_mantissa> ::= [ "_" ] <hex_digits> "." [ <hex_digits> ] |
+                   [ "_" ] <hex_digits> |
+                   "." <hex_digits>
+
+<hex_exponent> ::= ( "p" | "P" ) [ "+" | "-" ] <decimal_digits>
+
+<imaginary_lit> ::= ( <decimal_digits> | <int_lit> | <float_lit> ) "i"
+
+<rune_lit> ::= "'" ( <unicode_value> | <byte_value> ) "'"
+
+<unicode_value> ::= <unicode_char> | <little_u_value> | <big_u_value> | <escaped_char>
+
+<byte_value> ::= <octal_byte_value> | <hex_byte_value>
+
+<octal_byte_value> ::= "\" <octal_digit> <octal_digit> <octal_digit>
+
+<hex_byte_value> ::= "\" "x" <hex_digit> <hex_digit>
+
+<little_u_value> ::= "\" "u" <hex_digit> <hex_digit> <hex_digit> <hex_digit>
+
+<big_u_value> ::= "\" "U" <hex_digit> <hex_digit> <hex_digit> <hex_digit>
+                            <hex_digit> <hex_digit> <hex_digit> <hex_digit>
+
+<escaped_char> ::= "\" ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | "\" | "'" | "\"" )
+
+<string_lit> ::= <raw_string_lit> | <interpreted_string_lit>
+
+<raw_string_lit> ::= "`" { <unicode_char> | <newline> } "`"
+
+<interpreted_string_lit> ::= "\"" { <unicode_value> | <byte_value> } "\""
+
+/* Character classes */
+<newline> ::= /* the Unicode code point U+000A */
+
+<unicode_char> ::= /* an arbitrary Unicode code point except newline */
+
+<unicode_letter> ::= /* a Unicode code point categorized as "Letter" */
+
+<unicode_digit> ::= /* a Unicode code point categorized as "Number, decimal digit" */
+
+<letter> ::= <unicode_letter> | "_"
+
+<decimal_digit> ::= "0" … "9"
+
+<binary_digit> ::= "0" | "1"
+
+<octal_digit> ::= "0" … "7"
+
+<hex_digit> ::= "0" … "9" | "A" … "F" | "a" … "f"
+
+/* Built-in functions */
+<builtin_call> ::= <identifier> <arguments>
+
+/* Type instantiations (Generics - Go 1.18+) */
+<type_instantiation> ::= <type_name> <type_args>
+
+<type_args> ::= "[" <type_list> [ "," ] "]"
+
+/* Type inference expressions */
+<type_inference> ::= <expression> <type_args>
+
+/* Generic function calls */
+<generic_call> ::= <operand_name> <type_args> <arguments>
+
+/* Interface type elements (Go 1.18+ type sets) */
+<interface_elem> ::= <method_elem> | <type_elem>
+
+<type_elem> ::= <type_term> { "|" <type_term> }
+
+<type_term> ::= <type> | <underlying_type>
+
+<underlying_type> ::= "~" <type>
+
+/* Comparable constraint */
+<comparable_constraint> ::= "comparable"
+
+/* Type approximation elements */
+<approximation_element> ::= "~" <type>
+
+/* Union elements */
+<union_element> ::= <type_term> { "|" <type_term> }
+
+/* Embedded interface elements */
+<embedded_elem> ::= <interface_type_name>
+
+/* Go 1.19 specific features */
+
+/* Soft memory limit support */
+<memory_limit_directive> ::= "//go:memorylimit" <int_lit>
+
+/* Jump table optimization for switches */
+<jump_table_switch> ::= "switch" <expression> "{" { <jump_case_clause> } "}"
+
+<jump_case_clause> ::= <jump_switch_case> ":" <statement_list>
+
+<jump_switch_case> ::= "case" <constant_expression_list> | "default"
+
+<constant_expression_list> ::= <constant_expression> { "," <constant_expression> }
+
+<constant_expression> ::= <expression>
+
+/* Doc comment support */
+<doc_comment> ::= <line_comment> | <general_comment>
+
+<line_comment> ::= "//" { <unicode_char> } <newline>
+
+<general_comment> ::= "/*" { <unicode_char> | <newline> } "*/"
+
+/* Unix build constraint */
+<build_constraint> ::= "//go:build" <build_expr>
+
+<build_expr> ::= <build_term> { ( "&&" | "||" ) <build_term> }
+
+<build_term> ::= <build_factor> | "!" <build_factor> | "(" <build_expr> ")"
+
+<build_factor> ::= <identifier>
+
+/* Workspace mode support */
+<go_work_file> ::= <go_directive> <use_directive_list> <replace_directive_list>
+
+<go_directive> ::= "go" <version>
+
+<version> ::= <decimal_lit> "." <decimal_lit> [ "." <decimal_lit> ]
+
+<use_directive_list> ::= { <use_directive> }
+
+<use_directive> ::= "use" <module_path>
+
+<module_path> ::= <string_lit>
+
+<replace_directive_list> ::= { <replace_directive> }
+
+<replace_directive> ::= "replace" <module_path> [ <version> ] "=>" <replacement>
+
+<replacement> ::= <module_path> [ <version> ] | <local_path>
+
+<local_path> ::= <string_lit>
+
+/* Go module support */
+<go_mod_file> ::= <module_directive> <go_directive> <require_directive_list> <exclude_directive_list> <replace_directive_list> <retract_directive_list>
+
+<module_directive> ::= "module" <module_path>
+
+<require_directive_list> ::= { <require_directive> }
+
+<require_directive> ::= "require" <module_path> <version>
+
+<exclude_directive_list> ::= { <exclude_directive> }
+
+<exclude_directive> ::= "exclude" <module_path> <version>
+
+<retract_directive_list> ::= { <retract_directive> }
+
+<retract_directive> ::= "retract" ( <version> | "[" <version> "," <version> "]" )
+
+/* Atomic operations support */
+<atomic_operation> ::= <atomic_load> | <atomic_store> | <atomic_add> | <atomic_swap> | <atomic_compare_and_swap>
+
+<atomic_load> ::= "atomic" "." "Load" <type_args> "(" <arguments> ")"
+
+<atomic_store> ::= "atomic" "." "Store" <type_args> "(" <arguments> ")"
+
+<atomic_add> ::= "atomic" "." "Add" <type_args> "(" <arguments> ")"
+
+<atomic_swap> ::= "atomic" "." "Swap" <type_args> "(" <arguments> ")"
+
+<atomic_compare_and_swap> ::= "atomic" "." "CompareAndSwap" <type_args> "(" <arguments> ")"
+
+/* Enhanced error handling */
+<error_wrapping> ::= "fmt" "." "Errorf" "(" <format_string> "," <expression_list> ")"
+
+<format_string> ::= <string_lit>
+
+<error_unwrapping> ::= "errors" "." "Unwrap" "(" <expression> ")"
+
+<error_is> ::= "errors" "." "Is" "(" <expression> "," <expression> ")"
+
+<error_as> ::= "errors" "." "As" "(" <expression> "," <expression> ")"
+
+/* Context support */
+<context_with_value> ::= "context" "." "WithValue" "(" <arguments> ")"
+
+<context_with_cancel> ::= "context" "." "WithCancel" "(" <arguments> ")"
+
+<context_with_timeout> ::= "context" "." "WithTimeout" "(" <arguments> ")"
+
+<context_with_deadline> ::= "context" "." "WithDeadline" "(" <arguments> ")"
+
+/* Reflection support */
+<reflect_type_of> ::= "reflect" "." "TypeOf" "(" <expression> ")"
+
+<reflect_value_of> ::= "reflect" "." "ValueOf" "(" <expression> ")"
+
+/* JSON support */
+<json_marshal> ::= "json" "." "Marshal" "(" <expression> ")"
+
+<json_unmarshal> ::= "json" "." "Unmarshal" "(" <arguments> ")"
+
+/* HTTP support */
+<http_handler> ::= "http" "." "HandlerFunc" "(" <expression> ")"
+
+<http_handle> ::= "http" "." "Handle" "(" <arguments> ")"
+
+<http_handle_func> ::= "http" "." "HandleFunc" "(" <arguments> ")"
+
+<http_listen_and_serve> ::= "http" "." "ListenAndServe" "(" <arguments> ")"
+
+/* Testing support */
+<test_function> ::= "func" "Test" <identifier> "(" "*" "testing" "." "T" ")" <block>
+
+<benchmark_function> ::= "func" "Benchmark" <identifier> "(" "*" "testing" "." "B" ")" <block>
+
+<example_function> ::= "func" "Example" [ <identifier> ] "(" ")" <block>
+
+/* Fuzzing support (Go 1.18+) */
+<fuzz_function> ::= "func" "Fuzz" <identifier> "(" "*" "testing" "." "F" ")" <block>
+
+/* Performance improvements */
+<register_args> ::= /* RISC-V register argument passing */
+
+<jump_table> ::= /* Jump table for large switch statements */
+
+<soft_memory_limit> ::= /* Runtime soft memory limit */
+
+<gc_optimization> ::= /* Garbage collector optimizations */
+
+/* Toolchain enhancements */
+<trimpath_flag> ::= "-trimpath"
+
+<build_info> ::= "debug" "." "ReadBuildInfo" "(" ")"
+
+<go_version> ::= "go" "version" "-m" <binary_path>
+
+<binary_path> ::= <string_lit>
+
+/* LoongArch support */
+<loongarch_support> ::= /* GOOS=linux GOARCH=loong64 */
+
+/* Enhanced vet checks */
+<errors_as_check> ::= "errors" "." "As" "(" <expression> "," "*" "error" ")"
+
+/* Doc comment formatting */
+<formatted_doc_comment> ::= <doc_comment_block>
+
+<doc_comment_block> ::= { <doc_comment_line> }
+
+<doc_comment_line> ::= "//" [ <doc_comment_content> ] <newline>
+
+<doc_comment_content> ::= <doc_text> | <doc_link> | <doc_list> | <doc_heading>
+
+<doc_text> ::= { <unicode_char> }
+
+<doc_link> ::= "[" <link_text> "]" "(" <link_url> ")"
+
+<link_text> ::= { <unicode_char> }
+
+<link_url> ::= { <unicode_char> }
+
+<doc_list> ::= <doc_list_item> { <doc_list_item> }
+
+<doc_list_item> ::= ( "-" | "*" | <decimal_digit> "." ) <doc_text> <newline>
+
+<doc_heading> ::= "#" { "#" } <doc_text> <newline>
+
+/* Unix build constraint support */
+<unix_constraint> ::= "unix"
+
+/* Enhanced go generate */
+<go_generate> ::= "//go:generate" <generate_command>
+
+<generate_command> ::= { <unicode_char> }
+
+/* Improved go list */
+<go_list_json> ::= "go" "list" "-json" [ "=" <json_fields> ] <packages>
+
+<json_fields> ::= <json_field> { "," <json_field> }
+
+<json_field> ::= <identifier>
+
+<packages> ::= <package_pattern> { <package_pattern> }
+
+<package_pattern> ::= <string_lit>
+
+/* Module caching */
+<module_cache> ::= /* Enhanced module loading cache */
+
+/* Error recovery */
+<error_recovery> ::= /* Enhanced error recovery in parsing */
+
+/* Performance monitoring */
+<performance_metrics> ::= <gc_metrics> | <memory_metrics> | <cpu_metrics>
+
+<gc_metrics> ::= "runtime" "." "GCStats"
+
+<memory_metrics> ::= "runtime" "." "MemStats"
+
+<cpu_metrics> ::= "runtime" "." "NumCPU" "(" ")"
+
+/* Advanced concurrency */
+<goroutine_pool> ::= /* Goroutine pooling patterns */
+
+<channel_patterns> ::= <fan_in> | <fan_out> | <pipeline>
+
+<fan_in> ::= /* Fan-in concurrency pattern */
+
+<fan_out> ::= /* Fan-out concurrency pattern */
+
+<pipeline> ::= /* Pipeline concurrency pattern */
+
+/* Advanced generics usage */
+<generic_constraints> ::= <ordered_constraint> | <comparable_constraint> | <custom_constraint>
+
+<ordered_constraint> ::= "golang.org/x/exp/constraints" "." "Ordered"
+
+<custom_constraint> ::= "interface" "{" <constraint_elements> "}"
+
+<constraint_elements> ::= <constraint_element> { ";" <constraint_element> }
+
+<constraint_element> ::= <method_elem> | <type_elem>
+
+/* Type inference improvements */
+<improved_type_inference> ::= /* Enhanced type inference for generics */
+
+/* Workspace mode features */
+<workspace_features> ::= <multi_module_workspace> | <local_replacements>
+
+<multi_module_workspace> ::= /* Multi-module workspace support */
+
+<local_replacements> ::= /* Local module replacements */
+
+/* Enhanced debugging */
+<debug_info> ::= <dwarf_info> | <pprof_info>
+
+<dwarf_info> ::= /* DWARF debugging information */
+
+<pprof_info> ::= /* pprof profiling information */
+
+/* Security enhancements */
+<security_features> ::= <crypto_rand> | <secure_compare>
+
+<crypto_rand> ::= "crypto/rand" "." "Read" "(" <arguments> ")"
+
+<secure_compare> ::= "crypto/subtle" "." "ConstantTimeCompare" "(" <arguments> ")"
+

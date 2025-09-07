@@ -1,0 +1,60 @@
+Grammar: CEBNF
+TokenSplitter: None
+
+/* Enhanced Grammar for validating International Postal Addresses */
+/* Supports US, Danish, and extensible international formats */
+
+<postal-address>     ::= <us-address> | <danish-address> | <international-address>
+
+/* US Address Format (existing) */
+<us-address>         ::= <name-part> <street-address> <us-zip-part>
+<name-part>          ::= <opt-whitespace> <personal-part> <whitespace> <last-name> <opt-whitespace> <opt-suffix-part> <opt-whitespace> <EOL> | <opt-whitespace> <personal-part> <opt-whitespace> <name-part>
+<personal-part>      ::= <first-name> | <initials> "." 
+<street-address>     ::= <opt-whitespace> <house-num> <whitespace> <street-name> <whitespace> <opt-whitespace> <opt-apt-num> <EOL>
+<us-zip-part>        ::= <opt-whitespace><town-name> <opt-whitespace> "," <opt-whitespace> <state-code> <whitespace> <us-zip-code> <EOL>
+<us-zip-code>        ::= <digit><digit><digit><digit><digit> | <digit><digit><digit><digit><digit>"-"<digit><digit><digit><digit>
+
+/* Danish Address Format (new) */
+<danish-address>     ::= <name-part> <danish-street-address> <danish-zip-part>
+<danish-street-address> ::= <opt-whitespace> <danish-street-name> <whitespace> <house-num> <opt-whitespace> <opt-danish-apt> <EOL>
+<danish-zip-part>    ::= <opt-whitespace><danish-zip-code> <whitespace> <danish-city-name> <EOL>
+<danish-zip-code>    ::= <danish-4digit> | <danish-3digit> | "DK-"<danish-4digit>
+<danish-4digit>      ::= <digit><digit><digit><digit>
+<danish-3digit>      ::= <digit><digit><digit>
+<danish-city-name>   ::= <text>
+<opt-danish-apt>     ::= "," <whitespace> <danish-apt-designation> | ""
+<danish-apt-designation> ::= <digit> "." <whitespace> <danish-apt-side> | <digit> "." | <text>
+<danish-apt-side>    ::= "tv" | "th" | "mf" | "st"
+
+/* International Format (extensible) */
+<international-address> ::= <name-part> <intl-street-address> <intl-zip-part>
+<intl-street-address> ::= <opt-whitespace> <street-name> <whitespace> <house-num> <opt-whitespace> <opt-apt-num> <EOL>
+<intl-zip-part>      ::= <opt-whitespace><country-code>"-"<postal-code> <whitespace> <city-name> <EOL>
+<country-code>       ::= "DK" | "US" | "DE" | "FR" | "UK" | "CA" | "AU"
+<postal-code>        ::= <alphanumeric-code>
+<alphanumeric-code>  ::= <text>
+
+/* Common Elements */
+<opt-suffix-part>    ::= "Sr." | "Jr." | ""
+<opt-apt-num>        ::= <number> | ""
+<house-num>          ::= <number>
+<street-name>        ::= <text>
+<danish-street-name> ::= <text>
+<last-name>          ::= <text>
+<first-name>         ::= <text>
+<town-name>          ::= <text>
+<city-name>          ::= <text>
+<state-code>         ::= <text>
+<initials>           ::= <initial> | <initial> <initials>
+<initial>            ::= <character>
+
+/* Validation Rules */
+<digit>              ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<character>          ::= <letter> | <digit>
+<letter>             ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+<text>               ::= <character> | <character> <text>
+<number>             ::= <digit> | <digit> <number>
+<whitespace>         ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace>     ::= "" | <whitespace>
+<EOL>                ::= "\n" | "\r\n"
+

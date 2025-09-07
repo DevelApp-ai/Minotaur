@@ -1,0 +1,27 @@
+{
+  "summary": {
+    "duration": 2332,
+    "rssGrowth": 30,
+    "heapGrowth": 32,
+    "peakRSS": 148,
+    "peakHeap": 59,
+    "largestSpike": 30,
+    "spikeLocation": "test-teardown"
+  },
+  "checkpoints": [
+    {
+      "label": "test-setup",
+      "timestamp": 1755061146805,
+      "rss": 118,
+      "heapUsed": 27,
+      "heapTotal": 66
+    },
+    {
+      "label": "test-teardown",
+      "timestamp": 1755061149137,
+      "rss": 148,
+      "heapUsed": 59,
+      "heapTotal": 89
+    }
+  ]
+}

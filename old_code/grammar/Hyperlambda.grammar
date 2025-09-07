@@ -1,0 +1,181 @@
+Grammar: CEBNF
+TokenSplitter: Space
+
+/* Hyperlambda Grammar for Minotaur Parser Generator */
+/* Supports the complete Hyperlambda syntax including nodes, types, lambda expressions, and comments */
+/* Based on Hyperlambda specification from Magic Cloud (https://docs.ainiro.io/hyperlambda/) */
+
+/* Document Structure */
+<hyperlambda-document> ::= <node-list>?
+
+<node-list> ::= <node> <node-list>?
+
+<node> ::= <comment>
+         | <data-node>
+         | <slot-node>
+         | <empty-line>
+
+/* Comments */
+<comment> ::= "//" <comment-text>? <EOL>
+
+<comment-text> ::= <text-content>
+
+/* Node Definitions */
+<data-node> ::= <indentation>? "." <node-name> <node-value-part>? <EOL> <children>?
+
+<slot-node> ::= <indentation>? <node-name> <node-value-part>? <EOL> <children>?
+
+<node-name> ::= <identifier>
+
+<node-value-part> ::= ":" <typed-value>
+                    | ":" <lambda-expression>
+                    | ":" <string-value>
+
+/* Type System */
+<typed-value> ::= <type-declaration> ":" <value>
+
+<type-declaration> ::= "int"
+                     | "long"
+                     | "string"
+                     | "bool"
+                     | "date"
+                     | "decimal"
+                     | "double"
+                     | "float"
+                     | "guid"
+                     | "byte"
+                     | "short"
+                     | "uint"
+                     | "ulong"
+                     | "ushort"
+
+<value> ::= <integer-value>
+          | <string-value>
+          | <boolean-value>
+          | <decimal-value>
+
+/* Values */
+<integer-value> ::= <sign>? <digits>
+
+<decimal-value> ::= <sign>? <digits> "." <digits>
+
+<boolean-value> ::= "true" | "false"
+
+<string-value> ::= <quoted-string>
+                 | <unquoted-string>
+
+<quoted-string> ::= "\"" <string-content> "\""
+                  | "'" <string-content> "'"
+                  | "@\"" <verbatim-string-content> "\""
+
+<unquoted-string> ::= <text-content>
+
+<string-content> ::= <string-char>*
+
+<verbatim-string-content> ::= <verbatim-char>*
+
+<string-char> ::= <escaped-char>
+                | <regular-char>
+
+<verbatim-char> ::= <any-char-except-quote>
+                  | "\"\""
+
+<escaped-char> ::= "\\" <escape-sequence>
+
+<escape-sequence> ::= "\\"
+                    | "\""
+                    | "'"
+                    | "n"
+                    | "r"
+                    | "t"
+                    | "0"
+
+/* Lambda Expressions */
+<lambda-expression> ::= "x:" <lambda-path>
+
+<lambda-path> ::= <absolute-path>
+                | <relative-path>
+
+<absolute-path> ::= "@" <path-segment>
+
+<relative-path> ::= <path-segment>
+
+<path-segment> ::= <node-reference> <path-continuation>?
+
+<path-continuation> ::= "/" <path-segment>
+                      | "/*"
+                      | "/#"
+
+<node-reference> ::= "." <identifier>
+                   | <identifier>
+                   | "*"
+                   | "#"
+
+/* Children and Indentation */
+<children> ::= <child-node> <children>?
+
+<child-node> ::= <indented-node>
+
+<indented-node> ::= <indentation> <node>
+
+<indentation> ::= "   " <indentation>?
+
+/* Basic Elements */
+<identifier> ::= <identifier-start> <identifier-part>*
+
+<identifier-start> ::= <letter>
+                     | "_"
+                     | "-"
+
+<identifier-part> ::= <letter>
+                    | <digit>
+                    | "_"
+                    | "-"
+                    | "."
+
+<text-content> ::= <text-char>*
+
+<text-char> ::= <letter>
+              | <digit>
+              | <symbol>
+              | <whitespace-char>
+
+<letter> ::= <upper-case-letter>
+           | <lower-case-letter>
+
+<upper-case-letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+
+<lower-case-letter> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+<digits> ::= <digit> <digits>?
+
+<sign> ::= "+" | "-"
+
+<symbol> ::= "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_" | "+" | "=" | "{" | "}" | "[" | "]" | "|" | "\\" | ":" | ";" | "\"" | "'" | "<" | ">" | "," | "." | "?" | "/" | "~" | "`"
+
+<whitespace-char> ::= " " | "\t"
+
+<regular-char> ::= <letter>
+                 | <digit>
+                 | <safe-symbol>
+
+<safe-symbol> ::= "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_" | "+" | "=" | "{" | "}" | "[" | "]" | "|" | "<" | ">" | "," | "." | "?" | "/" | "~" | "`"
+
+<any-char-except-quote> ::= <letter>
+                          | <digit>
+                          | <symbol-except-quote>
+                          | <whitespace-char>
+
+<symbol-except-quote> ::= "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_" | "+" | "=" | "{" | "}" | "[" | "]" | "|" | "\\" | ":" | ";" | "<" | ">" | "," | "." | "?" | "/" | "~" | "`"
+
+/* Whitespace and Line Endings */
+<whitespace> ::= <whitespace-char> <whitespace>?
+
+<opt-whitespace> ::= <whitespace>?
+
+<empty-line> ::= <opt-whitespace> <EOL>
+
+<EOL> ::= "\r\n" | "\n" | "\r"
+

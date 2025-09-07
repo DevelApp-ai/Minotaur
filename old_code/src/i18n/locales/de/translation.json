@@ -1,0 +1,107 @@
+{
+  "app": {
+    "title": "Minotaurus",
+    "subtitle": "Meister des Grammatik-Labyrinths"
+  },
+  "navigation": {
+    "editor": "Editor",
+    "visualEditor": "Visueller Editor",
+    "callbacks": "Callbacks",
+    "visualization": "Visualisierung",
+    "debugging": "Debugging"
+  },
+  "desktop": {
+    "showTools": "Desktop-Tools anzeigen",
+    "hideTools": "Desktop-Tools ausblenden"
+  },
+  "editor": {
+    "grammar": "Grammatik",
+    "source": "Quelle",
+    "grammarName": "Grammatikname",
+    "fileName": "Dateiname",
+    "parse": "Analysieren",
+    "clear": "Löschen",
+    "load": "Laden",
+    "save": "Speichern",
+    "export": "Exportieren",
+    "import": "Importieren"
+  },
+  "blockly": {
+    "title": "Visueller Grammatik-Editor",
+    "generateGrammar": "Grammatik generieren",
+    "clearWorkspace": "Arbeitsbereich löschen",
+    "loadExample": "Beispiel laden"
+  },
+  "callbacks": {
+    "title": "Regel-Aktivierungs-Callbacks",
+    "addCallback": "Callback hinzufügen",
+    "removeCallback": "Callback entfernen",
+    "testCallback": "Callback testen",
+    "ruleName": "Regelname",
+    "callbackFunction": "Callback-Funktion"
+  },
+  "visualization": {
+    "title": "Parse-Baum-Visualisierung",
+    "expandAll": "Alle erweitern",
+    "collapseAll": "Alle einklappen",
+    "exportImage": "Bild exportieren",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "resetZoom": "Zoom zurücksetzen"
+  },
+  "debugging": {
+    "title": "Parser-Debugging",
+    "stepForward": "Schritt vorwärts",
+    "stepBackward": "Schritt rückwärts",
+    "reset": "Zurücksetzen",
+    "run": "Ausführen",
+    "pause": "Pausieren",
+    "currentState": "Aktueller Zustand",
+    "lexerState": "Lexer-Zustand",
+    "parserState": "Parser-Zustand"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "yes": "Ja",
+    "no": "Nein",
+    "close": "Schließen",
+    "open": "Öffnen",
+    "new": "Neu",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "copy": "Kopieren",
+    "paste": "Einfügen",
+    "cut": "Ausschneiden",
+    "undo": "Rückgängig",
+    "redo": "Wiederholen",
+    "search": "Suchen",
+    "replace": "Ersetzen",
+    "settings": "Einstellungen",
+    "help": "Hilfe",
+    "about": "Über"
+  },
+  "messages": {
+    "parseSuccess": "Analyse erfolgreich abgeschlossen",
+    "parseError": "Analyse mit Fehlern fehlgeschlagen",
+    "fileLoaded": "Datei erfolgreich geladen",
+    "fileSaved": "Datei erfolgreich gespeichert",
+    "invalidGrammar": "Ungültige Grammatik-Syntax",
+    "noSourceCode": "Kein Quellcode zum Analysieren"
+  },
+  "language": {
+    "selector": "Sprache",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "portuguese": "Português (BR)",
+    "dutch": "Nederlands",
+    "nepali": "नेपाली",
+    "danish": "Dansk",
+    "norwegian": "Norsk",
+    "swedish": "Svenska"
+  }
+}
+

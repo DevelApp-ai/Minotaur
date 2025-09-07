@@ -1,0 +1,107 @@
+{
+  "app": {
+    "title": "ミノタウロス",
+    "subtitle": "文法迷宮の主"
+  },
+  "navigation": {
+    "editor": "エディタ",
+    "visualEditor": "ビジュアルエディタ",
+    "callbacks": "コールバック",
+    "visualization": "可視化",
+    "debugging": "デバッグ"
+  },
+  "desktop": {
+    "showTools": "デスクトップツールを表示",
+    "hideTools": "デスクトップツールを非表示"
+  },
+  "editor": {
+    "grammar": "文法",
+    "source": "ソース",
+    "grammarName": "文法名",
+    "fileName": "ファイル名",
+    "parse": "解析",
+    "clear": "クリア",
+    "load": "読み込み",
+    "save": "保存",
+    "export": "エクスポート",
+    "import": "インポート"
+  },
+  "blockly": {
+    "title": "ビジュアル文法エディタ",
+    "generateGrammar": "文法を生成",
+    "clearWorkspace": "ワークスペースをクリア",
+    "loadExample": "例を読み込み"
+  },
+  "callbacks": {
+    "title": "ルール活性化コールバック",
+    "addCallback": "コールバックを追加",
+    "removeCallback": "コールバックを削除",
+    "testCallback": "コールバックをテスト",
+    "ruleName": "ルール名",
+    "callbackFunction": "コールバック関数"
+  },
+  "visualization": {
+    "title": "解析木の可視化",
+    "expandAll": "すべて展開",
+    "collapseAll": "すべて折りたたみ",
+    "exportImage": "画像をエクスポート",
+    "zoomIn": "ズームイン",
+    "zoomOut": "ズームアウト",
+    "resetZoom": "ズームをリセット"
+  },
+  "debugging": {
+    "title": "パーサーデバッグ",
+    "stepForward": "次のステップ",
+    "stepBackward": "前のステップ",
+    "reset": "リセット",
+    "run": "実行",
+    "pause": "一時停止",
+    "currentState": "現在の状態",
+    "lexerState": "レクサー状態",
+    "parserState": "パーサー状態"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "キャンセル",
+    "yes": "はい",
+    "no": "いいえ",
+    "close": "閉じる",
+    "open": "開く",
+    "new": "新規",
+    "delete": "削除",
+    "edit": "編集",
+    "copy": "コピー",
+    "paste": "貼り付け",
+    "cut": "切り取り",
+    "undo": "元に戻す",
+    "redo": "やり直し",
+    "search": "検索",
+    "replace": "置換",
+    "settings": "設定",
+    "help": "ヘルプ",
+    "about": "について"
+  },
+  "messages": {
+    "parseSuccess": "解析が正常に完了しました",
+    "parseError": "解析がエラーで失敗しました",
+    "fileLoaded": "ファイルが正常に読み込まれました",
+    "fileSaved": "ファイルが正常に保存されました",
+    "invalidGrammar": "無効な文法構文",
+    "noSourceCode": "解析するソースコードがありません"
+  },
+  "language": {
+    "selector": "言語",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "portuguese": "Português (BR)",
+    "dutch": "Nederlands",
+    "nepali": "नेपाली",
+    "danish": "Dansk",
+    "norwegian": "Norsk",
+    "swedish": "Svenska"
+  }
+}
+

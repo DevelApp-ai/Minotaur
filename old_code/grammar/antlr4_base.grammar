@@ -1,0 +1,324 @@
+Grammar: ANTLR4_Base
+TokenSplitter: Space
+Inheritable: true
+FormatType: ANTLR4
+ImportSemantics: true
+
+// ANTLR v4 Base Grammar Template
+// This base grammar defines the fundamental parsing patterns and semantic behaviors
+// for ANTLR v4 grammars within Minotaur's inheritance-based compiler-compiler support
+
+// ============================================================================
+// LEXER RULE PATTERNS
+// ============================================================================
+
+// Fragment rule pattern - ANTLR v4 fragments are reusable lexer components
+<fragment-rule> ::= "fragment" <IDENTIFIER> ":" <lexer-expression> ";"
+
+// Lexer rule pattern - uppercase identifiers define tokens
+<lexer-rule> ::= <LEXER_IDENTIFIER> ":" <lexer-expression> <lexer-action>? ";"
+
+// Lexer expression patterns
+<lexer-expression> ::= <lexer-alternative> ("|" <lexer-alternative>)*
+<lexer-alternative> ::= <lexer-element>+
+<lexer-element> ::= <lexer-atom> <lexer-suffix>?
+<lexer-atom> ::= <character-range>
+              | <string-literal>
+              | <lexer-rule-ref>
+              | <fragment-ref>
+              | "(" <lexer-expression> ")"
+              | "."
+
+// Character range and sets
+<character-range> ::= "[" <character-set> "]"
+<character-set> ::= <character-range-item>+
+<character-range-item> ::= <character> "-" <character>
+                        | <character>
+                        | <escape-sequence>
+
+// Lexer suffixes for repetition
+<lexer-suffix> ::= "?"      // Optional
+                | "*"       // Zero or more
+                | "+"       // One or more
+
+// Lexer actions and commands
+<lexer-action> ::= "->" <lexer-command> ("," <lexer-command>)*
+<lexer-command> ::= "skip"
+                 | "channel" "(" <IDENTIFIER> ")"
+                 | "mode" "(" <IDENTIFIER> ")"
+                 | "pushMode" "(" <IDENTIFIER> ")"
+                 | "popMode"
+                 | "type" "(" <IDENTIFIER> ")"
+                 | "more"
+
+// ============================================================================
+// PARSER RULE PATTERNS
+// ============================================================================
+
+// Parser rule pattern - lowercase identifiers define non-terminals
+<parser-rule> ::= <PARSER_IDENTIFIER> <rule-returns>? <rule-locals>? <rule-options>? ":"
+                  <parser-expression> ";"
+
+// Rule attributes
+<rule-returns> ::= "returns" "[" <argument-list> "]"
+<rule-locals> ::= "locals" "[" <argument-list> "]"
+<rule-options> ::= "options" "{" <option-list> "}"
+
+// Parser expression patterns with left-recursion support
+<parser-expression> ::= <parser-alternative> ("|" <parser-alternative>)*
+<parser-alternative> ::= <parser-element>+
+<parser-element> ::= <parser-atom> <element-suffix>?
+<parser-atom> ::= <parser-rule-ref> <rule-arguments>?
+               | <token-ref>
+               | <string-literal>
+               | "(" <parser-expression> ")"
+               | <semantic-predicate>
+               | <action>
+
+// Element suffixes
+<element-suffix> ::= "?"        // Optional
+                  | "*"         // Zero or more
+                  | "+"         // One or more
+                  | "??"        // Non-greedy optional
+                  | "*?"        // Non-greedy zero or more
+                  | "+?"        // Non-greedy one or more
+
+// Rule references and arguments
+<rule-arguments> ::= "[" <argument-list> "]"
+<argument-list> ::= <argument> ("," <argument>)*
+<argument> ::= <IDENTIFIER> "=" <expression>
+            | <expression>
+
+// ============================================================================
+// SEMANTIC ACTIONS AND PREDICATES
+// ============================================================================
+
+// Embedded actions - code blocks executed during parsing
+<action> ::= "{" <action-content> "}" => { 
+  executeEmbeddedAction($1, getCurrentContext(), getCurrentPosition()) 
+}
+
+// Semantic predicates - runtime conditions
+<semantic-predicate> ::= "{" <predicate-content> "}?" => { 
+  evaluateSemanticPredicate($1, getCurrentContext()) 
+}
+
+// Action content parsing
+<action-content> ::= <java-code-block>
+<predicate-content> ::= <java-expression>
+
+// ============================================================================
+// PRECEDENCE AND ASSOCIATIVITY PATTERNS
+// ============================================================================
+
+// ANTLR v4 precedence through rule ordering and explicit precedence
+<precedence-declaration> ::= "options" "{" "precedence" "=" <precedence-level> "}"
+<precedence-level> ::= <INTEGER>
+
+// Left-recursive expression patterns (handled by GLR)
+<left-recursive-expr> ::= <left-recursive-expr> <operator> <primary-expr>
+                       | <primary-expr>
+
+// Precedence climbing pattern
+<expression-with-precedence> ::= <primary-expr> (<binary-op> <primary-expr>)*
+
+// ============================================================================
+// LEXER MODES AND STATES
+// ============================================================================
+
+// Mode declarations
+<mode-declaration> ::= "mode" <IDENTIFIER> ";"
+
+// Mode-specific lexer rules
+<mode-lexer-rule> ::= <lexer-rule> => { 
+  handleModeSpecificRule($1, getCurrentMode()) 
+}
+
+// Mode transitions
+<mode-transition> ::= "pushMode" "(" <IDENTIFIER> ")" => { 
+  pushLexerMode($1) 
+}
+                   | "popMode" => { 
+  popLexerMode() 
+}
+                   | "mode" "(" <IDENTIFIER> ")" => { 
+  setLexerMode($1) 
+}
+
+// ============================================================================
+// ERROR RECOVERY PATTERNS
+// ============================================================================
+
+// ANTLR v4 automatic error recovery
+<error-recovery> ::= <automatic-recovery>
+                  | <manual-recovery>
+
+<automatic-recovery> ::= "catch" "[" <exception-type> <IDENTIFIER> "]" "{" <recovery-action> "}"
+<manual-recovery> ::= "finally" "{" <cleanup-action> "}"
+
+// Error synchronization points
+<sync-point> ::= <sync-token>
+<sync-token> ::= ";" | "}" | "{" | <KEYWORD>
+
+// ============================================================================
+// GRAMMAR OPTIONS AND IMPORTS
+// ============================================================================
+
+// Grammar-level options
+<grammar-options> ::= "options" "{" <option-list> "}"
+<option-list> ::= <option> (";" <option>)*
+<option> ::= <IDENTIFIER> "=" <option-value>
+<option-value> ::= <string-literal> | <IDENTIFIER> | <INTEGER>
+
+// Import statements
+<import-statement> ::= "import" <import-list> ";"
+<import-list> ::= <IDENTIFIER> ("," <IDENTIFIER>)*
+
+// ============================================================================
+// TOKEN DEFINITIONS AND REFERENCES
+// ============================================================================
+
+// Token references (uppercase identifiers)
+<token-ref> ::= <LEXER_IDENTIFIER> => { 
+  createTokenReference($1) 
+}
+
+// String literals as implicit tokens
+<string-literal> ::= "'" <single-quoted-string> "'" => { 
+  createImplicitToken($1) 
+}
+                  | '"' <double-quoted-string> '"' => { 
+  createImplicitToken($1) 
+}
+
+// ============================================================================
+// IDENTIFIERS AND LITERALS
+// ============================================================================
+
+// ANTLR v4 naming conventions
+<LEXER_IDENTIFIER> ::= /[A-Z][a-zA-Z0-9_]*/ => { 
+  validateLexerIdentifier($1) 
+}
+
+<PARSER_IDENTIFIER> ::= /[a-z][a-zA-Z0-9_]*/ => { 
+  validateParserIdentifier($1) 
+}
+
+<IDENTIFIER> ::= /[a-zA-Z][a-zA-Z0-9_]*/ => { 
+  createIdentifier($1) 
+}
+
+<INTEGER> ::= /[0-9]+/ => { 
+  parseInt($1) 
+}
+
+// String content
+<single-quoted-string> ::= /[^'\\]*(\\.[^'\\]*)*/ => { 
+  unescapeString($1) 
+}
+
+<double-quoted-string> ::= /[^"\\]*(\\.[^"\\]*)*/ => { 
+  unescapeString($1) 
+}
+
+// ============================================================================
+// SEMANTIC ACTION TEMPLATES
+// ============================================================================
+
+// Template for handling ANTLR v4 semantic actions
+<semantic-action-template> ::= "{" <java-code> "}" => {
+  // Preserve ANTLR v4 action execution context
+  const context = {
+    ruleContext: getCurrentRuleContext(),
+    tokenStream: getTokenStream(),
+    parseTree: getCurrentParseTree(),
+    localVariables: getLocalVariables(),
+    ruleArguments: getRuleArguments()
+  };
+  
+  // Execute action with ANTLR v4 semantics
+  executeANTLRAction($1, context);
+}
+
+// Template for attribute access ($1, $2, etc.)
+<attribute-access> ::= "$" <INTEGER> => {
+  getAttributeValue($1, getCurrentRuleContext())
+}
+
+// Template for rule return values
+<return-value> ::= "$" <IDENTIFIER> => {
+  getRuleReturnValue($1, getCurrentRuleContext())
+}
+
+// ============================================================================
+// PRECEDENCE INHERITANCE TEMPLATES
+// ============================================================================
+
+// Default ANTLR v4 precedence relationships
+Precedence: {
+  // Arithmetic operators (standard precedence)
+  Level1: { operators: ["||"], associativity: "left", description: "Logical OR" }
+  Level2: { operators: ["&&"], associativity: "left", description: "Logical AND" }
+  Level3: { operators: ["|"], associativity: "left", description: "Bitwise OR" }
+  Level4: { operators: ["^"], associativity: "left", description: "Bitwise XOR" }
+  Level5: { operators: ["&"], associativity: "left", description: "Bitwise AND" }
+  Level6: { operators: ["==", "!="], associativity: "left", description: "Equality" }
+  Level7: { operators: ["<", ">", "<=", ">="], associativity: "left", description: "Relational" }
+  Level8: { operators: ["<<", ">>"], associativity: "left", description: "Shift" }
+  Level9: { operators: ["+", "-"], associativity: "left", description: "Additive" }
+  Level10: { operators: ["*", "/", "%"], associativity: "left", description: "Multiplicative" }
+  Level11: { operators: ["!"], associativity: "right", description: "Unary" }
+}
+
+// ============================================================================
+// ERROR RECOVERY INHERITANCE TEMPLATES
+// ============================================================================
+
+// ANTLR v4 error recovery strategies
+ErrorRecovery: {
+  strategy: "automatic",
+  tokenInsertion: true,
+  tokenDeletion: true,
+  synchronization: ["semicolon", "brace", "keyword"],
+  reportingLevel: "detailed",
+  
+  // Error synchronization tokens
+  syncTokens: [";", "}", "{", "public", "private", "class", "interface"],
+  
+  // Recovery actions
+  recoveryActions: {
+    missingToken: "insertToken",
+    extraneousToken: "deleteToken",
+    mismatchedToken: "replaceToken",
+    noViableAlternative: "synchronize"
+  }
+}
+
+// ============================================================================
+// EXTENSION POINTS FOR INHERITANCE
+// ============================================================================
+
+// Extension point for additional lexer rules
+<extended-lexer-rules> ::= <lexer-rule>* => {
+  // Inheriting grammars can add lexer rules here
+  processExtendedLexerRules($1);
+}
+
+// Extension point for additional parser rules
+<extended-parser-rules> ::= <parser-rule>* => {
+  // Inheriting grammars can add parser rules here
+  processExtendedParserRules($1);
+}
+
+// Extension point for custom semantic actions
+<extended-semantic-actions> ::= <action>* => {
+  // Inheriting grammars can add custom actions here
+  processExtendedSemanticActions($1);
+}
+
+// Extension point for custom precedence rules
+<extended-precedence> ::= <precedence-declaration>* => {
+  // Inheriting grammars can modify precedence here
+  processExtendedPrecedence($1);
+}
+

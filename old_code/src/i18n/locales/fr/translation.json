@@ -1,0 +1,107 @@
+{
+  "app": {
+    "title": "Minotaure",
+    "subtitle": "Maître du Labyrinthe des Grammaires"
+  },
+  "navigation": {
+    "editor": "Éditeur",
+    "visualEditor": "Éditeur Visuel",
+    "callbacks": "Callbacks",
+    "visualization": "Visualisation",
+    "debugging": "Débogage"
+  },
+  "desktop": {
+    "showTools": "Afficher les Outils de Bureau",
+    "hideTools": "Masquer les Outils de Bureau"
+  },
+  "editor": {
+    "grammar": "Grammaire",
+    "source": "Source",
+    "grammarName": "Nom de Grammaire",
+    "fileName": "Nom de Fichier",
+    "parse": "Analyser",
+    "clear": "Effacer",
+    "load": "Charger",
+    "save": "Sauvegarder",
+    "export": "Exporter",
+    "import": "Importer"
+  },
+  "blockly": {
+    "title": "Éditeur Visuel de Grammaire",
+    "generateGrammar": "Générer la Grammaire",
+    "clearWorkspace": "Effacer l'Espace de Travail",
+    "loadExample": "Charger un Exemple"
+  },
+  "callbacks": {
+    "title": "Callbacks d'Activation de Règles",
+    "addCallback": "Ajouter un Callback",
+    "removeCallback": "Supprimer le Callback",
+    "testCallback": "Tester le Callback",
+    "ruleName": "Nom de Règle",
+    "callbackFunction": "Fonction Callback"
+  },
+  "visualization": {
+    "title": "Visualisation de l'Arbre d'Analyse",
+    "expandAll": "Tout Développer",
+    "collapseAll": "Tout Réduire",
+    "exportImage": "Exporter l'Image",
+    "zoomIn": "Zoomer",
+    "zoomOut": "Dézoomer",
+    "resetZoom": "Réinitialiser le Zoom"
+  },
+  "debugging": {
+    "title": "Débogage de l'Analyseur",
+    "stepForward": "Étape Suivante",
+    "stepBackward": "Étape Précédente",
+    "reset": "Réinitialiser",
+    "run": "Exécuter",
+    "pause": "Pause",
+    "currentState": "État Actuel",
+    "lexerState": "État du Lexer",
+    "parserState": "État du Parser"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Annuler",
+    "yes": "Oui",
+    "no": "Non",
+    "close": "Fermer",
+    "open": "Ouvrir",
+    "new": "Nouveau",
+    "delete": "Supprimer",
+    "edit": "Éditer",
+    "copy": "Copier",
+    "paste": "Coller",
+    "cut": "Couper",
+    "undo": "Annuler",
+    "redo": "Refaire",
+    "search": "Rechercher",
+    "replace": "Remplacer",
+    "settings": "Paramètres",
+    "help": "Aide",
+    "about": "À propos"
+  },
+  "messages": {
+    "parseSuccess": "Analyse terminée avec succès",
+    "parseError": "L'analyse a échoué avec des erreurs",
+    "fileLoaded": "Fichier chargé avec succès",
+    "fileSaved": "Fichier sauvegardé avec succès",
+    "invalidGrammar": "Syntaxe de grammaire invalide",
+    "noSourceCode": "Aucun code source à analyser"
+  },
+  "language": {
+    "selector": "Langue",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "portuguese": "Português (BR)",
+    "dutch": "Nederlands",
+    "nepali": "नेपाली",
+    "danish": "Dansk",
+    "norwegian": "Norsk",
+    "swedish": "Svenska"
+  }
+}
+

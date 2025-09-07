@@ -1,0 +1,107 @@
+{
+  "app": {
+    "title": "मिनोटौर",
+    "subtitle": "व्याकरण भूलभुलैयाको मालिक"
+  },
+  "navigation": {
+    "editor": "सम्पादक",
+    "visualEditor": "दृश्य सम्पादक",
+    "callbacks": "कलब्याकहरू",
+    "visualization": "दृश्यीकरण",
+    "debugging": "डिबगिङ"
+  },
+  "desktop": {
+    "showTools": "डेस्कटप उपकरणहरू देखाउनुहोस्",
+    "hideTools": "डेस्कटप उपकरणहरू लुकाउनुहोस्"
+  },
+  "editor": {
+    "grammar": "व्याकरण",
+    "source": "स्रोत",
+    "grammarName": "व्याकरण नाम",
+    "fileName": "फाइल नाम",
+    "parse": "विश्लेषण गर्नुहोस्",
+    "clear": "खाली गर्नुहोस्",
+    "load": "लोड गर्नुहोस्",
+    "save": "सेभ गर्नुहोस्",
+    "export": "निर्यात गर्नुहोस्",
+    "import": "आयात गर्नुहोस्"
+  },
+  "blockly": {
+    "title": "दृश्य व्याकरण सम्पादक",
+    "generateGrammar": "व्याकरण उत्पन्न गर्नुहोस्",
+    "clearWorkspace": "कार्यक्षेत्र खाली गर्नुहोस्",
+    "loadExample": "उदाहरण लोड गर्नुहोस्"
+  },
+  "callbacks": {
+    "title": "नियम सक्रियता कलब्याकहरू",
+    "addCallback": "कलब्याक थप्नुहोस्",
+    "removeCallback": "कलब्याक हटाउनुहोस्",
+    "testCallback": "कलब्याक परीक्षण गर्नुहोस्",
+    "ruleName": "नियम नाम",
+    "callbackFunction": "कलब्याक प्रकार्य"
+  },
+  "visualization": {
+    "title": "पार्स ट्री दृश्यीकरण",
+    "expandAll": "सबै विस्तार गर्नुहोस्",
+    "collapseAll": "सबै संकुचित गर्नुहोस्",
+    "exportImage": "छवि निर्यात गर्नुहोस्",
+    "zoomIn": "जुम इन",
+    "zoomOut": "जुम आउट",
+    "resetZoom": "जुम रिसेट गर्नुहोस्"
+  },
+  "debugging": {
+    "title": "पार्सर डिबगिङ",
+    "stepForward": "अगाडि बढ्नुहोस्",
+    "stepBackward": "पछाडि जानुहोस्",
+    "reset": "रिसेट गर्नुहोस्",
+    "run": "चलाउनुहोस्",
+    "pause": "रोक्नुहोस्",
+    "currentState": "हालको अवस्था",
+    "lexerState": "लेक्सर अवस्था",
+    "parserState": "पार्सर अवस्था"
+  },
+  "common": {
+    "ok": "ठीक छ",
+    "cancel": "रद्द गर्नुहोस्",
+    "yes": "हो",
+    "no": "होइन",
+    "close": "बन्द गर्नुहोस्",
+    "open": "खोल्नुहोस्",
+    "new": "नयाँ",
+    "delete": "मेटाउनुहोस्",
+    "edit": "सम्पादन गर्नुहोस्",
+    "copy": "प्रतिलिपि गर्नुहोस्",
+    "paste": "टाँस्नुहोस्",
+    "cut": "काट्नुहोस्",
+    "undo": "पूर्ववत गर्नुहोस्",
+    "redo": "पुनः गर्नुहोस्",
+    "search": "खोज्नुहोस्",
+    "replace": "बदल्नुहोस्",
+    "settings": "सेटिङहरू",
+    "help": "सहायता",
+    "about": "बारेमा"
+  },
+  "messages": {
+    "parseSuccess": "विश्लेषण सफलतापूर्वक पूरा भयो",
+    "parseError": "विश्लेषण त्रुटिहरूसँग असफल भयो",
+    "fileLoaded": "फाइल सफलतापूर्वक लोड भयो",
+    "fileSaved": "फाइल सफलतापूर्वक सेभ भयो",
+    "invalidGrammar": "अवैध व्याकरण सिन्ट्याक्स",
+    "noSourceCode": "विश्लेषण गर्न कुनै स्रोत कोड छैन"
+  },
+  "language": {
+    "selector": "भाषा",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "portuguese": "Português (BR)",
+    "dutch": "Nederlands",
+    "nepali": "नेपाली",
+    "danish": "Dansk",
+    "norwegian": "Norsk",
+    "swedish": "Svenska"
+  }
+}
+

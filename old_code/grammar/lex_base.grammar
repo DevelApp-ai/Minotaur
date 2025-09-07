@@ -1,0 +1,405 @@
+Grammar: Lex_Base
+TokenSplitter: None
+Inheritable: true
+FormatType: Lex
+ImportSemantics: true
+CoordinateTokens: true
+
+// Lex Base Grammar Template
+// This base grammar defines the fundamental lexical analysis patterns and behaviors
+// for the original Lex lexer generator within Minotaur's inheritance-based compiler-compiler support
+
+// ============================================================================
+// LEX FILE STRUCTURE
+// ============================================================================
+
+// Lex file has three sections separated by %%
+<lex-file> ::= <definitions-section>? "%%" <rules-section> "%%" <subroutines-section>?
+
+// ============================================================================
+// DEFINITIONS SECTION
+// ============================================================================
+
+<definitions-section> ::= <definition>*
+
+<definition> ::= <substitution-definition>
+              | <c-code-block>
+
+// Substitution definitions (simple macros)
+<substitution-definition> ::= <name> <whitespace> <definition-text> => {
+  defineLexSubstitution($1, $2);
+}
+
+<name> ::= /[a-zA-Z_][a-zA-Z0-9_]*/ => {
+  validateLexName($1);
+}
+
+<definition-text> ::= /[^\n]+/ => {
+  parseDefinitionText($1);
+}
+
+// ============================================================================
+// RULES SECTION
+// ============================================================================
+
+<rules-section> ::= <rule>*
+
+<rule> ::= <pattern> <whitespace> <action> => {
+  createLexRule($1, $2);
+}
+
+// ============================================================================
+// LEX PATTERNS (SIMPLIFIED)
+// ============================================================================
+
+<pattern> ::= <simple-pattern>
+           | <character-class>
+           | <string-pattern>
+           | <pattern-with-operators>
+
+// Simple patterns
+<simple-pattern> ::= <literal-string> => {
+  createSimplePattern($1);
+}
+                  | <character> => {
+  createCharacterPattern($1);
+}
+                  | "." => {
+  createAnyCharacterPattern();
+}
+
+// Character classes (basic)
+<character-class> ::= "[" <character-list> "]" => {
+  createCharacterClass($1);
+}
+                   | "[^" <character-list> "]" => {
+  createNegatedCharacterClass($1);
+}
+
+<character-list> ::= <character-range>*
+<character-range> ::= <character> "-" <character> => {
+  createCharacterRange($1, $2);
+}
+                   | <character> => {
+  createSingleCharacter($1);
+}
+
+// String patterns
+<string-pattern> ::= '"' <string-content> '"' => {
+  createStringPattern($1);
+}
+
+<string-content> ::= <string-character>*
+<string-character> ::= <literal-character>
+                    | <escape-sequence>
+
+// Pattern operators (basic set)
+<pattern-with-operators> ::= <pattern> "*" => {
+  createZeroOrMore($1);
+}
+                          | <pattern> "+" => {
+  createOneOrMore($1);
+}
+                          | <pattern> "?" => {
+  createOptional($1);
+}
+                          | <pattern> "|" <pattern> => {
+  createAlternation($1, $2);
+}
+                          | "(" <pattern> ")" => {
+  createGroupedPattern($1);
+}
+
+// Substitution references
+<substitution-reference> ::= "{" <name> "}" => {
+  expandLexSubstitution($1);
+}
+
+// ============================================================================
+// LEX ACTIONS
+// ============================================================================
+
+<action> ::= <c-action>
+          | <simple-action>
+          | <empty-action>
+
+// C code action
+<c-action> ::= "{" <c-code-block> "}" => {
+  executeLexAction($1, getCurrentMatch(), getCurrentContext());
+}
+
+// Simple action (just return a value)
+<simple-action> ::= <return-statement> => {
+  executeSimpleAction($1);
+}
+
+<return-statement> ::= "return" "(" <return-value> ")" ";" => {
+  returnValue($1);
+}
+                    | "return" <return-value> ";" => {
+  returnValue($1);
+}
+
+<return-value> ::= <INTEGER> => {
+  createIntegerReturn($1);
+}
+                | <IDENTIFIER> => {
+  createIdentifierReturn($1);
+}
+
+// Empty action (continue scanning)
+<empty-action> ::= ";" => {
+  continueScanning();
+}
+
+// ============================================================================
+// LEX BUILT-IN VARIABLES AND FUNCTIONS
+// ============================================================================
+
+// Built-in variables (basic set)
+<lex-variable> ::= "yytext" => {
+  getMatchedText();
+}
+                | "yyleng" => {
+  getMatchedLength();
+}
+
+// Built-in functions (basic set)
+<lex-function> ::= "input" "(" ")" => {
+  readNextCharacter();
+}
+                | "unput" "(" <character> ")" => {
+  unputCharacter($1);
+}
+                | "output" "(" <character> ")" => {
+  outputCharacter($1);
+}
+
+// ============================================================================
+// SUBROUTINES SECTION (USER CODE)
+// ============================================================================
+
+<subroutines-section> ::= <c-code-block> => {
+  addUserCode($1);
+}
+
+<c-code-block> ::= <c-code-line>*
+<c-code-line> ::= /[^\n]*\n/ => {
+  preserveCCode($1);
+}
+
+// ============================================================================
+// ESCAPE SEQUENCES (BASIC)
+// ============================================================================
+
+<escape-sequence> ::= "\\" <escaped-character> => {
+  createEscapeSequence($1);
+}
+
+<escaped-character> ::= "n" => { createNewline(); }
+                     | "t" => { createTab(); }
+                     | "r" => { createCarriageReturn(); }
+                     | "b" => { createBackspace(); }
+                     | "f" => { createFormFeed(); }
+                     | "\\" => { createBackslash(); }
+                     | "\"" => { createDoubleQuote(); }
+                     | <digit> <digit> <digit> => { createOctalCharacter($1); }
+
+// ============================================================================
+// LEX IDENTIFIERS AND LITERALS
+// ============================================================================
+
+<IDENTIFIER> ::= /[a-zA-Z_][a-zA-Z0-9_]*/ => {
+  createIdentifier($1);
+}
+
+<INTEGER> ::= /[0-9]+/ => {
+  parseInt($1);
+}
+
+<character> ::= /[^\\\n]/ => {
+  createCharacter($1);
+}
+             | <escape-sequence> => {
+  $1;
+}
+
+<literal-character> ::= /[^\\"\[\]{}()*+?|.\n]/ => {
+  createLiteralCharacter($1);
+}
+
+<literal-string> ::= /[a-zA-Z0-9_]+/ => {
+  createLiteralString($1);
+}
+
+<digit> ::= /[0-7]/ => {
+  createDigit($1);
+}
+
+<whitespace> ::= /[ \t]+/ => {
+  // Whitespace handling
+}
+
+// ============================================================================
+// LEX SPECIAL PATTERNS
+// ============================================================================
+
+// Beginning of line
+<beginning-of-line> ::= "^" <pattern> => {
+  createBeginningOfLinePattern($1);
+}
+
+// End of line
+<end-of-line> ::= <pattern> "$" => {
+  createEndOfLinePattern($1);
+}
+
+// ============================================================================
+// SEMANTIC ACTION TEMPLATES
+// ============================================================================
+
+// Template for handling Lex semantic actions
+<lex-action-template> ::= "{" <c-code> "}" => {
+  // Preserve Lex action execution context
+  const context = {
+    matchedText: getMatchedText(),
+    matchedLength: getMatchedLength(),
+    inputFile: getInputFile(),
+    outputFile: getOutputFile()
+  };
+  
+  // Execute action with Lex semantics
+  executeLexAction($1, context);
+}
+
+// Template for simple return actions
+<return-action-template> ::= "return" <value> => {
+  // Return value with Lex semantics
+  const returnValue = $1;
+  return returnValue;
+}
+
+// ============================================================================
+// ERROR HANDLING TEMPLATES
+// ============================================================================
+
+// Lex error handling (very basic)
+ErrorRecovery: {
+  strategy: "default_action",
+  defaultAction: "output",
+  errorReporting: "none",
+  
+  // Default action for unmatched input
+  defaultRule: {
+    action: "output",
+    description: "Output unmatched characters"
+  },
+  
+  // Recovery actions (limited)
+  recoveryActions: {
+    unmatchedInput: "output",
+    lexicalError: "continue"
+  }
+}
+
+// ============================================================================
+// COMPATIBILITY FEATURES
+// ============================================================================
+
+// Basic compatibility with original Lex
+<lex-compatibility> ::= <basic-pattern-matching>
+                     | <simple-action-execution>
+                     | <minimal-error-handling>
+
+<basic-pattern-matching> ::= <simple-regex> => {
+  // Handle basic regular expressions
+  processBasicRegex($1);
+}
+
+<simple-action-execution> ::= <c-statement> => {
+  // Execute simple C statements
+  executeSimpleStatement($1);
+}
+
+<minimal-error-handling> ::= <default-rule> => {
+  // Minimal error handling
+  handleDefaultCase($1);
+}
+
+// ============================================================================
+// LEX LIMITATIONS AND CONSTRAINTS
+// ============================================================================
+
+// Original Lex limitations
+<lex-limitations> ::= <no-start-conditions>
+                   | <basic-regex-only>
+                   | <simple-actions-only>
+
+<no-start-conditions> ::= /* No start conditions in original Lex */ => {
+  // Start conditions not supported
+  warnNoStartConditions();
+}
+
+<basic-regex-only> ::= <limited-regex-features> => {
+  // Limited regex features
+  processLimitedRegex($1);
+}
+
+<simple-actions-only> ::= <basic-c-actions> => {
+  // Basic C actions only
+  processBasicActions($1);
+}
+
+// ============================================================================
+// EXTENSION POINTS FOR INHERITANCE
+// ============================================================================
+
+// Extension point for additional substitution definitions
+<extended-definitions> ::= <substitution-definition>* => {
+  processExtendedDefinitions($1);
+}
+
+// Extension point for additional rules
+<extended-rules> ::= <rule>* => {
+  processExtendedRules($1);
+}
+
+// Extension point for enhanced patterns
+<extended-patterns> ::= <pattern>* => {
+  processExtendedPatterns($1);
+}
+
+// Extension point for enhanced actions
+<extended-actions> ::= <action>* => {
+  processExtendedActions($1);
+}
+
+// Extension point for user subroutines
+<extended-subroutines> ::= <c-code-block> => {
+  processExtendedSubroutines($1);
+}
+
+// ============================================================================
+// MIGRATION HELPERS
+// ============================================================================
+
+// Helpers for migrating from Lex to more modern tools
+<migration-helper> ::= <flex-compatibility>
+                    | <modern-regex-support>
+                    | <enhanced-error-handling>
+
+<flex-compatibility> ::= <flex-feature-emulation> => {
+  // Emulate Flex features for easier migration
+  emulateFlex($1);
+}
+
+<modern-regex-support> ::= <extended-regex-patterns> => {
+  // Support modern regex patterns
+  supportModernRegex($1);
+}
+
+<enhanced-error-handling> ::= <better-error-recovery> => {
+  // Provide better error recovery
+  enhanceErrorRecovery($1);
+}
+

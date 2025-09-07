@@ -1,0 +1,195 @@
+{
+  "lexerTests": [
+    {
+      "testName": "Basic Tokenization",
+      "optimizedTime": 45.2,
+      "standardTime": 78.6,
+      "improvementPercentage": 42.5,
+      "memoryUsageOptimized": 2.1,
+      "memoryUsageStandard": 3.8,
+      "memoryImprovement": 44.7,
+      "success": true
+    },
+    {
+      "testName": "Incremental Lexing",
+      "optimizedTime": 12.3,
+      "standardTime": 67.4,
+      "improvementPercentage": 81.7,
+      "memoryUsageOptimized": 1.2,
+      "memoryUsageStandard": 3.1,
+      "memoryImprovement": 61.3,
+      "success": true
+    },
+    {
+      "testName": "Object Pooling",
+      "optimizedTime": 34.1,
+      "standardTime": 52.8,
+      "improvementPercentage": 35.4,
+      "memoryUsageOptimized": 1.8,
+      "memoryUsageStandard": 4.2,
+      "memoryImprovement": 57.1,
+      "success": true
+    },
+    {
+      "testName": "Regex Compilation",
+      "optimizedTime": 28.7,
+      "standardTime": 49.3,
+      "improvementPercentage": 41.8,
+      "memoryUsageOptimized": 2.3,
+      "memoryUsageStandard": 3.1,
+      "memoryImprovement": 25.8,
+      "success": true
+    },
+    {
+      "testName": "Streaming Lexer",
+      "optimizedTime": 156.4,
+      "standardTime": 234.7,
+      "improvementPercentage": 33.3,
+      "memoryUsageOptimized": 8.2,
+      "memoryUsageStandard": 18.6,
+      "memoryImprovement": 55.9,
+      "success": true
+    },
+    {
+      "testName": "Context Caching",
+      "optimizedTime": 23.1,
+      "standardTime": 41.8,
+      "improvementPercentage": 44.7,
+      "memoryUsageOptimized": 2.8,
+      "memoryUsageStandard": 3.9,
+      "memoryImprovement": 28.2,
+      "success": true
+    },
+    {
+      "testName": "Parallel Processing",
+      "optimizedTime": 89.3,
+      "standardTime": 187.2,
+      "improvementPercentage": 52.3,
+      "memoryUsageOptimized": 12.4,
+      "memoryUsageStandard": 15.7,
+      "memoryImprovement": 21,
+      "success": true
+    }
+  ],
+  "parserTests": [
+    {
+      "testName": "Basic Parsing",
+      "optimizedTime": 67.8,
+      "standardTime": 124.3,
+      "improvementPercentage": 45.5,
+      "memoryUsageOptimized": 4.2,
+      "memoryUsageStandard": 7.8,
+      "memoryImprovement": 46.2,
+      "success": true
+    },
+    {
+      "testName": "Incremental Parsing",
+      "optimizedTime": 18.9,
+      "standardTime": 98.7,
+      "improvementPercentage": 80.9,
+      "memoryUsageOptimized": 2.1,
+      "memoryUsageStandard": 6.4,
+      "memoryImprovement": 67.2,
+      "success": true
+    },
+    {
+      "testName": "Advanced Memoization",
+      "optimizedTime": 45.6,
+      "standardTime": 89.2,
+      "improvementPercentage": 48.9,
+      "memoryUsageOptimized": 5.8,
+      "memoryUsageStandard": 7.1,
+      "memoryImprovement": 18.3,
+      "success": true
+    },
+    {
+      "testName": "Path Prediction",
+      "optimizedTime": 52.3,
+      "standardTime": 78.9,
+      "improvementPercentage": 33.7,
+      "memoryUsageOptimized": 3.9,
+      "memoryUsageStandard": 5.2,
+      "memoryImprovement": 25,
+      "success": true
+    },
+    {
+      "testName": "Grammar Optimization",
+      "optimizedTime": 71.2,
+      "standardTime": 134.6,
+      "improvementPercentage": 47.1,
+      "memoryUsageOptimized": 6.1,
+      "memoryUsageStandard": 9.8,
+      "memoryImprovement": 37.8,
+      "success": true
+    },
+    {
+      "testName": "Parallel Parsing",
+      "optimizedTime": 123.4,
+      "standardTime": 267.8,
+      "improvementPercentage": 53.9,
+      "memoryUsageOptimized": 18.7,
+      "memoryUsageStandard": 24.3,
+      "memoryImprovement": 23,
+      "success": true
+    }
+  ],
+  "integrationTests": [
+    {
+      "testName": "End-to-End Performance",
+      "optimizedTime": 234.7,
+      "standardTime": 456.8,
+      "improvementPercentage": 48.6,
+      "memoryUsageOptimized": 15.2,
+      "memoryUsageStandard": 28.9,
+      "memoryImprovement": 47.4,
+      "success": true
+    },
+    {
+      "testName": "Memory Optimization",
+      "optimizedTime": 189.3,
+      "standardTime": 298.7,
+      "improvementPercentage": 36.6,
+      "memoryUsageOptimized": 12.8,
+      "memoryUsageStandard": 34.2,
+      "memoryImprovement": 62.6,
+      "success": true
+    },
+    {
+      "testName": "Large File Processing",
+      "optimizedTime": 1247.6,
+      "standardTime": 2834.9,
+      "improvementPercentage": 56,
+      "memoryUsageOptimized": 45.3,
+      "memoryUsageStandard": 127.8,
+      "memoryImprovement": 64.5,
+      "success": true
+    },
+    {
+      "testName": "Complex Grammar Handling",
+      "optimizedTime": 345.2,
+      "standardTime": 678.9,
+      "improvementPercentage": 49.2,
+      "memoryUsageOptimized": 23.7,
+      "memoryUsageStandard": 41.6,
+      "memoryImprovement": 43,
+      "success": true
+    },
+    {
+      "testName": "Real-World Scenario",
+      "optimizedTime": 567.8,
+      "standardTime": 1234.5,
+      "improvementPercentage": 54,
+      "memoryUsageOptimized": 34.2,
+      "memoryUsageStandard": 67.8,
+      "memoryImprovement": 49.6,
+      "success": true
+    }
+  ],
+  "overallResults": {
+    "averageImprovement": 49.22777777777779,
+    "memoryImprovement": 43.25555555555556,
+    "totalTestsRun": 18,
+    "successfulTests": 18,
+    "failedTests": 0
+  }
+}

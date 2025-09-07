@@ -1,0 +1,257 @@
+Grammar: CEBNF
+TokenSplitter: Space
+EmbeddedLanguages: JavaScript, CSS
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+CrossLanguageValidation: true
+
+/* HTML Grammar with Embedded JavaScript and CSS Support */
+/* Demonstrates the new embedded grammar format extensions */
+
+@IMPORT JavaScript FROM "JavaScript.grammar"
+@IMPORT CSS FROM "CSS.grammar"
+
+@COMPOSE {
+    primary: HTML
+    embedded: [JavaScript, CSS]
+    strategy: context_switching
+    symbol_resolution: hierarchical
+}
+
+/* Document Structure */
+<html-document> ::= <doctype>? <html-element>
+
+<doctype> ::= "<!DOCTYPE" <whitespace> "html" <opt-whitespace> ">"
+
+<html-element> ::= "<html" <attributes>? ">" 
+                   <head-element>? 
+                   <body-element>? 
+                   "</html>"
+
+/* Head Section */
+<head-element> ::= "<head" <attributes>? ">" 
+                   <head-content>* 
+                   "</head>"
+
+<head-content> ::= <title-element>
+                 | <meta-element>
+                 | <link-element>
+                 | <style-element>
+                 | <script-element>
+                 | <comment>
+                 | <whitespace>
+
+<title-element> ::= "<title" <attributes>? ">" <text-content> "</title>"
+
+<meta-element> ::= "<meta" <attributes> "/>"
+                 | "<meta" <attributes> ">"
+
+<link-element> ::= "<link" <attributes> "/>"
+                 | "<link" <attributes> ">"
+
+/* Embedded CSS Style Element */
+<style-element> ::= "<style" <attributes>? ">" 
+                    @CONTEXT[CSS] <css-stylesheet> @ENDCONTEXT 
+                    "</style>"
+
+/* Embedded JavaScript Script Element */
+<script-element> ::= "<script" <attributes>? ">" 
+                     @CONTEXT[JavaScript] <js-program> @ENDCONTEXT 
+                     "</script>"
+                   | "<script" <attributes> "/>"
+
+/* Body Section */
+<body-element> ::= "<body" <attributes>? ">" 
+                   <body-content>* 
+                   "</body>"
+
+<body-content> ::= <block-element>
+                 | <inline-element>
+                 | <text-content>
+                 | <comment>
+                 | <whitespace>
+
+/* Block Elements */
+<block-element> ::= <div-element>
+                  | <p-element>
+                  | <h1-element> | <h2-element> | <h3-element>
+                  | <ul-element> | <ol-element>
+                  | <form-element>
+                  | <section-element> | <article-element>
+                  | <header-element> | <footer-element>
+                  | <script-element>
+                  | <style-element>
+
+<div-element> ::= "<div" <id-attribute>? <class-attribute>? <onclick-attribute>? <attributes>? ">" 
+                  <element-content>* 
+                  "</div>"
+
+<p-element> ::= "<p" <attributes>? ">" <element-content>* "</p>"
+
+<h1-element> ::= "<h1" <attributes>? ">" <element-content>* "</h1>"
+<h2-element> ::= "<h2" <attributes>? ">" <element-content>* "</h2>"
+<h3-element> ::= "<h3" <attributes>? ">" <element-content>* "</h3>"
+
+/* List Elements */
+<ul-element> ::= "<ul" <attributes>? ">" <li-element>* "</ul>"
+<ol-element> ::= "<ol" <attributes>? ">" <li-element>* "</ol>"
+<li-element> ::= "<li" <attributes>? ">" <element-content>* "</li>"
+
+/* Form Elements */
+<form-element> ::= "<form" <attributes>? ">" <form-content>* "</form>"
+
+<form-content> ::= <input-element>
+                 | <button-element>
+                 | <label-element>
+                 | <textarea-element>
+                 | <select-element>
+                 | <element-content>
+
+<input-element> ::= "<input" <type-attribute>? <id-attribute>? <name-attribute>? <attributes>? "/>"
+                  | "<input" <type-attribute>? <id-attribute>? <name-attribute>? <attributes>? ">"
+
+<button-element> ::= "<button" <id-attribute>? <onclick-attribute>? <attributes>? ">" 
+                     <element-content>* 
+                     "</button>"
+
+<label-element> ::= "<label" <for-attribute>? <attributes>? ">" <element-content>* "</label>"
+
+<textarea-element> ::= "<textarea" <id-attribute>? <name-attribute>? <attributes>? ">" 
+                       <text-content> 
+                       "</textarea>"
+
+<select-element> ::= "<select" <id-attribute>? <name-attribute>? <attributes>? ">" 
+                     <option-element>* 
+                     "</select>"
+
+<option-element> ::= "<option" <value-attribute>? <attributes>? ">" <text-content> "</option>"
+
+/* Inline Elements */
+<inline-element> ::= <span-element>
+                   | <a-element>
+                   | <img-element>
+                   | <strong-element>
+                   | <em-element>
+                   | <code-element>
+
+<span-element> ::= "<span" <id-attribute>? <class-attribute>? <attributes>? ">" 
+                   <element-content>* 
+                   "</span>"
+
+<a-element> ::= "<a" <href-attribute>? <onclick-attribute>? <attributes>? ">" 
+                <element-content>* 
+                "</a>"
+
+<img-element> ::= "<img" <src-attribute> <alt-attribute>? <id-attribute>? <attributes>? "/>"
+                | "<img" <src-attribute> <alt-attribute>? <id-attribute>? <attributes>? ">"
+
+<strong-element> ::= "<strong" <attributes>? ">" <element-content>* "</strong>"
+<em-element> ::= "<em" <attributes>? ">" <element-content>* "</em>"
+<code-element> ::= "<code" <attributes>? ">" <element-content>* "</code>"
+
+/* Semantic HTML5 Elements */
+<section-element> ::= "<section" <attributes>? ">" <element-content>* "</section>"
+<article-element> ::= "<article" <attributes>? ">" <element-content>* "</article>"
+<header-element> ::= "<header" <attributes>? ">" <element-content>* "</header>"
+<footer-element> ::= "<footer" <attributes>? ">" <element-content>* "</footer>"
+
+/* Cross-Language Attribute Definitions */
+<id-attribute> ::= "id=\"" @SYMBOL[id] <identifier> "\""
+<class-attribute> ::= "class=\"" @SYMBOL[class] <class-list> "\""
+<onclick-attribute> ::= "onclick=\"" @REFERENCE[JavaScript.function] <function-call> "\""
+<for-attribute> ::= "for=\"" @REFERENCE[HTML.id] <identifier> "\""
+
+/* Standard Attributes */
+<type-attribute> ::= "type=\"" <attribute-value> "\""
+<name-attribute> ::= "name=\"" <attribute-value> "\""
+<value-attribute> ::= "value=\"" <attribute-value> "\""
+<src-attribute> ::= "src=\"" <attribute-value> "\""
+<href-attribute> ::= "href=\"" <attribute-value> "\""
+<alt-attribute> ::= "alt=\"" <attribute-value> "\""
+
+/* Generic Attributes */
+<attributes> ::= <whitespace> <attribute> <attributes>?
+<attribute> ::= <attribute-name> "=" <attribute-value>
+<attribute-name> ::= <identifier>
+<attribute-value> ::= "\"" <string-content> "\"" | "'" <string-content> "'"
+
+/* Content Types */
+<element-content> ::= <block-element>
+                    | <inline-element>
+                    | <text-content>
+                    | <comment>
+                    | <whitespace>
+
+<text-content> ::= <text-char> <text-content>?
+<string-content> ::= <string-char> <string-content>?
+
+/* Embedded Language Content Placeholders */
+<css-stylesheet> ::= @EMBED[CSS]
+<js-program> ::= @EMBED[JavaScript]
+
+/* Cross-Language Function Call */
+<function-call> ::= <identifier> "(" <argument-list>? ")"
+<argument-list> ::= <argument> "," <argument-list>?
+<argument> ::= <string-literal> | <identifier> | <number>
+
+/* Common Elements */
+<class-list> ::= <identifier> <class-list-tail>?
+<class-list-tail> ::= <whitespace> <class-list>
+
+<identifier> ::= <letter> <identifier-char>*
+<identifier-char> ::= <letter> | <digit> | "_" | "-"
+
+<string-literal> ::= "\"" <string-content> "\"" | "'" <string-content> "'"
+<number> ::= <digit> <number>?
+
+/* Comments */
+<comment> ::= "<!--" <comment-content> "-->"
+<comment-content> ::= <comment-char> <comment-content>?
+
+/* Character Classes */
+<text-char> ::= <letter> | <digit> | <space> | <punctuation> | <entity-ref>
+<string-char> ::= <letter> | <digit> | <space> | <safe-punctuation> | <entity-ref>
+<comment-char> ::= <letter> | <digit> | <space> | <safe-comment-char>
+
+<entity-ref> ::= "&" <entity-name> ";" | "&#" <number> ";" | "&#x" <hex-number> ";"
+<entity-name> ::= "amp" | "lt" | "gt" | "quot" | "apos" | "nbsp"
+
+<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" 
+           | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+           | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m"
+           | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+<hex-digit> ::= <digit> | "A" | "B" | "C" | "D" | "E" | "F" | "a" | "b" | "c" | "d" | "e" | "f"
+<hex-number> ::= <hex-digit> <hex-number>?
+
+<space> ::= " " | "\t"
+<whitespace> ::= <space> <whitespace>?
+<opt-whitespace> ::= <whitespace>?
+
+<punctuation> ::= "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_" 
+                | "+" | "=" | "[" | "]" | "{" | "}" | "|" | "\\" | ":" | ";" | "'" | "\""
+                | "," | "." | "/" | "?" | "~" | "`"
+
+<safe-punctuation> ::= "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_"
+                     | "+" | "=" | "[" | "]" | "{" | "}" | "|" | "\\" | ":" | ";" | ","
+                     | "." | "/" | "?" | "~" | "`"
+
+<safe-comment-char> ::= <punctuation> | <letter> | <digit> | <space>
+
+/* Validation Rules */
+@VALIDATE {
+    /* CSS selectors must reference existing HTML elements */
+    css_id_selector_validation: @REFERENCE[CSS.id_selector] -> @SYMBOL[HTML.id]
+    css_class_selector_validation: @REFERENCE[CSS.class_selector] -> @SYMBOL[HTML.class]
+    
+    /* JavaScript DOM references must reference existing HTML elements */
+    js_get_element_by_id_validation: @REFERENCE[JavaScript.getElementById] -> @SYMBOL[HTML.id]
+    js_onclick_function_validation: @REFERENCE[HTML.onclick] -> @SYMBOL[JavaScript.function]
+    
+    /* Form label-input associations */
+    label_for_validation: @REFERENCE[HTML.for] -> @SYMBOL[HTML.id]
+}
+
+
