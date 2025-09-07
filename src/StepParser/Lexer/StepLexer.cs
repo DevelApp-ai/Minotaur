@@ -37,7 +37,6 @@ public class StepLexer : IDisposable
 {
     // Zero-copy infrastructure (private, hidden from users)
     private readonly MemoryArena _arena;
-    private readonly StringInterner _stringInterner;
     private readonly ObjectPool<LexerPath> _pathPool;
 
     // Public API preserved for compatibility
@@ -58,7 +57,6 @@ public class StepLexer : IDisposable
     {
         // Initialize zero-copy infrastructure
         _arena = new MemoryArena(1024 * 1024); // 1MB initial size
-        _stringInterner = new StringInterner(_arena);
 
         // Create object pool for lexer paths
         var pathFactory = new LexerPathFactory();
@@ -426,12 +424,10 @@ public class StepLexer : IDisposable
     /// <param name="tokenList">The token list to add the token to.</param>
     private void CreateTokenFromMatch(LexerPath lexerPath, TerminalMatch match, List<Token> tokenList)
     {
-        var value = _stringInterner.Intern(match.Value);
-
         var token = new Token(
             lexerPath.LexerPathId,
             match.Terminal,
-            value,
+            match.Value,
             lexerPath.ActiveLineNumber,
             lexerPath.ActiveCharacterNumber);
 

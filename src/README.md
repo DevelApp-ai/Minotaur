@@ -28,7 +28,6 @@ src/
 │   │   └── TerminalMatch.cs       # Terminal matching results
 │   ├── Memory/                    # Memory management
 │   │   ├── MemoryArena.cs         # Memory arena for zero-copy
-│   │   ├── StringInterner.cs      # String deduplication
 │   │   └── ObjectPool.cs          # Object pooling
 │   ├── Context/                   # Context management
 │   │   ├── ContextTypes.cs        # Context-related types
@@ -77,7 +76,6 @@ src/
 ### 7. Memory Management
 - **Zero-copy architecture**: Minimizes memory allocations and copying
 - **Memory arena**: Efficient memory allocation for parsing operations
-- **String interning**: Deduplicates strings to reduce memory usage
 - **Object pooling**: Reuses objects to minimize garbage collection pressure
 
 ## Usage Examples
@@ -212,7 +210,6 @@ The StepParser follows a modular architecture with clear separation of concerns:
 
 ### Zero-Copy Architecture
 - Memory arena allocation reduces heap fragmentation
-- String interning eliminates duplicate string storage
 - Object pooling minimizes garbage collection
 - Efficient path management for ambiguous parsing
 

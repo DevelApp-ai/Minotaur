@@ -109,7 +109,6 @@ public class StepParser : IDisposable
 {
     // Zero-copy infrastructure
     private readonly MemoryArena _arena;
-    private readonly StringInterner _stringInterner;
     private readonly ObjectPool<ContextAwareParserPath> _pathPool;
 
     // Context integration
@@ -142,7 +141,6 @@ public class StepParser : IDisposable
     {
         // Initialize zero-copy infrastructure
         _arena = new MemoryArena(4 * 1024 * 1024); // 4MB initial size
-        _stringInterner = new StringInterner(_arena);
 
         var pathFactory = new ContextAwareParserPathFactory();
         _pathPool = new ObjectPool<ContextAwareParserPath>(pathFactory, _arena, 200, 2000);
