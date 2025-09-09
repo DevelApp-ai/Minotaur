@@ -143,8 +143,8 @@ public class StepParsingContextAdapter
     public List<ScopeInfo> GetCurrentScopes()
     {
         var context = GetCurrentContext();
-        return context.ScopeStack.Count > 0 ? context.ScopeStack : 
-               context.Scope != null ? new List<ScopeInfo> { context.Scope } : 
+        return context.ScopeStack.Count > 0 ? context.ScopeStack :
+               context.Scope != null ? new List<ScopeInfo> { context.Scope } :
                new List<ScopeInfo>();
     }
 
@@ -452,22 +452,22 @@ public class StepParsingContextAdapter
         {
             if (c == '\n')
             {
-                _currentPosition = _currentPosition with 
-                { 
-                    Line = _currentPosition.Line + 1, 
-                    Column = 1 
+                _currentPosition = _currentPosition with
+                {
+                    Line = _currentPosition.Line + 1,
+                    Column = 1
                 };
             }
             else
             {
-                _currentPosition = _currentPosition with 
-                { 
-                    Column = _currentPosition.Column + 1 
+                _currentPosition = _currentPosition with
+                {
+                    Column = _currentPosition.Column + 1
                 };
             }
-            _currentPosition = _currentPosition with 
-            { 
-                Offset = _currentPosition.Offset + 1 
+            _currentPosition = _currentPosition with
+            {
+                Offset = _currentPosition.Offset + 1
             };
         }
     }

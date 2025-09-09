@@ -12,7 +12,7 @@ public class StepParserBasicTests
     {
         // Arrange & Act
         using var parser = new StepParser.Core.StepParser();
-        
+
         // Assert
         Assert.NotNull(parser);
         Assert.Equal(string.Empty, parser.ActiveGrammarName);
@@ -24,10 +24,10 @@ public class StepParserBasicTests
         // Arrange
         using var parser = new StepParser.Core.StepParser();
         var grammar = new Grammar.Grammar("TestGrammar");
-        
+
         // Act
         parser.SetActiveGrammar(grammar);
-        
+
         // Assert
         Assert.Equal("TestGrammar", parser.ActiveGrammarName);
     }
@@ -37,10 +37,10 @@ public class StepParserBasicTests
     {
         // Arrange
         var terminal = new Terminal("identifier", @"[a-zA-Z_][a-zA-Z0-9_]*");
-        
+
         // Act
         var match = terminal.MatchInput("testIdentifier");
-        
+
         // Assert
         Assert.NotNull(match);
         Assert.True(match.Success);
@@ -54,11 +54,11 @@ public class StepParserBasicTests
         var production = new Production("assignment");
         var identifierTerminal = new Terminal("identifier", @"[a-zA-Z_][a-zA-Z0-9_]*");
         var equalsTerminal = new Terminal("equals", @"=");
-        
+
         // Act
         production.AddPart(identifierTerminal);
         production.AddPart(equalsTerminal);
-        
+
         // Assert
         Assert.Equal("assignment", production.Name);
         Assert.Equal(2, production.Parts.Count);
@@ -69,10 +69,10 @@ public class StepParserBasicTests
     {
         // Arrange
         var terminal = new Terminal("number", @"\d+");
-        
+
         // Act
         var token = new Token(1, terminal, "123", 0, 5);
-        
+
         // Assert
         Assert.Equal(1, token.LexerPathId);
         Assert.Equal(terminal, token.Terminal);
@@ -86,10 +86,10 @@ public class StepParserBasicTests
     {
         // Arrange
         var content = "line1\nline2\nline3";
-        
+
         // Act
         var container = new SourceContainer(content);
-        
+
         // Assert
         Assert.Equal(3, container.LineCount);
         var lines = container.SourceLines.ToList();
@@ -104,23 +104,23 @@ public class StepParserBasicTests
         // Arrange
         using var parser = new StepParser.Core.StepParser();
         var grammar = new Grammar.Grammar("SimpleGrammar");
-        
+
         // Create a simple grammar for identifiers
         var identifierTerminal = new Terminal("identifier", @"[a-zA-Z_][a-zA-Z0-9_]*");
         grammar.AddValidStartTerminal(identifierTerminal);
-        
+
         var identifierProduction = new Production("identifier_rule");
         identifierProduction.AddPart(identifierTerminal);
         grammar.AddProduction(identifierProduction);
         grammar.AddStartProduction(identifierProduction);
-        
+
         parser.SetActiveGrammar(grammar);
-        
+
         var sourceContainer = new SourceContainer("testVariable");
-        
+
         // Act
         var matches = await parser.ParseAsync("SimpleGrammar", sourceContainer);
-        
+
         // Assert
         Assert.NotNull(matches);
         // Note: The actual parsing logic would need more implementation to produce matches
@@ -132,11 +132,11 @@ public class StepParserBasicTests
     {
         // Arrange
         using var parser = new StepParser.Core.StepParser();
-        
+
         // Act
         parser.SetContextState("in_function", true);
         parser.SetContextState("in_class", false);
-        
+
         // Assert
         Assert.True(parser.GetContextState("in_function"));
         Assert.False(parser.GetContextState("in_class"));
@@ -149,18 +149,19 @@ public class StepParserBasicTests
         // Arrange
         using var parser = new StepParser.Core.StepParser();
         var callbackExecuted = false;
-        
+
         void TestCallback(Dictionary<string, object> context)
         {
             callbackExecuted = true;
         }
-        
+
         // Act
         parser.RegisterCallback("test_production", TestCallback);
         parser.ClearCallbacks();
-        
+
         // Assert - Since we cleared callbacks, they shouldn't be executed
         // This test validates the callback registration API
         Assert.NotNull(parser); // Basic validation that operations completed
+        Assert.False(callbackExecuted); // Callback should not have been executed since we cleared it
     }
 }

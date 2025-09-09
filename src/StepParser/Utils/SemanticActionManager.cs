@@ -96,7 +96,7 @@ public class SemanticActionManager
         {
             _actionCache[grammarName] = new Dictionary<string, SemanticAction>();
         }
-        
+
         if (resolvedAction != null)
         {
             _actionCache[grammarName][actionName] = resolvedAction;

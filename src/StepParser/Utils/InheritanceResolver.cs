@@ -28,7 +28,7 @@ public class InheritanceResolver
     public void RegisterGrammar(Grammar.Grammar grammar)
     {
         _grammars[grammar.Name] = grammar;
-        
+
         // Clear cache for this grammar and its dependents
         ClearCacheForGrammar(grammar.Name);
     }
@@ -91,7 +91,7 @@ public class InheritanceResolver
             if (grammar.BaseGrammars.Contains(grammarName))
             {
                 dependents.Add(grammar.Name);
-                
+
                 // Recursively get dependents of dependents
                 var transitiveDependents = GetDependentGrammars(grammar.Name);
                 dependents.AddRange(transitiveDependents);
