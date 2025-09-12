@@ -42,7 +42,7 @@ jobs:
         reportgenerator "-reports:./TestResults/**/coverage.cobertura.xml" "-targetdir:./CoverageReport" "-reporttypes:Html;JsonSummary"
     
     - name: Upload coverage report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: ./CoverageReport/
@@ -122,7 +122,7 @@ jobs:
         timeout 60s dotnet run --configuration Release 2>&1 | tee ../../performance-log.txt || true
     
     - name: Upload performance log
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: performance-log
         path: performance-log.txt

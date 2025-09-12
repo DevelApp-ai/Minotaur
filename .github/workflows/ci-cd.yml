@@ -45,7 +45,7 @@ jobs:
       run: dotnet test src/Minotaur.sln --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage"
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results
@@ -167,7 +167,7 @@ jobs:
       run: dotnet pack src/StepParser/StepParser.csproj --no-build --configuration Release --output ./packages
     
     - name: Upload packages as artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: nuget-packages
         path: ./packages/*.nupkg
