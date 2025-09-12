@@ -18,6 +18,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
+    - name: Install .NET 7.0.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '7.0.x'
+    
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -68,6 +73,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
+    - name: Install .NET 7.0.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '7.0.x'
+    
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
@@ -97,6 +107,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    
+    - name: Install .NET 7.0.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '7.0.x'
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
