@@ -1,3 +1,6 @@
+using CognitiveGraph;
+using CognitiveGraph.Schema;
+using CognitiveGraph.Accessors;
 using GolemCognitiveGraph.Visitors;
 
 namespace GolemCognitiveGraph.Core;
@@ -22,7 +25,24 @@ public class TerminalNode : CognitiveGraphNode
     /// </summary>
     /// <param name="text">The text content.</param>
     /// <param name="tokenType">The token type.</param>
-    public TerminalNode(string text = "", string tokenType = "")
+    public TerminalNode(string text = "", string tokenType = "") : base()
+    {
+        Text = text;
+        TokenType = tokenType;
+        NodeType = "terminal";
+        
+        // Store text in metadata for unparser access
+        Metadata["text"] = text;
+        Metadata["tokenType"] = tokenType;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the TerminalNode class with underlying node.
+    /// </summary>
+    /// <param name="text">The text content.</param>
+    /// <param name="tokenType">The token type.</param>
+    /// <param name="underlyingNode">The underlying SymbolNode from CognitiveGraph.</param>
+    public TerminalNode(string text, string tokenType, SymbolNode underlyingNode) : base(underlyingNode)
     {
         Text = text;
         TokenType = tokenType;
@@ -91,7 +111,24 @@ public class NonTerminalNode : CognitiveGraphNode
     /// </summary>
     /// <param name="ruleName">The rule name.</param>
     /// <param name="productionIndex">The production index.</param>
-    public NonTerminalNode(string ruleName = "", int productionIndex = -1)
+    public NonTerminalNode(string ruleName = "", int productionIndex = -1) : base()
+    {
+        RuleName = ruleName;
+        ProductionIndex = productionIndex;
+        NodeType = "nonterminal";
+        
+        // Store rule information in metadata
+        Metadata["ruleName"] = ruleName;
+        Metadata["productionIndex"] = productionIndex;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the NonTerminalNode class with underlying node.
+    /// </summary>
+    /// <param name="ruleName">The rule name.</param>
+    /// <param name="productionIndex">The production index.</param>
+    /// <param name="underlyingNode">The underlying SymbolNode from CognitiveGraph.</param>
+    public NonTerminalNode(string ruleName, int productionIndex, SymbolNode underlyingNode) : base(underlyingNode)
     {
         RuleName = ruleName;
         ProductionIndex = productionIndex;

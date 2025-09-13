@@ -1,11 +1,14 @@
 using System.Text.Json;
+using CognitiveGraph;
+using CognitiveGraph.Schema;
+using CognitiveGraph.Accessors;
 using GolemCognitiveGraph.Visitors;
 
 namespace GolemCognitiveGraph.Core;
 
 /// <summary>
 /// Represents a node in the cognitive graph with zero-copy semantics.
-/// Serves as the base class for all graph nodes in the Golem system.
+/// Serves as a wrapper around DevelApp.CognitiveGraph.SymbolNode for the Golem system.
 /// </summary>
 public abstract class CognitiveGraphNode
 {
@@ -18,6 +21,22 @@ public abstract class CognitiveGraphNode
     /// Gets or sets the node type identifier.
     /// </summary>
     public string NodeType { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets the underlying SymbolNode from CognitiveGraph.
+    /// Since SymbolNode is a ref struct, we store a reference flag instead.
+    /// </summary>
+    public bool HasUnderlyingNode { get; protected set; }
+
+    /// <summary>
+    /// The source start position from the underlying node.
+    /// </summary>
+    protected uint UnderlyingSourceStart { get; set; }
+
+    /// <summary>
+    /// The source length from the underlying node.
+    /// </summary>
+    protected uint UnderlyingSourceLength { get; set; }
 
     /// <summary>
     /// Gets the parent node, if any.
@@ -40,6 +59,33 @@ public abstract class CognitiveGraphNode
     /// Gets or sets the source position information for this node.
     /// </summary>
     public SourcePosition? SourcePosition { get; set; }
+
+    /// <summary>
+    /// Initializes a new instance of the CognitiveGraphNode class.
+    /// </summary>
+    /// <param name="underlyingNode">The underlying SymbolNode from CognitiveGraph.</param>
+    protected CognitiveGraphNode(SymbolNode underlyingNode)
+    {
+        HasUnderlyingNode = true;
+        UnderlyingSourceStart = underlyingNode.SourceStart;
+        UnderlyingSourceLength = underlyingNode.SourceLength;
+        
+        // Extract source position from underlying node
+        SourcePosition = new SourcePosition(
+            Line: 0, // Will be calculated from offset
+            Column: 0, // Will be calculated from offset
+            Offset: (int)underlyingNode.SourceStart,
+            Length: (int)underlyingNode.SourceLength
+        );
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the CognitiveGraphNode class without an underlying node.
+    /// </summary>
+    protected CognitiveGraphNode()
+    {
+        HasUnderlyingNode = false;
+    }
 
     /// <summary>
     /// Adds a child node to this node.

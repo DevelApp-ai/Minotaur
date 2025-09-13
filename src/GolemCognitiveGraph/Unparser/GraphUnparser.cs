@@ -1,3 +1,6 @@
+using CognitiveGraph;
+using CognitiveGraph.Schema;
+using CognitiveGraph.Accessors;
 using GolemCognitiveGraph.Core;
 using GolemCognitiveGraph.Visitors;
 using System.Text;

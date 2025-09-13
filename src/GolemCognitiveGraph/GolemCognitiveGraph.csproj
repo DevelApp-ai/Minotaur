@@ -9,10 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.0.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
-    <!-- CognitiveGraph package reference - currently commented out until package is available -->
-    <!-- <PackageReference Include="CognitiveGraph" Version="1.0.0" /> -->
   </ItemGroup>
 
 </Project>

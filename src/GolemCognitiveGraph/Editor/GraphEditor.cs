@@ -1,3 +1,7 @@
+using CognitiveGraph;
+using CognitiveGraph.Builder;
+using CognitiveGraph.Schema;
+using CognitiveGraph.Accessors;
 using GolemCognitiveGraph.Core;
 using GolemCognitiveGraph.Visitors;
 using System.Collections.Concurrent;
@@ -7,6 +11,7 @@ namespace GolemCognitiveGraph.Editor;
 /// <summary>
 /// Core component for performing zero-copy modifications on cognitive graphs.
 /// Implements the strategy pattern for different editing operations.
+/// Uses DevelApp.CognitiveGraph as the underlying data structure.
 /// </summary>
 public class GraphEditor : IDisposable
 {
@@ -15,6 +20,16 @@ public class GraphEditor : IDisposable
     private readonly Stack<EditOperation> _redoStack = new();
     private readonly object _editLock = new();
     private bool _disposed;
+
+    /// <summary>
+    /// Gets the underlying CognitiveGraph.CognitiveGraph instance.
+    /// </summary>
+    public CognitiveGraph.CognitiveGraph? UnderlyingGraph { get; private set; }
+
+    /// <summary>
+    /// Gets the graph builder for creating new nodes.
+    /// </summary>
+    public CognitiveGraphBuilder? GraphBuilder { get; private set; }
 
     /// <summary>
     /// Gets the root node of the graph being edited.
@@ -40,12 +55,54 @@ public class GraphEditor : IDisposable
     /// Initializes a new instance of the GraphEditor class.
     /// </summary>
     /// <param name="root">The root node of the graph to edit.</param>
-    public GraphEditor(CognitiveGraphNode? root = null)
+    /// <param name="underlyingGraph">The underlying CognitiveGraph.CognitiveGraph instance.</param>
+    public GraphEditor(CognitiveGraphNode? root = null, CognitiveGraph.CognitiveGraph? underlyingGraph = null)
     {
+        UnderlyingGraph = underlyingGraph;
+        GraphBuilder = new CognitiveGraphBuilder();
+        
         if (root != null)
         {
             SetRoot(root);
         }
+        else if (underlyingGraph != null)
+        {
+            // Create wrapper node from underlying graph root
+            var rootNode = underlyingGraph.GetRootNode();
+            // TODO: Create appropriate wrapper based on node type
+            // This is a simplified implementation - in practice would need
+            // more sophisticated node wrapping logic
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the GraphEditor class from source code.
+    /// </summary>
+    /// <param name="sourceCode">The source code to parse into a cognitive graph.</param>
+    public GraphEditor(string sourceCode)
+    {
+        GraphBuilder = new CognitiveGraphBuilder();
+        // For demonstration, create a simple root node
+        // In practice, this would involve parsing the source code
+        var rootOffset = GraphBuilder.WriteSymbolNode(
+            symbolId: 1,
+            nodeType: 200,
+            sourceStart: 0,
+            sourceLength: (uint)sourceCode.Length,
+            properties: new List<(string key, PropertyValueType type, object value)>
+            {
+                ("NodeType", PropertyValueType.String, "CompilationUnit"),
+                ("Source", PropertyValueType.String, sourceCode)
+            }
+        );
+        
+        var buffer = GraphBuilder.Build(rootOffset, sourceCode);
+        UnderlyingGraph = new CognitiveGraph.CognitiveGraph(buffer);
+        
+        // Create wrapper root node
+        var underlyingRoot = UnderlyingGraph.GetRootNode();
+        Root = new NonTerminalNode("CompilationUnit", 0, underlyingRoot);
+        RebuildNodeIndex();
     }
 
     /// <summary>
