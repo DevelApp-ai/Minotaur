@@ -29,6 +29,12 @@ public abstract class CognitiveGraphNode
     public bool HasUnderlyingNode { get; protected set; }
 
     /// <summary>
+    /// Reference to the underlying node from StepParser or CognitiveGraph packages.
+    /// Used for zero-copy integration with external parsers.
+    /// </summary>
+    public object? UnderlyingNode { get; set; }
+
+    /// <summary>
     /// The source start position from the underlying node.
     /// </summary>
     protected uint UnderlyingSourceStart { get; set; }
