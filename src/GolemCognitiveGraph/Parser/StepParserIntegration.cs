@@ -12,17 +12,17 @@ public class ParserConfiguration
     /// The language to parse (e.g., "csharp", "javascript", "python")
     /// </summary>
     public string Language { get; set; } = "csharp";
-    
+
     /// <summary>
     /// Whether to include location information in nodes
     /// </summary>
     public bool IncludeLocationInfo { get; set; } = true;
-    
+
     /// <summary>
     /// Whether to preserve comments during parsing
     /// </summary>
     public bool PreserveComments { get; set; } = true;
-    
+
     /// <summary>
     /// Whether to include whitespace tokens
     /// </summary>
@@ -56,7 +56,7 @@ public class StepParserIntegration : IDisposable
         // For now, create a demonstration graph that shows the integration framework
         // This will be replaced with actual StepParser integration once the APIs are stable
         var rootNode = CreateDemoGraphFromSourceCode(sourceCode);
-        
+
         await Task.Delay(1); // Simulate async operation
         return new GraphEditor(rootNode);
     }
@@ -80,10 +80,10 @@ public class StepParserIntegration : IDisposable
     public async Task<GraphEditor> UpdateGraphAsync(GraphEditor editor, string newSourceCode)
     {
         var newGraph = await ParseToEditableGraphAsync(newSourceCode);
-        
+
         // Preserve any metadata from the original graph
         PreserveMetadata(editor.Root, newGraph.Root);
-        
+
         return newGraph;
     }
 
@@ -106,11 +106,11 @@ public class StepParserIntegration : IDisposable
 
             // Simulate parsing validation
             await Task.Delay(1);
-            
+
             // Basic validation - check for balanced braces as an example
             var braceCount = sourceCode.Count(c => c == '{') - sourceCode.Count(c => c == '}');
             var parenCount = sourceCode.Count(c => c == '(') - sourceCode.Count(c => c == ')');
-            
+
             if (braceCount != 0 || parenCount != 0)
             {
                 return new ParseValidationResult
@@ -120,7 +120,7 @@ public class StepParserIntegration : IDisposable
                     TokenCount = EstimateTokenCount(sourceCode)
                 };
             }
-            
+
             return new ParseValidationResult
             {
                 IsValid = true,
@@ -143,20 +143,20 @@ public class StepParserIntegration : IDisposable
     {
         // Create a simplified representation of the source code as a cognitive graph
         // This demonstrates the framework and will be enhanced with actual StepParser integration
-        
+
         var root = new NonTerminalNode("compilation_unit", 0);
         root.Metadata["sourceCode"] = sourceCode;
         root.Metadata["language"] = _config.Language;
         root.Metadata["parserIntegration"] = "StepParser-Ready";
-        
+
         // Simple tokenization demonstration (will be replaced by actual StepLexer)
         var tokens = SimpleTokenize(sourceCode);
         var statement = new NonTerminalNode("statement", 0);
-        
+
         foreach (var token in tokens)
         {
             CognitiveGraphNode node;
-            
+
             if (IsKeyword(token))
             {
                 node = new TerminalNode(token, "keyword");
@@ -174,23 +174,23 @@ public class StepParserIntegration : IDisposable
             {
                 node = new TerminalNode(token, "token");
             }
-            
+
             if (_config.IncludeLocationInfo)
             {
                 node.Metadata["__demo_location"] = $"token_{tokens.ToList().IndexOf(token)}";
             }
-            
+
             statement.AddChild(node);
         }
-        
+
         root.AddChild(statement);
-        
+
         // Add integration markers to show the framework is ready
         var integrationMarker = new TerminalNode("StepParser Integration Ready", "system_comment");
         integrationMarker.Metadata["integration_version"] = "1.0.1";
         integrationMarker.Metadata["ready_for"] = "DevelApp.StepLexer and DevelApp.StepParser";
         root.AddChild(integrationMarker);
-        
+
         return root;
     }
 
@@ -210,34 +210,34 @@ public class StepParserIntegration : IDisposable
     }
 
     #region Helper Methods for Demo Implementation
-    
+
     private IEnumerable<string> SimpleTokenize(string sourceCode)
     {
         // Simple whitespace-based tokenization for demonstration
         // Will be replaced by actual StepLexer tokenization
-        return sourceCode.Split(new[] { ' ', '\t', '\r', '\n', ';', '(', ')', '{', '}', '[', ']' }, 
+        return sourceCode.Split(new[] { ' ', '\t', '\r', '\n', ';', '(', ')', '{', '}', '[', ']' },
                                StringSplitOptions.RemoveEmptyEntries);
     }
 
     private bool IsKeyword(string token)
     {
-        var keywords = new[] { "var", "int", "string", "bool", "class", "public", "private", "static", 
+        var keywords = new[] { "var", "int", "string", "bool", "class", "public", "private", "static",
                               "void", "return", "if", "else", "for", "while", "function", "let", "const" };
         return keywords.Contains(token.ToLowerInvariant());
     }
 
     private bool IsIdentifier(string token)
     {
-        return !string.IsNullOrEmpty(token) && 
-               char.IsLetter(token[0]) && 
+        return !string.IsNullOrEmpty(token) &&
+               char.IsLetter(token[0]) &&
                token.All(c => char.IsLetterOrDigit(c) || c == '_') &&
                !IsKeyword(token);
     }
 
     private bool IsLiteral(string token)
     {
-        return int.TryParse(token, out _) || 
-               double.TryParse(token, out _) || 
+        return int.TryParse(token, out _) ||
+               double.TryParse(token, out _) ||
                bool.TryParse(token, out _) ||
                (token.StartsWith("\"") && token.EndsWith("\""));
     }
@@ -246,10 +246,10 @@ public class StepParserIntegration : IDisposable
     {
         if (int.TryParse(token, out var intValue))
             return intValue;
-        
+
         if (double.TryParse(token, out var doubleValue))
             return doubleValue;
-            
+
         if (bool.TryParse(token, out var boolValue))
             return boolValue;
 
@@ -311,7 +311,7 @@ public static class StepParserIntegrationFactory
             PreserveComments = true
         });
     }
-    
+
     public static StepParserIntegration CreateForJavaScript()
     {
         return new StepParserIntegration(new ParserConfiguration
@@ -321,7 +321,7 @@ public static class StepParserIntegrationFactory
             PreserveComments = true
         });
     }
-    
+
     public static StepParserIntegration CreateForPython()
     {
         return new StepParserIntegration(new ParserConfiguration

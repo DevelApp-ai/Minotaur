@@ -200,19 +200,19 @@ public class StepParserIntegrationTests
     {
         // Arrange
         using var integration = new StepParserIntegration();
-        
+
         // Create initial graph (this will likely fail until StepParser APIs are properly integrated)
         var initialSource = "var x = 42;";
         var newSource = "var y = 24;";
-        
+
         try
         {
             using var initialEditor = await integration.ParseToEditableGraphAsync(initialSource);
             initialEditor.Root.Metadata["userAdded"] = "test";
-            
+
             // Act
             using var updatedEditor = await integration.UpdateGraphAsync(initialEditor, newSource);
-            
+
             // Assert
             Assert.IsTrue(updatedEditor.Root.Metadata.ContainsKey("userAdded"));
             Assert.AreEqual("test", updatedEditor.Root.Metadata["userAdded"]);

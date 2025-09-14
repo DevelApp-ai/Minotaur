@@ -233,10 +233,10 @@ class Program
             // Test validation of source code
             var sourceCode = "var x = 42;";
             Console.WriteLine($"Validating source: {sourceCode}");
-            
+
             var validationResult = await parser.ValidateSourceAsync(sourceCode);
             Console.WriteLine($"Validation result: {(validationResult.IsValid ? "Valid" : "Invalid")}");
-            
+
             if (!validationResult.IsValid)
             {
                 Console.WriteLine($"Errors found: {validationResult.Errors.Length}");
@@ -258,12 +258,12 @@ class Program
                 Console.WriteLine("Successfully created editable graph from source code!");
                 Console.WriteLine($"Root node type: {editor.Root.NodeType}");
                 Console.WriteLine($"Child count: {editor.Root.Children.Count}");
-                
+
                 // Demonstrate that we can still edit the parsed graph
                 var comment = new TerminalNode("This was parsed from source", "comment");
                 editor.InsertNode(editor.Root.Id, comment);
                 Console.WriteLine("Added comment node to parsed graph");
-                
+
                 // Unparse back to code
                 using var unparser = new GraphUnparser();
                 var generatedCode = await unparser.UnparseAsync(editor.Root);
@@ -273,7 +273,7 @@ class Program
             {
                 Console.WriteLine($"Parser integration not yet fully implemented: {ex.GetType().Name}");
                 Console.WriteLine("This is expected until the StepLexer/StepParser APIs are properly integrated");
-                
+
                 // Show that the framework is in place for future integration
                 Console.WriteLine("\nFramework components ready for integration:");
                 Console.WriteLine("  ✓ StepParserIntegration class created");
