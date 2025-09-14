@@ -30,7 +30,7 @@ public abstract class CognitiveGraphVisitorBase : ICognitiveGraphVisitor
     public virtual void Visit(Core.CognitiveGraphNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
-        
+
         BeforeVisitNode(node);
         VisitChildren(node);
         AfterVisitNode(node);
@@ -43,7 +43,7 @@ public abstract class CognitiveGraphVisitorBase : ICognitiveGraphVisitor
     public virtual void VisitChildren(Core.CognitiveGraphNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
-        
+
         foreach (var child in node.Children)
         {
             Visit(child);

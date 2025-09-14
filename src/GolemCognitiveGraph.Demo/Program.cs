@@ -15,10 +15,10 @@ class Program
 
         // Demo 1: Basic graph construction and editing
         await DemoBasicGraphEditing();
-        
+
         // Demo 2: Code unparsing
         await DemoCodeUnparsing();
-        
+
         // Demo 3: Advanced editing operations
         await DemoAdvancedEditing();
 
@@ -62,10 +62,10 @@ class Program
         // Demonstrate undo/redo
         Console.WriteLine("\nTesting undo/redo...");
         Console.WriteLine($"Can undo: {editor.CanUndo}");
-        
+
         editor.Undo(); // Remove right operand
         Console.WriteLine($"After undo: {root.Children.Count} children");
-        
+
         editor.Redo(); // Add right operand back
         Console.WriteLine($"After redo: {root.Children.Count} children");
 
@@ -79,25 +79,25 @@ class Program
 
         // Create a more complex expression: (x + y) * 2
         var root = new NonTerminalNode("expression");
-        
+
         // Left parenthesized expression
         var leftExpr = new NonTerminalNode("parenthesized_expression");
         leftExpr.Metadata["blockType"] = "parentheses";
-        
+
         var x = new IdentifierNode("x");
         var plus = new TerminalNode("+", "operator");
         var y = new IdentifierNode("y");
-        
+
         leftExpr.AddChild(x);
         leftExpr.AddChild(plus);
         leftExpr.AddChild(y);
-        
+
         // Multiplication operator
         var multiply = new TerminalNode("*", "operator");
-        
+
         // Right operand
         var two = new LiteralNode("2", "number", 2);
-        
+
         root.AddChild(leftExpr);
         root.AddChild(multiply);
         root.AddChild(two);
@@ -120,7 +120,7 @@ class Program
         // Add a comment and unparse again
         var comment = new TerminalNode("Calculate result", "comment");
         comment.Metadata["commentType"] = "line";
-        
+
         var commentedRoot = new NonTerminalNode("commented_expression");
         commentedRoot.AddChild(comment);
         commentedRoot.AddChild(root);
@@ -148,18 +148,18 @@ class Program
         var returnType = new IdentifierNode("int");
         var methodName = new IdentifierNode("CalculateSum");
         var parameters = new NonTerminalNode("parameters");
-        
+
         signature.AddChild(returnType);
         signature.AddChild(methodName);
         signature.AddChild(parameters);
-        
+
         editor.InsertNode(method.Id, signature);
         Console.WriteLine("Added method signature");
 
         // Add method body
         var body = new NonTerminalNode("body");
         body.Metadata["blockType"] = "braces";
-        
+
         editor.InsertNode(method.Id, body);
         Console.WriteLine("Added method body");
 
@@ -167,19 +167,19 @@ class Program
         var returnStmt = new NonTerminalNode("return_statement");
         var returnKeyword = new TerminalNode("return", "keyword");
         var returnExpr = new NonTerminalNode("expression");
-        
+
         // Create: a + b
         var a = new IdentifierNode("a");
         var plus = new TerminalNode("+", "operator");
         var b = new IdentifierNode("b");
-        
+
         returnExpr.AddChild(a);
         returnExpr.AddChild(plus);
         returnExpr.AddChild(b);
-        
+
         returnStmt.AddChild(returnKeyword);
         returnStmt.AddChild(returnExpr);
-        
+
         editor.InsertNode(body.Id, returnStmt);
         Console.WriteLine("Added return statement: return a + b;");
 
@@ -189,11 +189,11 @@ class Program
         var x = new IdentifierNode("x");
         var multiply = new TerminalNode("*", "operator");
         var y = new IdentifierNode("y");
-        
+
         newExpr.AddChild(x);
         newExpr.AddChild(multiply);
         newExpr.AddChild(y);
-        
+
         editor.ReplaceNode(returnExpr.Id, newExpr, preserveChildren: false);
         Console.WriteLine("Replacement completed");
 

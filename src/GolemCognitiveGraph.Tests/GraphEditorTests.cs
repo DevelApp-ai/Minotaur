@@ -12,10 +12,10 @@ public class GraphEditorTests
     {
         // Arrange
         var root = new NonTerminalNode("root");
-        
+
         // Act
         using var editor = new GraphEditor(root);
-        
+
         // Assert
         Assert.IsNotNull(editor.Root);
         Assert.AreEqual(root.Id, editor.Root.Id);
@@ -29,10 +29,10 @@ public class GraphEditorTests
         var root = new NonTerminalNode("root");
         using var editor = new GraphEditor(root);
         var child = new TerminalNode("test", "identifier");
-        
+
         // Act
         var operation = editor.InsertNode(root.Id, child);
-        
+
         // Assert
         Assert.IsNotNull(operation);
         Assert.AreEqual("InsertNode", operation.OperationType);
@@ -49,10 +49,10 @@ public class GraphEditorTests
         var child = new TerminalNode("test", "identifier");
         root.AddChild(child);
         using var editor = new GraphEditor(root);
-        
+
         // Act
         var operation = editor.RemoveNode(child.Id);
-        
+
         // Assert
         Assert.IsNotNull(operation);
         Assert.AreEqual("RemoveNode", operation.OperationType);
@@ -67,16 +67,16 @@ public class GraphEditorTests
         var root = new NonTerminalNode("root");
         using var editor = new GraphEditor(root);
         var child = new TerminalNode("test", "identifier");
-        
+
         // Act - Insert and then undo
         editor.InsertNode(root.Id, child);
         Assert.AreEqual(1, root.Children.Count);
         Assert.IsTrue(editor.CanUndo);
-        
+
         editor.Undo();
         Assert.AreEqual(0, root.Children.Count);
         Assert.IsTrue(editor.CanRedo);
-        
+
         editor.Redo();
         Assert.AreEqual(1, root.Children.Count);
         Assert.IsFalse(editor.CanRedo);
@@ -90,12 +90,12 @@ public class GraphEditorTests
         var child = new TerminalNode("test", "identifier");
         root.AddChild(child);
         using var editor = new GraphEditor(root);
-        
+
         // Act
         var foundRoot = editor.FindNode(root.Id);
         var foundChild = editor.FindNode(child.Id);
         var notFound = editor.FindNode(Guid.NewGuid());
-        
+
         // Assert
         Assert.IsNotNull(foundRoot);
         Assert.AreEqual(root.Id, foundRoot.Id);
@@ -114,12 +114,12 @@ public class GraphEditorTests
         child.AddChild(grandchild);
         root.AddChild(child);
         using var editor = new GraphEditor(root);
-        
+
         var replacement = new TerminalNode("new", "identifier");
-        
+
         // Act
         var operation = editor.ReplaceNode(child.Id, replacement, preserveChildren: true);
-        
+
         // Assert
         Assert.IsNotNull(operation);
         Assert.AreEqual("ReplaceNode", operation.OperationType);
@@ -138,16 +138,16 @@ public class GraphEditorTests
         var parent1 = new NonTerminalNode("parent1");
         var parent2 = new NonTerminalNode("parent2");
         var child = new TerminalNode("moveme", "identifier");
-        
+
         root.AddChild(parent1);
         root.AddChild(parent2);
         parent1.AddChild(child);
-        
+
         using var editor = new GraphEditor(root);
-        
+
         // Act
         var operation = editor.MoveNode(child.Id, parent2.Id);
-        
+
         // Assert
         Assert.IsNotNull(operation);
         Assert.AreEqual("MoveNode", operation.OperationType);
@@ -164,7 +164,7 @@ public class GraphEditorTests
         // Arrange
         var root = new NonTerminalNode("root");
         using var editor = new GraphEditor(root);
-        
+
         // Act
         editor.RemoveNode(root.Id);
     }
@@ -176,7 +176,7 @@ public class GraphEditorTests
         // Arrange
         var root = new NonTerminalNode("root");
         using var editor = new GraphEditor(root);
-        
+
         // Act
         editor.Undo();
     }

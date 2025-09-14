@@ -60,7 +60,7 @@ public class GraphEditor : IDisposable
     {
         UnderlyingGraph = underlyingGraph;
         GraphBuilder = new CognitiveGraphBuilder();
-        
+
         if (root != null)
         {
             SetRoot(root);
@@ -95,10 +95,10 @@ public class GraphEditor : IDisposable
                 ("Source", PropertyValueType.String, sourceCode)
             }
         );
-        
+
         var buffer = GraphBuilder.Build(rootOffset, sourceCode);
         UnderlyingGraph = new CognitiveGraph.CognitiveGraph(buffer);
-        
+
         // Create wrapper root node
         var underlyingRoot = UnderlyingGraph.GetRootNode();
         Root = new NonTerminalNode("CompilationUnit", 0, underlyingRoot);
@@ -112,7 +112,7 @@ public class GraphEditor : IDisposable
     public void SetRoot(CognitiveGraphNode root)
     {
         ArgumentNullException.ThrowIfNull(root);
-        
+
         lock (_editLock)
         {
             Root = root;
@@ -130,7 +130,7 @@ public class GraphEditor : IDisposable
     public EditOperation InsertNode(Guid parentId, CognitiveGraphNode newNode, int? index = null)
     {
         ArgumentNullException.ThrowIfNull(newNode);
-        
+
         lock (_editLock)
         {
             if (!_nodeIndex.TryGetValue(parentId, out var parent))
@@ -179,7 +179,7 @@ public class GraphEditor : IDisposable
     public EditOperation ReplaceNode(Guid nodeId, CognitiveGraphNode replacement, bool preserveChildren = true)
     {
         ArgumentNullException.ThrowIfNull(replacement);
-        
+
         lock (_editLock)
         {
             if (!_nodeIndex.TryGetValue(nodeId, out var node))
@@ -235,7 +235,7 @@ public class GraphEditor : IDisposable
             var operation = _undoStack.Pop();
             operation.Undo(this);
             _redoStack.Push(operation);
-            
+
             OnGraphModified(new GraphModifiedEventArgs(operation, GraphModificationType.Undo));
         }
     }
@@ -255,7 +255,7 @@ public class GraphEditor : IDisposable
             var operation = _redoStack.Pop();
             operation.Execute(this);
             _undoStack.Push(operation);
-            
+
             OnGraphModified(new GraphModifiedEventArgs(operation, GraphModificationType.Redo));
         }
     }
@@ -275,14 +275,14 @@ public class GraphEditor : IDisposable
         operation.Execute(this);
         _undoStack.Push(operation);
         _redoStack.Clear(); // Clear redo stack when new operation is executed
-        
+
         OnGraphModified(new GraphModifiedEventArgs(operation, GraphModificationType.Execute));
     }
 
     private void RebuildNodeIndex()
     {
         _nodeIndex.Clear();
-        
+
         if (Root != null)
         {
             var indexBuilder = new NodeIndexBuilder(_nodeIndex);

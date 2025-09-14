@@ -130,7 +130,7 @@ public class OperatorUnparseStrategy : UnparseStrategyBase
 
         // Add spacing around operators based on type
         var needsSpacing = ShouldAddSpacing(text);
-        
+
         if (needsSpacing)
         {
             context.Write($" {text} ");
@@ -213,7 +213,7 @@ public class BlockUnparseStrategy : UnparseStrategyBase
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var blockType = GetMetadataString(node, "blockType");
-        
+
         switch (blockType.ToLowerInvariant())
         {
             case "braces":
@@ -272,7 +272,7 @@ public class StatementUnparseStrategy : UnparseStrategyBase
         var needsSemicolon = GetMetadataString(node, "needsSemicolon") != "false";
 
         // Process the statement content through child nodes
-        
+
         // Add semicolon if needed
         if (needsSemicolon && !IsBlockStatement(statementType))
         {

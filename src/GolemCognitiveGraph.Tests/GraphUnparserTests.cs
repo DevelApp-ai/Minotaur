@@ -16,16 +16,16 @@ public class GraphUnparserTests
         var op = new TerminalNode("+", "operator");
         op.NodeType = "operator";  // Set node type explicitly
         var right = new LiteralNode("5", "number", 5);
-        
+
         root.AddChild(left);
         root.AddChild(op);
         root.AddChild(right);
-        
+
         using var unparser = new GraphUnparser();
-        
+
         // Act
         var result = unparser.Unparse(root);
-        
+
         // Assert
         Assert.IsNotNull(result);
         StringAssert.Contains(result, "x");
@@ -42,16 +42,16 @@ public class GraphUnparserTests
         comment.NodeType = "comment";  // Set node type explicitly
         comment.Metadata["commentType"] = "line";
         var stmt = new IdentifierNode("x");
-        
+
         root.AddChild(comment);
         root.AddChild(stmt);
-        
+
         var config = new UnparseConfiguration { IncludeComments = true };
         using var unparser = new GraphUnparser(config);
-        
+
         // Act
         var result = unparser.Unparse(root);
-        
+
         // Assert
         StringAssert.Contains(result, "// This is a comment");
         StringAssert.Contains(result, "x");
@@ -66,16 +66,16 @@ public class GraphUnparserTests
         comment.NodeType = "comment";  // Set node type explicitly
         comment.Metadata["commentType"] = "line";
         var stmt = new IdentifierNode("x");
-        
+
         root.AddChild(comment);
         root.AddChild(stmt);
-        
+
         var config = new UnparseConfiguration { IncludeComments = false };
         using var unparser = new GraphUnparser(config);
-        
+
         // Act
         var result = unparser.Unparse(root);
-        
+
         // Assert
         Assert.IsFalse(result.Contains("// This is a comment"));
         StringAssert.Contains(result, "x");
@@ -87,10 +87,10 @@ public class GraphUnparserTests
         // Arrange
         var root = new IdentifierNode("test");
         using var unparser = new GraphUnparser();
-        
+
         // Act
         var result = await unparser.UnparseAsync(root);
-        
+
         // Assert
         Assert.IsNotNull(result);
         StringAssert.Contains(result, "test");
@@ -101,20 +101,20 @@ public class GraphUnparserTests
     {
         // Arrange
         var root = new NonTerminalNode("literals");
-        
+
         var stringLit = new LiteralNode("hello", "string", "hello");
         var numberLit = new LiteralNode("42", "number", 42);
         var boolLit = new LiteralNode("true", "boolean", true);
-        
+
         root.AddChild(stringLit);
         root.AddChild(numberLit);
         root.AddChild(boolLit);
-        
+
         using var unparser = new GraphUnparser();
-        
+
         // Act
         var result = unparser.Unparse(root);
-        
+
         // Assert
         StringAssert.Contains(result, "\"hello\"");
         StringAssert.Contains(result, "42");
@@ -130,16 +130,16 @@ public class GraphUnparserTests
         var op = new TerminalNode("==", "operator");
         op.NodeType = "operator";  // Set node type explicitly
         var right = new IdentifierNode("b");
-        
+
         root.AddChild(left);
         root.AddChild(op);
         root.AddChild(right);
-        
+
         using var unparser = new GraphUnparser();
-        
+
         // Act
         var result = unparser.Unparse(root);
-        
+
         // Assert
         StringAssert.Contains(result, "a == b");
     }
@@ -151,13 +151,13 @@ public class GraphUnparserTests
         var root = new NonTerminalNode("custom");
         root.NodeType = "custom";
         root.Metadata["text"] = "custom_content";
-        
+
         using var unparser = new GraphUnparser();
         unparser.RegisterStrategy("custom", new CustomUnparseStrategy());
-        
+
         // Act
         var result = unparser.Unparse(root);
-        
+
         // Assert
         StringAssert.Contains(result, "CUSTOM: custom_content");
     }

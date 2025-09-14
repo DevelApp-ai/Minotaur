@@ -30,7 +30,7 @@ public class TerminalNode : CognitiveGraphNode
         Text = text;
         TokenType = tokenType;
         NodeType = "terminal";
-        
+
         // Store text in metadata for unparser access
         Metadata["text"] = text;
         Metadata["tokenType"] = tokenType;
@@ -47,7 +47,7 @@ public class TerminalNode : CognitiveGraphNode
         Text = text;
         TokenType = tokenType;
         NodeType = "terminal";
-        
+
         // Store text in metadata for unparser access
         Metadata["text"] = text;
         Metadata["tokenType"] = tokenType;
@@ -116,7 +116,7 @@ public class NonTerminalNode : CognitiveGraphNode
         RuleName = ruleName;
         ProductionIndex = productionIndex;
         NodeType = "nonterminal";
-        
+
         // Store rule information in metadata
         Metadata["ruleName"] = ruleName;
         Metadata["productionIndex"] = productionIndex;
@@ -133,7 +133,7 @@ public class NonTerminalNode : CognitiveGraphNode
         RuleName = ruleName;
         ProductionIndex = productionIndex;
         NodeType = "nonterminal";
-        
+
         // Store rule information in metadata
         Metadata["ruleName"] = ruleName;
         Metadata["productionIndex"] = productionIndex;
@@ -209,7 +209,7 @@ public class LiteralNode : TerminalNode
         LiteralType = literalType;
         Value = value;
         NodeType = "literal";
-        
+
         // Store literal information in metadata
         Metadata["literalType"] = literalType;
         Metadata["value"] = value ?? text;
@@ -270,7 +270,7 @@ public class IdentifierNode : TerminalNode
         Namespace = namespaceName;
         IsQualified = !string.IsNullOrEmpty(namespaceName);
         NodeType = "identifier";
-        
+
         // Store identifier information in metadata
         Metadata["namespace"] = namespaceName ?? string.Empty;
         Metadata["isQualified"] = IsQualified;

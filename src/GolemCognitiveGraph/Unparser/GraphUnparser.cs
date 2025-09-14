@@ -36,7 +36,7 @@ public class GraphUnparser : IDisposable
     {
         ArgumentNullException.ThrowIfNull(nodeType);
         ArgumentNullException.ThrowIfNull(strategy);
-        
+
         _strategies[nodeType] = strategy;
     }
 
@@ -48,10 +48,10 @@ public class GraphUnparser : IDisposable
     public string Unparse(CognitiveGraphNode node)
     {
         ArgumentNullException.ThrowIfNull(node);
-        
+
         var context = new UnparseContext(_configuration);
         var visitor = new UnparseVisitor(_strategies, context);
-        
+
         node.Accept(visitor);
         return context.GetResult();
     }
@@ -65,7 +65,7 @@ public class GraphUnparser : IDisposable
     public async Task<string> UnparseAsync(CognitiveGraphNode node, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(node);
-        
+
         return await Task.Run(() => Unparse(node), cancellationToken);
     }
 
@@ -79,7 +79,7 @@ public class GraphUnparser : IDisposable
     {
         ArgumentNullException.ThrowIfNull(node);
         ArgumentNullException.ThrowIfNull(stream);
-        
+
         var result = await UnparseAsync(node, cancellationToken);
         var bytes = Encoding.UTF8.GetBytes(result);
         await stream.WriteAsync(bytes, cancellationToken);
@@ -209,7 +209,7 @@ public class UnparseContext
         {
             Write(text);
         }
-        
+
         _output.Append(_configuration.LineEnding);
         _atLineStart = true;
     }
@@ -277,7 +277,7 @@ internal class UnparseVisitor : CognitiveGraphVisitorBase
             // Fallback strategy for unknown node types
             _context.Write($"/* Unknown node type: {node.NodeType} */");
         }
-        
+
         // Then visit children
         VisitChildren(node);
     }

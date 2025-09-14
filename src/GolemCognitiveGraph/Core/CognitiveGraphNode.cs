@@ -69,7 +69,7 @@ public abstract class CognitiveGraphNode
         HasUnderlyingNode = true;
         UnderlyingSourceStart = underlyingNode.SourceStart;
         UnderlyingSourceLength = underlyingNode.SourceLength;
-        
+
         // Extract source position from underlying node
         SourcePosition = new SourcePosition(
             Line: 0, // Will be calculated from offset
@@ -94,7 +94,7 @@ public abstract class CognitiveGraphNode
     public virtual void AddChild(CognitiveGraphNode child)
     {
         ArgumentNullException.ThrowIfNull(child);
-        
+
         if (child.Parent != null)
         {
             throw new InvalidOperationException("Node already has a parent");

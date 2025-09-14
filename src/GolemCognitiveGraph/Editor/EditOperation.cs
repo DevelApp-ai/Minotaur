@@ -99,7 +99,7 @@ public class InsertNodeOperation : EditOperation
 public class RemoveNodeOperation : EditOperation
 {
     public Guid NodeId { get; }
-    
+
     // State for undo
     private Guid _originalParentId;
     private int _originalIndex;
