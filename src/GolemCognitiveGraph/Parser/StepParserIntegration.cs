@@ -1,5 +1,6 @@
 using GolemCognitiveGraph.Core;
 using GolemCognitiveGraph.Editor;
+using GolemCognitiveGraph.Plugins;
 
 namespace GolemCognitiveGraph.Parser;
 
@@ -32,45 +33,63 @@ public class ParserConfiguration
 /// <summary>
 /// Integrates with DevelApp.StepLexer and DevelApp.StepParser NuGet packages (1.0.1).
 /// Provides seamless conversion between source code and cognitive graphs for editing.
-/// Ready for integration when the actual package APIs are stable.
+/// Uses the RuntimePluggableClassFactory system for extensible language support.
 /// </summary>
 public class StepParserIntegration : IDisposable
 {
     private readonly ParserConfiguration _config;
+    private readonly LanguagePluginManager _pluginManager;
     private bool _disposed;
 
-    public StepParserIntegration(ParserConfiguration? config = null)
+    public StepParserIntegration(ParserConfiguration? config = null, LanguagePluginManager? pluginManager = null)
     {
         _config = config ?? new ParserConfiguration();
+        _pluginManager = pluginManager ?? new LanguagePluginManager();
     }
 
     /// <summary>
+    /// Gets the language plugin manager for accessing extensible language support
+    /// </summary>
+    public LanguagePluginManager PluginManager => _pluginManager;
+
+    /// <summary>
     /// Parses source code into a cognitive graph using StepParser and creates a GraphEditor for manipulation.
-    /// Currently returns a demonstration graph until the actual StepParser API integration is complete.
+    /// Uses the appropriate language plugin for language-specific parsing.
     /// </summary>
     public async Task<GraphEditor> ParseToEditableGraphAsync(string sourceCode)
     {
         if (string.IsNullOrEmpty(sourceCode))
             throw new ArgumentException("Source code cannot be null or empty", nameof(sourceCode));
 
-        // For now, create a demonstration graph that shows the integration framework
-        // This will be replaced with actual StepParser integration once the APIs are stable
-        var rootNode = CreateDemoGraphFromSourceCode(sourceCode);
+        var plugin = _pluginManager.GetPlugin(_config.Language);
+        if (plugin != null)
+        {
+            // Use the language plugin for parsing
+            var rootNode = await plugin.ParseAsync(sourceCode);
+            return new GraphEditor(rootNode);
+        }
 
-        await Task.Delay(1); // Simulate async operation
-        return new GraphEditor(rootNode);
+        // Fallback to demonstration graph if no plugin is available
+        var fallbackNode = CreateDemoGraphFromSourceCode(sourceCode);
+        return new GraphEditor(fallbackNode);
     }
 
     /// <summary>
     /// Parses source code and returns the raw cognitive graph without editor wrapper.
-    /// Currently returns a demonstration graph until the actual StepParser API integration is complete.
+    /// Uses the appropriate language plugin for language-specific parsing.
     /// </summary>
     public async Task<CognitiveGraphNode> ParseToCognitiveGraphAsync(string sourceCode)
     {
         if (string.IsNullOrEmpty(sourceCode))
             throw new ArgumentException("Source code cannot be null or empty", nameof(sourceCode));
 
-        await Task.Delay(1); // Simulate async operation
+        var plugin = _pluginManager.GetPlugin(_config.Language);
+        if (plugin != null)
+        {
+            return await plugin.ParseAsync(sourceCode);
+        }
+
+        // Fallback to demonstration graph if no plugin is available
         return CreateDemoGraphFromSourceCode(sourceCode);
     }
 
@@ -82,13 +101,16 @@ public class StepParserIntegration : IDisposable
         var newGraph = await ParseToEditableGraphAsync(newSourceCode);
 
         // Preserve any metadata from the original graph
-        PreserveMetadata(editor.Root, newGraph.Root);
+        if (editor.Root != null && newGraph.Root != null)
+        {
+            PreserveMetadata(editor.Root, newGraph.Root);
+        }
 
         return newGraph;
     }
 
     /// <summary>
-    /// Validates that source code can be parsed without errors
+    /// Validates that source code can be parsed without errors using the appropriate language plugin
     /// </summary>
     public async Task<ParseValidationResult> ValidateSourceAsync(string sourceCode)
     {
@@ -104,7 +126,25 @@ public class StepParserIntegration : IDisposable
                 };
             }
 
-            // Simulate parsing validation
+            var plugin = _pluginManager.GetPlugin(_config.Language);
+            if (plugin != null)
+            {
+                var validationResult = await plugin.ValidateAsync(sourceCode);
+                return new ParseValidationResult
+                {
+                    IsValid = validationResult.IsValid,
+                    Errors = validationResult.Errors.Select(e => new ParseError
+                    {
+                        Message = e.Message,
+                        Type = e.Code,
+                        Line = e.Line,
+                        Column = e.Column
+                    }).ToArray(),
+                    TokenCount = await EstimateTokenCountAsync(sourceCode)
+                };
+            }
+
+            // Fallback validation if no plugin is available
             await Task.Delay(1);
 
             // Basic validation - check for balanced braces as an example
@@ -259,6 +299,18 @@ public class StepParserIntegration : IDisposable
         return token;
     }
 
+    private async Task<int> EstimateTokenCountAsync(string sourceCode)
+    {
+        var plugin = _pluginManager.GetPlugin(_config.Language);
+        if (plugin != null)
+        {
+            var tokens = await plugin.TokenizeAsync(sourceCode);
+            return tokens.Count();
+        }
+
+        return EstimateTokenCount(sourceCode);
+    }
+
     private int EstimateTokenCount(string sourceCode)
     {
         return SimpleTokenize(sourceCode).Count();
@@ -270,7 +322,7 @@ public class StepParserIntegration : IDisposable
     {
         if (!_disposed)
         {
-            // Future: Dispose of actual StepLexer/StepParser instances
+            _pluginManager?.Dispose();
             _disposed = true;
         }
     }
@@ -298,37 +350,60 @@ public class ParseError
 }
 
 /// <summary>
-/// Factory methods for creating commonly used integrations
+/// Factory methods for creating commonly used integrations with plugin support
 /// </summary>
 public static class StepParserIntegrationFactory
 {
-    public static StepParserIntegration CreateForCSharp()
+    public static StepParserIntegration CreateForCSharp(LanguagePluginManager? pluginManager = null)
     {
         return new StepParserIntegration(new ParserConfiguration
         {
             Language = "csharp",
             IncludeLocationInfo = true,
             PreserveComments = true
-        });
+        }, pluginManager);
     }
 
-    public static StepParserIntegration CreateForJavaScript()
+    public static StepParserIntegration CreateForJavaScript(LanguagePluginManager? pluginManager = null)
     {
         return new StepParserIntegration(new ParserConfiguration
         {
             Language = "javascript",
             IncludeLocationInfo = true,
             PreserveComments = true
-        });
+        }, pluginManager);
     }
 
-    public static StepParserIntegration CreateForPython()
+    public static StepParserIntegration CreateForPython(LanguagePluginManager? pluginManager = null)
     {
         return new StepParserIntegration(new ParserConfiguration
         {
             Language = "python",
             IncludeLocationInfo = true,
             PreserveComments = true
-        });
+        }, pluginManager);
+    }
+
+    /// <summary>
+    /// Creates an integration for a specific file extension using plugin auto-detection
+    /// </summary>
+    public static StepParserIntegration CreateForFile(string filePath, LanguagePluginManager? pluginManager = null)
+    {
+        var manager = pluginManager ?? new LanguagePluginManager();
+        var extension = Path.GetExtension(filePath);
+        var plugin = manager.GetPluginByExtension(extension);
+
+        if (plugin != null)
+        {
+            return new StepParserIntegration(new ParserConfiguration
+            {
+                Language = plugin.LanguageId,
+                IncludeLocationInfo = true,
+                PreserveComments = true
+            }, manager);
+        }
+
+        // Default to C# if no plugin is found
+        return CreateForCSharp(manager);
     }
 }

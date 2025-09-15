@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="DevelApp.CognitiveGraph" Version="1.0.0" />
+    <PackageReference Include="DevelApp.RuntimePluggableClassFactory.Interface" Version="2.0.1" />
+    <PackageReference Include="DevelApp.RuntimePluggableClassFactory" Version="2.0.1" />
     <PackageReference Include="DevelApp.StepLexer" Version="1.0.1" />
     <PackageReference Include="DevelApp.StepParser" Version="1.0.1" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
