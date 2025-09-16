@@ -1,9 +1,9 @@
 namespace GolemCognitiveGraph.Plugins;
 
 /// <summary>
-/// Interface for language-specific unparsing and compiler-compiler generation plugins.
+/// Interface for language-specific unparsing plugins.
 /// Implements the runtime pluggable class factory pattern for extensibility.
-/// Note: Parsing is handled by DevelApp.StepParser - plugins focus on code generation.
+/// NOTE: All parsing, grammar, and syntax is handled by DevelApp.StepParser - plugins only generate code.
 /// </summary>
 public interface ILanguagePlugin
 {
@@ -24,20 +24,14 @@ public interface ILanguagePlugin
 
     /// <summary>
     /// Generate source code from a cognitive graph using language-specific unparsing rules.
-    /// This is the primary function of language plugins.
+    /// This is the ONLY function of language plugins - all grammar/syntax comes from StepParser.
     /// </summary>
     Task<string> UnparseAsync(Core.CognitiveGraphNode graph);
 
     /// <summary>
-    /// Generate compiler-compiler grammar rules for this language.
-    /// Used for extending the system with new language backends.
+    /// Get cosmetic code formatting options for output (NOT syntax-related)
     /// </summary>
-    Task<CompilerGeneratorRules> GenerateCompilerRulesAsync();
-
-    /// <summary>
-    /// Get language-specific formatting options for code generation
-    /// </summary>
-    LanguageFormattingOptions GetFormattingOptions();
+    CodeFormattingOptions GetFormattingOptions();
 
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid code for this language
@@ -46,48 +40,16 @@ public interface ILanguagePlugin
 }
 
 /// <summary>
-/// Compiler-compiler grammar rules for language generation
+/// Cosmetic code formatting options for output (NOT syntax-related - syntax comes from StepParser grammar)
 /// </summary>
-public class CompilerGeneratorRules
-{
-    public string LanguageId { get; set; } = string.Empty;
-    public List<GrammarRule> ProductionRules { get; set; } = new();
-    public List<LexicalRule> LexicalRules { get; set; } = new();
-    public Dictionary<string, object> LanguageMetadata { get; set; } = new();
-}
-
-/// <summary>
-/// Grammar production rule for compiler generation
-/// </summary>
-public class GrammarRule
-{
-    public string NonTerminal { get; set; } = string.Empty;
-    public List<string> Productions { get; set; } = new();
-    public Dictionary<string, object> Attributes { get; set; } = new();
-}
-
-/// <summary>
-/// Lexical rule for token recognition
-/// </summary>
-public class LexicalRule
-{
-    public string TokenType { get; set; } = string.Empty;
-    public string Pattern { get; set; } = string.Empty;
-    public int Priority { get; set; }
-    public Dictionary<string, object> Attributes { get; set; } = new();
-}
-
-/// <summary>
-/// Language-specific formatting options for code generation
-/// </summary>
-public class LanguageFormattingOptions
+public class CodeFormattingOptions
 {
     public string IndentStyle { get; set; } = "spaces"; // "spaces" or "tabs"
     public int IndentSize { get; set; } = 4;
     public string LineEnding { get; set; } = "\n";
     public bool InsertTrailingNewline { get; set; } = true;
     public int MaxLineLength { get; set; } = 120;
-    public Dictionary<string, object> LanguageSpecific { get; set; } = new();
+    public Dictionary<string, object> CosmeticOptions { get; set; } = new();
 }
 
 /// <summary>

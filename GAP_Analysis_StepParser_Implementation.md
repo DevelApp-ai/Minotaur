@@ -45,20 +45,32 @@ This document analyzes the gaps between the current Minotaur system implementati
    - **Plugin system provides compiler-compiler extensibility** for new language backends
    - Zero-copy integration between StepParser and Cognitive Graph Editor
 
-6. **Extensible Plugin System (via RuntimePluggableClassFactory)**
+6. **Extensible Plugin System (via RuntimePluggableClassFactory) - CORRECTED ARCHITECTURE**
    - DevelApp.RuntimePluggableClassFactory 2.0.1: Plugin discovery and loading
-   - ILanguagePlugin interface for unparsing and compiler-compiler generation
+   - ILanguagePlugin interface for UNPARSING ONLY (no grammar/syntax - StepParser is single source of truth)
    - Built-in plugins for C#, JavaScript, and Python unparsing
-   - Language-specific formatting options and validation for unparsing
-   - Compiler-compiler rule generation for extending to new languages
+   - Cosmetic formatting options that do not affect syntax or grammar
+   - Unparsing validation for cognitive graph to code generation
 
 7. **Comprehensive Testing**
    - 41 comprehensive unit tests covering all functionality (100% passing)
    - Integration tests for StepParser NuGet package integration
    - Graph editing tests covering CRUD operations and undo/redo
    - Unparser tests covering multiple language strategies
-   - Plugin system tests for unparsing and compiler-compiler generation
-   - Demo application showcasing complete end-to-end workflow
+   - Plugin system tests for unparsing validation (no grammar/syntax testing in plugins)
+   - Demo application showcasing StepParser (grammar) → Graph editing → Plugin unparsing workflow
+
+## 📋 ARCHITECTURAL CORRECTION SUMMARY
+
+**CRITICAL FIX**: Removed grammar and syntax handling from plugins to preserve StepParser as the single source of truth for all language grammar and syntax. 
+
+**Plugin responsibilities CORRECTED to**:
+- ✅ Code generation/unparsing from cognitive graphs
+- ✅ Cosmetic formatting preferences (indentation, line endings, etc.)
+- ✅ Output validation for generated code
+- ❌ **REMOVED**: Grammar rule generation (violates StepParser authority)
+- ❌ **REMOVED**: Lexical rule generation (violates StepParser authority)  
+- ❌ **REMOVED**: Syntax-affecting formatting (violates StepParser authority)
 
 ## 🔴 Remaining Gaps vs Documentation Requirements
 
@@ -111,16 +123,16 @@ This document analyzes the gaps between the current Minotaur system implementati
 ### 4. Compiler-Compiler Generation (Document 4 & 5)
 
 **Required**: Grammar rule generation for new languages
-**Current Status**: ✅ **IMPLEMENTED** - Plugin system provides CompilerGeneratorRules
-**Gap**: **CLOSED** - Plugins can generate grammar production rules and lexical rules
+**Current Status**: ⚠️ **ARCHITECTURAL CORRECTION REQUIRED** - Removed from plugins to preserve StepParser as single source of truth
+**Gap**: **CLOSED** - Grammar generation must be handled by StepParser grammar files, not plugins
 
 **Required**: Extensible language backends
-**Current Status**: ✅ **IMPLEMENTED** - RuntimePluggableClassFactory for plugin extensibility
-**Gap**: **CLOSED** - New languages can be added via plugins without recompilation
+**Current Status**: ✅ **IMPLEMENTED** - RuntimePluggableClassFactory for plugin extensibility (unparsing only)
+**Gap**: **CLOSED** - New languages can be added via plugins for unparsing without recompilation
 
-**Required**: Language-specific formatting and code generation
-**Current Status**: ✅ **IMPLEMENTED** - LanguageFormattingOptions and language-specific unparsing
-**Gap**: **CLOSED** - Each plugin provides formatting rules and code generation capabilities
+**Required**: Language-specific code generation (NOT syntax/grammar)
+**Current Status**: ✅ **IMPLEMENTED** - CodeFormattingOptions and language-specific unparsing
+**Gap**: **CLOSED** - Each plugin provides cosmetic formatting and code generation capabilities
 
 ## 📊 Implementation Completeness Summary
 

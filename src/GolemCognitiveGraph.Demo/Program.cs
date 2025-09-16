@@ -305,21 +305,21 @@ class Program
 
     static async Task DemoPluginSystem()
     {
-        Console.WriteLine("5. Plugin System Demo - Unparsing & Compiler-Compiler Generation");
-        Console.WriteLine("==================================================================");
+        Console.WriteLine("5. Plugin System Demo - Unparsing ONLY (StepParser handles all grammar/syntax)");
+        Console.WriteLine("================================================================================");
 
         try
         {
-            // Demo the language plugin manager - NOTE: Plugins handle UNPARSING only
+            // Demo the language plugin manager - NOTE: Plugins handle UNPARSING only, NO grammar
             using var pluginManager = new LanguagePluginManager();
 
-            Console.WriteLine("Registered Language Plugins (for unparsing and compiler-compiler generation):");
+            Console.WriteLine("Registered Language Plugins (for unparsing ONLY - grammar comes from StepParser):");
             foreach (var kvp in pluginManager.RegisteredPlugins)
             {
                 var plugin = kvp.Value;
                 Console.WriteLine($"  • {plugin.DisplayName} ({plugin.LanguageId})");
                 Console.WriteLine($"    Extensions: {string.Join(", ", plugin.SupportedExtensions)}");
-                Console.WriteLine($"    Purpose: Code generation and compiler-compiler rules");
+                Console.WriteLine($"    Purpose: Code generation ONLY (no grammar/syntax handling)");
             }
 
             Console.WriteLine("\nSupported File Extensions for Code Generation:");
@@ -327,7 +327,7 @@ class Program
             Console.WriteLine($"  {string.Join(", ", extensions)}");
 
             // Demo file-based plugin selection for unparsing
-            Console.WriteLine("\nFile-based Language Detection (for code generation):");
+            Console.WriteLine("\nFile-based Language Detection (for code generation only):");
             var testFiles = new[] { "Program.cs", "script.js", "main.py", "unknown.txt" };
             foreach (var file in testFiles)
             {
@@ -343,7 +343,7 @@ class Program
             }
 
             // Demo language-specific unparsing (NOT parsing - parsing is handled by StepParser)
-            Console.WriteLine("\nLanguage-specific Unparsing Capabilities:");
+            Console.WriteLine("\nLanguage-specific Unparsing Capabilities (grammar/syntax from StepParser):");
 
             // Create test cognitive graphs for unparsing
             var testGraphs = new Dictionary<string, CognitiveGraphNode>
@@ -375,25 +375,22 @@ class Program
                         }
                     }
 
-                    // Test unparsing (code generation)
+                    // Test unparsing (code generation) - the ONLY thing plugins do
                     var generated = await plugin.UnparseAsync(graph);
                     Console.WriteLine($"    Generated code: {generated.Replace("\n", " ").Replace("\r", "").Trim()}");
 
-                    // Test compiler-compiler generation
-                    var compilerRules = await plugin.GenerateCompilerRulesAsync();
-                    Console.WriteLine($"    Compiler rules: {compilerRules.ProductionRules.Count} productions, {compilerRules.LexicalRules.Count} lexical rules");
-
-                    // Test formatting options
+                    // Test cosmetic formatting options (NOT syntax - syntax comes from StepParser)
                     var formatting = plugin.GetFormattingOptions();
-                    Console.WriteLine($"    Formatting: {formatting.IndentSize} {formatting.IndentStyle}, max line {formatting.MaxLineLength}");
+                    Console.WriteLine($"    Cosmetic formatting: {formatting.IndentSize} {formatting.IndentStyle}, max line {formatting.MaxLineLength}");
                 }
             }
 
             // Demo integration between StepParser (for parsing) and Plugins (for unparsing)
             Console.WriteLine("\nIntegrated StepParser + Plugin System Architecture:");
             using var integration = StepParserIntegrationFactory.CreateForFile("Example.cs", pluginManager);
-            Console.WriteLine($"  • StepParser handles ALL parsing (DevelApp.StepParser 1.0.1)");
-            Console.WriteLine($"  • Plugins handle unparsing for {integration.PluginManager.RegisteredPlugins.Count} languages");
+            Console.WriteLine($"  • StepParser handles ALL parsing, grammar, and syntax (DevelApp.StepParser 1.0.1)");
+            Console.WriteLine($"  • Plugins handle unparsing ONLY for {integration.PluginManager.RegisteredPlugins.Count} languages");
+            Console.WriteLine($"  • StepParser grammar files are the single source of truth for syntax");
             Console.WriteLine($"  • Zero-copy integration between parsing and unparsing");
 
             // Test the clear separation: StepParser for parsing, Plugins for unparsing
@@ -402,17 +399,17 @@ class Program
             Console.WriteLine($"    1. Source code: '{testCode}'");
 
             var editor = await integration.ParseToEditableGraphAsync(testCode);
-            Console.WriteLine($"    2. StepParser → Cognitive graph (root: {editor.Root?.NodeType ?? "null"})");
+            Console.WriteLine($"    2. StepParser (with grammar) → Cognitive graph (root: {editor.Root?.NodeType ?? "null"})");
 
             var csharpPlugin = integration.PluginManager.GetPlugin("csharp");
             if (csharpPlugin != null && editor.Root != null)
             {
                 var regenerated = await csharpPlugin.UnparseAsync(editor.Root);
-                Console.WriteLine($"    3. Plugin unparser → Generated code: '{regenerated.Trim()}'");
+                Console.WriteLine($"    3. Plugin unparser (no grammar) → Generated code: '{regenerated.Trim()}'");
             }
 
             var finalValidation = await integration.ValidateSourceAsync(testCode);
-            Console.WriteLine($"    4. StepParser validation: {finalValidation.IsValid} (Token count: {finalValidation.TokenCount})");
+            Console.WriteLine($"    4. StepParser validation (with grammar): {finalValidation.IsValid} (Token count: {finalValidation.TokenCount})");
         }
         catch (Exception ex)
         {

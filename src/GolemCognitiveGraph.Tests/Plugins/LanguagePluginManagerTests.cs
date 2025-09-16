@@ -147,14 +147,9 @@ public class LanguagePluginManagerTests
             return Task.FromResult("test code");
         }
 
-        public Task<CompilerGeneratorRules> GenerateCompilerRulesAsync()
+        public CodeFormattingOptions GetFormattingOptions()
         {
-            return Task.FromResult(new CompilerGeneratorRules { LanguageId = LanguageId });
-        }
-
-        public LanguageFormattingOptions GetFormattingOptions()
-        {
-            return new LanguageFormattingOptions();
+            return new CodeFormattingOptions();
         }
 
         public Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph)
