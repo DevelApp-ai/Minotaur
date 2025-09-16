@@ -142,24 +142,24 @@ public class LanguagePluginManagerTests
         public string DisplayName => "Test Language";
         public string[] SupportedExtensions => new[] { ".test" };
 
-        public Task<IEnumerable<LanguageToken>> TokenizeAsync(string sourceCode)
-        {
-            return Task.FromResult(Enumerable.Empty<LanguageToken>());
-        }
-
-        public Task<Core.CognitiveGraphNode> ParseAsync(string sourceCode)
-        {
-            return Task.FromResult<Core.CognitiveGraphNode>(new Core.NonTerminalNode("test", 0));
-        }
-
         public Task<string> UnparseAsync(Core.CognitiveGraphNode graph)
         {
             return Task.FromResult("test code");
         }
 
-        public Task<ValidationResult> ValidateAsync(string sourceCode)
+        public Task<CompilerGeneratorRules> GenerateCompilerRulesAsync()
         {
-            return Task.FromResult(new ValidationResult { IsValid = true });
+            return Task.FromResult(new CompilerGeneratorRules { LanguageId = LanguageId });
+        }
+
+        public LanguageFormattingOptions GetFormattingOptions()
+        {
+            return new LanguageFormattingOptions();
+        }
+
+        public Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph)
+        {
+            return Task.FromResult(new UnparseValidationResult { CanUnparse = true });
         }
     }
 }

@@ -305,101 +305,114 @@ class Program
 
     static async Task DemoPluginSystem()
     {
-        Console.WriteLine("5. Plugin System Demo");
-        Console.WriteLine("=====================");
+        Console.WriteLine("5. Plugin System Demo - Unparsing & Compiler-Compiler Generation");
+        Console.WriteLine("==================================================================");
 
         try
         {
-            // Demo the language plugin manager
+            // Demo the language plugin manager - NOTE: Plugins handle UNPARSING only
             using var pluginManager = new LanguagePluginManager();
 
-            Console.WriteLine("Registered Language Plugins:");
+            Console.WriteLine("Registered Language Plugins (for unparsing and compiler-compiler generation):");
             foreach (var kvp in pluginManager.RegisteredPlugins)
             {
                 var plugin = kvp.Value;
                 Console.WriteLine($"  • {plugin.DisplayName} ({plugin.LanguageId})");
                 Console.WriteLine($"    Extensions: {string.Join(", ", plugin.SupportedExtensions)}");
+                Console.WriteLine($"    Purpose: Code generation and compiler-compiler rules");
             }
 
-            Console.WriteLine("\nSupported File Extensions:");
+            Console.WriteLine("\nSupported File Extensions for Code Generation:");
             var extensions = pluginManager.GetSupportedExtensions();
             Console.WriteLine($"  {string.Join(", ", extensions)}");
 
-            // Demo file-based plugin selection
-            Console.WriteLine("\nFile-based Language Detection:");
+            // Demo file-based plugin selection for unparsing
+            Console.WriteLine("\nFile-based Language Detection (for code generation):");
             var testFiles = new[] { "Program.cs", "script.js", "main.py", "unknown.txt" };
             foreach (var file in testFiles)
             {
                 var plugin = pluginManager.GetPluginByExtension(Path.GetExtension(file));
                 if (plugin != null)
                 {
-                    Console.WriteLine($"  {file} → {plugin.DisplayName} ({plugin.LanguageId})");
+                    Console.WriteLine($"  {file} → {plugin.DisplayName} ({plugin.LanguageId}) unparsing");
                 }
                 else
                 {
-                    Console.WriteLine($"  {file} → No plugin found");
+                    Console.WriteLine($"  {file} → No unparsing plugin found");
                 }
             }
 
-            // Demo language-specific parsing
-            Console.WriteLine("\nLanguage-specific Parsing:");
-            var codeExamples = new Dictionary<string, string>
+            // Demo language-specific unparsing (NOT parsing - parsing is handled by StepParser)
+            Console.WriteLine("\nLanguage-specific Unparsing Capabilities:");
+
+            // Create test cognitive graphs for unparsing
+            var testGraphs = new Dictionary<string, CognitiveGraphNode>
             {
-                ["csharp"] = "public class Example { public void Method() { } }",
-                ["javascript"] = "function example() { return 'hello'; }",
-                ["python"] = "def example(): return 'hello'"
+                ["csharp"] = CreateSampleCSharpGraph(),
+                ["javascript"] = CreateSampleJavaScriptGraph(),
+                ["python"] = CreateSamplePythonGraph()
             };
 
-            foreach (var kvp in codeExamples)
+            foreach (var kvp in testGraphs)
             {
                 var language = kvp.Key;
-                var code = kvp.Value;
+                var graph = kvp.Value;
                 var plugin = pluginManager.GetPlugin(language);
 
                 if (plugin != null)
                 {
-                    Console.WriteLine($"\n  {plugin.DisplayName} Example:");
-                    Console.WriteLine($"    Code: {code}");
+                    Console.WriteLine($"\n  {plugin.DisplayName} Unparsing Example:");
 
-                    // Test validation
-                    var pluginValidation = await plugin.ValidateAsync(code);
-                    Console.WriteLine($"    Valid: {pluginValidation.IsValid}");
+                    // Test unparsing validation
+                    var unparseValidation = await plugin.ValidateGraphForUnparsingAsync(graph);
+                    Console.WriteLine($"    Can unparse: {unparseValidation.CanUnparse}");
 
-                    if (pluginValidation.Errors.Any())
+                    if (unparseValidation.Warnings.Any())
                     {
-                        foreach (var error in pluginValidation.Errors)
+                        foreach (var warning in unparseValidation.Warnings)
                         {
-                            Console.WriteLine($"    Error: {error.Message}");
+                            Console.WriteLine($"    Warning: {warning.Message}");
                         }
                     }
 
-                    // Test tokenization
-                    var tokens = await plugin.TokenizeAsync(code);
-                    Console.WriteLine($"    Tokens: {tokens.Count()}");
-
-                    // Test parsing
-                    var graph = await plugin.ParseAsync(code);
-                    Console.WriteLine($"    Root node: {graph.NodeType}");
-
-                    // Test unparsing
+                    // Test unparsing (code generation)
                     var generated = await plugin.UnparseAsync(graph);
-                    Console.WriteLine($"    Generated: {generated.Replace("\n", " ").Trim()}");
+                    Console.WriteLine($"    Generated code: {generated.Replace("\n", " ").Replace("\r", "").Trim()}");
+
+                    // Test compiler-compiler generation
+                    var compilerRules = await plugin.GenerateCompilerRulesAsync();
+                    Console.WriteLine($"    Compiler rules: {compilerRules.ProductionRules.Count} productions, {compilerRules.LexicalRules.Count} lexical rules");
+
+                    // Test formatting options
+                    var formatting = plugin.GetFormattingOptions();
+                    Console.WriteLine($"    Formatting: {formatting.IndentSize} {formatting.IndentStyle}, max line {formatting.MaxLineLength}");
                 }
             }
 
-            // Demo plugin integration with StepParserIntegration
-            Console.WriteLine("\nIntegrated StepParser with Plugin System:");
+            // Demo integration between StepParser (for parsing) and Plugins (for unparsing)
+            Console.WriteLine("\nIntegrated StepParser + Plugin System Architecture:");
             using var integration = StepParserIntegrationFactory.CreateForFile("Example.cs", pluginManager);
-            Console.WriteLine($"  Created integration for .cs files");
-            Console.WriteLine($"  Plugin Manager has {integration.PluginManager.RegisteredPlugins.Count} registered plugins");
+            Console.WriteLine($"  • StepParser handles ALL parsing (DevelApp.StepParser 1.0.1)");
+            Console.WriteLine($"  • Plugins handle unparsing for {integration.PluginManager.RegisteredPlugins.Count} languages");
+            Console.WriteLine($"  • Zero-copy integration between parsing and unparsing");
 
-            // Test the integration
+            // Test the clear separation: StepParser for parsing, Plugins for unparsing
             var testCode = "class Test { }";
+            Console.WriteLine($"\n  Workflow demonstration:");
+            Console.WriteLine($"    1. Source code: '{testCode}'");
+
             var editor = await integration.ParseToEditableGraphAsync(testCode);
-            Console.WriteLine($"  Parsed test code into graph with root: {editor.Root?.NodeType ?? "null"}");
+            Console.WriteLine($"    2. StepParser → Cognitive graph (root: {editor.Root?.NodeType ?? "null"})");
+
+            var csharpPlugin = integration.PluginManager.GetPlugin("csharp");
+            if (csharpPlugin != null && editor.Root != null)
+            {
+                var regenerated = await csharpPlugin.UnparseAsync(editor.Root);
+                Console.WriteLine($"    3. Plugin unparser → Generated code: '{regenerated.Trim()}'");
+            }
 
             var finalValidation = await integration.ValidateSourceAsync(testCode);
-            Console.WriteLine($"  Validation result: {finalValidation.IsValid} (Token count: {finalValidation.TokenCount})");
+            Console.WriteLine($"    4. StepParser validation: {finalValidation.IsValid} (Token count: {finalValidation.TokenCount})");
         }
         catch (Exception ex)
         {
@@ -408,5 +421,30 @@ class Program
         }
 
         Console.WriteLine();
+    }
+
+    // Helper methods to create sample graphs for unparsing demonstration
+    private static CognitiveGraphNode CreateSampleCSharpGraph()
+    {
+        var root = new NonTerminalNode("class_declaration");
+        root.AddChild(new TerminalNode("class", "keyword"));
+        root.AddChild(new IdentifierNode("TestClass"));
+        return root;
+    }
+
+    private static CognitiveGraphNode CreateSampleJavaScriptGraph()
+    {
+        var root = new NonTerminalNode("function_declaration");
+        root.AddChild(new TerminalNode("function", "keyword"));
+        root.AddChild(new IdentifierNode("testFunction"));
+        return root;
+    }
+
+    private static CognitiveGraphNode CreateSamplePythonGraph()
+    {
+        var root = new NonTerminalNode("funcdef");
+        root.AddChild(new TerminalNode("def", "keyword"));
+        root.AddChild(new IdentifierNode("test_function"));
+        return root;
     }
 }

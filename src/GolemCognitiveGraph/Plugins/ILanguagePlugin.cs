@@ -1,8 +1,9 @@
 namespace GolemCognitiveGraph.Plugins;
 
 /// <summary>
-/// Interface for language-specific parsing and unparsing plugins.
+/// Interface for language-specific unparsing and compiler-compiler generation plugins.
 /// Implements the runtime pluggable class factory pattern for extensibility.
+/// Note: Parsing is handled by DevelApp.StepParser - plugins focus on code generation.
 /// </summary>
 public interface ILanguagePlugin
 {
@@ -22,69 +23,100 @@ public interface ILanguagePlugin
     string[] SupportedExtensions { get; }
 
     /// <summary>
-    /// Parse source code into tokens using language-specific lexing rules
-    /// </summary>
-    Task<IEnumerable<LanguageToken>> TokenizeAsync(string sourceCode);
-
-    /// <summary>
-    /// Parse source code into a cognitive graph using language-specific grammar
-    /// </summary>
-    Task<Core.CognitiveGraphNode> ParseAsync(string sourceCode);
-
-    /// <summary>
-    /// Generate source code from a cognitive graph using language-specific unparsing rules
+    /// Generate source code from a cognitive graph using language-specific unparsing rules.
+    /// This is the primary function of language plugins.
     /// </summary>
     Task<string> UnparseAsync(Core.CognitiveGraphNode graph);
 
     /// <summary>
-    /// Validate source code syntax without full parsing
+    /// Generate compiler-compiler grammar rules for this language.
+    /// Used for extending the system with new language backends.
     /// </summary>
-    Task<ValidationResult> ValidateAsync(string sourceCode);
+    Task<CompilerGeneratorRules> GenerateCompilerRulesAsync();
+
+    /// <summary>
+    /// Get language-specific formatting options for code generation
+    /// </summary>
+    LanguageFormattingOptions GetFormattingOptions();
+
+    /// <summary>
+    /// Validate that a cognitive graph can be unparsed to valid code for this language
+    /// </summary>
+    Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph);
 }
 
 /// <summary>
-/// Represents a language token with metadata
+/// Compiler-compiler grammar rules for language generation
 /// </summary>
-public class LanguageToken
+public class CompilerGeneratorRules
 {
-    public string Text { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty;
-    public int StartPosition { get; set; }
-    public int EndPosition { get; set; }
-    public int Line { get; set; }
-    public int Column { get; set; }
-    public Dictionary<string, object> Metadata { get; set; } = new();
+    public string LanguageId { get; set; } = string.Empty;
+    public List<GrammarRule> ProductionRules { get; set; } = new();
+    public List<LexicalRule> LexicalRules { get; set; } = new();
+    public Dictionary<string, object> LanguageMetadata { get; set; } = new();
 }
 
 /// <summary>
-/// Result of syntax validation
+/// Grammar production rule for compiler generation
 /// </summary>
-public class ValidationResult
+public class GrammarRule
 {
-    public bool IsValid { get; set; }
-    public List<ValidationError> Errors { get; set; } = new();
-    public List<ValidationWarning> Warnings { get; set; } = new();
+    public string NonTerminal { get; set; } = string.Empty;
+    public List<string> Productions { get; set; } = new();
+    public Dictionary<string, object> Attributes { get; set; } = new();
 }
 
 /// <summary>
-/// Validation error information
+/// Lexical rule for token recognition
 /// </summary>
-public class ValidationError
+public class LexicalRule
+{
+    public string TokenType { get; set; } = string.Empty;
+    public string Pattern { get; set; } = string.Empty;
+    public int Priority { get; set; }
+    public Dictionary<string, object> Attributes { get; set; } = new();
+}
+
+/// <summary>
+/// Language-specific formatting options for code generation
+/// </summary>
+public class LanguageFormattingOptions
+{
+    public string IndentStyle { get; set; } = "spaces"; // "spaces" or "tabs"
+    public int IndentSize { get; set; } = 4;
+    public string LineEnding { get; set; } = "\n";
+    public bool InsertTrailingNewline { get; set; } = true;
+    public int MaxLineLength { get; set; } = 120;
+    public Dictionary<string, object> LanguageSpecific { get; set; } = new();
+}
+
+/// <summary>
+/// Result of validating a cognitive graph for unparsing
+/// </summary>
+public class UnparseValidationResult
+{
+    public bool CanUnparse { get; set; }
+    public List<UnparseValidationError> Errors { get; set; } = new();
+    public List<UnparseValidationWarning> Warnings { get; set; } = new();
+}
+
+/// <summary>
+/// Unparsing validation error
+/// </summary>
+public class UnparseValidationError
 {
     public string Message { get; set; } = string.Empty;
-    public string Code { get; set; } = string.Empty;
-    public int Line { get; set; }
-    public int Column { get; set; }
+    public string NodeId { get; set; } = string.Empty;
+    public string NodeType { get; set; } = string.Empty;
     public string Severity { get; set; } = "Error";
 }
 
 /// <summary>
-/// Validation warning information
+/// Unparsing validation warning
 /// </summary>
-public class ValidationWarning
+public class UnparseValidationWarning
 {
     public string Message { get; set; } = string.Empty;
-    public string Code { get; set; } = string.Empty;
-    public int Line { get; set; }
-    public int Column { get; set; }
+    public string NodeId { get; set; } = string.Empty;
+    public string NodeType { get; set; } = string.Empty;
 }

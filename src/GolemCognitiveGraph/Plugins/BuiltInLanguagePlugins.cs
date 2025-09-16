@@ -3,67 +3,13 @@ using GolemCognitiveGraph.Core;
 namespace GolemCognitiveGraph.Plugins;
 
 /// <summary>
-/// Built-in C# language plugin implementation
+/// Built-in C# language plugin implementation for unparsing and compiler-compiler generation
 /// </summary>
 public class CSharpLanguagePlugin : ILanguagePlugin
 {
     public string LanguageId => "csharp";
     public string DisplayName => "C#";
     public string[] SupportedExtensions => new[] { ".cs", ".csx" };
-
-    public async Task<IEnumerable<LanguageToken>> TokenizeAsync(string sourceCode)
-    {
-        // Integrate with DevelApp.StepLexer for C# tokenization
-        var tokens = new List<LanguageToken>();
-
-        // Basic tokenization for demonstration - will be enhanced with StepLexer integration
-        var words = sourceCode.Split(new[] { ' ', '\t', '\r', '\n', ';', '(', ')', '{', '}', '[', ']' },
-                                    StringSplitOptions.RemoveEmptyEntries);
-
-        int position = 0;
-        int line = 1;
-        int column = 1;
-
-        foreach (var word in words)
-        {
-            var token = new LanguageToken
-            {
-                Text = word,
-                Type = DetermineTokenType(word),
-                StartPosition = position,
-                EndPosition = position + word.Length,
-                Line = line,
-                Column = column
-            };
-
-            tokens.Add(token);
-            position += word.Length;
-            column += word.Length;
-        }
-
-        await Task.CompletedTask;
-        return tokens;
-    }
-
-    public async Task<CognitiveGraphNode> ParseAsync(string sourceCode)
-    {
-        // Integrate with DevelApp.StepParser for C# parsing
-        var root = new NonTerminalNode("compilation_unit", 0);
-        root.Metadata["language"] = LanguageId;
-        root.Metadata["source"] = sourceCode;
-
-        // Basic parsing structure for demonstration
-        var @namespace = new NonTerminalNode("namespace_declaration", 0);
-        var @class = new NonTerminalNode("class_declaration", 0);
-        var method = new NonTerminalNode("method_declaration", 0);
-
-        @class.AddChild(method);
-        @namespace.AddChild(@class);
-        root.AddChild(@namespace);
-
-        await Task.CompletedTask;
-        return root;
-    }
 
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -75,54 +21,81 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
-    public async Task<ValidationResult> ValidateAsync(string sourceCode)
+    public async Task<CompilerGeneratorRules> GenerateCompilerRulesAsync()
     {
-        var result = new ValidationResult { IsValid = true };
-
-        // Basic C# syntax validation
-        var braceCount = sourceCode.Count(c => c == '{') - sourceCode.Count(c => c == '}');
-        var parenCount = sourceCode.Count(c => c == '(') - sourceCode.Count(c => c == ')');
-
-        if (braceCount != 0)
+        var rules = new CompilerGeneratorRules
         {
-            result.IsValid = false;
-            result.Errors.Add(new ValidationError
-            {
-                Message = "Unbalanced braces",
-                Code = "CS0116",
-                Severity = "Error"
-            });
-        }
+            LanguageId = LanguageId
+        };
 
-        if (parenCount != 0)
+        // Add C# grammar production rules for compiler-compiler generation
+        rules.ProductionRules.AddRange(new[]
         {
-            result.IsValid = false;
-            result.Errors.Add(new ValidationError
+            new GrammarRule
             {
-                Message = "Unbalanced parentheses",
-                Code = "CS1026",
-                Severity = "Error"
+                NonTerminal = "compilation_unit",
+                Productions = new List<string> { "using_directives namespace_declaration*" }
+            },
+            new GrammarRule
+            {
+                NonTerminal = "class_declaration",
+                Productions = new List<string> { "class IDENTIFIER '{' class_member* '}'" }
+            },
+            new GrammarRule
+            {
+                NonTerminal = "method_declaration",
+                Productions = new List<string> { "type IDENTIFIER '(' parameter_list? ')' method_body" }
+            }
+        });
+
+        // Add C# lexical rules
+        rules.LexicalRules.AddRange(new[]
+        {
+            new LexicalRule { TokenType = "IDENTIFIER", Pattern = @"[a-zA-Z_][a-zA-Z0-9_]*", Priority = 1 },
+            new LexicalRule { TokenType = "STRING", Pattern = @"""([^""\\]|\\.)*""", Priority = 2 },
+            new LexicalRule { TokenType = "NUMBER", Pattern = @"\d+(\.\d+)?", Priority = 3 }
+        });
+
+        await Task.CompletedTask;
+        return rules;
+    }
+
+    public LanguageFormattingOptions GetFormattingOptions()
+    {
+        return new LanguageFormattingOptions
+        {
+            IndentStyle = "spaces",
+            IndentSize = 4,
+            LineEnding = "\r\n",
+            InsertTrailingNewline = true,
+            MaxLineLength = 120,
+            LanguageSpecific = new Dictionary<string, object>
+            {
+                ["BraceStyle"] = "Allman",
+                ["UseTabs"] = false,
+                ["SpaceAfterKeywords"] = true
+            }
+        };
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        var result = new UnparseValidationResult { CanUnparse = true };
+
+        // Validate that the graph structure is compatible with C# syntax
+        if (graph.NodeType != "compilation_unit" && graph.NodeType != "class_declaration" &&
+            graph.NodeType != "method_declaration" && graph.NodeType != "expression")
+        {
+            result.Warnings.Add(new UnparseValidationWarning
+            {
+                Message = $"Root node type '{graph.NodeType}' may not generate valid C# code",
+                NodeId = graph.Id.ToString(),
+                NodeType = graph.NodeType
             });
         }
 
         await Task.CompletedTask;
         return result;
-    }
-
-    private string DetermineTokenType(string word)
-    {
-        var keywords = new[] { "using", "namespace", "class", "public", "private", "static", "void", "string", "int", "bool" };
-
-        if (keywords.Contains(word.ToLowerInvariant()))
-            return "keyword";
-
-        if (char.IsLetter(word.FirstOrDefault()))
-            return "identifier";
-
-        if (char.IsDigit(word.FirstOrDefault()))
-            return "literal";
-
-        return "operator";
     }
 }
 
@@ -135,23 +108,6 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
     public string DisplayName => "JavaScript";
     public string[] SupportedExtensions => new[] { ".js", ".mjs", ".jsx" };
 
-    public async Task<IEnumerable<LanguageToken>> TokenizeAsync(string sourceCode)
-    {
-        // Similar implementation for JavaScript
-        await Task.CompletedTask;
-        return new List<LanguageToken>();
-    }
-
-    public async Task<CognitiveGraphNode> ParseAsync(string sourceCode)
-    {
-        var root = new NonTerminalNode("program", 0);
-        root.Metadata["language"] = LanguageId;
-        root.Metadata["source"] = sourceCode;
-
-        await Task.CompletedTask;
-        return root;
-    }
-
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         var visitor = new JavaScriptUnparseVisitor();
@@ -161,10 +117,54 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
-    public async Task<ValidationResult> ValidateAsync(string sourceCode)
+    public async Task<CompilerGeneratorRules> GenerateCompilerRulesAsync()
     {
+        var rules = new CompilerGeneratorRules
+        {
+            LanguageId = LanguageId
+        };
+
+        // Add JavaScript grammar rules
+        rules.ProductionRules.AddRange(new[]
+        {
+            new GrammarRule
+            {
+                NonTerminal = "program",
+                Productions = new List<string> { "statement_list" }
+            },
+            new GrammarRule
+            {
+                NonTerminal = "function_declaration",
+                Productions = new List<string> { "function IDENTIFIER '(' parameter_list? ')' '{' statement_list '}'" }
+            }
+        });
+
         await Task.CompletedTask;
-        return new ValidationResult { IsValid = true };
+        return rules;
+    }
+
+    public LanguageFormattingOptions GetFormattingOptions()
+    {
+        return new LanguageFormattingOptions
+        {
+            IndentStyle = "spaces",
+            IndentSize = 2,
+            LineEnding = "\n",
+            InsertTrailingNewline = true,
+            MaxLineLength = 100,
+            LanguageSpecific = new Dictionary<string, object>
+            {
+                ["SemicolonStyle"] = "ASI", // Automatic Semicolon Insertion
+                ["QuoteStyle"] = "single"
+            }
+        };
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        var result = new UnparseValidationResult { CanUnparse = true };
+        await Task.CompletedTask;
+        return result;
     }
 }
 
@@ -175,24 +175,7 @@ public class PythonLanguagePlugin : ILanguagePlugin
 {
     public string LanguageId => "python";
     public string DisplayName => "Python";
-    public string[] SupportedExtensions => new[] { ".py", ".pyw", ".pyx" };
-
-    public async Task<IEnumerable<LanguageToken>> TokenizeAsync(string sourceCode)
-    {
-        // Python-specific tokenization
-        await Task.CompletedTask;
-        return new List<LanguageToken>();
-    }
-
-    public async Task<CognitiveGraphNode> ParseAsync(string sourceCode)
-    {
-        var root = new NonTerminalNode("module", 0);
-        root.Metadata["language"] = LanguageId;
-        root.Metadata["source"] = sourceCode;
-
-        await Task.CompletedTask;
-        return root;
-    }
+    public string[] SupportedExtensions => new[] { ".py", ".pyw" };
 
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -203,9 +186,53 @@ public class PythonLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
-    public async Task<ValidationResult> ValidateAsync(string sourceCode)
+    public async Task<CompilerGeneratorRules> GenerateCompilerRulesAsync()
     {
+        var rules = new CompilerGeneratorRules
+        {
+            LanguageId = LanguageId
+        };
+
+        // Add Python grammar rules
+        rules.ProductionRules.AddRange(new[]
+        {
+            new GrammarRule
+            {
+                NonTerminal = "file_input",
+                Productions = new List<string> { "stmt*" }
+            },
+            new GrammarRule
+            {
+                NonTerminal = "funcdef",
+                Productions = new List<string> { "'def' NAME '(' parameters ')' ':' suite" }
+            }
+        });
+
         await Task.CompletedTask;
-        return new ValidationResult { IsValid = true };
+        return rules;
+    }
+
+    public LanguageFormattingOptions GetFormattingOptions()
+    {
+        return new LanguageFormattingOptions
+        {
+            IndentStyle = "spaces",
+            IndentSize = 4,
+            LineEnding = "\n",
+            InsertTrailingNewline = true,
+            MaxLineLength = 88, // Black formatter default
+            LanguageSpecific = new Dictionary<string, object>
+            {
+                ["UseBlackFormatting"] = true,
+                ["QuoteStyle"] = "double"
+            }
+        };
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        var result = new UnparseValidationResult { CanUnparse = true };
+        await Task.CompletedTask;
+        return result;
     }
 }
