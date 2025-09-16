@@ -1,9 +1,9 @@
 namespace GolemCognitiveGraph.Plugins;
 
 /// <summary>
-/// Interface for language-specific unparsing plugins.
+/// Interface for language-specific unparsing and compiler-compiler generation plugins.
 /// Implements the runtime pluggable class factory pattern for extensibility.
-/// NOTE: All parsing, grammar, and syntax is handled by DevelApp.StepParser - plugins only generate code.
+/// NOTE: Parsing, grammar, and syntax is handled by DevelApp.StepParser - plugins handle unparsing and compiler-compiler generation.
 /// </summary>
 public interface ILanguagePlugin
 {
@@ -24,9 +24,16 @@ public interface ILanguagePlugin
 
     /// <summary>
     /// Generate source code from a cognitive graph using language-specific unparsing rules.
-    /// This is the ONLY function of language plugins - all grammar/syntax comes from StepParser.
+    /// This is the primary function of language plugins.
     /// </summary>
     Task<string> UnparseAsync(Core.CognitiveGraphNode graph);
+
+    /// <summary>
+    /// Generate compiler-compiler backend rules for this language.
+    /// Used for extending the system with new language backends.
+    /// NOTE: This does NOT generate grammar - it generates backend/target-specific generation rules.
+    /// </summary>
+    Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync();
 
     /// <summary>
     /// Get cosmetic code formatting options for output (NOT syntax-related)
@@ -37,6 +44,39 @@ public interface ILanguagePlugin
     /// Validate that a cognitive graph can be unparsed to valid code for this language
     /// </summary>
     Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph);
+}
+
+/// <summary>
+/// Compiler-compiler backend rules for language generation.
+/// NOTE: These are backend/target generation rules, NOT grammar rules - grammar comes from StepParser.
+/// </summary>
+public class CompilerBackendRules
+{
+    public string LanguageId { get; set; } = string.Empty;
+    public List<CodeGenerationRule> GenerationRules { get; set; } = new();
+    public List<TemplateRule> TemplateRules { get; set; } = new();
+    public Dictionary<string, object> BackendMetadata { get; set; } = new();
+}
+
+/// <summary>
+/// Code generation rule for compiler backend (NOT grammar rule)
+/// </summary>
+public class CodeGenerationRule
+{
+    public string NodeType { get; set; } = string.Empty;
+    public string GenerationTemplate { get; set; } = string.Empty;
+    public Dictionary<string, object> GenerationHints { get; set; } = new();
+}
+
+/// <summary>
+/// Template rule for backend code generation
+/// </summary>
+public class TemplateRule
+{
+    public string TemplateName { get; set; } = string.Empty;
+    public string TemplateContent { get; set; } = string.Empty;
+    public List<string> RequiredParameters { get; set; } = new();
+    public Dictionary<string, object> TemplateMetadata { get; set; } = new();
 }
 
 /// <summary>

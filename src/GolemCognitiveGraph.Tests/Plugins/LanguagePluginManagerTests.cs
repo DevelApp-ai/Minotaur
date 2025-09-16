@@ -147,6 +147,11 @@ public class LanguagePluginManagerTests
             return Task.FromResult("test code");
         }
 
+        public Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+        {
+            return Task.FromResult(new CompilerBackendRules { LanguageId = LanguageId });
+        }
+
         public CodeFormattingOptions GetFormattingOptions()
         {
             return new CodeFormattingOptions();

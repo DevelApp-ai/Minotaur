@@ -305,21 +305,21 @@ class Program
 
     static async Task DemoPluginSystem()
     {
-        Console.WriteLine("5. Plugin System Demo - Unparsing ONLY (StepParser handles all grammar/syntax)");
-        Console.WriteLine("================================================================================");
+        Console.WriteLine("5. Plugin System Demo - Unparsing & Compiler Backend Generation (StepParser handles grammar)");
+        Console.WriteLine("==========================================================================================");
 
         try
         {
-            // Demo the language plugin manager - NOTE: Plugins handle UNPARSING only, NO grammar
+            // Demo the language plugin manager - NOTE: Plugins handle UNPARSING and COMPILER BACKEND, NO grammar
             using var pluginManager = new LanguagePluginManager();
 
-            Console.WriteLine("Registered Language Plugins (for unparsing ONLY - grammar comes from StepParser):");
+            Console.WriteLine("Registered Language Plugins (unparsing + compiler backend generation - grammar from StepParser):");
             foreach (var kvp in pluginManager.RegisteredPlugins)
             {
                 var plugin = kvp.Value;
                 Console.WriteLine($"  • {plugin.DisplayName} ({plugin.LanguageId})");
                 Console.WriteLine($"    Extensions: {string.Join(", ", plugin.SupportedExtensions)}");
-                Console.WriteLine($"    Purpose: Code generation ONLY (no grammar/syntax handling)");
+                Console.WriteLine($"    Purpose: Code generation + compiler backend (no grammar/syntax handling)");
             }
 
             Console.WriteLine("\nSupported File Extensions for Code Generation:");
@@ -327,7 +327,7 @@ class Program
             Console.WriteLine($"  {string.Join(", ", extensions)}");
 
             // Demo file-based plugin selection for unparsing
-            Console.WriteLine("\nFile-based Language Detection (for code generation only):");
+            Console.WriteLine("\nFile-based Language Detection (for code generation + backend generation):");
             var testFiles = new[] { "Program.cs", "script.js", "main.py", "unknown.txt" };
             foreach (var file in testFiles)
             {
@@ -375,9 +375,13 @@ class Program
                         }
                     }
 
-                    // Test unparsing (code generation) - the ONLY thing plugins do
+                    // Test unparsing (code generation)
                     var generated = await plugin.UnparseAsync(graph);
                     Console.WriteLine($"    Generated code: {generated.Replace("\n", " ").Replace("\r", "").Trim()}");
+
+                    // Test compiler backend generation (NOT grammar - backend generation rules)
+                    var backendRules = await plugin.GenerateCompilerBackendRulesAsync();
+                    Console.WriteLine($"    Backend rules: {backendRules.GenerationRules.Count} generation rules, {backendRules.TemplateRules.Count} templates");
 
                     // Test cosmetic formatting options (NOT syntax - syntax comes from StepParser)
                     var formatting = plugin.GetFormattingOptions();
@@ -385,12 +389,13 @@ class Program
                 }
             }
 
-            // Demo integration between StepParser (for parsing) and Plugins (for unparsing)
+            // Demo integration between StepParser (for parsing) and Plugins (for unparsing + backend)
             Console.WriteLine("\nIntegrated StepParser + Plugin System Architecture:");
             using var integration = StepParserIntegrationFactory.CreateForFile("Example.cs", pluginManager);
             Console.WriteLine($"  • StepParser handles ALL parsing, grammar, and syntax (DevelApp.StepParser 1.0.1)");
-            Console.WriteLine($"  • Plugins handle unparsing ONLY for {integration.PluginManager.RegisteredPlugins.Count} languages");
+            Console.WriteLine($"  • Plugins handle unparsing + compiler backend generation for {integration.PluginManager.RegisteredPlugins.Count} languages");
             Console.WriteLine($"  • StepParser grammar files are the single source of truth for syntax");
+            Console.WriteLine($"  • Plugins provide backend generation rules for compiler-compiler extensibility");
             Console.WriteLine($"  • Zero-copy integration between parsing and unparsing");
 
             // Test the clear separation: StepParser for parsing, Plugins for unparsing

@@ -3,8 +3,8 @@ using GolemCognitiveGraph.Core;
 namespace GolemCognitiveGraph.Plugins;
 
 /// <summary>
-/// Built-in C# language plugin for unparsing ONLY - no grammar or syntax handling
-/// All grammar and syntax comes from StepParser - plugins only generate formatted output
+/// Built-in C# language plugin for unparsing and compiler backend generation
+/// All grammar and syntax comes from StepParser - plugins handle backend generation
 /// </summary>
 public class CSharpLanguagePlugin : ILanguagePlugin
 {
@@ -21,6 +21,57 @@ public class CSharpLanguagePlugin : ILanguagePlugin
 
         await Task.CompletedTask;
         return visitor.GetGeneratedCode();
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        var rules = new CompilerBackendRules
+        {
+            LanguageId = LanguageId
+        };
+
+        // Add C# backend generation rules (NOT grammar rules - those come from StepParser)
+        rules.GenerationRules.AddRange(new[]
+        {
+            new CodeGenerationRule
+            {
+                NodeType = "class_declaration",
+                GenerationTemplate = "public class {name} { {members} }",
+                GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "Allman" }
+            },
+            new CodeGenerationRule
+            {
+                NodeType = "method_declaration",
+                GenerationTemplate = "{modifiers} {returnType} {name}({parameters}) { {body} }",
+                GenerationHints = new Dictionary<string, object> { ["IndentBody"] = true }
+            },
+            new CodeGenerationRule
+            {
+                NodeType = "property_declaration",
+                GenerationTemplate = "{modifiers} {type} {name} { get; set; }",
+                GenerationHints = new Dictionary<string, object> { ["AutoProperty"] = true }
+            }
+        });
+
+        // Add C# template rules
+        rules.TemplateRules.AddRange(new[]
+        {
+            new TemplateRule
+            {
+                TemplateName = "namespace_template",
+                TemplateContent = "namespace {namespace_name}\n{\n{content}\n}",
+                RequiredParameters = new List<string> { "namespace_name", "content" }
+            },
+            new TemplateRule
+            {
+                TemplateName = "using_template",
+                TemplateContent = "using {namespace};",
+                RequiredParameters = new List<string> { "namespace" }
+            }
+        });
+
+        await Task.CompletedTask;
+        return rules;
     }
 
     public CodeFormattingOptions GetFormattingOptions()
@@ -63,7 +114,7 @@ public class CSharpLanguagePlugin : ILanguagePlugin
 }
 
 /// <summary>
-/// Built-in JavaScript language plugin for unparsing ONLY
+/// Built-in JavaScript language plugin for unparsing and compiler backend generation
 /// </summary>
 public class JavaScriptLanguagePlugin : ILanguagePlugin
 {
@@ -78,6 +129,34 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         
         await Task.CompletedTask;
         return visitor.GetGeneratedCode();
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        var rules = new CompilerBackendRules
+        {
+            LanguageId = LanguageId
+        };
+
+        // Add JavaScript backend generation rules
+        rules.GenerationRules.AddRange(new[]
+        {
+            new CodeGenerationRule
+            {
+                NodeType = "function_declaration",
+                GenerationTemplate = "function {name}({parameters}) { {body} }",
+                GenerationHints = new Dictionary<string, object> { ["HoistFunctions"] = true }
+            },
+            new CodeGenerationRule
+            {
+                NodeType = "arrow_function",
+                GenerationTemplate = "({parameters}) => { {body} }",
+                GenerationHints = new Dictionary<string, object> { ["LexicalThis"] = true }
+            }
+        });
+
+        await Task.CompletedTask;
+        return rules;
     }
 
     public CodeFormattingOptions GetFormattingOptions()
@@ -106,7 +185,7 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
 }
 
 /// <summary>
-/// Built-in Python language plugin for unparsing ONLY
+/// Built-in Python language plugin for unparsing and compiler backend generation
 /// </summary>
 public class PythonLanguagePlugin : ILanguagePlugin
 {
@@ -121,6 +200,34 @@ public class PythonLanguagePlugin : ILanguagePlugin
         
         await Task.CompletedTask;
         return visitor.GetGeneratedCode();
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        var rules = new CompilerBackendRules
+        {
+            LanguageId = LanguageId
+        };
+
+        // Add Python backend generation rules
+        rules.GenerationRules.AddRange(new[]
+        {
+            new CodeGenerationRule
+            {
+                NodeType = "function_def",
+                GenerationTemplate = "def {name}({parameters}):\n{body}",
+                GenerationHints = new Dictionary<string, object> { ["IndentWithSpaces"] = true }
+            },
+            new CodeGenerationRule
+            {
+                NodeType = "class_def",
+                GenerationTemplate = "class {name}({bases}):\n{body}",
+                GenerationHints = new Dictionary<string, object> { ["RequirePass"] = true }
+            }
+        });
+
+        await Task.CompletedTask;
+        return rules;
     }
 
     public CodeFormattingOptions GetFormattingOptions()
