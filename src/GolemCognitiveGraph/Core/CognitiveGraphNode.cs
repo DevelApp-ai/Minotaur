@@ -135,6 +135,31 @@ public abstract class CognitiveGraphNode
     public abstract CognitiveGraphNode Clone();
 
     /// <summary>
+    /// Finds the node at the specified source position.
+    /// </summary>
+    public CognitiveGraphNode? FindNodeAt(SourcePosition position)
+    {
+        // Check if this node contains the position
+        if (SourcePosition?.Contains(position) == true)
+        {
+            // Check children first (more specific)
+            foreach (var child in Children)
+            {
+                var result = child.FindNodeAt(position);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            
+            // If no child contains it, this node is the best match
+            return this;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Accepts a visitor for traversal operations.
     /// </summary>
     /// <param name="visitor">The visitor to accept.</param>
@@ -142,7 +167,7 @@ public abstract class CognitiveGraphNode
 }
 
 /// <summary>
-/// Represents source position information for tracking location in original source.
+/// Represents source position information with enhanced precision for tracking location in original source.
 /// </summary>
 public record SourcePosition(int Line, int Column, int Offset, int Length)
 {
@@ -150,4 +175,88 @@ public record SourcePosition(int Line, int Column, int Offset, int Length)
     /// Gets the end position of this source span.
     /// </summary>
     public SourcePosition End => this with { Offset = Offset + Length, Length = 0 };
+
+    /// <summary>
+    /// Gets the end line number (calculated from start line and content).
+    /// </summary>
+    public int EndLine { get; init; } = Line;
+
+    /// <summary>
+    /// Gets the end column number (calculated from start column and content).
+    /// </summary>
+    public int EndColumn { get; init; } = Column;
+
+    /// <summary>
+    /// Gets the filename or source identifier this position refers to.
+    /// </summary>
+    public string? SourceFile { get; init; }
+
+    /// <summary>
+    /// Checks if this position contains another position.
+    /// </summary>
+    public bool Contains(SourcePosition other)
+    {
+        return Offset <= other.Offset && (Offset + Length) >= (other.Offset + other.Length);
+    }
+
+    /// <summary>
+    /// Checks if this position overlaps with another position.
+    /// </summary>
+    public bool OverlapsWith(SourcePosition other)
+    {
+        return !(Offset + Length <= other.Offset || other.Offset + other.Length <= Offset);
+    }
+
+    /// <summary>
+    /// Creates a new position spanning from this position to another.
+    /// </summary>
+    public SourcePosition SpanTo(SourcePosition other)
+    {
+        var startOffset = Math.Min(Offset, other.Offset);
+        var endOffset = Math.Max(Offset + Length, other.Offset + other.Length);
+        return this with 
+        { 
+            Offset = startOffset, 
+            Length = endOffset - startOffset,
+            EndLine = other.EndLine,
+            EndColumn = other.EndColumn
+        };
+    }
+
+    /// <summary>
+    /// Converts offset-based position to line/column coordinates using source text.
+    /// </summary>
+    public static SourcePosition FromOffset(int offset, int length, string sourceText, string? sourceFile = null)
+    {
+        var (line, column) = CalculateLineColumn(sourceText, offset);
+        var (endLine, endColumn) = CalculateLineColumn(sourceText, offset + length);
+        
+        return new SourcePosition(line, column, offset, length)
+        {
+            EndLine = endLine,
+            EndColumn = endColumn,
+            SourceFile = sourceFile
+        };
+    }
+
+    private static (int Line, int Column) CalculateLineColumn(string sourceText, int offset)
+    {
+        var line = 1;
+        var column = 1;
+        
+        for (var i = 0; i < Math.Min(offset, sourceText.Length); i++)
+        {
+            if (sourceText[i] == '\n')
+            {
+                line++;
+                column = 1;
+            }
+            else
+            {
+                column++;
+            }
+        }
+        
+        return (line, column);
+    }
 }
