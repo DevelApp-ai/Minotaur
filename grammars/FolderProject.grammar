@@ -1,0 +1,256 @@
+# Folder Project Grammar
+# Generic folder-based project structure for cross-file analysis
+# Supports various project types through file pattern detection and grammar embedding
+
+grammar FolderProject;
+
+# Entry point for folder-based project analysis
+folder_project:
+    project_root
+    file_discovery*
+    cross_references*
+    ;
+
+project_root:
+    root_path: directory_path
+    project_type: detected_project_type
+    configuration_files*
+    ;
+
+# Project type detection based on file patterns
+detected_project_type:
+    dotnet_project |
+    node_project |
+    python_project |
+    java_project |
+    cpp_project |
+    rust_project |
+    go_project |
+    generic_project
+    ;
+
+dotnet_project:
+    indicators: (*.sln | *.csproj | *.vbproj | *.fsproj)
+    @embed_grammar("DotNetProject.grammar")
+    ;
+
+node_project:
+    indicators: (package.json | tsconfig.json | *.ts | *.js)
+    @embed_grammar("JavaScript.grammar")
+    @embed_grammar("JSON.grammar")
+    ;
+
+python_project:
+    indicators: (*.py | requirements.txt | setup.py | pyproject.toml)
+    @embed_grammar("Python311.grammar")
+    ;
+
+java_project:
+    indicators: (*.java | pom.xml | build.gradle | *.gradle)
+    @embed_grammar("Java17.grammar")
+    ;
+
+cpp_project:
+    indicators: (*.cpp | *.hpp | *.c | *.h | CMakeLists.txt | Makefile)
+    @embed_grammar("Cpp20.grammar")
+    ;
+
+rust_project:
+    indicators: (*.rs | Cargo.toml | Cargo.lock)
+    @embed_grammar("Rust2021.grammar")
+    ;
+
+go_project:
+    indicators: (*.go | go.mod | go.sum)
+    @embed_grammar("Go119.grammar")
+    ;
+
+generic_project:
+    indicators: mixed_file_types
+    @embed_grammar("GrammarFile.grammar")
+    ;
+
+# File discovery and classification
+file_discovery:
+    file_path: absolute_path
+    file_type: detected_file_type
+    embedded_grammar: grammar_reference?
+    cross_file_relationships*
+    ;
+
+detected_file_type:
+    source_code_file |
+    configuration_file |
+    documentation_file |
+    resource_file |
+    build_file
+    ;
+
+source_code_file:
+    extension: file_extension
+    grammar: embedded_grammar_reference
+    symbols: extracted_symbols*
+    dependencies: file_dependencies*
+    ;
+
+configuration_file:
+    config_type: (json | xml | yaml | toml | ini | properties)
+    @embed_grammar(config_grammar_map[config_type])
+    settings: configuration_settings*
+    ;
+
+documentation_file:
+    doc_type: (markdown | rst | txt | html)
+    @embed_grammar("Markdown.grammar") # if available
+    references: doc_references*
+    ;
+
+resource_file:
+    resource_type: (image | audio | video | data | binary)
+    usage_tracking: resource_usage*
+    ;
+
+build_file:
+    build_system: (cmake | make | msbuild | gradle | maven | npm | cargo)
+    targets: build_targets*
+    dependencies: build_dependencies*
+    ;
+
+# Cross-file relationship analysis
+cross_file_relationships:
+    include_relationship |
+    import_relationship |
+    reference_relationship |
+    dependency_relationship
+    ;
+
+include_relationship:
+    source_file: file_path
+    included_file: file_path
+    include_type: ('header' | 'module' | 'component' | 'library')
+    line_number: integer
+    ;
+
+import_relationship:
+    source_file: file_path
+    imported_symbol: qualified_name
+    import_source: file_path?
+    import_type: ('namespace' | 'class' | 'function' | 'variable' | 'type')
+    ;
+
+reference_relationship:
+    source_file: file_path
+    referenced_file: file_path
+    reference_type: ('resource' | 'configuration' | 'documentation' | 'test')
+    context: reference_context
+    ;
+
+dependency_relationship:
+    dependent_file: file_path
+    dependency_file: file_path
+    dependency_type: ('compilation' | 'runtime' | 'test' | 'build')
+    strength: ('strong' | 'weak' | 'optional')
+    ;
+
+# Configuration file mappings
+config_grammar_map:
+    json -> "JSON.grammar"
+    xml -> "XML.grammar"  
+    yaml -> "YAML.grammar"
+    toml -> "TOML.grammar"
+    ini -> "INI.grammar"
+    properties -> "Properties.grammar"
+    ;
+
+# Symbol extraction for cross-file analysis
+extracted_symbols:
+    symbol_name: identifier
+    symbol_type: ('class' | 'interface' | 'function' | 'variable' | 'constant' | 'type' | 'namespace')
+    visibility: ('public' | 'private' | 'protected' | 'internal' | 'package')
+    location: source_location
+    signature: symbol_signature?
+    ;
+
+file_dependencies:
+    dependency_path: file_path
+    dependency_nature: ('import' | 'include' | 'reference' | 'embed')
+    resolved_path: absolute_path?
+    is_external: boolean
+    ;
+
+source_location:
+    line: integer
+    column: integer
+    length: integer?
+    ;
+
+symbol_signature:
+    parameters: parameter_list?
+    return_type: type_reference?
+    generic_parameters: generic_parameter_list?
+    ;
+
+# Build target tracking
+build_targets:
+    target_name: identifier
+    target_type: ('executable' | 'library' | 'test' | 'documentation')
+    source_files: file_path_list
+    dependencies: dependency_list
+    ;
+
+build_dependencies:
+    dependency_name: identifier
+    dependency_version: version_constraint?
+    dependency_source: ('local' | 'remote' | 'system')
+    ;
+
+# Resource usage tracking
+resource_usage:
+    using_file: file_path
+    usage_context: ('embedded' | 'referenced' | 'linked')
+    usage_location: source_location
+    ;
+
+doc_references:
+    referenced_file: file_path
+    reference_type: ('code' | 'resource' | 'external')
+    anchor: identifier?
+    ;
+
+configuration_settings:
+    setting_key: qualified_name
+    setting_value: configuration_value
+    environment_specific: boolean
+    ;
+
+# Lexical tokens
+directory_path: [A-Za-z]:[/\\]([^/\\<>:"|?*]+[/\\])*
+absolute_path: directory_path [^/\\<>:"|?*]+
+file_extension: \.[A-Za-z0-9]+
+identifier: [A-Za-z_][A-Za-z0-9_]*
+qualified_name: identifier(\. identifier)*
+integer: [0-9]+
+boolean: ('true' | 'false')
+version_constraint: [0-9]+(\.[0-9]+)*([<>=!~^]+[0-9]+(\.[0-9]+)*)?
+
+file_path_list: file_path (',' file_path)*
+dependency_list: identifier (',' identifier)*
+parameter_list: parameter (',' parameter)*
+parameter: identifier ':' type_reference
+type_reference: qualified_name ('[' ']')?
+generic_parameter_list: '<' identifier (',' identifier)* '>'
+configuration_value: (string_literal | numeric_literal | boolean_literal | array_literal | object_literal)
+
+string_literal: '"' [^"]* '"' | "'" [^']* "'"
+numeric_literal: [0-9]+(\.[0-9]+)?
+boolean_literal: ('true' | 'false')
+array_literal: '[' configuration_value (',' configuration_value)* ']'
+object_literal: '{' key_value_pair (',' key_value_pair)* '}'
+key_value_pair: string_literal ':' configuration_value
+
+reference_context: identifier
+
+# Whitespace and comments
+WS: [ \t\r\n]+ -> skip;
+COMMENT: ('#' | '//' | '--') ~[\r\n]* -> skip;
+BLOCK_COMMENT: ('/*' .*? '*/' | '<!--' .*? '-->') -> skip;

@@ -1,0 +1,185 @@
+# DotNet Project Grammar
+# Supports .NET solution and project file parsing for cross-file analysis
+# Enables project-level loading with embedded grammars for different file types
+
+grammar DotNetProject;
+
+# Entry point for .NET project structure analysis
+project_root:
+    solution_file? 
+    project_files* 
+    source_files*
+    ;
+
+# .NET Solution file (.sln) structure
+solution_file:
+    'Microsoft Visual Studio Solution File, Format Version' version_number
+    solution_projects*
+    solution_configuration*
+    ;
+
+solution_projects:
+    'Project(' project_type_guid ')' '=' project_name ',' project_path ',' project_guid
+    project_dependencies?
+    'EndProject'
+    ;
+
+# .NET Project file (.csproj, .vbproj, etc.) structure  
+project_files:
+    xml_declaration?
+    project_element
+    ;
+
+project_element:
+    '<Project' project_attributes '>'
+    property_groups*
+    item_groups*
+    imports*
+    targets*
+    '</Project>'
+    ;
+
+property_groups:
+    '<PropertyGroup' condition? '>'
+    properties*
+    '</PropertyGroup>'
+    ;
+
+item_groups:
+    '<ItemGroup' condition? '>'
+    items*
+    '</ItemGroup>'
+    ;
+
+# Cross-file reference tracking for analysis
+items:
+    compile_include |
+    content_include |
+    embedded_resource |
+    package_reference |
+    project_reference |
+    assembly_reference
+    ;
+
+compile_include:
+    '<Compile Include="' file_path '"' compile_attributes? '/>'
+    ;
+
+project_reference:
+    '<ProjectReference Include="' project_path '"' reference_attributes? '/>'
+    ;
+
+package_reference:
+    '<PackageReference Include="' package_name '" Version="' version '"' package_attributes? '/>'
+    ;
+
+# Source file integration with embedded grammars
+source_files:
+    csharp_file |
+    vb_file |
+    fsharp_file |
+    razor_file |
+    xaml_file |
+    json_file |
+    xml_file
+    ;
+
+# Embedded grammar references for different file types
+csharp_file:
+    @embed_grammar("CSharp10.grammar")
+    file_path: *.cs
+    cross_file_references: using_directives, namespace_declarations, type_references
+    ;
+
+vb_file:
+    @embed_grammar("VisualBasic.grammar") 
+    file_path: *.vb
+    cross_file_references: imports_statements, namespace_declarations, type_references
+    ;
+
+fsharp_file:
+    @embed_grammar("FSharp.grammar")
+    file_path: *.fs
+    cross_file_references: open_statements, module_declarations, type_references
+    ;
+
+razor_file:
+    @embed_grammar("HTMLEmbedded.grammar")
+    @embed_grammar("CSharp10.grammar")
+    file_path: *.razor, *.cshtml
+    cross_file_references: using_directives, model_references, component_references
+    ;
+
+xaml_file:
+    @embed_grammar("XAML.grammar")
+    file_path: *.xaml
+    cross_file_references: namespace_declarations, type_references, resource_references
+    ;
+
+json_file:
+    @embed_grammar("JSON.grammar")
+    file_path: *.json, *.jsonc
+    cross_file_references: schema_references, configuration_references
+    ;
+
+xml_file:
+    @embed_grammar("XML.grammar")
+    file_path: *.xml, *.config, *.settings
+    cross_file_references: schema_references, configuration_references
+    ;
+
+# Cross-file analysis constructs
+cross_file_references:
+    namespace_usage |
+    type_dependency |
+    resource_dependency |
+    configuration_dependency
+    ;
+
+namespace_usage:
+    source_file: file_path
+    target_namespace: qualified_identifier
+    usage_type: ('using' | 'import' | 'open' | 'include')
+    ;
+
+type_dependency:
+    source_file: file_path
+    target_type: qualified_identifier
+    dependency_type: ('inheritance' | 'composition' | 'usage' | 'reference')
+    ;
+
+resource_dependency:
+    source_file: file_path
+    target_resource: resource_path
+    resource_type: ('embedded' | 'content' | 'link' | 'reference')
+    ;
+
+configuration_dependency:
+    source_file: file_path
+    target_config: config_path
+    config_type: ('appsettings' | 'web.config' | 'app.config' | 'project')
+    ;
+
+# Lexical tokens
+project_type_guid: '{' guid_pattern '}'
+project_guid: '{' guid_pattern '}'
+guid_pattern: [0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}
+
+version_number: [0-9]+\.[0-9]+
+project_name: '"' [^"]+ '"'
+project_path: '"' [^"]+ '"'
+file_path: [^"'\s]+
+package_name: [A-Za-z][A-Za-z0-9._]*
+version: [0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?(-[A-Za-z0-9]+)?
+
+qualified_identifier: [A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*
+resource_path: [^"'\s]+
+config_path: [^"'\s]+
+
+condition: 'Condition="' [^"]+ '"'
+xml_declaration: '<?xml version="1.0" encoding="UTF-8"?>'
+
+# Whitespace and comments
+WS: [ \t\r\n]+ -> skip;
+COMMENT: '#' ~[\r\n]* -> skip;
+XML_COMMENT: '<!--' .*? '-->' -> skip;

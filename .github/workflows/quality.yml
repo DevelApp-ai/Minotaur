@@ -1,0 +1,171 @@
+name: Code Quality Checks
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-metrics:
+    name: Code Metrics and Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Minotaur.sln
+    
+    - name: Build solution
+      run: dotnet build src/Minotaur.sln --no-restore --configuration Release
+    
+    - name: Install code analysis tools
+      run: |
+        dotnet tool install --global dotnet-reportgenerator-globaltool
+        dotnet tool install --global dotnet-counters
+    
+    - name: Run tests with coverage
+      run: |
+        dotnet test src/Minotaur.sln --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults/ --logger "trx;LogFileName=test-results.trx" || echo "No test projects found"
+    
+    - name: Check for coverage files
+      id: coverage_check
+      run: |
+        if find ./TestResults -name "coverage.cobertura.xml" -type f | grep -q .; then
+          echo "coverage_found=true" >> $GITHUB_OUTPUT
+        else
+          echo "coverage_found=false" >> $GITHUB_OUTPUT
+          echo "::notice::No coverage files found. When adding test projects, ensure they include the coverlet.collector NuGet package for coverage collection."
+        fi
+    
+    - name: Generate coverage report
+      if: steps.coverage_check.outputs.coverage_found == 'true'
+      run: |
+        reportgenerator "-reports:./TestResults/**/coverage.cobertura.xml" "-targetdir:./CoverageReport" "-reporttypes:Html;JsonSummary"
+    
+    - name: Upload coverage report
+      if: steps.coverage_check.outputs.coverage_found == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: ./CoverageReport/
+    
+    - name: Check coverage threshold
+      if: steps.coverage_check.outputs.coverage_found == 'true'
+      run: |
+        if [ -f "./CoverageReport/Summary.json" ]; then
+          coverage=$(cat ./CoverageReport/Summary.json | grep -o '"coverage":[0-9.]*' | cut -d':' -f2)
+          echo "Code coverage: $coverage%"
+          if (( $(echo "$coverage < 70" | bc -l) )); then
+            echo "::warning::Code coverage ($coverage%) is below the recommended threshold of 70%"
+          fi
+        fi
+
+  documentation-check:
+    name: Documentation Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Install documentation tools
+      run: |
+        dotnet tool install --global xmldocmd
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Minotaur.sln
+    
+    - name: Build solution
+      run: dotnet build src/Minotaur.sln --no-restore --configuration Release
+    
+    - name: Check XML documentation
+      run: |
+        find src -name "*.cs" -type f | xargs grep -L "///" | tee undocumented-files.txt || true
+        if [ -s undocumented-files.txt ]; then
+          echo "::warning::Found files without XML documentation comments:"
+          cat undocumented-files.txt
+        fi
+    
+    - name: Validate README links
+      run: |
+        if command -v markdown-link-check &> /dev/null; then
+          markdown-link-check src/README.md || echo "::warning::Some links in README may be broken"
+        else
+          echo "Skipping link check - markdown-link-check not available"
+        fi
+
+  performance-baseline:
+    name: Performance Baseline
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Minotaur.sln
+    
+    - name: Build solution
+      run: dotnet build src/Minotaur.sln --no-restore --configuration Release
+    
+    - name: Run performance tests
+      run: |
+        if [ -d "src/StepParser.Demo" ]; then
+          cd src/StepParser.Demo
+          echo "Running demo application for performance baseline..."
+          timeout 60s dotnet run --configuration Release 2>&1 | tee ../../performance-log.txt || true
+        else
+          echo "No demo projects found for performance testing" | tee performance-log.txt
+        fi
+    
+    - name: Upload performance log
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-log
+        path: performance-log.txt
+
+  build-matrix:
+    name: Multi-Platform Build Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet-version: ['8.0.x']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Minotaur.sln
+    
+    - name: Build solution
+      run: dotnet build src/Minotaur.sln --no-restore --configuration Release
+    
+    - name: Run tests
+      run: dotnet test src/Minotaur.sln --no-build --configuration Release --verbosity normal

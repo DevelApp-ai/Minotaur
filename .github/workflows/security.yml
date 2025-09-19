@@ -1,0 +1,136 @@
+name: Security and Dependency Scan
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install .NET 7.0.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '7.0.x'
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Minotaur.sln
+    
+    - name: List vulnerable packages
+      run: |
+        dotnet list src/Minotaur.sln package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+        if grep -q "has the following vulnerable packages" vulnerability-report.txt; then
+          echo "::warning::Vulnerable packages detected. Please review the vulnerability report."
+          cat vulnerability-report.txt
+        fi
+    
+    - name: List deprecated packages
+      run: |
+        dotnet list src/Minotaur.sln package --deprecated --include-transitive 2>&1 | tee deprecated-report.txt
+        if grep -q "has the following deprecated packages" deprecated-report.txt; then
+          echo "::warning::Deprecated packages detected. Consider updating."
+          cat deprecated-report.txt
+        fi
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          vulnerability-report.txt
+          deprecated-report.txt
+
+  codeql-analysis:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp' ]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install .NET 7.0.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '7.0.x'
+    
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended,security-and-quality
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Minotaur.sln
+    
+    - name: Build solution
+      run: dotnet build src/Minotaur.sln --no-restore --configuration Release
+    
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+
+  license-scan:
+    name: License Compliance Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install .NET 7.0.x
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '7.0.x'
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Install license scanner
+      run: dotnet tool install --global dotnet-project-licenses
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Minotaur.sln
+    
+    - name: Scan licenses
+      run: |
+        dotnet-project-licenses --input src/Minotaur.sln --output-format json --output license-report.json --include-transitive
+        dotnet-project-licenses --input src/Minotaur.sln --output-format table --include-transitive
+    
+    - name: Upload license report
+      uses: actions/upload-artifact@v4
+      with:
+        name: license-report
+        path: license-report.json

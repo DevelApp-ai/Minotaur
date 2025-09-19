@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
+    <!-- NuGet Package Properties -->
+    <PackageId>DevelApp.Minotaur</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>Minotaur Cognitive Graph Editor</Title>
+    <Description>A zero-copy cognitive graph editor and unparser framework with StepParser integration, extensible plugin system, and advanced location tracking capabilities. Implements the complete GrammarForge documentation requirements with production-ready NuGet package dependencies.</Description>
+    <Authors>DevelApp AI</Authors>
+    <Company>DevelApp AI</Company>
+    <Copyright>Copyright © 2024 DevelApp AI</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur2</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur2.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>cognitive-graph;parser;compiler;stepparser;zero-copy;graph-editor;unparser;plugin-system;compiler-compiler</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.0.0" />
+    <PackageReference Include="DevelApp.RuntimePluggableClassFactory.Interface" Version="2.0.1" />
+    <PackageReference Include="DevelApp.RuntimePluggableClassFactory" Version="2.0.1" />
+    <PackageReference Include="DevelApp.StepLexer" Version="1.0.1" />
+    <PackageReference Include="DevelApp.StepParser" Version="1.0.1" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
