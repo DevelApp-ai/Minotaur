@@ -57,7 +57,7 @@ public class ContextAwareEditor
     public async Task<EditResult> EditWithContextAsync(ContextualEdit edit)
     {
         var context = await BuildEditContextAsync(edit);
-        
+
         // Trigger before-edit callbacks
         foreach (var callback in _callbacks)
         {
@@ -87,7 +87,7 @@ public class ContextAwareEditor
     {
         var targetNode = FindNodeAtPosition(edit.TargetPosition);
         var contextNodes = FindContextNodes(targetNode, edit.ContextRadius);
-        
+
         return new EditContext
         {
             TargetNode = targetNode,
@@ -106,7 +106,7 @@ public class ContextAwareEditor
     private List<CognitiveGraphNode> FindContextNodes(CognitiveGraphNode? targetNode, int radius)
     {
         var contextNodes = new List<CognitiveGraphNode>();
-        
+
         if (targetNode == null) return contextNodes;
 
         // Add siblings
@@ -163,7 +163,7 @@ public class ContextAwareEditor
         }
 
         context.TargetNode.AddChild(edit.NewNode);
-        
+
         await Task.CompletedTask;
         return EditResult.Success(new[] { context.TargetNode, edit.NewNode });
     }
@@ -193,7 +193,7 @@ public class ContextAwareEditor
         }
 
         context.TargetNode.Parent.RemoveChild(context.TargetNode);
-        
+
         await Task.CompletedTask;
         return EditResult.Success(new[] { context.TargetNode.Parent });
     }
@@ -207,7 +207,7 @@ public class ContextAwareEditor
 
         context.TargetNode.Parent.RemoveChild(context.TargetNode);
         edit.NewParent.AddChild(context.TargetNode);
-        
+
         await Task.CompletedTask;
         return EditResult.Success(new[] { context.TargetNode, edit.NewParent });
     }
@@ -330,7 +330,7 @@ public class PrecisionLocationTracker : ILocationTracker
         }
 
         var column = offset - _lineOffsets[line] + 1;
-        
+
         return new SourcePosition(line + 1, column, offset, 0)
         {
             SourceFile = _sourceFile
@@ -345,7 +345,7 @@ public class PrecisionLocationTracker : ILocationTracker
         }
 
         var offset = _lineOffsets[line - 1] + column - 1;
-        
+
         if (offset < 0 || offset > _sourceText.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(column));
@@ -366,7 +366,7 @@ public class PrecisionLocationTracker : ILocationTracker
     public SourcePosition[] GetPositionsInRange(SourcePosition range)
     {
         var positions = new List<SourcePosition>();
-        
+
         for (var offset = range.Offset; offset < range.Offset + range.Length; offset++)
         {
             positions.Add(GetPositionAt(offset));
@@ -377,17 +377,17 @@ public class PrecisionLocationTracker : ILocationTracker
 
     public bool IsValidPosition(SourcePosition position)
     {
-        return position.Line >= 1 && 
-               position.Line <= _lineOffsets.Length && 
-               position.Column >= 1 && 
-               position.Offset >= 0 && 
+        return position.Line >= 1 &&
+               position.Line <= _lineOffsets.Length &&
+               position.Column >= 1 &&
+               position.Offset >= 0 &&
                position.Offset <= _sourceText.Length;
     }
 
     private int[] BuildLineOffsets()
     {
         var offsets = new List<int> { 0 };
-        
+
         for (var i = 0; i < _sourceText.Length; i++)
         {
             if (_sourceText[i] == '\n')

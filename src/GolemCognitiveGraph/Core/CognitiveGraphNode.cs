@@ -168,7 +168,7 @@ public abstract class CognitiveGraphNode
                     return result;
                 }
             }
-            
+
             // If no child contains it, this node is the best match
             return this;
         }
@@ -231,9 +231,9 @@ public record SourcePosition(int Line, int Column, int Offset, int Length)
     {
         var startOffset = Math.Min(Offset, other.Offset);
         var endOffset = Math.Max(Offset + Length, other.Offset + other.Length);
-        return this with 
-        { 
-            Offset = startOffset, 
+        return this with
+        {
+            Offset = startOffset,
             Length = endOffset - startOffset,
             EndLine = other.EndLine,
             EndColumn = other.EndColumn
@@ -247,7 +247,7 @@ public record SourcePosition(int Line, int Column, int Offset, int Length)
     {
         var (line, column) = CalculateLineColumn(sourceText, offset);
         var (endLine, endColumn) = CalculateLineColumn(sourceText, offset + length);
-        
+
         return new SourcePosition(line, column, offset, length)
         {
             EndLine = endLine,
@@ -260,7 +260,7 @@ public record SourcePosition(int Line, int Column, int Offset, int Length)
     {
         var line = 1;
         var column = 1;
-        
+
         for (var i = 0; i < Math.Min(offset, sourceText.Length); i++)
         {
             if (sourceText[i] == '\n')
@@ -273,7 +273,7 @@ public record SourcePosition(int Line, int Column, int Offset, int Length)
                 column++;
             }
         }
-        
+
         return (line, column);
     }
 }

@@ -117,7 +117,7 @@ public class ProjectLoader : IProjectLoader
 
         // Extract file references from project
         var sourceFiles = await ExtractSourceFiles(projectGraph, rootPath);
-        
+
         // Analyze each source file
         foreach (var sourceFile in sourceFiles)
         {
@@ -216,31 +216,31 @@ public class ProjectLoader : IProjectLoader
         {
             // Folder analysis
             var files = Directory.GetFiles(path, "*", SearchOption.TopDirectoryOnly);
-            
+
             if (files.Any(f => Path.GetExtension(f).Equals(".sln", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.DotNetSolution);
-            
+
             if (files.Any(f => Path.GetExtension(f).EndsWith("proj", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.DotNetProject);
-            
+
             if (files.Any(f => Path.GetFileName(f).Equals("package.json", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.NodeProject);
-            
+
             if (files.Any(f => Path.GetFileName(f).Equals("requirements.txt", StringComparison.OrdinalIgnoreCase) ||
                               Path.GetFileName(f).Equals("setup.py", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.PythonProject);
-            
+
             if (files.Any(f => Path.GetFileName(f).Equals("pom.xml", StringComparison.OrdinalIgnoreCase) ||
                               Path.GetExtension(f).Equals(".gradle", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.JavaProject);
-            
+
             if (files.Any(f => Path.GetFileName(f).Equals("CMakeLists.txt", StringComparison.OrdinalIgnoreCase) ||
                               Path.GetFileName(f).Equals("Makefile", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.CppProject);
-            
+
             if (files.Any(f => Path.GetFileName(f).Equals("Cargo.toml", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.RustProject);
-            
+
             if (files.Any(f => Path.GetFileName(f).Equals("go.mod", StringComparison.OrdinalIgnoreCase)))
                 detectedTypes.Add(ProjectType.GoProject);
 

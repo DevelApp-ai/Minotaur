@@ -143,7 +143,7 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
     {
         var visitor = new JavaScriptUnparseVisitor();
         visitor.Visit(graph);
-        
+
         await Task.CompletedTask;
         return visitor.GetGeneratedCode();
     }
@@ -214,7 +214,7 @@ public class PythonLanguagePlugin : ILanguagePlugin
     {
         var visitor = new PythonUnparseVisitor();
         visitor.Visit(graph);
-        
+
         await Task.CompletedTask;
         return visitor.GetGeneratedCode();
     }
