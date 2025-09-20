@@ -16,7 +16,7 @@
  */
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using GolemCognitiveGraph.Advanced;
+using GolemCognitiveGraph.ContextAware;
 using GolemCognitiveGraph.Core;
 using GolemCognitiveGraph.Editor;
 

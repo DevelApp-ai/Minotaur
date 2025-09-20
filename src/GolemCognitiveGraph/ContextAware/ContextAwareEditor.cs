@@ -18,7 +18,7 @@
 using GolemCognitiveGraph.Core;
 using GolemCognitiveGraph.Editor;
 
-namespace GolemCognitiveGraph.Advanced;
+namespace GolemCognitiveGraph.ContextAware;
 
 /// <summary>
 /// Provides context-aware editing capabilities and rule activation callbacks.
