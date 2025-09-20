@@ -1,0 +1,69 @@
+Grammar: ABNF
+TokenSplitter: Space
+FormatType: EBNF
+
+/*
+ * Augmented Backus-Naur Form (ABNF) Grammar
+ * Based on RFC 5234 - Augmented BNF for Syntax Specifications: ABNF
+ * https://tools.ietf.org/html/rfc5234
+ */
+
+<abnf-document> ::= <rule>+
+
+<rule> ::= <rulename> <defined-as> <elements> <c-nl>
+
+<rulename> ::= <ALPHA> (<ALPHA> | <DIGIT> | "-")*
+
+<defined-as> ::= "=" | "=/"
+
+<elements> ::= <alternation>
+
+<alternation> ::= <concatenation> ("|" <concatenation>)*
+
+<concatenation> ::= <repetition>+
+
+<repetition> ::= <repeat>? <element>
+
+<repeat> ::= <DIGIT>+ | (<DIGIT>* "*" <DIGIT>*)
+
+<element> ::= <rulename> | <group> | <option> | <char-val> | <num-val> | <prose-val>
+
+<group> ::= "(" <alternation> ")"
+
+<option> ::= "[" <alternation> "]"
+
+<char-val> ::= "\"" <char>* "\""
+
+<num-val> ::= "%" (<bin-val> | <dec-val> | <hex-val>)
+
+<bin-val> ::= "b" (<BIT>+ | <BIT>+ ("." <BIT>+)+ | <BIT>+ "-" <BIT>+)
+
+<dec-val> ::= "d" (<DIGIT>+ | <DIGIT>+ ("." <DIGIT>+)+ | <DIGIT>+ "-" <DIGIT>+)
+
+<hex-val> ::= "x" (<HEXDIG>+ | <HEXDIG>+ ("." <HEXDIG>+)+ | <HEXDIG>+ "-" <HEXDIG>+)
+
+<prose-val> ::= "<" <prose-text> ">"
+
+<prose-text> ::= /[^>]*/
+
+<c-nl> ::= <comment> | <CRLF>
+
+<comment> ::= ";" <WSP>* <VCHAR>* <CRLF>
+
+<c-wsp> ::= <WSP> | (<c-nl> <WSP>)
+
+<ALPHA> ::= /[A-Za-z]/
+
+<DIGIT> ::= /[0-9]/
+
+<HEXDIG> ::= <DIGIT> | /[A-Fa-f]/
+
+<BIT> ::= "0" | "1"
+
+<VCHAR> ::= /[\x21-\x7E]/
+
+<WSP> ::= /[ \t]/
+
+<CRLF> ::= /\r?\n/
+
+<char> ::= /[\x01-\x7F]/

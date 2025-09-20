@@ -1,0 +1,233 @@
+Grammar: JSONSchema
+TokenSplitter: Space
+FormatType: EBNF
+
+/*
+ * JSON Schema Grammar Definition
+ * Based on JSON Schema Draft 2020-12 (Draft 8)
+ * https://json-schema.org/draft/2020-12/schema
+ */
+
+<schema> ::= <schema-document>
+
+<schema-document> ::= <object> | <boolean>
+
+<schema-keywords> ::= <type-keyword>
+                   | <format-keyword>
+                   | <validation-keywords>
+                   | <applicator-keywords>
+                   | <annotation-keywords>
+                   | <meta-schema-keywords>
+                   | <conditional-keywords>
+                   | <logical-keywords>
+
+<type-keyword> ::= "\"type\"" ":" <type-value>
+
+<type-value> ::= <simple-type> | <type-array>
+
+<simple-type> ::= "\"null\""
+               | "\"boolean\""
+               | "\"object\""
+               | "\"array\""
+               | "\"number\""
+               | "\"integer\""
+               | "\"string\""
+
+<type-array> ::= "[" <type-list> "]"
+
+<type-list> ::= <simple-type>
+             | <simple-type> "," <type-list>
+
+<format-keyword> ::= "\"format\"" ":" <format-value>
+
+<format-value> ::= "\"date-time\""
+                | "\"date\""
+                | "\"time\""
+                | "\"duration\""
+                | "\"email\""
+                | "\"idn-email\""
+                | "\"hostname\""
+                | "\"idn-hostname\""
+                | "\"ipv4\""
+                | "\"ipv6\""
+                | "\"uri\""
+                | "\"uri-reference\""
+                | "\"iri\""
+                | "\"iri-reference\""
+                | "\"uuid\""
+                | "\"uri-template\""
+                | "\"json-pointer\""
+                | "\"relative-json-pointer\""
+                | "\"regex\""
+
+<validation-keywords> ::= <string-validation>
+                       | <numeric-validation>
+                       | <array-validation>
+                       | <object-validation>
+
+<string-validation> ::= <min-length> | <max-length> | <pattern>
+
+<min-length> ::= "\"minLength\"" ":" <non-negative-integer>
+
+<max-length> ::= "\"maxLength\"" ":" <non-negative-integer>
+
+<pattern> ::= "\"pattern\"" ":" <string>
+
+<numeric-validation> ::= <minimum> | <maximum> | <exclusive-minimum> | <exclusive-maximum> | <multiple-of>
+
+<minimum> ::= "\"minimum\"" ":" <number>
+
+<maximum> ::= "\"maximum\"" ":" <number>
+
+<exclusive-minimum> ::= "\"exclusiveMinimum\"" ":" <number>
+
+<exclusive-maximum> ::= "\"exclusiveMaximum\"" ":" <number>
+
+<multiple-of> ::= "\"multipleOf\"" ":" <positive-number>
+
+<array-validation> ::= <min-items> | <max-items> | <unique-items> | <min-contains> | <max-contains>
+
+<min-items> ::= "\"minItems\"" ":" <non-negative-integer>
+
+<max-items> ::= "\"maxItems\"" ":" <non-negative-integer>
+
+<unique-items> ::= "\"uniqueItems\"" ":" <boolean>
+
+<min-contains> ::= "\"minContains\"" ":" <non-negative-integer>
+
+<max-contains> ::= "\"maxContains\"" ":" <non-negative-integer>
+
+<object-validation> ::= <min-properties> | <max-properties> | <required> | <dependent-required>
+
+<min-properties> ::= "\"minProperties\"" ":" <non-negative-integer>
+
+<max-properties> ::= "\"maxProperties\"" ":" <non-negative-integer>
+
+<required> ::= "\"required\"" ":" <string-array>
+
+<dependent-required> ::= "\"dependentRequired\"" ":" <object>
+
+<applicator-keywords> ::= <properties> | <pattern-properties> | <additional-properties> | <items> | <additional-items>
+
+<properties> ::= "\"properties\"" ":" <schema-object>
+
+<pattern-properties> ::= "\"patternProperties\"" ":" <schema-object>
+
+<additional-properties> ::= "\"additionalProperties\"" ":" <schema>
+
+<items> ::= "\"items\"" ":" <schema> | "\"items\"" ":" <schema-array>
+
+<additional-items> ::= "\"additionalItems\"" ":" <schema>
+
+<annotation-keywords> ::= <title> | <description> | <default> | <examples>
+
+<title> ::= "\"title\"" ":" <string>
+
+<description> ::= "\"description\"" ":" <string>
+
+<default> ::= "\"default\"" ":" <value>
+
+<examples> ::= "\"examples\"" ":" <array>
+
+<meta-schema-keywords> ::= <schema-keyword> | <vocabulary> | <id> | <anchor> | <dynamic-anchor> | <ref> | <dynamic-ref> | <defs> | <comment>
+
+<schema-keyword> ::= "\"$schema\"" ":" <uri>
+
+<vocabulary> ::= "\"$vocabulary\"" ":" <object>
+
+<id> ::= "\"$id\"" ":" <uri>
+
+<anchor> ::= "\"$anchor\"" ":" <string>
+
+<dynamic-anchor> ::= "\"$dynamicAnchor\"" ":" <string>
+
+<ref> ::= "\"$ref\"" ":" <uri-reference>
+
+<dynamic-ref> ::= "\"$dynamicRef\"" ":" <uri-reference>
+
+<defs> ::= "\"$defs\"" ":" <schema-object>
+
+<comment> ::= "\"$comment\"" ":" <string>
+
+<conditional-keywords> ::= <if-then-else> | <dependent-schemas>
+
+<if-then-else> ::= <if> <then>? <else>?
+
+<if> ::= "\"if\"" ":" <schema>
+
+<then> ::= "\"then\"" ":" <schema>
+
+<else> ::= "\"else\"" ":" <schema>
+
+<dependent-schemas> ::= "\"dependentSchemas\"" ":" <schema-object>
+
+<logical-keywords> ::= <all-of> | <any-of> | <one-of> | <not>
+
+<all-of> ::= "\"allOf\"" ":" <schema-array>
+
+<any-of> ::= "\"anyOf\"" ":" <schema-array>
+
+<one-of> ::= "\"oneOf\"" ":" <schema-array>
+
+<not> ::= "\"not\"" ":" <schema>
+
+<schema-array> ::= "[" <schema-list> "]"
+
+<schema-list> ::= <schema>
+               | <schema> "," <schema-list>
+
+<schema-object> ::= "{" <schema-property-list> "}"
+
+<schema-property-list> ::= <schema-property>
+                        | <schema-property> "," <schema-property-list>
+
+<schema-property> ::= <string> ":" <schema>
+
+<string-array> ::= "[" <string-list> "]"
+
+<string-list> ::= <string>
+               | <string> "," <string-list>
+
+<non-negative-integer> ::= /0|[1-9][0-9]*/
+
+<positive-number> ::= <number>
+
+<uri> ::= <string>
+
+<uri-reference> ::= <string>
+
+<object> ::= "{" <property-list>? "}"
+
+<property-list> ::= <property>
+                 | <property> "," <property-list>
+
+<property> ::= <string> ":" <value>
+
+<array> ::= "[" <value-list>? "]"
+
+<value-list> ::= <value>
+              | <value> "," <value-list>
+
+<value> ::= <object> | <array> | <string> | <number> | <boolean> | <null>
+
+<string> ::= "\"" <character>* "\""
+
+<character> ::= /[^"\\]/ | "\\" <escape-character>
+
+<escape-character> ::= "\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t" | "u" <hex-digit> <hex-digit> <hex-digit> <hex-digit>
+
+<hex-digit> ::= /[0-9A-Fa-f]/
+
+<number> ::= <integer> <fraction>? <exponent>?
+
+<integer> ::= /-?(?:0|[1-9][0-9]*)/
+
+<fraction> ::= "." <digit>+
+
+<exponent> ::= /[eE][+-]?[0-9]+/
+
+<digit> ::= /[0-9]/
+
+<boolean> ::= "true" | "false"
+
+<null> ::= "null"
