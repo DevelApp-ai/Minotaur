@@ -1,0 +1,462 @@
+Grammar: Flex_Base
+TokenSplitter: None
+Inheritable: true
+FormatType: Flex
+ImportSemantics: true
+CoordinateTokens: true
+
+// Flex Base Grammar Template
+// This base grammar defines the fundamental lexical analysis patterns and behaviors
+// for Flex lexer generators within Minotaur's inheritance-based compiler-compiler support
+
+// ============================================================================
+// FLEX FILE STRUCTURE
+// ============================================================================
+
+// Flex file has three sections separated by %%
+<flex-file> ::= <definitions-section>? "%%" <rules-section> "%%" <user-code-section>?
+
+// ============================================================================
+// DEFINITIONS SECTION
+// ============================================================================
+
+<definitions-section> ::= <definition>*
+
+<definition> ::= <name-definition>
+              | <start-condition-definition>
+              | <option-definition>
+              | <c-code-block>
+
+// Name definitions (macros)
+<name-definition> ::= <name> <whitespace> <definition-text> => {
+  defineFlexMacro($1, $2);
+}
+
+<name> ::= /[a-zA-Z_][a-zA-Z0-9_]*/ => {
+  validateFlexName($1);
+}
+
+<definition-text> ::= /[^\n]+/ => {
+  parseDefinitionText($1);
+}
+
+// Start condition definitions
+<start-condition-definition> ::= "%s" <start-condition-list> => {
+  defineInclusiveStartConditions($1);
+}
+                              | "%x" <start-condition-list> => {
+  defineExclusiveStartConditions($1);
+}
+
+<start-condition-list> ::= <start-condition> (<whitespace> <start-condition>)*
+<start-condition> ::= <IDENTIFIER> => {
+  createStartCondition($1);
+}
+
+// Option definitions
+<option-definition> ::= "%option" <option-list> => {
+  setFlexOptions($1);
+}
+
+<option-list> ::= <option> (<whitespace> <option>)*
+<option> ::= <option-name> ("=" <option-value>)?
+
+<option-name> ::= /[a-zA-Z][a-zA-Z0-9-]*/ => {
+  validateOptionName($1);
+}
+
+<option-value> ::= /[^\s]+/ => {
+  parseOptionValue($1);
+}
+
+// ============================================================================
+// RULES SECTION
+// ============================================================================
+
+<rules-section> ::= <rule>*
+
+<rule> ::= <start-condition-prefix>? <pattern> <whitespace> <action> => {
+  createFlexRule($1, $2, $3);
+}
+
+// Start condition prefix
+<start-condition-prefix> ::= "<" <start-condition-list> ">" => {
+  setRuleStartConditions($1);
+}
+
+// ============================================================================
+// FLEX PATTERNS
+// ============================================================================
+
+<pattern> ::= <regex-pattern>
+           | <string-pattern>
+           | <character-class>
+           | <pattern-combination>
+
+// Regular expression patterns
+<regex-pattern> ::= <regex-element>+ => {
+  createRegexPattern($1);
+}
+
+<regex-element> ::= <character-class>
+                 | <literal-character>
+                 | <escape-sequence>
+                 | <quantifier>
+                 | <group>
+                 | <anchor>
+                 | <name-reference>
+
+// Character classes
+<character-class> ::= "[" <character-range>* "]" => {
+  createCharacterClass($1);
+}
+                   | "[^" <character-range>* "]" => {
+  createNegatedCharacterClass($1);
+}
+
+<character-range> ::= <character> "-" <character> => {
+  createCharacterRange($1, $2);
+}
+                   | <character> => {
+  createSingleCharacter($1);
+}
+
+// String patterns (quoted strings)
+<string-pattern> ::= '"' <string-content> '"' => {
+  createStringPattern($1);
+}
+
+<string-content> ::= <string-character>*
+<string-character> ::= <literal-character>
+                    | <escape-sequence>
+
+// Quantifiers
+<quantifier> ::= "*" => { createZeroOrMore(); }
+              | "+" => { createOneOrMore(); }
+              | "?" => { createOptional(); }
+              | "{" <count-spec> "}" => { createCountedRepetition($1); }
+
+<count-spec> ::= <INTEGER> => { createExactCount($1); }
+              | <INTEGER> "," => { createMinCount($1); }
+              | <INTEGER> "," <INTEGER> => { createRangeCount($1, $2); }
+              | "," <INTEGER> => { createMaxCount($1); }
+
+// Groups and alternation
+<group> ::= "(" <pattern-alternative> ")" => {
+  createPatternGroup($1);
+}
+
+<pattern-alternative> ::= <pattern> ("|" <pattern>)* => {
+  createPatternAlternative($1);
+}
+
+// Anchors
+<anchor> ::= "^" => { createBeginningOfLine(); }
+          | "$" => { createEndOfLine(); }
+          | "<<EOF>>" => { createEndOfFile(); }
+
+// Name references (macro expansion)
+<name-reference> ::= "{" <name> "}" => {
+  expandFlexMacro($1);
+}
+
+// ============================================================================
+// FLEX ACTIONS
+// ============================================================================
+
+<action> ::= <c-action>
+          | <return-action>
+          | <special-action>
+
+// C code action
+<c-action> ::= "{" <c-code-block> "}" => {
+  executeFlexAction($1, getCurrentMatch(), getCurrentContext());
+}
+
+// Simple return action
+<return-action> ::= <return-value> => {
+  returnToken($1);
+}
+
+<return-value> ::= <TOKEN_NAME> => {
+  createTokenReturn($1);
+}
+                | <INTEGER> => {
+  createIntegerReturn($1);
+}
+
+// Special actions
+<special-action> ::= "ECHO" => {
+  echoMatchedText();
+}
+                  | "REJECT" => {
+  rejectMatch();
+}
+                  | "|" => {
+  continueToNextRule();
+}
+
+// ============================================================================
+// FLEX BUILT-IN VARIABLES AND FUNCTIONS
+// ============================================================================
+
+// Built-in variables
+<flex-variable> ::= "yytext" => {
+  getMatchedText();
+}
+                 | "yyleng" => {
+  getMatchedLength();
+}
+                 | "yylineno" => {
+  getCurrentLineNumber();
+}
+                 | "yyin" => {
+  getInputFile();
+}
+                 | "yyout" => {
+  getOutputFile();
+}
+
+// Built-in functions
+<flex-function> ::= "input" "(" ")" => {
+  readNextCharacter();
+}
+                 | "unput" "(" <character> ")" => {
+  unputCharacter($1);
+}
+                 | "output" "(" <character> ")" => {
+  outputCharacter($1);
+}
+                 | "yymore" "(" ")" => {
+  appendToCurrentToken();
+}
+                 | "yyless" "(" <INTEGER> ")" => {
+  returnCharactersToInput($1);
+}
+
+// ============================================================================
+// START CONDITIONS AND STATE MANAGEMENT
+// ============================================================================
+
+// State transition actions
+<state-action> ::= "BEGIN" <start-condition> => {
+  changeStartCondition($1);
+}
+                | "BEGIN" "INITIAL" => {
+  returnToInitialState();
+}
+
+// Conditional patterns based on start conditions
+<conditional-pattern> ::= "<" <condition-list> ">" <pattern> => {
+  createConditionalPattern($1, $2);
+}
+
+<condition-list> ::= <condition> ("," <condition>)*
+<condition> ::= <start-condition>
+             | "INITIAL" => {
+  referenceInitialState();
+}
+             | "*" => {
+  referenceAllStates();
+}
+
+// ============================================================================
+// FLEX OPTIONS AND DIRECTIVES
+// ============================================================================
+
+// Common Flex options
+<flex-options> ::= <case-insensitive>
+                | <interactive>
+                | <batch>
+                | <debug>
+                | <nodefault>
+                | <yywrap>
+
+<case-insensitive> ::= "%option" "case-insensitive" => {
+  enableCaseInsensitive();
+}
+
+<interactive> ::= "%option" "interactive" => {
+  enableInteractiveMode();
+}
+
+<batch> ::= "%option" "batch" => {
+  enableBatchMode();
+}
+
+<debug> ::= "%option" "debug" => {
+  enableDebugMode();
+}
+
+<nodefault> ::= "%option" "nodefault" => {
+  disableDefaultRule();
+}
+
+<yywrap> ::= "%option" "yywrap" => {
+  enableYYWrap();
+}
+          | "%option" "noyywrap" => {
+  disableYYWrap();
+}
+
+// ============================================================================
+// USER CODE SECTION
+// ============================================================================
+
+<user-code-section> ::= <c-code-block> => {
+  addUserCode($1);
+}
+
+<c-code-block> ::= <c-code-line>*
+<c-code-line> ::= /[^\n]*\n/ => {
+  preserveCCode($1);
+}
+
+// ============================================================================
+// ESCAPE SEQUENCES AND SPECIAL CHARACTERS
+// ============================================================================
+
+<escape-sequence> ::= "\\" <escaped-character> => {
+  createEscapeSequence($1);
+}
+
+<escaped-character> ::= "n" => { createNewline(); }
+                     | "t" => { createTab(); }
+                     | "r" => { createCarriageReturn(); }
+                     | "b" => { createBackspace(); }
+                     | "f" => { createFormFeed(); }
+                     | "a" => { createBell(); }
+                     | "v" => { createVerticalTab(); }
+                     | "\\" => { createBackslash(); }
+                     | "\"" => { createDoubleQuote(); }
+                     | "'" => { createSingleQuote(); }
+                     | <octal-sequence> => { createOctalCharacter($1); }
+                     | <hex-sequence> => { createHexCharacter($1); }
+
+<octal-sequence> ::= /[0-7]{1,3}/ => {
+  parseOctalSequence($1);
+}
+
+<hex-sequence> ::= "x" /[0-9a-fA-F]{1,2}/ => {
+  parseHexSequence($1);
+}
+
+// ============================================================================
+// FLEX IDENTIFIERS AND LITERALS
+// ============================================================================
+
+<IDENTIFIER> ::= /[a-zA-Z_][a-zA-Z0-9_]*/ => {
+  createIdentifier($1);
+}
+
+<TOKEN_NAME> ::= /[A-Z][A-Z0-9_]*/ => {
+  validateTokenName($1);
+}
+
+<INTEGER> ::= /[0-9]+/ => {
+  parseInt($1);
+}
+
+<character> ::= /[^\\\n]/ => {
+  createCharacter($1);
+}
+             | <escape-sequence> => {
+  $1;
+}
+
+<literal-character> ::= /[^\\"\[\]{}()*+?|^$.\n]/ => {
+  createLiteralCharacter($1);
+}
+
+<whitespace> ::= /[ \t]+/ => {
+  // Whitespace handling
+}
+
+// ============================================================================
+// SEMANTIC ACTION TEMPLATES
+// ============================================================================
+
+// Template for handling Flex semantic actions
+<flex-action-template> ::= "{" <c-code> "}" => {
+  // Preserve Flex action execution context
+  const context = {
+    matchedText: getMatchedText(),
+    matchedLength: getMatchedLength(),
+    lineNumber: getCurrentLineNumber(),
+    startCondition: getCurrentStartCondition(),
+    inputFile: getInputFile(),
+    outputFile: getOutputFile()
+  };
+  
+  // Execute action with Flex semantics
+  executeFlexAction($1, context);
+}
+
+// Template for token return
+<token-return-template> ::= "return" <TOKEN_NAME> => {
+  // Return token with Flex semantics
+  const tokenType = $1;
+  const tokenValue = getMatchedText();
+  return createToken(tokenType, tokenValue);
+}
+
+// Template for state transitions
+<state-transition-template> ::= "BEGIN" <start-condition> => {
+  // Change lexer state with Flex semantics
+  const newState = $1;
+  changeStartCondition(newState);
+}
+
+// ============================================================================
+// ERROR HANDLING TEMPLATES
+// ============================================================================
+
+// Flex error handling
+ErrorRecovery: {
+  strategy: "default_rule",
+  defaultAction: "ECHO",
+  errorReporting: "stderr",
+  
+  // Default rule handling
+  defaultRule: {
+    action: "ECHO",
+    description: "Echo unmatched characters"
+  },
+  
+  // Error recovery actions
+  recoveryActions: {
+    unmatchedInput: "echo",
+    lexicalError: "skip",
+    bufferOverflow: "abort"
+  }
+}
+
+// ============================================================================
+// EXTENSION POINTS FOR INHERITANCE
+// ============================================================================
+
+// Extension point for additional name definitions
+<extended-definitions> ::= <name-definition>* => {
+  processExtendedDefinitions($1);
+}
+
+// Extension point for additional start conditions
+<extended-start-conditions> ::= <start-condition-definition>* => {
+  processExtendedStartConditions($1);
+}
+
+// Extension point for additional rules
+<extended-rules> ::= <rule>* => {
+  processExtendedRules($1);
+}
+
+// Extension point for additional options
+<extended-options> ::= <option-definition>* => {
+  processExtendedOptions($1);
+}
+
+// Extension point for custom user code
+<extended-user-code> ::= <c-code-block> => {
+  processExtendedUserCode($1);
+}
+

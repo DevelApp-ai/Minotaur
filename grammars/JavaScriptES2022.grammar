@@ -1,0 +1,923 @@
+/*
+ * JavaScript ES2022 Grammar Specification
+ * 
+ * This grammar is designed for parsing the JavaScript ES2022 (ECMAScript 2022) programming language and is suitable for a grammar marketplace.
+ * It covers the full language specification, including modern features like top-level await, private class fields, class static blocks,
+ * enhanced error handling with Error.cause, RegExp match indices, and Object.hasOwn. This grammar is based on the 
+ * official ECMAScript 2022 specification and includes all language features up to ES2022.
+ */
+
+Grammar: CEBNF
+TokenSplitter: Space
+Keywords: async, await, break, case, catch, class, const, continue, debugger, default, delete, do, else, enum, export, extends, false, finally, for, function, if, import, in, instanceof, let, new, null, return, super, switch, this, throw, true, try, typeof, var, void, while, with, yield, static, private, public, protected, abstract, implements, interface, package
+
+<program> ::= <module-body>?
+
+<module-body> ::= <module-item-list>
+
+<module-item-list> ::= <module-item> <module-item-list>?
+
+<module-item> ::= <import-declaration>
+                | <export-declaration>
+                | <statement-list-item>
+
+/* Import Declarations */
+<import-declaration> ::= import <import-clause> <from-clause> <semicolon>?
+                       | import <module-specifier> <semicolon>?
+
+<import-clause> ::= <import-default-binding>
+                  | <namespace-import>
+                  | <named-imports>
+                  | <import-default-binding> , <namespace-import>
+                  | <import-default-binding> , <named-imports>
+
+<import-default-binding> ::= <identifier-name>
+
+<namespace-import> ::= * as <identifier-name>
+
+<named-imports> ::= { }
+                  | { <import-specifier-list> }
+                  | { <import-specifier-list> , }
+
+<import-specifier-list> ::= <import-specifier> <import-specifier-tail>?
+
+<import-specifier-tail> ::= , <import-specifier-list>
+
+<import-specifier> ::= <identifier-name>
+                     | <identifier-name> as <identifier-name>
+
+<module-specifier> ::= <string-literal>
+
+<from-clause> ::= from <module-specifier>
+
+/* Export Declarations */
+<export-declaration> ::= export * <from-clause> <semicolon>?
+                       | export * as <identifier-name> <from-clause> <semicolon>?
+                       | export <named-exports> <from-clause>? <semicolon>?
+                       | export <variable-statement>
+                       | export <declaration>
+                       | export default <hoistable-declaration>
+                       | export default <class-declaration>
+                       | export default <assignment-expression> <semicolon>?
+
+<named-exports> ::= { }
+                  | { <export-specifier-list> }
+                  | { <export-specifier-list> , }
+
+<export-specifier-list> ::= <export-specifier> <export-specifier-tail>?
+
+<export-specifier-tail> ::= , <export-specifier-list>
+
+<export-specifier> ::= <identifier-name>
+                     | <identifier-name> as <identifier-name>
+
+/* Statements */
+<statement> ::= <block-statement>
+              | <variable-statement>
+              | <empty-statement>
+              | <expression-statement>
+              | <if-statement>
+              | <breakable-statement>
+              | <continue-statement>
+              | <break-statement>
+              | <return-statement>
+              | <with-statement>
+              | <labelled-statement>
+              | <throw-statement>
+              | <try-statement>
+              | <debugger-statement>
+
+<declaration> ::= <hoistable-declaration>
+                | <class-declaration>
+                | <lexical-declaration>
+
+<hoistable-declaration> ::= <function-declaration>
+                          | <generator-declaration>
+                          | <async-function-declaration>
+                          | <async-generator-declaration>
+
+<breakable-statement> ::= <iteration-statement>
+                        | <switch-statement>
+
+<block-statement> ::= <block>
+
+<block> ::= { <statement-list>? }
+
+<statement-list> ::= <statement-list-item> <statement-list>?
+
+<statement-list-item> ::= <statement>
+                        | <declaration>
+
+<lexical-declaration> ::= <let-or-const> <binding-list> <semicolon>?
+
+<let-or-const> ::= let | const
+
+<binding-list> ::= <lexical-binding> <binding-list-tail>?
+
+<binding-list-tail> ::= , <binding-list>
+
+<lexical-binding> ::= <binding-identifier> <initializer>?
+                    | <binding-pattern> <initializer>
+
+<variable-statement> ::= var <variable-declaration-list> <semicolon>?
+
+<variable-declaration-list> ::= <variable-declaration> <variable-declaration-tail>?
+
+<variable-declaration-tail> ::= , <variable-declaration-list>
+
+<variable-declaration> ::= <binding-identifier> <initializer>?
+                         | <binding-pattern> <initializer>
+
+<binding-pattern> ::= <object-binding-pattern>
+                    | <array-binding-pattern>
+
+<object-binding-pattern> ::= { }
+                           | { <binding-rest-property> }
+                           | { <binding-property-list> }
+                           | { <binding-property-list> , <binding-rest-property>? }
+
+<array-binding-pattern> ::= [ <elision>? <binding-rest-element>? ]
+                          | [ <binding-element-list> ]
+                          | [ <binding-element-list> , <elision>? <binding-rest-element>? ]
+
+<binding-rest-property> ::= ... <binding-identifier>
+
+<binding-property-list> ::= <binding-property> <binding-property-tail>?
+
+<binding-property-tail> ::= , <binding-property-list>
+
+<binding-property> ::= <single-name-binding>
+                     | <property-name> : <binding-element>
+
+<binding-element> ::= <single-name-binding>
+                    | <binding-pattern> <initializer>?
+
+<single-name-binding> ::= <binding-identifier> <initializer>?
+
+<binding-rest-element> ::= ... <binding-identifier>
+                         | ... <binding-pattern>
+
+<empty-statement> ::= ;
+
+<expression-statement> ::= <expression> <semicolon>?
+
+<if-statement> ::= if ( <expression> ) <statement> else <statement>
+                 | if ( <expression> ) <statement>
+
+<iteration-statement> ::= <do-while-statement>
+                        | <while-statement>
+                        | <for-statement>
+                        | <for-in-statement>
+                        | <for-of-statement>
+                        | <for-await-of-statement>
+
+<do-while-statement> ::= do <statement> while ( <expression> ) <semicolon>?
+
+<while-statement> ::= while ( <expression> ) <statement>
+
+<for-statement> ::= for ( <expression>? ; <expression>? ; <expression>? ) <statement>
+                  | for ( var <variable-declaration-list> ; <expression>? ; <expression>? ) <statement>
+                  | for ( <lexical-declaration> <expression>? ; <expression>? ) <statement>
+
+<for-in-statement> ::= for ( <left-hand-side-expression> in <expression> ) <statement>
+                     | for ( var <for-binding> in <expression> ) <statement>
+                     | for ( <for-declaration> in <expression> ) <statement>
+
+<for-of-statement> ::= for ( <left-hand-side-expression> of <assignment-expression> ) <statement>
+                     | for ( var <for-binding> of <assignment-expression> ) <statement>
+                     | for ( <for-declaration> of <assignment-expression> ) <statement>
+
+<for-await-of-statement> ::= for await ( <left-hand-side-expression> of <assignment-expression> ) <statement>
+                           | for await ( var <for-binding> of <assignment-expression> ) <statement>
+                           | for await ( <for-declaration> of <assignment-expression> ) <statement>
+
+<for-declaration> ::= <let-or-const> <for-binding>
+
+<for-binding> ::= <binding-identifier>
+                | <binding-pattern>
+
+<continue-statement> ::= continue <semicolon>?
+                       | continue <label-identifier> <semicolon>?
+
+<break-statement> ::= break <semicolon>?
+                    | break <label-identifier> <semicolon>?
+
+<return-statement> ::= return <semicolon>?
+                     | return <expression> <semicolon>?
+
+<with-statement> ::= with ( <expression> ) <statement>
+
+<switch-statement> ::= switch ( <expression> ) <case-block>
+
+<case-block> ::= { <case-clauses>? }
+               | { <case-clauses>? <default-clause> <case-clauses>? }
+
+<case-clauses> ::= <case-clause> <case-clauses>?
+
+<case-clause> ::= case <expression> : <statement-list>?
+
+<default-clause> ::= default : <statement-list>?
+
+<labelled-statement> ::= <label-identifier> : <labelled-item>
+
+<labelled-item> ::= <statement>
+                  | <function-declaration>
+
+<throw-statement> ::= throw <expression> <semicolon>?
+
+<try-statement> ::= try <block> <catch>
+                  | try <block> <finally>
+                  | try <block> <catch> <finally>
+
+<catch> ::= catch ( <catch-parameter> ) <block>
+          | catch <block>
+
+<finally> ::= finally <block>
+
+<catch-parameter> ::= <binding-identifier>
+                    | <binding-pattern>
+
+<debugger-statement> ::= debugger <semicolon>?
+
+/* Function and Class Declarations */
+<function-declaration> ::= function <binding-identifier> ( <formal-parameters> ) { <function-body> }
+                         | function ( <formal-parameters> ) { <function-body> }
+
+<function-expression> ::= function <binding-identifier>? ( <formal-parameters> ) { <function-body> }
+
+<unique-formal-parameters> ::= <formal-parameters>
+
+<formal-parameters> ::= <formal-parameter-list>?
+
+<formal-parameter-list> ::= <formal-parameter> <formal-parameter-tail>?
+
+<formal-parameter-tail> ::= , <formal-parameter-list>
+
+<function-rest-parameter> ::= <binding-rest-element>
+
+<formal-parameter> ::= <binding-element>
+
+<function-body> ::= <function-statement-list>?
+
+<function-statement-list> ::= <statement-list-item> <function-statement-list>?
+
+<arrow-function> ::= <arrow-parameters> => <concise-body>
+
+<arrow-parameters> ::= <binding-identifier>
+                     | <covered-formal-parameters>
+
+<concise-body> ::= <assignment-expression>
+                 | { <function-body> }
+
+<arrow-formal-parameters> ::= ( <unique-formal-parameters> )
+
+<generator-declaration> ::= function * <binding-identifier> ( <formal-parameters> ) { <generator-body> }
+                          | function * ( <formal-parameters> ) { <generator-body> }
+
+<generator-expression> ::= function * <binding-identifier>? ( <formal-parameters> ) { <generator-body> }
+
+<generator-body> ::= <function-body>
+
+<yield-expression> ::= yield
+                     | yield <assignment-expression>
+                     | yield * <assignment-expression>
+
+<async-function-declaration> ::= async function <binding-identifier> ( <formal-parameters> ) { <async-function-body> }
+
+<async-function-expression> ::= async function <binding-identifier>? ( <formal-parameters> ) { <async-function-body> }
+
+<async-method> ::= async <property-name> ( <unique-formal-parameters> ) { <async-function-body> }
+
+<async-function-body> ::= <function-body>
+
+<await-expression> ::= await <unary-expression>
+
+<async-arrow-function> ::= async <async-arrow-binding-identifier> => <async-concise-body>
+                         | <covered-async-arrow-head> => <async-concise-body>
+
+<async-concise-body> ::= <assignment-expression>
+                       | { <async-function-body> }
+
+<async-arrow-binding-identifier> ::= <binding-identifier>
+
+<covered-async-arrow-head> ::= async <arrow-formal-parameters>
+
+<async-generator-declaration> ::= async function * <binding-identifier> ( <formal-parameters> ) { <async-generator-body> }
+
+<async-generator-expression> ::= async function * <binding-identifier>? ( <formal-parameters> ) { <async-generator-body> }
+
+<async-generator-body> ::= <function-body>
+
+/* Class Declarations */
+<class-declaration> ::= class <binding-identifier> <class-tail>
+                      | class <class-tail>
+
+<class-expression> ::= class <binding-identifier>? <class-tail>
+
+<class-tail> ::= <class-heritage>? { <class-body>? }
+
+<class-heritage> ::= extends <left-hand-side-expression>
+
+<class-body> ::= <class-element-list>
+
+<class-element-list> ::= <class-element> <class-element-list>?
+
+<class-element> ::= <method-definition>
+                  | <class-static-block>
+                  | ;
+
+/* Class Static Blocks (ES2022) */
+<class-static-block> ::= static { <class-static-block-body> }
+
+<class-static-block-body> ::= <class-static-block-statement-list>?
+
+<class-static-block-statement-list> ::= <statement-list-item> <class-static-block-statement-list>?
+
+<method-definition> ::= <property-name> ( <unique-formal-parameters> ) { <function-body> }
+                      | <generator-method>
+                      | <async-method>
+                      | <async-generator-method>
+                      | get <property-name> ( ) { <function-body> }
+                      | set <property-name> ( <property-set-parameter-list> ) { <function-body> }
+
+<generator-method> ::= * <property-name> ( <unique-formal-parameters> ) { <generator-body> }
+
+<async-generator-method> ::= async * <property-name> ( <unique-formal-parameters> ) { <async-generator-body> }
+
+<property-set-parameter-list> ::= <formal-parameter>
+
+/* Private Names (ES2022) */
+<private-identifier> ::= # <identifier-name>
+
+<class-element-name> ::= <property-name>
+                       | <private-identifier>
+
+/* Expressions */
+<primary-expression> ::= this
+                       | <identifier-reference>
+                       | <literal>
+                       | <array-literal>
+                       | <object-literal>
+                       | <function-expression>
+                       | <class-expression>
+                       | <generator-expression>
+                       | <async-function-expression>
+                       | <async-generator-expression>
+                       | <regular-expression-literal>
+                       | <template-literal>
+                       | <covered-parenthesized-expression-and-arrow-parameter-list>
+
+<covered-parenthesized-expression-and-arrow-parameter-list> ::= ( <expression> )
+                                                              | ( <expression> , <assignment-expression-list> )
+                                                              | ( )
+                                                              | ( ... <binding-identifier> )
+                                                              | ( ... <binding-pattern> )
+                                                              | ( <expression> , ... <binding-identifier> )
+                                                              | ( <expression> , ... <binding-pattern> )
+
+<parenthesized-expression> ::= ( <expression> )
+
+<literal> ::= <null-literal>
+            | <boolean-literal>
+            | <numeric-literal>
+            | <string-literal>
+            | <bigint-literal>
+
+<array-literal> ::= [ <elision>? ]
+                  | [ <element-list> ]
+                  | [ <element-list> , <elision>? ]
+
+<element-list> ::= <elision>? <assignment-expression> <element-list-tail>?
+                 | <elision>? <spread-element> <element-list-tail>?
+
+<element-list-tail> ::= , <element-list>
+
+<elision> ::= , <elision>?
+
+<spread-element> ::= ... <assignment-expression>
+
+<object-literal> ::= { }
+                   | { <property-definition-list> }
+                   | { <property-definition-list> , }
+
+<property-definition-list> ::= <property-definition> <property-definition-tail>?
+
+<property-definition-tail> ::= , <property-definition-list>
+
+<property-definition> ::= <identifier-reference>
+                        | <covered-initializer-name>
+                        | <property-name> : <assignment-expression>
+                        | <method-definition>
+                        | ... <assignment-expression>
+
+<property-name> ::= <literal-property-name>
+                  | <computed-property-name>
+
+<literal-property-name> ::= <identifier-name>
+                          | <string-literal>
+                          | <numeric-literal>
+
+<computed-property-name> ::= [ <assignment-expression> ]
+
+<covered-initializer-name> ::= <identifier-reference> <initializer>
+
+<initializer> ::= = <assignment-expression>
+
+<template-literal> ::= <no-substitution-template>
+                     | <substitution-template>
+
+<no-substitution-template> ::= ` <template-characters>? `
+
+<substitution-template> ::= ` <template-characters>? ${ <expression> } <template-characters>? `
+                          | <substitution-template> ${ <expression> } <template-characters>?
+
+<template-characters> ::= <template-character> <template-characters>?
+
+<template-character> ::= $ <template-character-except-dollar>
+                       | \ <escape-sequence>
+                       | <line-terminator-sequence>
+                       | <template-character-except-dollar-backslash-grave>
+
+<template-character-except-dollar> ::= <source-character-except-dollar>
+
+<template-character-except-dollar-backslash-grave> ::= <source-character-except-dollar-backslash-grave>
+
+<regular-expression-literal> ::= / <regular-expression-body> / <regular-expression-flags>
+
+<regular-expression-body> ::= <regular-expression-first-char> <regular-expression-chars>?
+
+<regular-expression-chars> ::= <regular-expression-char> <regular-expression-chars>?
+
+<regular-expression-first-char> ::= <regular-expression-non-terminator-except-star-backslash>
+                                  | <regular-expression-backslash-sequence>
+
+<regular-expression-char> ::= <regular-expression-non-terminator-except-backslash>
+                            | <regular-expression-backslash-sequence>
+
+<regular-expression-backslash-sequence> ::= \ <regular-expression-non-terminator>
+
+<regular-expression-non-terminator> ::= <source-character-except-line-terminator>
+
+<regular-expression-non-terminator-except-star-backslash> ::= <source-character-except-line-terminator-star-backslash>
+
+<regular-expression-non-terminator-except-backslash> ::= <source-character-except-line-terminator-backslash>
+
+<regular-expression-flags> ::= <regular-expression-flag> <regular-expression-flags>?
+
+<regular-expression-flag> ::= <identifier-part>
+
+/* Left-Hand-Side Expressions */
+<member-expression> ::= <primary-expression>
+                      | <member-expression> [ <expression> ]
+                      | <member-expression> . <identifier-name>
+                      | <member-expression> . <private-identifier>
+                      | <member-expression> <template-literal>
+                      | <super-property>
+                      | <meta-property>
+                      | new <member-expression> <arguments>
+                      | <member-expression> . <private-identifier>
+
+<super-property> ::= super [ <expression> ]
+                   | super . <identifier-name>
+
+<meta-property> ::= <new-target>
+                  | <import-meta>
+
+<new-target> ::= new . target
+
+<import-meta> ::= import . meta
+
+<new-expression> ::= <member-expression>
+                   | new <new-expression>
+
+<call-expression> ::= <cover-call-expression-and-async-arrow-head>
+                    | <super-call>
+                    | <import-call>
+                    | <call-expression> <arguments>
+                    | <call-expression> [ <expression> ]
+                    | <call-expression> . <identifier-name>
+                    | <call-expression> . <private-identifier>
+                    | <call-expression> <template-literal>
+
+<super-call> ::= super <arguments>
+
+<import-call> ::= import ( <assignment-expression> )
+
+<arguments> ::= ( )
+              | ( <argument-list> )
+              | ( <argument-list> , )
+
+<argument-list> ::= <assignment-expression> <argument-list-tail>?
+                  | ... <assignment-expression> <argument-list-tail>?
+
+<argument-list-tail> ::= , <argument-list>
+
+<optional-expression> ::= <member-expression> <optional-chain>
+                        | <call-expression> <optional-chain>
+                        | <optional-expression> <optional-chain>
+
+<optional-chain> ::= ?. <arguments>
+                   | ?. [ <expression> ]
+                   | ?. <identifier-name>
+                   | ?. <private-identifier>
+                   | ?. <template-literal>
+                   | <optional-chain> <arguments>
+                   | <optional-chain> [ <expression> ]
+                   | <optional-chain> . <identifier-name>
+                   | <optional-chain> . <private-identifier>
+                   | <optional-chain> <template-literal>
+
+<left-hand-side-expression> ::= <new-expression>
+                              | <call-expression>
+                              | <optional-expression>
+
+<update-expression> ::= <left-hand-side-expression>
+                      | <left-hand-side-expression> ++
+                      | <left-hand-side-expression> --
+                      | ++ <unary-expression>
+                      | -- <unary-expression>
+
+<unary-expression> ::= <update-expression>
+                     | delete <unary-expression>
+                     | void <unary-expression>
+                     | typeof <unary-expression>
+                     | + <unary-expression>
+                     | - <unary-expression>
+                     | ~ <unary-expression>
+                     | ! <unary-expression>
+                     | <await-expression>
+
+<exponential-expression> ::= <unary-expression>
+                           | <update-expression> ** <exponential-expression>
+
+<multiplicative-expression> ::= <exponential-expression>
+                              | <multiplicative-expression> <multiplicative-operator> <exponential-expression>
+
+<multiplicative-operator> ::= * | / | %
+
+<additive-expression> ::= <multiplicative-expression>
+                        | <additive-expression> + <multiplicative-expression>
+                        | <additive-expression> - <multiplicative-expression>
+
+<shift-expression> ::= <additive-expression>
+                     | <shift-expression> << <additive-expression>
+                     | <shift-expression> >> <additive-expression>
+                     | <shift-expression> >>> <additive-expression>
+
+<relational-expression> ::= <shift-expression>
+                          | <relational-expression> < <shift-expression>
+                          | <relational-expression> > <shift-expression>
+                          | <relational-expression> <= <shift-expression>
+                          | <relational-expression> >= <shift-expression>
+                          | <relational-expression> instanceof <shift-expression>
+                          | <relational-expression> in <shift-expression>
+                          | <private-identifier> in <shift-expression>
+
+<equality-expression> ::= <relational-expression>
+                        | <equality-expression> == <relational-expression>
+                        | <equality-expression> != <relational-expression>
+                        | <equality-expression> === <relational-expression>
+                        | <equality-expression> !== <relational-expression>
+
+<bitwise-and-expression> ::= <equality-expression>
+                           | <bitwise-and-expression> & <equality-expression>
+
+<bitwise-xor-expression> ::= <bitwise-and-expression>
+                           | <bitwise-xor-expression> ^ <bitwise-and-expression>
+
+<bitwise-or-expression> ::= <bitwise-xor-expression>
+                          | <bitwise-or-expression> | <bitwise-xor-expression>
+
+<logical-and-expression> ::= <bitwise-or-expression>
+                           | <logical-and-expression> && <bitwise-or-expression>
+
+<logical-or-expression> ::= <logical-and-expression>
+                          | <logical-or-expression> || <logical-and-expression>
+
+<coalesce-expression> ::= <coalesce-expression-head> ?? <bitwise-or-expression>
+
+<coalesce-expression-head> ::= <coalesce-expression>
+                             | <bitwise-or-expression>
+
+<short-circuit-expression> ::= <logical-or-expression>
+                             | <coalesce-expression>
+
+<conditional-expression> ::= <short-circuit-expression>
+                           | <short-circuit-expression> ? <assignment-expression> : <assignment-expression>
+
+<assignment-expression> ::= <conditional-expression>
+                          | <yield-expression>
+                          | <arrow-function>
+                          | <async-arrow-function>
+                          | <left-hand-side-expression> = <assignment-expression>
+                          | <left-hand-side-expression> <assignment-operator> <assignment-expression>
+
+<assignment-operator> ::= *= | /= | %= | += | -= | <<= | >>= | >>>= | &= | ^= | |= | **= | &&= | ||= | ??=
+
+<assignment-expression-list> ::= <assignment-expression> <assignment-expression-tail>?
+
+<assignment-expression-tail> ::= , <assignment-expression-list>
+
+<expression> ::= <assignment-expression>
+               | <expression> , <assignment-expression>
+
+/* Identifiers */
+<binding-identifier> ::= <identifier>
+                       | yield
+                       | await
+
+<identifier-reference> ::= <identifier>
+                         | yield
+                         | await
+
+<label-identifier> ::= <identifier>
+                     | yield
+                     | await
+
+<identifier> ::= <identifier-name>
+
+<identifier-name> ::= <identifier-start> <identifier-part>*
+
+<identifier-start> ::= <unicode-letter>
+                     | $
+                     | _
+                     | \ <unicode-escape-sequence>
+
+<identifier-part> ::= <identifier-start>
+                    | <unicode-digit>
+                    | <unicode-connector-punctuation>
+                    | \ <unicode-escape-sequence>
+
+<unicode-letter> ::= <letter>
+
+<unicode-digit> ::= <decimal-digit>
+
+<unicode-connector-punctuation> ::= _
+
+<unicode-escape-sequence> ::= u <hex-4-digits>
+                            | u { <code-point> }
+
+<hex-4-digits> ::= <hex-digit> <hex-digit> <hex-digit> <hex-digit>
+
+<code-point> ::= <hex-digits>
+
+<hex-digits> ::= <hex-digit> <hex-digits>?
+
+<hex-digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | a | b | c | d | e | f | A | B | C | D | E | F
+
+/* Literals */
+<null-literal> ::= null
+
+<boolean-literal> ::= true | false
+
+<numeric-literal> ::= <decimal-literal>
+                    | <decimal-big-integer-literal>
+                    | <non-decimal-integer-literal>
+                    | <non-decimal-integer-literal> <big-int-literal-suffix>
+
+<decimal-big-integer-literal> ::= 0 <big-int-literal-suffix>
+                                | <non-zero-digit> <decimal-digits>? <big-int-literal-suffix>
+                                | <non-zero-digit> <numeric-literal-separator> <decimal-digits> <big-int-literal-suffix>
+
+<non-decimal-integer-literal> ::= <binary-integer-literal>
+                                | <octal-integer-literal>
+                                | <hex-integer-literal>
+
+<big-int-literal-suffix> ::= n
+
+<decimal-literal> ::= <decimal-integer-literal> . <decimal-digits>? <exponent-part>?
+                    | . <decimal-digits> <exponent-part>?
+                    | <decimal-integer-literal> <exponent-part>?
+
+<decimal-integer-literal> ::= 0
+                            | <non-zero-digit> <decimal-digits>?
+                            | <non-zero-digit> <numeric-literal-separator> <decimal-digits>
+
+<decimal-digits> ::= <decimal-digit> <decimal-digits-tail>?
+
+<decimal-digits-tail> ::= <decimal-digit> <decimal-digits-tail>?
+                        | <numeric-literal-separator> <decimal-digit> <decimal-digits-tail>?
+
+<decimal-digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+<non-zero-digit> ::= 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+
+<numeric-literal-separator> ::= _
+
+<exponent-part> ::= <exponent-indicator> <signed-integer>
+
+<exponent-indicator> ::= e | E
+
+<signed-integer> ::= <decimal-digits>
+                   | + <decimal-digits>
+                   | - <decimal-digits>
+
+<binary-integer-literal> ::= 0b <binary-digits>
+                           | 0B <binary-digits>
+
+<binary-digits> ::= <binary-digit> <binary-digits-tail>?
+
+<binary-digits-tail> ::= <binary-digit> <binary-digits-tail>?
+                       | <numeric-literal-separator> <binary-digit> <binary-digits-tail>?
+
+<binary-digit> ::= 0 | 1
+
+<octal-integer-literal> ::= 0o <octal-digits>
+                          | 0O <octal-digits>
+
+<octal-digits> ::= <octal-digit> <octal-digits-tail>?
+
+<octal-digits-tail> ::= <octal-digit> <octal-digits-tail>?
+                      | <numeric-literal-separator> <octal-digit> <octal-digits-tail>?
+
+<octal-digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+
+<hex-integer-literal> ::= 0x <hex-digits>
+                        | 0X <hex-digits>
+
+<string-literal> ::= " <double-string-characters>? "
+                   | ' <single-string-characters>? '
+
+<double-string-characters> ::= <double-string-character> <double-string-characters>?
+
+<single-string-characters> ::= <single-string-character> <single-string-characters>?
+
+<double-string-character> ::= <source-character-except-double-quote-backslash-line-terminator>
+                            | <line-continuation>
+                            | <escape-sequence>
+
+<single-string-character> ::= <source-character-except-single-quote-backslash-line-terminator>
+                            | <line-continuation>
+                            | <escape-sequence>
+
+<line-continuation> ::= \ <line-terminator-sequence>
+
+<escape-sequence> ::= <character-escape-sequence>
+                    | 0
+                    | <hex-escape-sequence>
+                    | <unicode-escape-sequence>
+
+<character-escape-sequence> ::= <single-escape-character>
+                              | <non-escape-character>
+
+<single-escape-character> ::= ' | " | \ | b | f | n | r | t | v
+
+<non-escape-character> ::= <source-character-except-escape-character-line-terminator>
+
+<escape-character> ::= <single-escape-character>
+                     | <decimal-digit>
+                     | x
+                     | u
+
+<hex-escape-sequence> ::= x <hex-digit> <hex-digit>
+
+<bigint-literal> ::= <decimal-big-integer-literal>
+                   | <non-decimal-integer-literal> <big-int-literal-suffix>
+
+/* Character Classes */
+<source-character> ::= <any-unicode-code-point>
+
+<source-character-except-line-terminator> ::= <source-character-except-cr-lf>
+
+<source-character-except-double-quote-backslash-line-terminator> ::= <source-character-except-double-quote-backslash-cr-lf>
+
+<source-character-except-single-quote-backslash-line-terminator> ::= <source-character-except-single-quote-backslash-cr-lf>
+
+<source-character-except-escape-character-line-terminator> ::= <source-character-except-escape-character-cr-lf>
+
+<source-character-except-dollar> ::= <source-character-except-dollar-sign>
+
+<source-character-except-dollar-backslash-grave> ::= <source-character-except-dollar-backslash-grave-accent>
+
+<source-character-except-line-terminator-star-backslash> ::= <source-character-except-cr-lf-star-backslash>
+
+<source-character-except-line-terminator-backslash> ::= <source-character-except-cr-lf-backslash>
+
+<line-terminator> ::= <lf> | <cr> | <ls> | <ps>
+
+<line-terminator-sequence> ::= <lf>
+                             | <cr>
+                             | <ls>
+                             | <ps>
+                             | <cr> <lf>
+
+<letter> ::= <uppercase-letter> | <lowercase-letter>
+
+<uppercase-letter> ::= A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z
+
+<lowercase-letter> ::= a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z
+
+/* Whitespace and Comments */
+<white-space> ::= <tab> | <vt> | <ff> | <sp> | <nbsp> | <zwnbsp> | <usp>
+
+<line-terminator> ::= <lf> | <cr> | <ls> | <ps>
+
+<comment> ::= <multi-line-comment> | <single-line-comment>
+
+<multi-line-comment> ::= /* <multi-line-comment-chars>? */
+
+<multi-line-comment-chars> ::= <multi-line-not-asterisk-char> <multi-line-comment-chars>?
+                             | * <post-asterisk-comment-chars>?
+
+<post-asterisk-comment-chars> ::= <multi-line-not-forward-slash-or-asterisk-char> <multi-line-comment-chars>?
+                                | * <post-asterisk-comment-chars>?
+
+<multi-line-not-asterisk-char> ::= <source-character-except-asterisk>
+
+<multi-line-not-forward-slash-or-asterisk-char> ::= <source-character-except-forward-slash-asterisk>
+
+<single-line-comment> ::= // <single-line-comment-chars>?
+
+<single-line-comment-chars> ::= <single-line-comment-char> <single-line-comment-chars>?
+
+<single-line-comment-char> ::= <source-character-except-line-terminator>
+
+/* Automatic Semicolon Insertion */
+<semicolon> ::= ;
+
+/* Top-level await support (ES2022) */
+<top-level-await-expression> ::= await <unary-expression>
+
+/* Error.cause support (ES2022) */
+<error-constructor-call> ::= new Error ( <assignment-expression> , { cause : <assignment-expression> } )
+
+/* Object.hasOwn support (ES2022) */
+<object-has-own-call> ::= Object . hasOwn ( <assignment-expression> , <assignment-expression> )
+
+/* RegExp match indices (ES2022) */
+<regexp-match-indices> ::= <regular-expression-literal> . exec ( <assignment-expression> )
+
+/* Private field access (ES2022) */
+<private-field-access> ::= <member-expression> . <private-identifier>
+
+/* Class static initialization blocks (ES2022) */
+<static-initialization-block> ::= static { <statement-list>? }
+
+/* Enhanced numeric separators */
+<numeric-separator> ::= _
+
+/* Array.prototype.at() method support */
+<array-at-method> ::= <member-expression> . at ( <assignment-expression> )
+
+/* String.prototype.at() method support */
+<string-at-method> ::= <member-expression> . at ( <assignment-expression> )
+
+/* Temporal character classes */
+<tab> ::= \t
+<vt> ::= \v
+<ff> ::= \f
+<sp> ::= " "
+<nbsp> ::= \u00A0
+<zwnbsp> ::= \uFEFF
+<usp> ::= <unicode-space-separator>
+
+<lf> ::= \n
+<cr> ::= \r
+<ls> ::= \u2028
+<ps> ::= \u2029
+
+<unicode-space-separator> ::= <any-unicode-space-separator>
+
+<any-unicode-code-point> ::= <unicode-character>
+<any-unicode-space-separator> ::= <unicode-space-character>
+<unicode-character> ::= <printable-ascii-character>
+<unicode-space-character> ::= " " | \t | \n | \r | \u00A0 | \uFEFF
+
+<printable-ascii-character> ::= <letter> | <decimal-digit> | <punctuation-character>
+
+<punctuation-character> ::= ! | " | # | $ | % | & | ' | ( | ) | * | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | \ | ] | ^ | _ | ` | { | | | } | ~
+
+<source-character-except-cr-lf> ::= <printable-ascii-character>
+<source-character-except-double-quote-backslash-cr-lf> ::= <printable-ascii-character-except-double-quote-backslash>
+<source-character-except-single-quote-backslash-cr-lf> ::= <printable-ascii-character-except-single-quote-backslash>
+<source-character-except-escape-character-cr-lf> ::= <printable-ascii-character-except-escape-characters>
+<source-character-except-dollar-sign> ::= <printable-ascii-character-except-dollar>
+<source-character-except-dollar-backslash-grave-accent> ::= <printable-ascii-character-except-dollar-backslash-grave>
+<source-character-except-cr-lf-star-backslash> ::= <printable-ascii-character-except-star-backslash>
+<source-character-except-cr-lf-backslash> ::= <printable-ascii-character-except-backslash>
+<source-character-except-asterisk> ::= <printable-ascii-character-except-asterisk>
+<source-character-except-forward-slash-asterisk> ::= <printable-ascii-character-except-forward-slash-asterisk>
+
+<printable-ascii-character-except-double-quote-backslash> ::= <letter> | <decimal-digit> | <safe-punctuation-except-double-quote-backslash>
+<printable-ascii-character-except-single-quote-backslash> ::= <letter> | <decimal-digit> | <safe-punctuation-except-single-quote-backslash>
+<printable-ascii-character-except-escape-characters> ::= <letter> | <safe-punctuation-except-escape-characters>
+<printable-ascii-character-except-dollar> ::= <letter> | <decimal-digit> | <safe-punctuation-except-dollar>
+<printable-ascii-character-except-dollar-backslash-grave> ::= <letter> | <decimal-digit> | <safe-punctuation-except-dollar-backslash-grave>
+<printable-ascii-character-except-star-backslash> ::= <letter> | <decimal-digit> | <safe-punctuation-except-star-backslash>
+<printable-ascii-character-except-backslash> ::= <letter> | <decimal-digit> | <safe-punctuation-except-backslash>
+<printable-ascii-character-except-asterisk> ::= <letter> | <decimal-digit> | <safe-punctuation-except-asterisk>
+<printable-ascii-character-except-forward-slash-asterisk> ::= <letter> | <decimal-digit> | <safe-punctuation-except-forward-slash-asterisk>
+
+<safe-punctuation-except-double-quote-backslash> ::= ! | # | $ | % | & | ' | ( | ) | * | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | ] | ^ | _ | ` | { | | | } | ~
+<safe-punctuation-except-single-quote-backslash> ::= ! | " | # | $ | % | & | ( | ) | * | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | ] | ^ | _ | ` | { | | | } | ~
+<safe-punctuation-except-escape-characters> ::= ! | " | # | $ | % | & | ' | ( | ) | * | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | ] | ^ | _ | ` | { | | | } | ~
+<safe-punctuation-except-dollar> ::= ! | " | # | % | & | ' | ( | ) | * | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | \ | ] | ^ | _ | ` | { | | | } | ~
+<safe-punctuation-except-dollar-backslash-grave> ::= ! | " | # | % | & | ' | ( | ) | * | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | ] | ^ | _ | { | | | } | ~
+<safe-punctuation-except-star-backslash> ::= ! | " | # | $ | % | & | ' | ( | ) | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | ] | ^ | _ | ` | { | | | } | ~
+<safe-punctuation-except-backslash> ::= ! | " | # | $ | % | & | ' | ( | ) | * | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | ] | ^ | _ | ` | { | | | } | ~
+<safe-punctuation-except-asterisk> ::= ! | " | # | $ | % | & | ' | ( | ) | + | , | - | . | / | : | ; | < | = | > | ? | @ | [ | \ | ] | ^ | _ | ` | { | | | } | ~
+<safe-punctuation-except-forward-slash-asterisk> ::= ! | " | # | $ | % | & | ' | ( | ) | + | , | - | . | : | ; | < | = | > | ? | @ | [ | \ | ] | ^ | _ | ` | { | | | } | ~
+
+<covered-formal-parameters> ::= ( <formal-parameter-list>? )
+<covered-call-expression-and-async-arrow-head> ::= <member-expression> <arguments>
+

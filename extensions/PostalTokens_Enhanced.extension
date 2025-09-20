@@ -1,0 +1,65 @@
+Grammar: CEBNF
+
+/* Enhanced Postal Code Token Definitions */
+/* Supports US, Danish, and International postal formats */
+
+/* US Postal Code Patterns */
+US_ZIP_5 = [0-9]{5}
+US_ZIP_9 = [0-9]{5}-[0-9]{4}
+US_STATE_CODE = [A-Z]{2}
+
+/* Danish Postal Code Patterns */
+DK_POSTAL_4 = [0-9]{4}
+DK_POSTAL_3 = [0-9]{3}
+DK_POSTAL_INTL = DK-[0-9]{4}
+DK_APT_SIDE = (tv|th|mf|st)
+
+/* International Postal Code Patterns */
+COUNTRY_CODE = (DK|US|DE|FR|UK|CA|AU|SE|NO|FI)
+POSTAL_SEPARATOR = [-\s]
+
+/* German Postal Codes */
+DE_POSTAL = [0-9]{5}
+
+/* French Postal Codes */
+FR_POSTAL = [0-9]{5}
+
+/* UK Postal Codes */
+UK_POSTAL = [A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}
+
+/* Canadian Postal Codes */
+CA_POSTAL = [A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9]
+
+/* Australian Postal Codes */
+AU_POSTAL = [0-9]{4}
+
+/* Common Address Elements */
+HOUSE_NUMBER = [0-9]+[A-Z]?
+APT_NUMBER = [0-9]+[A-Z]?
+STREET_SUFFIX = (St|Street|Ave|Avenue|Rd|Road|Blvd|Boulevard|Dr|Drive|Ln|Lane|Ct|Court|Pl|Place|Way|Cir|Circle)
+
+/* Name Patterns */
+PERSONAL_NAME = [A-Z][a-z]+
+INITIAL = [A-Z]\.?
+SUFFIX = (Jr\.?|Sr\.?|III|IV|II)
+
+/* Validation Patterns */
+WHITESPACE = [\s\t]+
+OPTIONAL_WHITESPACE = [\s\t]*
+NEWLINE = [\r\n]+
+COMMA = ,
+HYPHEN = -
+PERIOD = \.
+
+/* Danish Specific Patterns */
+DANISH_STREET_TYPES = (gade|vej|alle|plads|torv|boulevard|park|have)
+DANISH_CITIES = (København|Aarhus|Odense|Aalborg|Esbjerg|Randers|Kolding|Horsens|Vejle|Roskilde|Herning|Hørsholm|Silkeborg|Næstved|Fredericia|Viborg|Køge|Holstebro|Taastrup|Slagelse)
+
+/* US Specific Patterns */
+US_STATES = (AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC)
+
+/* International Extensions */
+EUROPEAN_POSTAL = ([0-9]{4,5}|[A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2})
+NORTH_AMERICAN_POSTAL = ([0-9]{5}(-[0-9]{4})?|[A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9])
+ASIAN_POSTAL = [0-9]{3,7}
+
