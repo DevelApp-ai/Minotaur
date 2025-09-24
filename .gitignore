@@ -419,13 +419,3 @@ FodyWeavers.xsd
 
 # Legacy code directory (to be removed in future)
 old_code/
-
-# Examples directory - may contain intentionally malformed code for testing
-# Exclude from code quality checks but include in repository
-examples/**/*.cs
-examples/**/*.js
-examples/**/*.py
-examples/**/*.java
-examples/**/*.cpp
-examples/**/*.c
-examples/**/*.ts

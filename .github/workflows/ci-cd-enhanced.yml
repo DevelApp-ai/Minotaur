@@ -8,6 +8,15 @@ on:
   release:
     types: [ published ]
 
+permissions:
+  contents: read
+  packages: write
+  actions: read
+  checks: write
+  pull-requests: write
+  security-events: write
+  statuses: write
+
 env:
   DOTNET_VERSION: '8.0.x'
   SOLUTION_PATH: 'src/Minotaur.sln'
