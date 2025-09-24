@@ -39,15 +39,15 @@ public class SyntaxStructureAnalyzer
         // 1. Identify common patterns (function definitions, variable declarations)
         var functionPatterns = DiscoverFunctionPatterns();
         var declarationPatterns = DiscoverDeclarationPatterns();
-        
+
         // 2. Analyze expression precedence and associativity
         var expressionRules = AnalyzeExpressionStructure();
-        
+
         // 3. Identify statement types and control flow
         var statementRules = AnalyzeStatementStructure();
-        
+
         return CombineIntoProductionRules(
-            functionPatterns, declarationPatterns, 
+            functionPatterns, declarationPatterns,
             expressionRules, statementRules);
     }
 
@@ -57,13 +57,13 @@ public class SyntaxStructureAnalyzer
         {
             var content = File.ReadAllText(filePath);
             var lines = content.Split('\n');
-            
+
             foreach (var line in lines)
             {
                 var trimmedLine = line.Trim();
                 if (string.IsNullOrEmpty(trimmedLine) || IsComment(trimmedLine))
                     continue;
-                
+
                 AnalyzeLine(trimmedLine, tokens);
             }
         }
@@ -109,7 +109,7 @@ public class SyntaxStructureAnalyzer
         {
             _patterns[patternType] = new List<string>();
         }
-        
+
         _patterns[patternType].Add(example);
         _patternFrequency[patternType] = _patternFrequency.GetValueOrDefault(patternType, 0) + 1;
     }
@@ -122,7 +122,7 @@ public class SyntaxStructureAnalyzer
             @"^\s*\w+\s+\w+\s*\([^)]*\)\s*\{",
             @"^\s*(public|private|protected)?\s*(static)?\s*\w+\s+\w+\s*\("
         };
-        
+
         return functionPatterns.Any(pattern => Regex.IsMatch(line, pattern, RegexOptions.IgnoreCase));
     }
 
@@ -134,7 +134,7 @@ public class SyntaxStructureAnalyzer
             @"^\s*\w+\s+\w+\s*=",
             @"^\s*(public|private|protected)?\s*(static)?\s*\w+\s+\w+\s*;"
         };
-        
+
         return declarationPatterns.Any(pattern => Regex.IsMatch(line, pattern, RegexOptions.IgnoreCase));
     }
 
@@ -146,7 +146,7 @@ public class SyntaxStructureAnalyzer
             @"^\s*(else|elif)\s*(\{|$)",
             @"^\s*(return|break|continue|throw)\s*(;|$|\w)"
         };
-        
+
         return controlPatterns.Any(pattern => Regex.IsMatch(line, pattern, RegexOptions.IgnoreCase));
     }
 
@@ -163,11 +163,11 @@ public class SyntaxStructureAnalyzer
     private List<ProductionRule> DiscoverFunctionPatterns()
     {
         var rules = new List<ProductionRule>();
-        
+
         if (_patterns.ContainsKey("function_definition"))
         {
             var examples = _patterns["function_definition"];
-            
+
             rules.Add(new ProductionRule
             {
                 Name = "function_definition",
@@ -181,7 +181,7 @@ public class SyntaxStructureAnalyzer
                 Confidence = 0.8,
                 Examples = examples.Take(3).ToList()
             });
-            
+
             rules.Add(new ProductionRule
             {
                 Name = "parameter_list",
@@ -193,7 +193,7 @@ public class SyntaxStructureAnalyzer
                 Priority = 80,
                 Confidence = 0.7
             });
-            
+
             rules.Add(new ProductionRule
             {
                 Name = "parameter",
@@ -206,18 +206,18 @@ public class SyntaxStructureAnalyzer
                 Confidence = 0.8
             });
         }
-        
+
         return rules;
     }
 
     private List<ProductionRule> DiscoverDeclarationPatterns()
     {
         var rules = new List<ProductionRule>();
-        
+
         if (_patterns.ContainsKey("variable_declaration"))
         {
             var examples = _patterns["variable_declaration"];
-            
+
             rules.Add(new ProductionRule
             {
                 Name = "variable_declaration",
@@ -234,14 +234,14 @@ public class SyntaxStructureAnalyzer
                 Examples = examples.Take(3).ToList()
             });
         }
-        
+
         return rules;
     }
 
     private List<ProductionRule> AnalyzeExpressionStructure()
     {
         var rules = new List<ProductionRule>();
-        
+
         // Basic expression hierarchy
         rules.Add(new ProductionRule
         {
@@ -253,7 +253,7 @@ public class SyntaxStructureAnalyzer
             Priority = 50,
             Confidence = 0.9
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "logical_or_expression",
@@ -265,7 +265,7 @@ public class SyntaxStructureAnalyzer
             Priority = 45,
             Confidence = 0.8
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "logical_and_expression",
@@ -277,7 +277,7 @@ public class SyntaxStructureAnalyzer
             Priority = 44,
             Confidence = 0.8
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "equality_expression",
@@ -290,7 +290,7 @@ public class SyntaxStructureAnalyzer
             Priority = 43,
             Confidence = 0.8
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "relational_expression",
@@ -305,7 +305,7 @@ public class SyntaxStructureAnalyzer
             Priority = 42,
             Confidence = 0.8
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "additive_expression",
@@ -318,7 +318,7 @@ public class SyntaxStructureAnalyzer
             Priority = 41,
             Confidence = 0.9
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "multiplicative_expression",
@@ -331,7 +331,7 @@ public class SyntaxStructureAnalyzer
             Priority = 40,
             Confidence = 0.9
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "primary_expression",
@@ -346,14 +346,14 @@ public class SyntaxStructureAnalyzer
             Priority = 39,
             Confidence = 0.95
         });
-        
+
         return rules;
     }
 
     private List<ProductionRule> AnalyzeStatementStructure()
     {
         var rules = new List<ProductionRule>();
-        
+
         if (_patterns.ContainsKey("control_statement"))
         {
             // Control flow statements
@@ -368,7 +368,7 @@ public class SyntaxStructureAnalyzer
                 Priority = 85,
                 Confidence = 0.9
             });
-            
+
             rules.Add(new ProductionRule
             {
                 Name = "while_statement",
@@ -379,7 +379,7 @@ public class SyntaxStructureAnalyzer
                 Priority = 85,
                 Confidence = 0.9
             });
-            
+
             rules.Add(new ProductionRule
             {
                 Name = "for_statement",
@@ -391,7 +391,7 @@ public class SyntaxStructureAnalyzer
                 Confidence = 0.8
             });
         }
-        
+
         // Block statement
         rules.Add(new ProductionRule
         {
@@ -403,7 +403,7 @@ public class SyntaxStructureAnalyzer
             Priority = 95,
             Confidence = 0.95
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "statement_list",
@@ -415,7 +415,7 @@ public class SyntaxStructureAnalyzer
             Priority = 90,
             Confidence = 0.9
         });
-        
+
         rules.Add(new ProductionRule
         {
             Name = "statement",
@@ -432,7 +432,7 @@ public class SyntaxStructureAnalyzer
             Priority = 80,
             Confidence = 0.85
         });
-        
+
         return rules;
     }
 
@@ -443,7 +443,7 @@ public class SyntaxStructureAnalyzer
         List<ProductionRule> statementRules)
     {
         var allRules = new List<ProductionRule>();
-        
+
         // Add a top-level program rule
         allRules.Add(new ProductionRule
         {
@@ -455,7 +455,7 @@ public class SyntaxStructureAnalyzer
             Priority = 100,
             Confidence = 0.95
         });
-        
+
         allRules.Add(new ProductionRule
         {
             Name = "declaration_list",
@@ -467,7 +467,7 @@ public class SyntaxStructureAnalyzer
             Priority = 95,
             Confidence = 0.9
         });
-        
+
         allRules.Add(new ProductionRule
         {
             Name = "declaration",
@@ -479,13 +479,13 @@ public class SyntaxStructureAnalyzer
             Priority = 90,
             Confidence = 0.9
         });
-        
+
         // Combine all rule sets
         allRules.AddRange(functionPatterns);
         allRules.AddRange(declarationPatterns);
         allRules.AddRange(expressionRules);
         allRules.AddRange(statementRules);
-        
+
         return new ProductionRules(allRules);
     }
 }

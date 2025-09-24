@@ -51,19 +51,19 @@ public enum TokenType
 public class TokenDefinitions
 {
     public List<TokenPattern> Patterns { get; set; } = new();
-    
+
     public TokenDefinitions() { }
-    
+
     public TokenDefinitions(IEnumerable<TokenPattern> patterns)
     {
         Patterns = patterns.ToList();
     }
-    
+
     public void AddPattern(TokenPattern pattern)
     {
         Patterns.Add(pattern);
     }
-    
+
     public IEnumerable<TokenPattern> GetPatternsByType(TokenType type)
     {
         return Patterns.Where(p => p.Type == type);
@@ -90,19 +90,19 @@ public class ProductionRule
 public class ProductionRules
 {
     public List<ProductionRule> Rules { get; set; } = new();
-    
+
     public ProductionRules() { }
-    
+
     public ProductionRules(IEnumerable<ProductionRule> rules)
     {
         Rules = rules.ToList();
     }
-    
+
     public void AddRule(ProductionRule rule)
     {
         Rules.Add(rule);
     }
-    
+
     public ProductionRule? GetRule(string name)
     {
         return Rules.FirstOrDefault(r => r.Name == name);
@@ -161,9 +161,9 @@ public class GrammarRefinement
     public string Suggestion { get; set; } = string.Empty;
     public double Confidence { get; set; }
     public List<string> AffectedRules { get; set; } = new();
-    
+
     public GrammarRefinement() { }
-    
+
     public GrammarRefinement(IEnumerable<GrammarRefinement> refinements)
     {
         // This constructor seems incorrect - it should aggregate refinements
