@@ -1,20 +1,32 @@
-# Minotaur - Cognitive Graph Editor & Unparser
+# Minotaur - Advanced Compiler-Compiler Platform
 
-[![Build Status](https://github.com/DevelApp-ai/Minotaur2/workflows/CI-CD/badge.svg)](https://github.com/DevelApp-ai/Minotaur2/actions)
-[![NuGet](https://img.shields.io/nuget/v/DevelApp.Minotaur.svg)](https://www.nuget.org/packages/DevelApp.Minotaur/)
+[![CI/CD Pipeline](https://github.com/DevelApp-ai/Minotaur/actions/workflows/ci-cd-enhanced.yml/badge.svg)](https://github.com/DevelApp-ai/Minotaur/actions/workflows/ci-cd-enhanced.yml)
+[![NuGet Version](https://img.shields.io/nuget/v/Minotaur)](https://www.nuget.org/packages/Minotaur)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A production-ready zero-copy cognitive graph editor and unparser framework with StepParser integration, extensible plugin system, and advanced location tracking capabilities. Implements the complete GrammarForge documentation requirements.
+![Minotaur Logo](assets/logos/Minotaur_logo.png)
 
-## 🚀 Features
+Minotaur is a powerful compiler-compiler platform that revolutionizes grammar development through automated grammar generation, error-driven refinement, and comprehensive language analysis capabilities.
 
-- **Zero-Copy Cognitive Graph Management**: Built on `DevelApp.CognitiveGraph 1.0.0` for optimal performance
-- **Production StepParser Integration**: Seamless integration with `DevelApp.StepLexer 1.0.1` and `DevelApp.StepParser 1.0.1`
-- **Extensible Plugin System**: Runtime plugin loading with `DevelApp.RuntimePluggableClassFactory 2.0.1`
-- **Advanced Location Tracking**: Precision coordinate tracking with enhanced APIs
-- **Context-Aware Editing**: Rule activation callbacks and surgical operations
-- **Multi-Language Code Generation**: Built-in support for C#, JavaScript, and Python
-- **Compiler-Compiler Backend**: Extensible generation rules for new language backends
+## 🚀 Key Features
+
+### Automated Grammar Generation
+- **Source Code Analysis**: Automatically analyzes existing codebases to extract grammar patterns
+- **Token Pattern Recognition**: Identifies keywords, operators, literals, and structural elements
+- **Syntax Structure Discovery**: Discovers expression precedence, statement types, and control flow patterns
+- **Error-Driven Refinement**: Uses parsing errors to iteratively improve grammar accuracy
+
+### Advanced Language Support
+- **Context-Aware Processing**: Leverages advanced context analysis for precise grammar generation
+- **Multi-Language Support**: Handles diverse programming languages and domain-specific languages
+- **Embedded Grammar Support**: Processes languages embedded within other languages (e.g., JavaScript in HTML)
+- **Grammar File Creation Guide Compliance**: Outputs standard-compliant grammar files
+
+### Interactive Development Environment
+- **Command-Line Interface**: Comprehensive CLI for grammar generation, validation, and testing
+- **Real-Time Progress Tracking**: Monitor grammar generation progress with detailed metrics
+- **Quality Assessment**: Built-in validation and quality scoring for generated grammars
+- **Comprehensive Testing**: Extensive test suites for grammar validation and refinement
 
 ## 📦 Installation
 

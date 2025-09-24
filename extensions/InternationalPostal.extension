@@ -1,0 +1,71 @@
+Grammar: CEBNF
+
+/* International Postal Code Extension */
+/* Comprehensive patterns for global postal systems */
+
+/* European Postal Code Patterns */
+AUSTRIA_POSTAL = [0-9]{4}
+BELGIUM_POSTAL = [0-9]{4}
+DENMARK_POSTAL = [0-9]{4}
+FINLAND_POSTAL = [0-9]{5}
+FRANCE_POSTAL = [0-9]{5}
+GERMANY_POSTAL = [0-9]{5}
+ITALY_POSTAL = [0-9]{5}
+NETHERLANDS_POSTAL = [0-9]{4}\s?[A-Z]{2}
+NORWAY_POSTAL = [0-9]{4}
+SPAIN_POSTAL = [0-9]{5}
+SWEDEN_POSTAL = [0-9]{3}\s?[0-9]{2}
+SWITZERLAND_POSTAL = [0-9]{4}
+UK_POSTAL = [A-Z]{1,2}[0-9]{1,2}[A-Z]?\s?[0-9][A-Z]{2}
+
+/* North American Postal Code Patterns */
+USA_POSTAL = [0-9]{5}(-[0-9]{4})?
+CANADA_POSTAL = [A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9]
+MEXICO_POSTAL = [0-9]{5}
+
+/* Asian Postal Code Patterns */
+JAPAN_POSTAL = [0-9]{3}-[0-9]{4}
+CHINA_POSTAL = [0-9]{6}
+INDIA_POSTAL = [0-9]{6}
+SINGAPORE_POSTAL = [0-9]{6}
+SOUTH_KOREA_POSTAL = [0-9]{5}
+
+/* Oceanian Postal Code Patterns */
+AUSTRALIA_POSTAL = [0-9]{4}
+NEW_ZEALAND_POSTAL = [0-9]{4}
+
+/* Address Format Validation Rules */
+EUROPEAN_ADDRESS_FORMAT = (STREET_ADDRESS POSTAL_CODE CITY COUNTRY?)
+NORTH_AMERICAN_ADDRESS_FORMAT = (STREET_ADDRESS CITY STATE_PROVINCE POSTAL_CODE COUNTRY?)
+ASIAN_ADDRESS_FORMAT = (COUNTRY? POSTAL_CODE STATE_PROVINCE? CITY STREET_ADDRESS)
+
+/* Country Code Patterns */
+ISO_COUNTRY_CODE_2 = [A-Z]{2}
+ISO_COUNTRY_CODE_3 = [A-Z]{3}
+
+/* Common Address Elements */
+STREET_ADDRESS = [A-Za-z0-9\s\-\.,]+
+CITY_NAME = [A-Za-z\s\-\.]+
+STATE_PROVINCE = [A-Za-z\s\-\.]+
+COUNTRY_NAME = [A-Za-z\s\-\.]+
+
+/* Validation Constraints */
+POSTAL_CODE_LENGTH = [0-9A-Z\s\-]{3,10}
+ADDRESS_LINE_MAX = .{1,100}
+CITY_NAME_MAX = [A-Za-z\s\-\.]{1,50}
+
+/* Special Postal Codes */
+MILITARY_POSTAL = (APO|FPO|DPO)\s?[A-Z]{2}\s?[0-9]{5}
+PO_BOX = (P\.?O\.?\s?Box|Post\s?Office\s?Box)\s?[0-9]+
+
+/* International Formatting Rules */
+INTERNATIONAL_PREFIX = [A-Z]{2}-
+POSTAL_SEPARATOR_CHARS = [\s\-]
+OPTIONAL_POSTAL_SEPARATOR = [\s\-]?
+
+/* Address Validation Patterns */
+VALID_ADDRESS_CHARS = [A-Za-z0-9\s\-\.,#/]
+NUMERIC_ONLY = [0-9]+
+ALPHA_ONLY = [A-Za-z]+
+ALPHANUMERIC = [A-Za-z0-9]+
+

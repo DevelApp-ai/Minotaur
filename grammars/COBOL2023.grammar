@@ -1,0 +1,241 @@
+Grammar: COBOL2023
+TokenSplitter: Space
+FormatType: EBNF
+
+/*
+ * COBOL 2023 Grammar Specification
+ * 
+ * This grammar supports the latest COBOL 2023 standard (ISO/IEC 1989:2023)
+ * including modern features like JSON support, object-oriented programming,
+ * XML processing, web services, and enhanced data types.
+ */
+
+<cobol-program> ::= <identification-division> <environment-division>? <data-division>? <procedure-division>
+
+<identification-division> ::= "IDENTIFICATION" "DIVISION" "." <identification-entries>
+
+<identification-entries> ::= <program-id> <other-identification-entries>*
+
+<program-id> ::= "PROGRAM-ID" "." <program-name> <program-attributes>? "."
+
+<program-name> ::= <IDENTIFIER>
+
+<program-attributes> ::= "IS" ("INITIAL" | "RECURSIVE" | "COMMON")
+
+<environment-division> ::= "ENVIRONMENT" "DIVISION" "." <environment-sections>*
+
+<environment-sections> ::= <configuration-section> | <input-output-section>
+
+<configuration-section> ::= "CONFIGURATION" "SECTION" "." <configuration-entries>*
+
+<input-output-section> ::= "INPUT-OUTPUT" "SECTION" "." <io-entries>*
+
+<data-division> ::= "DATA" "DIVISION" "." <data-sections>*
+
+<data-sections> ::= <file-section> | <working-storage-section> | <local-storage-section> | <linkage-section>
+
+<file-section> ::= "FILE" "SECTION" "." <file-descriptions>*
+
+<working-storage-section> ::= "WORKING-STORAGE" "SECTION" "." <data-descriptions>*
+
+<local-storage-section> ::= "LOCAL-STORAGE" "SECTION" "." <data-descriptions>*
+
+<linkage-section> ::= "LINKAGE" "SECTION" "." <data-descriptions>*
+
+<data-descriptions> ::= <data-description-entry>
+
+<data-description-entry> ::= <level-number> <data-name>? <data-clauses>* "."
+
+<level-number> ::= /0[1-9]|[1-4][0-9]|77|88/
+
+<data-name> ::= <IDENTIFIER>
+
+<data-clauses> ::= <picture-clause> | <usage-clause> | <value-clause> | <occurs-clause>
+
+<picture-clause> ::= ("PIC" | "PICTURE") "IS"? <picture-string>
+
+<picture-string> ::= /[X9AS\(\)V\.,\-\+\$\*Z]+/
+
+<usage-clause> ::= "USAGE" "IS"? <usage-type>
+
+<usage-type> ::= "DISPLAY" | "COMPUTATIONAL" | "COMP" | "BINARY" | "PACKED-DECIMAL" | "POINTER"
+
+<value-clause> ::= "VALUE" "IS"? <literal>
+
+<occurs-clause> ::= "OCCURS" <integer> ("TO" <integer>)? "TIMES"
+
+<procedure-division> ::= "PROCEDURE" "DIVISION" ("USING" <parameter-list>)? "." <procedure-statements>*
+
+<parameter-list> ::= <data-name> ("," <data-name>)*
+
+<procedure-statements> ::= <statement> | <paragraph> | <section>
+
+<paragraph> ::= <paragraph-name> "." <statement>*
+
+<section> ::= <section-name> "SECTION" "." <paragraph>*
+
+<paragraph-name> ::= <IDENTIFIER>
+
+<section-name> ::= <IDENTIFIER>
+
+<statement> ::= <imperative-statement> | <conditional-statement>
+
+<imperative-statement> ::= <move-statement>
+                         | <add-statement>
+                         | <subtract-statement>
+                         | <multiply-statement>
+                         | <divide-statement>
+                         | <compute-statement>
+                         | <display-statement>
+                         | <accept-statement>
+                         | <perform-statement>
+                         | <call-statement>
+                         | <invoke-statement>
+                         | <stop-statement>
+                         | <exit-statement>
+                         | <json-statement>
+
+<conditional-statement> ::= <if-statement> | <evaluate-statement>
+
+<move-statement> ::= "MOVE" <identifier-or-literal> "TO" <identifier-list>
+
+<add-statement> ::= "ADD" <identifier-or-literal> ("," <identifier-or-literal>)* "TO" <identifier-list>
+
+<subtract-statement> ::= "SUBTRACT" <identifier-or-literal> ("," <identifier-or-literal>)* "FROM" <identifier-list>
+
+<multiply-statement> ::= "MULTIPLY" <identifier-or-literal> "BY" <identifier-list>
+
+<divide-statement> ::= "DIVIDE" <identifier-or-literal> ("INTO" | "BY") <identifier-list>
+
+<compute-statement> ::= "COMPUTE" <identifier> "=" <arithmetic-expression>
+
+<display-statement> ::= "DISPLAY" <identifier-or-literal> ("UPON" <device-name>)?
+
+<accept-statement> ::= "ACCEPT" <identifier> ("FROM" <source-name>)?
+
+<perform-statement> ::= "PERFORM" (<paragraph-name> | <statement-block>) (<times-clause> | <until-clause> | <varying-clause>)?
+
+<call-statement> ::= "CALL" <program-name> ("USING" <parameter-list>)?
+
+<invoke-statement> ::= "INVOKE" <object-reference> <method-name> ("USING" <parameter-list>)?
+
+<stop-statement> ::= "STOP" "RUN"
+
+<exit-statement> ::= "EXIT" ("PROGRAM" | "METHOD" | "PERFORM")?
+
+<json-statement> ::= <json-generate-statement> | <json-parse-statement>
+
+<json-generate-statement> ::= "JSON" "GENERATE" <identifier> "FROM" <identifier>
+
+<json-parse-statement> ::= "JSON" "PARSE" <identifier> "INTO" <identifier>
+
+<if-statement> ::= "IF" <condition> "THEN"? <statement-list> ("ELSE" <statement-list>)? "END-IF"?
+
+<evaluate-statement> ::= "EVALUATE" <expression> <when-clauses>* ("WHEN" "OTHER" <statement-list>)? "END-EVALUATE"
+
+<when-clauses> ::= "WHEN" <when-condition> <statement-list>
+
+<condition> ::= <simple-condition> | <complex-condition>
+
+<simple-condition> ::= <identifier-or-literal> <relational-operator> <identifier-or-literal>
+
+<complex-condition> ::= <condition> ("AND" | "OR") <condition> | "NOT" <condition>
+
+<relational-operator> ::= "=" | ">" | "<" | ">=" | "<=" | "NOT" "="
+
+<arithmetic-expression> ::= <term> (("+" | "-") <term>)*
+
+<term> ::= <factor> (("*" | "/") <factor>)*
+
+<factor> ::= <identifier-or-literal> | "(" <arithmetic-expression> ")"
+
+<identifier-or-literal> ::= <identifier> | <literal>
+
+<identifier> ::= <IDENTIFIER>
+
+<literal> ::= <numeric-literal> | <string-literal>
+
+<numeric-literal> ::= <integer> | <decimal>
+
+<string-literal> ::= "\"" <character>* "\"" | "'" <character>* "'"
+
+<integer> ::= /[+-]?[0-9]+/
+
+<decimal> ::= /[+-]?[0-9]*\.[0-9]+/
+
+<character> ::= /[^"']/
+
+<identifier-list> ::= <identifier> ("," <identifier>)*
+
+<statement-list> ::= <statement>*
+
+<statement-block> ::= <statement>+
+
+<times-clause> ::= <integer> "TIMES"
+
+<until-clause> ::= "UNTIL" <condition>
+
+<varying-clause> ::= "VARYING" <identifier> "FROM" <identifier-or-literal> "BY" <identifier-or-literal> "UNTIL" <condition>
+
+<when-condition> ::= <literal> | <condition>
+
+<expression> ::= <identifier-or-literal>
+
+<object-reference> ::= <identifier>
+
+<method-name> ::= <identifier>
+
+<device-name> ::= <identifier>
+
+<source-name> ::= <identifier>
+
+<other-identification-entries> ::= ("AUTHOR" "." <author-name> ".")?
+                                 | ("INSTALLATION" "." <installation-name> ".")?
+                                 | ("DATE-WRITTEN" "." <date> ".")?
+                                 | ("DATE-COMPILED" "." <date> ".")?
+
+<author-name> ::= <text-literal>
+
+<installation-name> ::= <text-literal>
+
+<date> ::= <text-literal>
+
+<text-literal> ::= /[^.]*/
+
+<configuration-entries> ::= <source-computer-clause> | <object-computer-clause> | <special-names-clause>
+
+<source-computer-clause> ::= "SOURCE-COMPUTER" "." <computer-name> "."
+
+<object-computer-clause> ::= "OBJECT-COMPUTER" "." <computer-name> "."
+
+<special-names-clause> ::= "SPECIAL-NAMES" "." <special-name-entries>* "."
+
+<computer-name> ::= <IDENTIFIER>
+
+<special-name-entries> ::= <IDENTIFIER> "IS" <IDENTIFIER>
+
+<io-entries> ::= <file-control-clause> | <i-o-control-clause>
+
+<file-control-clause> ::= "FILE-CONTROL" "." <file-control-entries>*
+
+<i-o-control-clause> ::= "I-O-CONTROL" "." <io-control-entries>*
+
+<file-control-entries> ::= "SELECT" <file-name> "ASSIGN" "TO" <assignment-name> "."
+
+<file-name> ::= <IDENTIFIER>
+
+<assignment-name> ::= <IDENTIFIER>
+
+<io-control-entries> ::= <IDENTIFIER>
+
+<file-descriptions> ::= "FD" <file-name> <file-description-clauses>* "."
+
+<file-description-clauses> ::= <record-clause> | <block-clause> | <label-clause>
+
+<record-clause> ::= "RECORD" ("CONTAINS" <integer> ("TO" <integer>)? ("CHARACTERS" | "RECORDS"))?
+
+<block-clause> ::= "BLOCK" "CONTAINS" <integer> ("TO" <integer>)? ("CHARACTERS" | "RECORDS")
+
+<label-clause> ::= "LABEL" ("RECORD" "IS" | "RECORDS" "ARE") ("STANDARD" | "OMITTED")
+
+<IDENTIFIER> ::= /[A-Za-z][A-Za-z0-9\-]*/

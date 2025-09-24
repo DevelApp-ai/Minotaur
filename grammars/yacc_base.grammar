@@ -1,0 +1,399 @@
+Grammar: Yacc_Base
+TokenSplitter: Space
+Inheritable: true
+FormatType: Yacc
+ImportSemantics: true
+CoordinateTokens: true
+
+// Yacc Base Grammar Template
+// This base grammar defines the fundamental parsing patterns and semantic behaviors
+// for the original Yacc parser generator within Minotaur's inheritance-based compiler-compiler support
+
+// ============================================================================
+// YACC FILE STRUCTURE
+// ============================================================================
+
+// Yacc file has three sections separated by %%
+<yacc-file> ::= <declarations-section>? "%%" <rules-section> "%%" <programs-section>?
+
+// ============================================================================
+// DECLARATIONS SECTION
+// ============================================================================
+
+<declarations-section> ::= <declaration>*
+
+<declaration> ::= <token-declaration>
+               | <type-declaration>
+               | <precedence-declaration>
+               | <start-declaration>
+               | <union-declaration>
+               | <c-code-block>
+
+// Token declarations
+<token-declaration> ::= "%token" <token-list> => {
+  declareYaccTokens($1);
+}
+
+<token-list> ::= <token-name> (<token-name>)*
+<token-name> ::= <IDENTIFIER> <token-number>?
+
+<token-number> ::= <INTEGER> => {
+  setTokenNumber($1);
+}
+
+// Type declarations for semantic values
+<type-declaration> ::= "%type" "<" <type-name> ">" <symbol-list> => {
+  declareSymbolTypes($1, $2);
+}
+
+<type-name> ::= <IDENTIFIER>
+<symbol-list> ::= <symbol> (<symbol>)*
+<symbol> ::= <token-name> | <nonterminal-name>
+
+// Union declaration for semantic value types
+<union-declaration> ::= "%union" "{" <union-body> "}" => {
+  declareSemanticValueUnion($1);
+}
+
+<union-body> ::= <c-code-block>
+
+// Start symbol declaration
+<start-declaration> ::= "%start" <nonterminal-name> => {
+  setStartSymbol($1);
+}
+
+// ============================================================================
+// PRECEDENCE AND ASSOCIATIVITY DECLARATIONS
+// ============================================================================
+
+// Left associative operators
+<left-precedence> ::= "%left" <precedence-list> => {
+  setLeftAssociativity($1);
+}
+
+// Right associative operators
+<right-precedence> ::= "%right" <precedence-list> => {
+  setRightAssociativity($1);
+}
+
+// Non-associative operators
+<nonassoc-precedence> ::= "%nonassoc" <precedence-list> => {
+  setNonAssociativity($1);
+}
+
+<precedence-list> ::= <precedence-symbol>+
+<precedence-symbol> ::= <token-name> | <string-literal>
+
+<precedence-declaration> ::= <left-precedence>
+                          | <right-precedence>
+                          | <nonassoc-precedence>
+
+// ============================================================================
+// GRAMMAR RULES SECTION
+// ============================================================================
+
+<rules-section> ::= <rule>+
+
+<rule> ::= <nonterminal-name> ":" <rule-body> ";" => {
+  createYaccRule($1, $2);
+}
+
+<rule-body> ::= <alternative> ("|" <alternative>)*
+
+<alternative> ::= <symbol-sequence> <action>? <precedence-spec>?
+
+<symbol-sequence> ::= <symbol>*
+<symbol> ::= <nonterminal-name> => {
+  createNonterminalReference($1);
+}
+          | <token-name> => {
+  createTerminalReference($1);
+}
+          | <string-literal> => {
+  createLiteralReference($1);
+}
+          | "error" => {
+  createErrorSymbol();
+}
+
+// ============================================================================
+// SEMANTIC ACTIONS
+// ============================================================================
+
+<action> ::= "{" <action-body> "}" => {
+  executeYaccAction($1, getCurrentRuleContext());
+}
+
+<action-body> ::= <c-statement>*
+
+<c-statement> ::= <assignment-statement>
+               | <function-call-statement>
+               | <control-statement>
+               | <c-code-line>
+
+// Assignment to $$ (rule result)
+<assignment-statement> ::= "$$" "=" <value-expression> ";" => {
+  setRuleResult($1);
+}
+
+// Access to symbol values ($1, $2, etc.)
+<value-expression> ::= <symbol-reference>
+                    | <function-call>
+                    | <arithmetic-expression>
+                    | <constant>
+
+<symbol-reference> ::= "$" <INTEGER> => {
+  getSymbolValue($1, getCurrentRuleContext());
+}
+                    | "$$" => {
+  getCurrentRuleResult();
+}
+
+// ============================================================================
+// PRECEDENCE SPECIFICATION
+// ============================================================================
+
+<precedence-spec> ::= "%prec" <precedence-symbol> => {
+  setPrecedence($1);
+}
+
+// ============================================================================
+// ERROR RECOVERY
+// ============================================================================
+
+// Error symbol for error recovery
+<error-symbol> ::= "error" => {
+  createErrorRecoverySymbol();
+}
+
+// Error recovery rules
+<error-rule> ::= <nonterminal-name> ":" "error" <recovery-symbols>? <action>? ";" => {
+  createErrorRecoveryRule($1, $2, $3);
+}
+
+<recovery-symbols> ::= <symbol>+
+
+// ============================================================================
+// PROGRAMS SECTION (USER CODE)
+// ============================================================================
+
+<programs-section> ::= <c-code-block> => {
+  addUserCode($1);
+}
+
+<c-code-block> ::= <c-code-line>*
+<c-code-line> ::= /[^\n]*\n/ => {
+  preserveCCode($1);
+}
+
+// ============================================================================
+// YACC IDENTIFIERS AND LITERALS
+// ============================================================================
+
+<IDENTIFIER> ::= /[a-zA-Z_][a-zA-Z0-9_]*/ => {
+  createIdentifier($1);
+}
+
+<nonterminal-name> ::= /[a-z][a-z0-9_]*/ => {
+  validateNonterminalName($1);
+}
+
+<INTEGER> ::= /[0-9]+/ => {
+  parseInt($1);
+}
+
+<string-literal> ::= "'" <single-quoted-string> "'" => {
+  createStringLiteral($1);
+}
+
+<single-quoted-string> ::= /[^'\\]*(\\.[^'\\]*)*/ => {
+  unescapeString($1);
+}
+
+// ============================================================================
+// C CODE INTEGRATION
+// ============================================================================
+
+// C code blocks in declarations section
+<c-declaration-block> ::= "%{" <c-code-block> "%}" => {
+  addDeclarationCode($1);
+}
+
+// Function calls in actions
+<function-call> ::= <function-name> "(" <argument-list>? ")" => {
+  callFunction($1, $2);
+}
+
+<function-name> ::= <IDENTIFIER>
+<argument-list> ::= <argument> ("," <argument>)*
+<argument> ::= <value-expression>
+
+// ============================================================================
+// YACC BUILT-IN FEATURES
+// ============================================================================
+
+// YYERROR macro for error reporting
+<error-action> ::= "YYERROR" => {
+  triggerParseError();
+}
+
+// YYACCEPT macro for successful completion
+<accept-action> ::= "YYACCEPT" => {
+  acceptParse();
+}
+
+// YYABORT macro for parse abortion
+<abort-action> ::= "YYABORT" => {
+  abortParse();
+}
+
+// ============================================================================
+// SEMANTIC VALUE HANDLING
+// ============================================================================
+
+// Semantic value access with type information
+<typed-symbol-reference> ::= "$" "<" <type-name> ">" <INTEGER> => {
+  getTypedSymbolValue($1, $2);
+}
+
+// Typed result assignment
+<typed-assignment> ::= "$$" "<" <type-name> ">" "=" <value-expression> ";" => {
+  setTypedRuleResult($1, $2);
+}
+
+// ============================================================================
+// YACC DIRECTIVES AND OPTIONS
+// ============================================================================
+
+// Yacc-specific directives (limited compared to Bison)
+<yacc-directive> ::= <token-declaration>
+                  | <type-declaration>
+                  | <precedence-declaration>
+                  | <start-declaration>
+                  | <union-declaration>
+
+// ============================================================================
+// SEMANTIC ACTION TEMPLATES
+// ============================================================================
+
+// Template for handling Yacc semantic actions
+<yacc-action-template> ::= "{" <c-code> "}" => {
+  // Preserve Yacc action execution context
+  const context = {
+    symbolStack: getParserStack(),
+    ruleResult: getCurrentRuleResult(),
+    symbolTable: getSymbolTable(),
+    parseState: getCurrentParseState()
+  };
+  
+  // Execute action with Yacc semantics
+  executeYaccAction($1, context);
+}
+
+// Template for symbol value access
+<symbol-value-template> ::= "$" <INTEGER> => {
+  // Access symbol value with Yacc semantics
+  const symbolIndex = $1;
+  const symbolValue = getSymbolValue(symbolIndex);
+  return symbolValue;
+}
+
+// Template for result assignment
+<result-template> ::= "$$" "=" <expression> => {
+  // Set rule result with Yacc semantics
+  setRuleResult($2);
+}
+
+// ============================================================================
+// PRECEDENCE INHERITANCE TEMPLATES
+// ============================================================================
+
+// Default Yacc precedence relationships (basic set)
+Precedence: {
+  // Simple precedence levels (lower number = lower precedence)
+  Level1: { tokens: ["+", "-"], associativity: "left", description: "Additive" }
+  Level2: { tokens: ["*", "/"], associativity: "left", description: "Multiplicative" }
+  Level3: { tokens: ["UMINUS"], associativity: "right", description: "Unary minus" }
+}
+
+// ============================================================================
+// ERROR RECOVERY INHERITANCE TEMPLATES
+// ============================================================================
+
+// Yacc error recovery strategies (basic)
+ErrorRecovery: {
+  strategy: "error_symbol",
+  errorSymbol: true,
+  errorProductions: true,
+  synchronization: ["semicolon"],
+  reportingLevel: "basic",
+  
+  // Error synchronization tokens
+  syncTokens: [";"],
+  
+  // Recovery actions
+  recoveryActions: {
+    syntaxError: "errorSymbol",
+    parseError: "synchronize"
+  },
+  
+  // Error reporting (basic)
+  errorReporting: {
+    format: "yacc",
+    includeLocation: false,
+    includeContext: false
+  }
+}
+
+// ============================================================================
+// COMPATIBILITY CONSIDERATIONS
+// ============================================================================
+
+// Legacy compatibility features
+<legacy-feature> ::= <old-style-declaration>
+                  | <compatibility-option>
+
+<old-style-declaration> ::= "%%" => {
+  // Handle old-style section separators
+  processSectionSeparator();
+}
+
+<compatibility-option> ::= "%option" <option-name> => {
+  // Handle compatibility options (limited support)
+  processCompatibilityOption($1);
+}
+
+// ============================================================================
+// EXTENSION POINTS FOR INHERITANCE
+// ============================================================================
+
+// Extension point for additional token declarations
+<extended-tokens> ::= <token-declaration>* => {
+  processExtendedTokens($1);
+}
+
+// Extension point for additional type declarations
+<extended-types> ::= <type-declaration>* => {
+  processExtendedTypes($1);
+}
+
+// Extension point for additional precedence declarations
+<extended-precedence> ::= <precedence-declaration>* => {
+  processExtendedPrecedence($1);
+}
+
+// Extension point for additional grammar rules
+<extended-rules> ::= <rule>* => {
+  processExtendedRules($1);
+}
+
+// Extension point for custom semantic actions
+<extended-actions> ::= <action>* => {
+  processExtendedActions($1);
+}
+
+// Extension point for user code
+<extended-user-code> ::= <c-code-block> => {
+  processExtendedUserCode($1);
+}
+

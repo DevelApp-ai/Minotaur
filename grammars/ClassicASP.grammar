@@ -1,0 +1,180 @@
+Grammar: ClassicASP
+TokenSplitter: Space
+FormatType: EBNF
+
+/*
+ * Classic ASP Grammar Specification
+ * 
+ * This grammar supports Classic ASP (Active Server Pages) with both VBScript and JScript
+ * server-side scripting languages, HTML markup, and ASP directives.
+ */
+
+<asp-document> ::= <asp-content>*
+
+<asp-content> ::= <html-content>
+               | <asp-directive>
+               | <asp-code-block>
+               | <asp-expression>
+               | <server-side-include>
+
+<html-content> ::= <html-text>
+                | <html-tag>
+                | <html-comment>
+
+<html-text> ::= /[^<]+/
+
+<html-tag> ::= "<" <tag-name> <attributes>? (">" | "/>" | ">" <tag-content>* "</" <tag-name> ">")
+
+<tag-name> ::= /[a-zA-Z][a-zA-Z0-9]*/
+
+<attributes> ::= <attribute>*
+
+<attribute> ::= <attribute-name> ("=" <attribute-value>)?
+
+<attribute-name> ::= /[a-zA-Z][a-zA-Z0-9\-]*/
+
+<attribute-value> ::= "\"" <quoted-content> "\"" | "'" <quoted-content> "'"
+
+<quoted-content> ::= /[^"']*/
+
+<tag-content> ::= <html-content>
+
+<html-comment> ::= "<!--" <comment-content> "-->"
+
+<comment-content> ::= /[^>]*/
+
+<asp-directive> ::= "<%@" <directive-attributes> "%>"
+
+<directive-attributes> ::= <directive-attribute>*
+
+<directive-attribute> ::= <directive-name> "=" <directive-value>
+
+<directive-name> ::= "LANGUAGE" | "CODEPAGE" | "LCID" | "ENABLESESSIONSTATE" | "TRANSACTION"
+
+<directive-value> ::= "\"" <directive-value-content> "\"" | <directive-value-content>
+
+<directive-value-content> ::= /[^">%]*/
+
+<asp-code-block> ::= "<%" <server-code> "%>"
+
+<asp-expression> ::= "<%=" <expression> "%>"
+
+<server-side-include> ::= "<!--#include" <include-attributes> "-->"
+
+<include-attributes> ::= <include-attribute>*
+
+<include-attribute> ::= ("file" | "virtual") "=" <include-path>
+
+<include-path> ::= "\"" <path-content> "\""
+
+<path-content> ::= /[^"]*/
+
+<server-code> ::= <vbscript-code> | <jscript-code>
+
+<vbscript-code> ::= <vb-statement>*
+
+<vb-statement> ::= <vb-variable-declaration>
+                | <vb-assignment>
+                | <vb-function-call>
+                | <vb-if-statement>
+                | <vb-loop-statement>
+                | <vb-response-write>
+                | <vb-comment>
+
+<vb-variable-declaration> ::= ("Dim" | "Private" | "Public") <vb-variable-list>
+
+<vb-variable-list> ::= <vb-variable> ("," <vb-variable>)*
+
+<vb-variable> ::= <IDENTIFIER> ("As" <vb-type>)?
+
+<vb-type> ::= "String" | "Integer" | "Long" | "Double" | "Boolean" | "Date" | "Object" | "Variant"
+
+<vb-assignment> ::= ("Set" <IDENTIFIER> "=" <expression>) | (<IDENTIFIER> "=" <expression>)
+
+<vb-function-call> ::= <IDENTIFIER> ("(" <argument-list>? ")")?
+
+<vb-if-statement> ::= "If" <condition> "Then" <vb-statement>* ("ElseIf" <condition> "Then" <vb-statement>*)* ("Else" <vb-statement>*)? "End" "If"
+
+<vb-loop-statement> ::= <vb-for-loop> | <vb-while-loop> | <vb-do-loop>
+
+<vb-for-loop> ::= "For" <IDENTIFIER> "=" <expression> "To" <expression> ("Step" <expression>)? <vb-statement>* "Next"
+
+<vb-while-loop> ::= "While" <condition> <vb-statement>* "Wend"
+
+<vb-do-loop> ::= "Do" ("While" | "Until") <condition> <vb-statement>* "Loop"
+
+<vb-response-write> ::= "Response.Write" <expression>
+
+<vb-comment> ::= "'" /[^\r\n]*/
+
+<jscript-code> ::= <js-statement>*
+
+<js-statement> ::= <js-variable-declaration>
+                | <js-assignment>
+                | <js-function-call>
+                | <js-if-statement>
+                | <js-loop-statement>
+                | <js-response-write>
+                | <js-comment>
+
+<js-variable-declaration> ::= "var" <js-variable-list> ";"
+
+<js-variable-list> ::= <IDENTIFIER> ("," <IDENTIFIER>)*
+
+<js-assignment> ::= <IDENTIFIER> "=" <expression> ";"
+
+<js-function-call> ::= <IDENTIFIER> "(" <argument-list>? ")" ";"
+
+<js-if-statement> ::= "if" "(" <condition> ")" "{" <js-statement>* "}" ("else" "{" <js-statement>* "}")?
+
+<js-loop-statement> ::= <js-for-loop> | <js-while-loop>
+
+<js-for-loop> ::= "for" "(" <js-for-init>? ";" <condition>? ";" <js-for-update>? ")" "{" <js-statement>* "}"
+
+<js-for-init> ::= <js-variable-declaration> | <js-assignment>
+
+<js-for-update> ::= <IDENTIFIER> "++" | "++" <IDENTIFIER> | <IDENTIFIER> "--" | "--" <IDENTIFIER>
+
+<js-while-loop> ::= "while" "(" <condition> ")" "{" <js-statement>* "}"
+
+<js-response-write> ::= "Response.Write(" <expression> ")" ";"
+
+<js-comment> ::= "//" /[^\r\n]*/ | "/*" /.*?/ "*/"
+
+<expression> ::= <primary-expression> (<binary-operator> <primary-expression>)*
+
+<primary-expression> ::= <literal>
+                      | <IDENTIFIER>
+                      | <function-call>
+                      | <object-member-access>
+                      | "(" <expression> ")"
+
+<object-member-access> ::= <IDENTIFIER> ("." <IDENTIFIER>)*
+
+<function-call> ::= <IDENTIFIER> "(" <argument-list>? ")"
+
+<argument-list> ::= <expression> ("," <expression>)*
+
+<condition> ::= <expression> (<comparison-operator> <expression>)?
+
+<binary-operator> ::= "+" | "-" | "*" | "/" | "%" | "&" | "And" | "Or" | "Xor"
+
+<comparison-operator> ::= "=" | "==" | "<>" | "!=" | "<" | ">" | "<=" | ">=" | "Like"
+
+<literal> ::= <string-literal> | <numeric-literal> | <boolean-literal> | <null-literal>
+
+<string-literal> ::= "\"" <string-content> "\"" | "'" <string-content> "'"
+
+<string-content> ::= /[^"']*/
+
+<numeric-literal> ::= <integer> | <decimal>
+
+<integer> ::= /[0-9]+/
+
+<decimal> ::= /[0-9]*\.[0-9]+/
+
+<boolean-literal> ::= "True" | "False" | "true" | "false"
+
+<null-literal> ::= "Nothing" | "null" | "Empty"
+
+<IDENTIFIER> ::= /[a-zA-Z_][a-zA-Z0-9_]*/

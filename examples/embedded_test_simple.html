@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Embedded Grammar Test</title>
+    <style>
+        /* CSS with cross-language references */
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        #main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .highlight {
+            background-color: yellow;
+            padding: 2px 4px;
+        }
+        
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .button:hover {
+            background-color: #0056b3;
+        }
+        
+        #output {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            min-height: 100px;
+            background-color: #f9f9f9;
+        }
+    </style>
+    <script>
+        // JavaScript with cross-language references
+        function initializePage() {
+            console.log('Page initialized');
+            
+            // DOM references that should validate against HTML IDs
+            var container = document.getElementById('main-container');
+            var output = document.getElementById('output');
+            var button = document.getElementById('test-button');
+            
+            if (container) {
+                console.log('Main container found');
+            }
+            
+            if (output) {
+                output.innerHTML = '<p>JavaScript successfully loaded and DOM elements found!</p>';
+            }
+            
+            // Add event listeners
+            if (button) {
+                button.addEventListener('click', handleButtonClick);
+            }
+        }
+        
+        function handleButtonClick() {
+            var output = document.getElementById('output');
+            var timestamp = new Date().toLocaleTimeString();
+            
+            output.innerHTML += '<p>Button clicked at ' + timestamp + '</p>';
+            
+            // Add highlight class to demonstrate CSS class reference
+            var highlights = document.querySelectorAll('.highlight');
+            highlights.forEach(function(element) {
+                element.style.backgroundColor = '#ffff00';
+            });
+        }
+        
+        function clearOutput() {
+            var output = document.getElementById('output');
+            if (output) {
+                output.innerHTML = '<p>Output cleared</p>';
+            }
+        }
+        
+        // Function that will be referenced from HTML onclick attribute
+        function showAlert() {
+            alert('Hello from embedded JavaScript!');
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</head>
+<body>
+    <div id="main-container">
+        <h1>Embedded Grammar Test Page</h1>
+        
+        <p>This page demonstrates the <span class="highlight">embedded grammar system</span> 
+           with cross-language validation between HTML, CSS, and JavaScript.</p>
+        
+        <h2>Features Demonstrated:</h2>
+        <ul>
+            <li><strong>CSS ID Selectors:</strong> #main-container, #output, #test-button</li>
+            <li><strong>CSS Class Selectors:</strong> .highlight, .button</li>
+            <li><strong>JavaScript DOM References:</strong> getElementById() calls</li>
+            <li><strong>HTML onclick Attributes:</strong> References to JavaScript functions</li>
+            <li><strong>Form Label Associations:</strong> for/id relationships</li>
+        </ul>
+        
+        <h2>Interactive Elements:</h2>
+        
+        <button id="test-button" class="button">Click Me!</button>
+        
+        <button class="button" onclick="showAlert()">Show Alert</button>
+        
+        <button class="button" onclick="clearOutput()">Clear Output</button>
+        
+        <h2>Form Example:</h2>
+        <form>
+            <label for="user-name">Name:</label>
+            <input type="text" id="user-name" name="name" placeholder="Enter your name">
+            
+            <label for="user-email">Email:</label>
+            <input type="email" id="user-email" name="email" placeholder="Enter your email">
+            
+            <label for="user-message">Message:</label>
+            <textarea id="user-message" name="message" placeholder="Enter your message"></textarea>
+        </form>
+        
+        <h2>Output:</h2>
+        <div id="output">
+            <p>Waiting for JavaScript to initialize...</p>
+        </div>
+    </div>
+</body>
+</html>
+

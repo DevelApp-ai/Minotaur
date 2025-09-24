@@ -1,0 +1,13 @@
+Grammar: ExtensionFile
+TokenSplitter: Space
+FormatType: EBNF
+
+﻿Grammar: CEBNF
+TokenSplitter: None
+
+<grammar contents> ::= <start-lines> <EOL> <additional lines>
+<start-lines>      ::= <first-line> [<second-line>]
+<first-line>       ::= "Extends Grammar:" <opt-whitespace> <word> <opt-whitespace> <EOL>
+<second-line>      ::= "Include:" <opt-whitespace> <includes> <opt-whitespace> <EOL>
+<includes>         ::= ANSI_WORD (<opt-whitespace> "," <opt-whitespace> ANSI_WORD)*
+<additional lines> ::= TOKEN* <EOL>

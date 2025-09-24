@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Embedded Grammar Example</title>
+    
+    <!-- Embedded CSS demonstrating style rules and selectors -->
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Container styles */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+        
+        /* Header styles */
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Button styles */
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Input styles */
+        .input-group {
+            margin: 20px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Output area styles */
+        #output {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Animation for dynamic content */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+        
+        /* Custom properties (CSS variables) */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --text-color: #4a5568;
+            --background-color: #f7fafc;
+            --border-color: #e2e8f0;
+        }
+        
+        /* Using custom properties */
+        .custom-element {
+            color: var(--text-color);
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="main-title">Minotaur Embedded Grammar Demo</h1>
+        
+        <p>This example demonstrates the power of Minotaur's embedded grammar parsing capabilities. 
+           The HTML contains embedded CSS and JavaScript that are parsed as separate languages while 
+           maintaining cross-language validation and reference tracking.</p>
+        
+        <div class="input-group">
+            <label for="user-name">Enter your name:</label>
+            <input type="text" id="user-name" placeholder="Your name here...">
+        </div>
+        
+        <div class="input-group">
+            <label for="user-message">Enter a message:</label>
+            <input type="text" id="user-message" placeholder="Your message here...">
+        </div>
+        
+        <button class="btn" id="greet-btn" onclick="greetUser()">Greet User</button>
+        <button class="btn" id="clear-btn" onclick="clearOutput()">Clear Output</button>
+        <button class="btn" id="demo-btn" onclick="runDemo()">Run Demo</button>
+        
+        <div id="output" class="custom-element">
+            <p>Output will appear here...</p>
+        </div>
+    </div>
+
+    <!-- Embedded JavaScript demonstrating various language features -->
+    <script>
+        // Global variables
+        let userCount = 0;
+        const messages = [];
+        
+        // Configuration object
+        const config = {
+            maxMessages: 10,
+            animationDuration: 500,
+            debugMode: false
+        };
+        
+        // Utility functions
+        function log(message) {
+            if (config.debugMode) {
+                console.log(`[DEBUG] ${message}`);
+            }
+        }
+        
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString();
+        }
+        
+        function sanitizeInput(input) {
+            return input.replace(/[<>]/g, '');
+        }
+        
+        // DOM manipulation functions
+        function getElementById(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                throw new Error(`Element with ID '${id}' not found`);
+            }
+            return element;
+        }
+        
+        function updateOutput(content, animate = true) {
+            const outputElement = getElementById('output');
+            outputElement.innerHTML = content;
+            
+            if (animate) {
+                outputElement.classList.remove('fade-in');
+                // Force reflow
+                outputElement.offsetHeight;
+                outputElement.classList.add('fade-in');
+            }
+            
+            log(`Output updated: ${content.substring(0, 50)}...`);
+        }
+        
+        function appendToOutput(content) {
+            const outputElement = getElementById('output');
+            const currentContent = outputElement.innerHTML;
+            outputElement.innerHTML = currentContent + '<br>' + content;
+        }
+        
+        // Main application functions
+        function greetUser() {
+            try {
+                const nameInput = getElementById('user-name');
+                const messageInput = getElementById('user-message');
+                
+                const name = sanitizeInput(nameInput.value.trim());
+                const message = sanitizeInput(messageInput.value.trim());
+                
+                if (!name) {
+                    updateOutput('<span style="color: red;">Please enter your name!</span>');
+                    return;
+                }
+                
+                userCount++;
+                const greeting = generateGreeting(name, message);
+                
+                // Store message
+                messages.push({
+                    name: name,
+                    message: message,
+                    timestamp: getCurrentTime(),
+                    id: userCount
+                });
+                
+                updateOutput(greeting);
+                
+                // Clear inputs
+                nameInput.value = '';
+                messageInput.value = '';
+                
+                log(`User greeted: ${name}`);
+                
+            } catch (error) {
+                updateOutput(`<span style="color: red;">Error: ${error.message}</span>`);
+                console.error('Error in greetUser:', error);
+            }
+        }
+        
+        function generateGreeting(name, message) {
+            const greetings = [
+                `Hello, ${name}! Welcome to the Minotaur demo!`,
+                `Greetings, ${name}! Thanks for trying our embedded grammar parser!`,
+                `Hi there, ${name}! Hope you enjoy this demonstration!`,
+                `Welcome, ${name}! This is powered by Minotaur technology!`
+            ];
+            
+            const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+            let output = `<h3>${randomGreeting}</h3>`;
+            
+            if (message) {
+                output += `<p><strong>Your message:</strong> "${message}"</p>`;
+            }
+            
+            output += `<p><small>Visitor #${userCount} at ${getCurrentTime()}</small></p>`;
+            
+            return output;
+        }
+        
+        function clearOutput() {
+            updateOutput('<p style="color: #666;">Output cleared. Ready for new input...</p>');
+            log('Output cleared');
+        }
+        
+        function runDemo() {
+            const demoSteps = [
+                'Initializing Minotaur demo...',
+                'Loading embedded grammar parsers...',
+                'Parsing HTML structure...',
+                'Analyzing CSS rules and selectors...',
+                'Processing JavaScript functions and variables...',
+                'Validating cross-language references...',
+                'Generating symbol table...',
+                'Demo complete! All languages parsed successfully.'
+            ];
+            
+            let stepIndex = 0;
+            updateOutput('<h3>Running Demo...</h3><div id="demo-progress"></div>');
+            
+            const progressElement = document.createElement('div');
+            progressElement.id = 'demo-progress';
+            getElementById('output').appendChild(progressElement);
+            
+            const interval = setInterval(() => {
+                if (stepIndex < demoSteps.length) {
+                    const step = demoSteps[stepIndex];
+                    progressElement.innerHTML += `<p>✓ ${step}</p>`;
+                    stepIndex++;
+                    
+                    log(`Demo step: ${step}`);
+                } else {
+                    clearInterval(interval);
+                    progressElement.innerHTML += '<p style="color: green; font-weight: bold;">🎉 Demo completed successfully!</p>';
+                    
+                    // Show statistics
+                    setTimeout(() => {
+                        showStatistics();
+                    }, 1000);
+                }
+            }, 800);
+        }
+        
+        function showStatistics() {
+            const stats = {
+                htmlElements: document.querySelectorAll('*').length,
+                cssRules: document.styleSheets[0] ? document.styleSheets[0].cssRules.length : 0,
+                jsVariables: Object.keys(window).filter(key => typeof window[key] !== 'function').length,
+                jsFunctions: Object.keys(window).filter(key => typeof window[key] === 'function').length,
+                totalMessages: messages.length,
+                userCount: userCount
+            };
+            
+            const statsHtml = `
+                <div style="margin-top: 20px; padding: 15px; background: #e6fffa; border-radius: 5px;">
+                    <h4>📊 Parsing Statistics</h4>
+                    <ul>
+                        <li><strong>HTML Elements:</strong> ${stats.htmlElements}</li>
+                        <li><strong>CSS Rules:</strong> ${stats.cssRules}</li>
+                        <li><strong>JavaScript Variables:</strong> ${stats.jsVariables}</li>
+                        <li><strong>JavaScript Functions:</strong> ${stats.jsFunctions}</li>
+                        <li><strong>User Interactions:</strong> ${stats.userCount}</li>
+                        <li><strong>Messages Stored:</strong> ${stats.totalMessages}</li>
+                    </ul>
+                    <p><small>These statistics demonstrate the cross-language analysis capabilities of Minotaur.</small></p>
+                </div>
+            `;
+            
+            appendToOutput(statsHtml);
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOM loaded, initializing application');
+            
+            // Add keyboard support
+            const nameInput = getElementById('user-name');
+            const messageInput = getElementById('user-message');
+            
+            nameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    messageInput.focus();
+                }
+            });
+            
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    greetUser();
+                }
+            });
+            
+            // Add input validation
+            nameInput.addEventListener('input', function() {
+                const value = this.value;
+                if (value.length > 50) {
+                    this.value = value.substring(0, 50);
+                    updateOutput('<span style="color: orange;">Name truncated to 50 characters.</span>');
+                }
+            });
+            
+            messageInput.addEventListener('input', function() {
+                const value = this.value;
+                if (value.length > 200) {
+                    this.value = value.substring(0, 200);
+                    updateOutput('<span style="color: orange;">Message truncated to 200 characters.</span>');
+                }
+            });
+            
+            // Initialize with welcome message
+            updateOutput(`
+                <h3>🚀 Welcome to Minotaur Embedded Grammar Demo!</h3>
+                <p>This page demonstrates:</p>
+                <ul>
+                    <li><strong>HTML</strong> structure with semantic elements</li>
+                    <li><strong>CSS</strong> styling with modern features (flexbox, animations, custom properties)</li>
+                    <li><strong>JavaScript</strong> functionality with DOM manipulation and event handling</li>
+                    <li><strong>Cross-language validation</strong> ensuring all references are valid</li>
+                </ul>
+                <p>Try entering your name and message above, or click "Run Demo" to see the parser in action!</p>
+            `);
+            
+            log('Application initialized successfully');
+        });
+        
+        // Error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            updateOutput(`<span style="color: red;">An error occurred: ${e.error.message}</span>`);
+        });
+        
+        // Performance monitoring
+        if (window.performance && window.performance.mark) {
+            window.performance.mark('script-start');
+            
+            window.addEventListener('load', function() {
+                window.performance.mark('script-end');
+                window.performance.measure('script-execution', 'script-start', 'script-end');
+                
+                const measure = window.performance.getEntriesByName('script-execution')[0];
+                log(`Script execution time: ${measure.duration.toFixed(2)}ms`);
+            });
+        }
+        
+        // Export functions for testing (if in Node.js environment)
+        if (typeof module !== 'undefined' && module.exports) {
+            module.exports = {
+                greetUser,
+                clearOutput,
+                runDemo,
+                generateGreeting,
+                sanitizeInput,
+                getCurrentTime
+            };
+        }
+    </script>
+</body>
+</html>
+
