@@ -11,7 +11,7 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   SOLUTION_PATH: 'src/Minotaur.sln'
-  PROJECT_PATH: 'src/GolemCognitiveGraph/GolemCognitiveGraph.csproj'
+  PROJECT_PATH: 'src/Minotaur/Minotaur.csproj'
 
 jobs:
   calculate-version:
@@ -198,8 +198,8 @@ jobs:
     
     - name: Run demo application for performance testing
       run: |
-        if [ -d "src/GolemCognitiveGraph.Demo" ]; then
-          cd src/GolemCognitiveGraph.Demo
+        if [ -d "src/Minotaur.Demo" ]; then
+          cd src/Minotaur.Demo
           timeout 30s dotnet run --configuration Release || echo "Demo completed or timed out as expected"
         else
           echo "No demo projects found for performance testing"

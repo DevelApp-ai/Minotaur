@@ -59,23 +59,23 @@ src/
 #### A. Main Project Directory
 ```
 CURRENT:  src/GolemCognitiveGraph/
-PROPOSED: src/Minotaur.CognitiveGraph/
-REASON:   Aligns with project name and NuGet package branding
+PROPOSED: src/Minotaur/
+REASON:   Aligns with project name - GolemCognitiveGraph should simply be Minotaur
 ```
 
 #### B. Support Projects
 ```
 CURRENT:  src/GolemCognitiveGraph.Demo/
-PROPOSED: src/Minotaur.CognitiveGraph.Demo/
+PROPOSED: src/Minotaur.Demo/
 
 CURRENT:  src/GolemCognitiveGraph.Tests/
-PROPOSED: src/Minotaur.CognitiveGraph.Tests/
+PROPOSED: src/Minotaur.Tests/
 ```
 
 #### C. Main Project File
 ```
 CURRENT:  GolemCognitiveGraph.csproj
-PROPOSED: Minotaur.CognitiveGraph.csproj
+PROPOSED: Minotaur.csproj
 ```
 
 ### 2. Medium Priority: Folder Structure Improvements
@@ -98,9 +98,9 @@ namespace GolemCognitiveGraph.Editor;
 // etc.
 
 // PROPOSED  
-namespace Minotaur.CognitiveGraph.ContextAware;
-namespace Minotaur.CognitiveGraph.Core;
-namespace Minotaur.CognitiveGraph.Editor;
+namespace Minotaur.ContextAware;
+namespace Minotaur.Core;
+namespace Minotaur.Editor;
 // etc.
 ```
 
@@ -157,11 +157,15 @@ namespace Minotaur.CognitiveGraph.Editor;
 
 ### Immediate Actions (This PR):
 1. ✅ Fix pipeline name (completed)
-2. 🔄 Rename `Advanced/` to `ContextAware/`
-3. 📋 Update documentation to reflect correct naming
+2. ✅ Rename `Advanced/` to `ContextAware/` (completed)
+3. ✅ Update documentation to reflect correct naming (completed)
+4. ✅ Rename `GolemCognitiveGraph` to `Minotaur` (IMPLEMENTING NOW)
+5. ✅ Update all namespaces (IMPLEMENTING NOW)
+6. ✅ Update project files and solution (IMPLEMENTING NOW)
+7. ✅ Update CI/CD paths and references (IMPLEMENTING NOW)
 
 ### Future Major Refactoring (Separate PR):
-1. 🏗️ Rename `GolemCognitiveGraph` to `Minotaur.CognitiveGraph`
+1. 🏗️ Rename `GolemCognitiveGraph` to `Minotaur`
 2. 🔧 Update all namespaces
 3. 📦 Update project files and solution
 4. 🔄 Update CI/CD paths and references
@@ -175,6 +179,6 @@ namespace Minotaur.CognitiveGraph.Editor;
 
 The current structure has significant naming inconsistencies that create confusion. The "GolemCognitiveGraph" naming appears to be legacy from a previous project iteration, while "Minotaur" is the current project identity. A phased approach is recommended:
 
-1. **Phase 1** (Current): Fix immediate pipeline naming and non-descriptive folders
-2. **Phase 2** (Future): Complete project renaming and namespace restructuring  
-3. **Phase 3** (Analysis): Evaluate external package consolidation opportunities
+1. **Phase 1** (Current): Complete project renaming and namespace restructuring - IMPLEMENTING NOW
+2. **Phase 2** (Future): Evaluate external package consolidation opportunities
+3. **Phase 3** (Analysis): Document clear separation between core functionality and Minotaur-specific features
