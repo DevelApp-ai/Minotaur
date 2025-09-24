@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex Embedded Grammar Example - Advanced Features</title>
+    
+    <!-- Advanced CSS demonstrating complex selectors, animations, and modern features -->
+    <style>
+        /* CSS Custom Properties (Variables) */
+        :root {
+            --primary-hue: 220;
+            --primary-saturation: 70%;
+            --primary-lightness: 50%;
+            --primary-color: hsl(var(--primary-hue), var(--primary-saturation), var(--primary-lightness));
+            --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 70%);
+            --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 30%);
+            
+            --secondary-color: #ff6b6b;
+            --accent-color: #4ecdc4;
+            --warning-color: #ffe66d;
+            --success-color: #95e1d3;
+            
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-family-mono: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+            
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-xxl: 3rem;
+            
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+            
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
+            
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+        
+        /* Modern CSS Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-family-primary);
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, 
+                var(--primary-color) 0%, 
+                var(--primary-light) 50%, 
+                var(--accent-color) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Container System */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+        
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+        
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Card Component */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--primary-dark);
+        }
+        
+        h3 {
+            font-size: clamp(1.25rem, 3vw, 2rem);
+            color: var(--primary-color);
+        }
+        
+        p {
+            margin-bottom: var(--spacing-md);
+            color: #4a5568;
+        }
+        
+        /* Button System */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left var(--transition-slow);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary-color), #ff5252);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent-color), #26d0ce);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Form Components */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-hue), var(--primary-saturation), var(--primary-lightness), 0.1);
+            background: white;
+        }
+        
+        .form-input:invalid {
+            border-color: var(--secondary-color);
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        
+        /* Interactive Components */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .tab {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #718096;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Progress Components */
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            margin: var(--spacing-md) 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--border-radius-sm);
+            transition: width var(--transition-slow);
+            position: relative;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.2) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 1rem 1rem;
+            animation: progress-stripes 1s linear infinite;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes progress-stripes {
+            from { background-position: 1rem 0; }
+            to { background-position: 0 0; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% { transform: translate3d(0, 0, 0); }
+            40%, 43% { transform: translate3d(0, -30px, 0); }
+            70% { transform: translate3d(0, -15px, 0); }
+            90% { transform: translate3d(0, -4px, 0); }
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        
+        .hidden { display: none; }
+        .visible { display: block; }
+        
+        .pulse { animation: pulse 2s infinite; }
+        .bounce { animation: bounce 1s infinite; }
+        .spin { animation: spin 1s linear infinite; }
+        
+        .mt-0 { margin-top: 0; }
+        .mt-1 { margin-top: var(--spacing-xs); }
+        .mt-2 { margin-top: var(--spacing-sm); }
+        .mt-3 { margin-top: var(--spacing-md); }
+        .mt-4 { margin-top: var(--spacing-lg); }
+        .mt-5 { margin-top: var(--spacing-xl); }
+        
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: var(--spacing-xs); }
+        .mb-2 { margin-bottom: var(--spacing-sm); }
+        .mb-3 { margin-bottom: var(--spacing-md); }
+        .mb-4 { margin-bottom: var(--spacing-lg); }
+        .mb-5 { margin-bottom: var(--spacing-xl); }
+        
+        /* Status Indicators */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+        }
+        
+        .status-warning {
+            background: rgba(237, 137, 54, 0.1);
+            color: #c05621;
+        }
+        
+        .status-error {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+        }
+        
+        .status-info {
+            background: rgba(66, 153, 225, 0.1);
+            color: #2b6cb0;
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-lightness: 60%;
+            }
+            
+            body {
+                background: linear-gradient(135deg, #1a202c 0%, #2d3748 50%, #4a5568 100%);
+                color: #e2e8f0;
+            }
+            
+            .card {
+                background: rgba(45, 55, 72, 0.95);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .form-input {
+                background: rgba(45, 55, 72, 0.9);
+                border-color: #4a5568;
+                color: #e2e8f0;
+            }
+            
+            .form-input:focus {
+                background: #2d3748;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            
+            .card {
+                background: white !important;
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+            
+            .btn {
+                background: white !important;
+                color: black !important;
+                border: 1px solid #ccc !important;
+            }
+        }
+        
+        /* High contrast mode */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary-color: #000080;
+                --secondary-color: #800000;
+                --accent-color: #008080;
+            }
+            
+            .card {
+                border: 2px solid #000;
+            }
+            
+            .btn {
+                border: 2px solid currentColor;
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="main-title">Advanced Minotaur Demo</h1>
+        
+        <div class="grid grid-2">
+            <!-- Interactive Demo Card -->
+            <div class="card">
+                <h2>🚀 Interactive Parser Demo</h2>
+                <p>Experience the power of embedded grammar parsing with real-time validation and cross-language analysis.</p>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="parser">Parser</button>
+                    <button class="tab" data-tab="validator">Validator</button>
+                    <button class="tab" data-tab="analyzer">Analyzer</button>
+                </div>
+                
+                <div class="tab-content active" id="parser-content">
+                    <div class="form-group">
+                        <label class="form-label" for="code-input">Enter HTML/CSS/JS Code:</label>
+                        <textarea class="form-input" id="code-input" rows="6" placeholder="<div class='example'>Hello World</div>"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="language-select">Target Language:</label>
+                        <select class="form-input form-select" id="language-select">
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="java">Java</option>
+                            <option value="csharp">C#</option>
+                            <option value="python">Python</option>
+                            <option value="javascript" selected>JavaScript</option>
+                            <option value="rust">Rust</option>
+                            <option value="go">Go</option>
+                            <option value="wasm">WebAssembly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button class="btn btn-primary" onclick="parseCode()">Parse Code</button>
+                        <button class="btn btn-outline" onclick="clearParser()">Clear</button>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="validator-content">
+                    <div class="form-group">
+                        <label class="form-label" for="validation-input">Code to Validate:</label>
+                        <textarea class="form-input" id="validation-input" rows="6" placeholder="Enter code for cross-language validation..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-between">
+                        <button class="btn btn-secondary" onclick="validateCode()">Validate</button>
+                        <button class="btn btn-outline" onclick="clearValidator()">Clear</button>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="analyzer-content">
+                    <div class="form-group">
+                        <label class="form-label">Analysis Options:</label>
+                        <div class="flex flex-col" style="gap: 0.5rem;">
+                            <label><input type="checkbox" id="analyze-performance" checked> Performance Analysis</label>
+                            <label><input type="checkbox" id="analyze-complexity" checked> Complexity Analysis</label>
+                            <label><input type="checkbox" id="analyze-dependencies" checked> Dependency Analysis</label>
+                            <label><input type="checkbox" id="analyze-optimization" checked> Optimization Suggestions</label>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-accent" onclick="analyzeCode()">Analyze Current Page</button>
+                </div>
+            </div>
+            
+            <!-- Results Card -->
+            <div class="card">
+                <h2>📊 Results & Analysis</h2>
+                <div id="results-container">
+                    <p class="text-center" style="color: #718096;">Results will appear here after running operations...</p>
+                </div>
+                
+                <div class="progress hidden" id="progress-container">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+                </div>
+                
+                <div class="mt-4 hidden" id="status-container">
+                    <div class="status status-info" id="status-indicator">
+                        <span>Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Metrics Card -->
+        <div class="card mt-4">
+            <h2>⚡ Performance Metrics</h2>
+            <div class="grid grid-4">
+                <div class="text-center">
+                    <h3 id="parse-time">0ms</h3>
+                    <p>Parse Time</p>
+                </div>
+                <div class="text-center">
+                    <h3 id="validation-time">0ms</h3>
+                    <p>Validation Time</p>
+                </div>
+                <div class="text-center">
+                    <h3 id="memory-usage">0KB</h3>
+                    <p>Memory Usage</p>
+                </div>
+                <div class="text-center">
+                    <h3 id="cache-hits">0%</h3>
+                    <p>Cache Hit Rate</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature Showcase Card -->
+        <div class="card mt-4">
+            <h2>🎯 Feature Showcase</h2>
+            <div class="grid grid-3">
+                <div class="text-center">
+                    <h3>Multi-Language Support</h3>
+                    <p>Parse HTML, CSS, and JavaScript simultaneously with cross-language validation.</p>
+                    <button class="btn btn-primary mt-2" onclick="demonstrateMultiLanguage()">Demo</button>
+                </div>
+                <div class="text-center">
+                    <h3>Context-Sensitive Parsing</h3>
+                    <p>Advanced context switching with symbol table management and scope tracking.</p>
+                    <button class="btn btn-secondary mt-2" onclick="demonstrateContextSensitive()">Demo</button>
+                </div>
+                <div class="text-center">
+                    <h3>Performance Optimization</h3>
+                    <p>Generate highly optimized parsers for multiple target languages.</p>
+                    <button class="btn btn-accent mt-2" onclick="demonstrateOptimization()">Demo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced JavaScript demonstrating complex language features -->
+    <script>
+        // Advanced JavaScript with modern ES6+ features, classes, modules, and complex logic
+        
+        // Configuration and Constants
+        const CONFIG = {
+            API_ENDPOINT: '/api/minotaur',
+            MAX_CODE_LENGTH: 10000,
+            PARSE_TIMEOUT: 5000,
+            CACHE_SIZE: 100,
+            DEBUG_MODE: true,
+            PERFORMANCE_MONITORING: true,
+            SUPPORTED_LANGUAGES: ['c', 'cpp', 'java', 'csharp', 'python', 'javascript', 'rust', 'go', 'wasm'],
+            VALIDATION_RULES: {
+                HTML: ['element_nesting', 'attribute_validation', 'semantic_structure'],
+                CSS: ['selector_validation', 'property_validation', 'media_query_validation'],
+                JavaScript: ['syntax_validation', 'scope_validation', 'dom_reference_validation']
+            }
+        };
+        
+        // Utility Classes and Functions
+        class Logger {
+            static levels = {
+                ERROR: 0,
+                WARN: 1,
+                INFO: 2,
+                DEBUG: 3
+            };
+            
+            static currentLevel = CONFIG.DEBUG_MODE ? Logger.levels.DEBUG : Logger.levels.INFO;
+            
+            static log(level, message, data = null) {
+                if (level <= Logger.currentLevel) {
+                    const timestamp = new Date().toISOString();
+                    const levelName = Object.keys(Logger.levels)[level];
+                    console.log(`[${timestamp}] ${levelName}: ${message}`, data || '');
+                }
+            }
+            
+            static error(message, data) { Logger.log(Logger.levels.ERROR, message, data); }
+            static warn(message, data) { Logger.log(Logger.levels.WARN, message, data); }
+            static info(message, data) { Logger.log(Logger.levels.INFO, message, data); }
+            static debug(message, data) { Logger.log(Logger.levels.DEBUG, message, data); }
+        }
+        
+        class PerformanceMonitor {
+            static measurements = new Map();
+            static memoryBaseline = null;
+            
+            static start(operation) {
+                if (!CONFIG.PERFORMANCE_MONITORING) return;
+                
+                Logger.debug(`Starting performance measurement for: ${operation}`);
+                PerformanceMonitor.measurements.set(operation, {
+                    startTime: performance.now(),
+                    startMemory: PerformanceMonitor.getMemoryUsage()
+                });
+            }
+            
+            static end(operation) {
+                if (!CONFIG.PERFORMANCE_MONITORING) return;
+                
+                const measurement = PerformanceMonitor.measurements.get(operation);
+                if (!measurement) {
+                    Logger.warn(`No measurement found for operation: ${operation}`);
+                    return null;
+                }
+                
+                const endTime = performance.now();
+                const endMemory = PerformanceMonitor.getMemoryUsage();
+                
+                const result = {
+                    operation,
+                    duration: endTime - measurement.startTime,
+                    memoryDelta: endMemory - measurement.startMemory,
+                    timestamp: new Date().toISOString()
+                };
+                
+                Logger.debug(`Performance measurement completed for: ${operation}`, result);
+                PerformanceMonitor.measurements.delete(operation);
+                
+                return result;
+            }
+            
+            static getMemoryUsage() {
+                if (performance.memory) {
+                    return performance.memory.usedJSHeapSize;
+                }
+                return 0;
+            }
+            
+            static updateUI(metrics) {
+                if (metrics) {
+                    document.getElementById('parse-time').textContent = `${metrics.duration.toFixed(2)}ms`;
+                    document.getElementById('memory-usage').textContent = `${(metrics.memoryDelta / 1024).toFixed(2)}KB`;
+                }
+            }
+        }
+        
+        class CacheManager {
+            constructor(maxSize = CONFIG.CACHE_SIZE) {
+                this.cache = new Map();
+                this.maxSize = maxSize;
+                this.hits = 0;
+                this.misses = 0;
+            }
+            
+            get(key) {
+                if (this.cache.has(key)) {
+                    this.hits++;
+                    const value = this.cache.get(key);
+                    // Move to end (LRU)
+                    this.cache.delete(key);
+                    this.cache.set(key, value);
+                    Logger.debug(`Cache hit for key: ${key}`);
+                    return value;
+                } else {
+                    this.misses++;
+                    Logger.debug(`Cache miss for key: ${key}`);
+                    return null;
+                }
+            }
+            
+            set(key, value) {
+                if (this.cache.has(key)) {
+                    this.cache.delete(key);
+                } else if (this.cache.size >= this.maxSize) {
+                    // Remove oldest entry
+                    const firstKey = this.cache.keys().next().value;
+                    this.cache.delete(firstKey);
+                    Logger.debug(`Cache evicted key: ${firstKey}`);
+                }
+                
+                this.cache.set(key, value);
+                Logger.debug(`Cache set for key: ${key}`);
+            }
+            
+            getHitRate() {
+                const total = this.hits + this.misses;
+                return total > 0 ? (this.hits / total) * 100 : 0;
+            }
+            
+            clear() {
+                this.cache.clear();
+                this.hits = 0;
+                this.misses = 0;
+                Logger.debug('Cache cleared');
+            }
+        }
+        
+        // Main Application Classes
+        class MinotaurParser {
+            constructor() {
+                this.cache = new CacheManager();
+                this.isInitialized = false;
+                this.supportedLanguages = new Set(CONFIG.SUPPORTED_LANGUAGES);
+                this.validationRules = CONFIG.VALIDATION_RULES;
+                this.symbolTable = new Map();
+                this.crossReferences = new Map();
+                this.parseHistory = [];
+            }
+            
+            async initialize() {
+                if (this.isInitialized) return;
+                
+                Logger.info('Initializing Minotaur Parser...');
+                PerformanceMonitor.start('parser_initialization');
+                
+                try {
+                    // Simulate parser initialization
+                    await this.loadGrammars();
+                    await this.initializeSymbolTable();
+                    await this.setupValidationRules();
+                    
+                    this.isInitialized = true;
+                    Logger.info('Minotaur Parser initialized successfully');
+                    
+                } catch (error) {
+                    Logger.error('Failed to initialize parser', error);
+                    throw error;
+                } finally {
+                    PerformanceMonitor.end('parser_initialization');
+                }
+            }
+            
+            async loadGrammars() {
+                // Simulate loading grammar files
+                const grammars = ['html_base.gf', 'javascript.gf', 'css.gf', 'html_embedded.gf'];
+                
+                for (const grammar of grammars) {
+                    Logger.debug(`Loading grammar: ${grammar}`);
+                    // Simulate async loading
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                Logger.info(`Loaded ${grammars.length} grammars`);
+            }
+            
+            async initializeSymbolTable() {
+                this.symbolTable.clear();
+                
+                // Initialize with built-in symbols
+                const builtinSymbols = {
+                    HTML: ['div', 'span', 'p', 'h1', 'h2', 'h3', 'body', 'head', 'html'],
+                    CSS: ['color', 'background', 'margin', 'padding', 'border', 'font-size'],
+                    JavaScript: ['document', 'window', 'console', 'setTimeout', 'setInterval']
+                };
+                
+                for (const [language, symbols] of Object.entries(builtinSymbols)) {
+                    this.symbolTable.set(language, new Set(symbols));
+                }
+                
+                Logger.debug('Symbol table initialized', this.symbolTable);
+            }
+            
+            async setupValidationRules() {
+                // Setup cross-language validation rules
+                this.validationRules.crossLanguage = [
+                    'css_selector_html_element_validation',
+                    'js_dom_reference_html_element_validation',
+                    'event_handler_binding_validation'
+                ];
+                
+                Logger.debug('Validation rules configured', this.validationRules);
+            }
+            
+            async parseCode(code, targetLanguage = 'javascript') {
+                if (!this.isInitialized) {
+                    await this.initialize();
+                }
+                
+                if (!this.supportedLanguages.has(targetLanguage)) {
+                    throw new Error(`Unsupported target language: ${targetLanguage}`);
+                }
+                
+                if (code.length > CONFIG.MAX_CODE_LENGTH) {
+                    throw new Error(`Code length exceeds maximum: ${CONFIG.MAX_CODE_LENGTH}`);
+                }
+                
+                const cacheKey = this.generateCacheKey(code, targetLanguage);
+                const cachedResult = this.cache.get(cacheKey);
+                
+                if (cachedResult) {
+                    Logger.info('Returning cached parse result');
+                    return cachedResult;
+                }
+                
+                Logger.info(`Parsing code for target language: ${targetLanguage}`);
+                PerformanceMonitor.start('code_parsing');
+                
+                try {
+                    const result = await this.performParsing(code, targetLanguage);
+                    this.cache.set(cacheKey, result);
+                    this.parseHistory.push({
+                        timestamp: new Date().toISOString(),
+                        targetLanguage,
+                        codeLength: code.length,
+                        success: true
+                    });
+                    
+                    return result;
+                    
+                } catch (error) {
+                    Logger.error('Parsing failed', error);
+                    this.parseHistory.push({
+                        timestamp: new Date().toISOString(),
+                        targetLanguage,
+                        codeLength: code.length,
+                        success: false,
+                        error: error.message
+                    });
+                    throw error;
+                    
+                } finally {
+                    const metrics = PerformanceMonitor.end('code_parsing');
+                    PerformanceMonitor.updateUI(metrics);
+                }
+            }
+            
+            async performParsing(code, targetLanguage) {
+                // Simulate complex parsing logic
+                const steps = [
+                    'Lexical Analysis',
+                    'Syntax Analysis',
+                    'Semantic Analysis',
+                    'Context Resolution',
+                    'Symbol Table Generation',
+                    'Cross-Language Validation',
+                    'Code Generation',
+                    'Optimization'
+                ];
+                
+                const result = {
+                    success: true,
+                    targetLanguage,
+                    parseTree: null,
+                    symbolTable: {},
+                    crossReferences: [],
+                    generatedCode: '',
+                    warnings: [],
+                    errors: [],
+                    metrics: {
+                        parseTime: 0,
+                        memoryUsage: 0,
+                        cacheHitRate: this.cache.getHitRate()
+                    }
+                };
+                
+                // Simulate parsing steps with progress updates
+                for (let i = 0; i < steps.length; i++) {
+                    const step = steps[i];
+                    Logger.debug(`Executing parsing step: ${step}`);
+                    
+                    // Update progress
+                    this.updateProgress((i + 1) / steps.length * 100);
+                    
+                    // Simulate processing time
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                    // Simulate step-specific processing
+                    switch (step) {
+                        case 'Lexical Analysis':
+                            result.tokens = this.performLexicalAnalysis(code);
+                            break;
+                        case 'Syntax Analysis':
+                            result.parseTree = this.performSyntaxAnalysis(result.tokens);
+                            break;
+                        case 'Semantic Analysis':
+                            result.semanticInfo = this.performSemanticAnalysis(result.parseTree);
+                            break;
+                        case 'Context Resolution':
+                            result.contextInfo = this.performContextResolution(result.semanticInfo);
+                            break;
+                        case 'Symbol Table Generation':
+                            result.symbolTable = this.generateSymbolTable(result.contextInfo);
+                            break;
+                        case 'Cross-Language Validation':
+                            result.validationResults = this.performCrossLanguageValidation(result);
+                            break;
+                        case 'Code Generation':
+                            result.generatedCode = this.generateCode(result, targetLanguage);
+                            break;
+                        case 'Optimization':
+                            result.optimizedCode = this.optimizeCode(result.generatedCode, targetLanguage);
+                            break;
+                    }
+                }
+                
+                return result;
+            }
+            
+            performLexicalAnalysis(code) {
+                // Simulate tokenization
+                const tokens = [];
+                const tokenTypes = ['KEYWORD', 'IDENTIFIER', 'LITERAL', 'OPERATOR', 'DELIMITER'];
+                
+                // Simple tokenization simulation
+                const words = code.split(/\s+/);
+                for (const word of words) {
+                    if (word.trim()) {
+                        tokens.push({
+                            type: tokenTypes[Math.floor(Math.random() * tokenTypes.length)],
+                            value: word.trim(),
+                            position: { line: 1, column: 1 }
+                        });
+                    }
+                }
+                
+                Logger.debug(`Generated ${tokens.length} tokens`);
+                return tokens;
+            }
+            
+            performSyntaxAnalysis(tokens) {
+                // Simulate parse tree generation
+                const parseTree = {
+                    type: 'Program',
+                    children: [],
+                    metadata: {
+                        nodeCount: tokens.length,
+                        depth: Math.ceil(Math.log2(tokens.length)),
+                        complexity: this.calculateComplexity(tokens)
+                    }
+                };
+                
+                Logger.debug('Generated parse tree', parseTree.metadata);
+                return parseTree;
+            }
+            
+            performSemanticAnalysis(parseTree) {
+                // Simulate semantic analysis
+                return {
+                    symbolReferences: Math.floor(Math.random() * 50),
+                    scopeDepth: Math.floor(Math.random() * 10),
+                    typeErrors: Math.floor(Math.random() * 3),
+                    warnings: Math.floor(Math.random() * 5)
+                };
+            }
+            
+            performContextResolution(semanticInfo) {
+                // Simulate context resolution
+                return {
+                    resolvedReferences: semanticInfo.symbolReferences - Math.floor(Math.random() * 5),
+                    unresolvedReferences: Math.floor(Math.random() * 3),
+                    contextSwitches: Math.floor(Math.random() * 10)
+                };
+            }
+            
+            generateSymbolTable(contextInfo) {
+                // Simulate symbol table generation
+                const symbolTable = {
+                    totalSymbols: contextInfo.resolvedReferences + Math.floor(Math.random() * 20),
+                    scopeLevels: Math.floor(Math.random() * 5) + 1,
+                    crossReferences: Math.floor(Math.random() * 15)
+                };
+                
+                return symbolTable;
+            }
+            
+            performCrossLanguageValidation(parseResult) {
+                // Simulate cross-language validation
+                const validationResults = {
+                    htmlElementValidation: { passed: true, issues: [] },
+                    cssValidation: { passed: true, issues: [] },
+                    jsValidation: { passed: true, issues: [] },
+                    crossLanguageValidation: { passed: true, issues: [] }
+                };
+                
+                // Simulate some validation issues
+                if (Math.random() < 0.3) {
+                    validationResults.crossLanguageValidation.issues.push({
+                        type: 'warning',
+                        message: 'CSS selector references non-existent HTML element',
+                        line: Math.floor(Math.random() * 100) + 1
+                    });
+                }
+                
+                return validationResults;
+            }
+            
+            generateCode(parseResult, targetLanguage) {
+                // Simulate code generation for target language
+                const codeTemplates = {
+                    c: '#include <stdio.h>\n\nint main() {\n    // Generated C parser code\n    return 0;\n}',
+                    cpp: '#include <iostream>\n\nint main() {\n    // Generated C++ parser code\n    return 0;\n}',
+                    java: 'public class Parser {\n    public static void main(String[] args) {\n        // Generated Java parser code\n    }\n}',
+                    javascript: '// Generated JavaScript parser code\nfunction parse(input) {\n    // Parser implementation\n}',
+                    python: '# Generated Python parser code\ndef parse(input):\n    # Parser implementation\n    pass'
+                };
+                
+                return codeTemplates[targetLanguage] || '// Generated parser code';
+            }
+            
+            optimizeCode(code, targetLanguage) {
+                // Simulate code optimization
+                const optimizations = [
+                    'Dead code elimination',
+                    'Constant folding',
+                    'Loop unrolling',
+                    'Inline expansion',
+                    'Register allocation'
+                ];
+                
+                Logger.debug(`Applied optimizations for ${targetLanguage}:`, optimizations);
+                return code + '\n// Optimized for ' + targetLanguage;
+            }
+            
+            calculateComplexity(tokens) {
+                // Simple complexity calculation
+                return Math.floor(tokens.length / 10) + 1;
+            }
+            
+            generateCacheKey(code, targetLanguage) {
+                // Simple hash function for cache key
+                let hash = 0;
+                const str = code + targetLanguage;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32-bit integer
+                }
+                return hash.toString();
+            }
+            
+            updateProgress(percentage) {
+                const progressBar = document.getElementById('progress-bar');
+                const progressContainer = document.getElementById('progress-container');
+                
+                if (progressBar && progressContainer) {
+                    progressContainer.classList.remove('hidden');
+                    progressBar.style.width = `${percentage}%`;
+                    
+                    if (percentage >= 100) {
+                        setTimeout(() => {
+                            progressContainer.classList.add('hidden');
+                        }, 1000);
+                    }
+                }
+            }
+            
+            getStatistics() {
+                return {
+                    totalParses: this.parseHistory.length,
+                    successfulParses: this.parseHistory.filter(p => p.success).length,
+                    cacheHitRate: this.cache.getHitRate(),
+                    supportedLanguages: Array.from(this.supportedLanguages),
+                    symbolTableSize: this.symbolTable.size,
+                    crossReferencesCount: this.crossReferences.size
+                };
+            }
+        }
+        
+        class UIManager {
+            constructor() {
+                this.activeTab = 'parser';
+                this.parser = new MinotaurParser();
+                this.isProcessing = false;
+            }
+            
+            initialize() {
+                this.setupEventListeners();
+                this.setupTabs();
+                Logger.info('UI Manager initialized');
+            }
+            
+            setupEventListeners() {
+                // Tab switching
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        this.switchTab(e.target.dataset.tab);
+                    });
+                });
+                
+                // Form submissions
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        this.handleQuickAction();
+                    }
+                });
+                
+                // Auto-save functionality
+                const codeInput = document.getElementById('code-input');
+                if (codeInput) {
+                    codeInput.addEventListener('input', this.debounce(() => {
+                        this.autoSave();
+                    }, 1000));
+                }
+            }
+            
+            setupTabs() {
+                const tabs = document.querySelectorAll('.tab');
+                const contents = document.querySelectorAll('.tab-content');
+                
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const targetTab = tab.dataset.tab;
+                        
+                        // Update tab states
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        
+                        // Update content states
+                        contents.forEach(content => {
+                            content.classList.remove('active');
+                            if (content.id === `${targetTab}-content`) {
+                                content.classList.add('active');
+                            }
+                        });
+                        
+                        this.activeTab = targetTab;
+                        Logger.debug(`Switched to tab: ${targetTab}`);
+                    });
+                });
+            }
+            
+            switchTab(tabName) {
+                const tab = document.querySelector(`[data-tab="${tabName}"]`);
+                if (tab) {
+                    tab.click();
+                }
+            }
+            
+            handleQuickAction() {
+                switch (this.activeTab) {
+                    case 'parser':
+                        parseCode();
+                        break;
+                    case 'validator':
+                        validateCode();
+                        break;
+                    case 'analyzer':
+                        analyzeCode();
+                        break;
+                }
+            }
+            
+            autoSave() {
+                const codeInput = document.getElementById('code-input');
+                if (codeInput && codeInput.value.trim()) {
+                    localStorage.setItem('minotaur_autosave', codeInput.value);
+                    Logger.debug('Auto-saved code input');
+                }
+            }
+            
+            loadAutoSave() {
+                const saved = localStorage.getItem('minotaur_autosave');
+                if (saved) {
+                    const codeInput = document.getElementById('code-input');
+                    if (codeInput) {
+                        codeInput.value = saved;
+                        Logger.debug('Loaded auto-saved code input');
+                    }
+                }
+            }
+            
+            showStatus(message, type = 'info') {
+                const statusContainer = document.getElementById('status-container');
+                const statusIndicator = document.getElementById('status-indicator');
+                
+                if (statusContainer && statusIndicator) {
+                    statusContainer.classList.remove('hidden');
+                    statusIndicator.className = `status status-${type}`;
+                    statusIndicator.textContent = message;
+                    
+                    // Auto-hide after 5 seconds
+                    setTimeout(() => {
+                        statusContainer.classList.add('hidden');
+                    }, 5000);
+                }
+            }
+            
+            updateResults(content) {
+                const resultsContainer = document.getElementById('results-container');
+                if (resultsContainer) {
+                    resultsContainer.innerHTML = content;
+                }
+            }
+            
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+        
+        // Global instances
+        const uiManager = new UIManager();
+        const parser = new MinotaurParser();
+        
+        // Global functions for HTML event handlers
+        async function parseCode() {
+            if (uiManager.isProcessing) return;
+            
+            const codeInput = document.getElementById('code-input');
+            const languageSelect = document.getElementById('language-select');
+            
+            if (!codeInput || !languageSelect) {
+                Logger.error('Required form elements not found');
+                return;
+            }
+            
+            const code = codeInput.value.trim();
+            const targetLanguage = languageSelect.value;
+            
+            if (!code) {
+                uiManager.showStatus('Please enter some code to parse', 'warning');
+                return;
+            }
+            
+            uiManager.isProcessing = true;
+            uiManager.showStatus('Parsing code...', 'info');
+            
+            try {
+                const result = await parser.parseCode(code, targetLanguage);
+                
+                const resultHtml = `
+                    <h3>✅ Parse Successful</h3>
+                    <div class="grid grid-2">
+                        <div>
+                            <h4>Parse Results</h4>
+                            <ul>
+                                <li><strong>Target Language:</strong> ${result.targetLanguage}</li>
+                                <li><strong>Tokens:</strong> ${result.tokens?.length || 0}</li>
+                                <li><strong>Parse Tree Nodes:</strong> ${result.parseTree?.metadata?.nodeCount || 0}</li>
+                                <li><strong>Complexity:</strong> ${result.parseTree?.metadata?.complexity || 0}</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Symbol Table</h4>
+                            <ul>
+                                <li><strong>Total Symbols:</strong> ${result.symbolTable?.totalSymbols || 0}</li>
+                                <li><strong>Scope Levels:</strong> ${result.symbolTable?.scopeLevels || 0}</li>
+                                <li><strong>Cross References:</strong> ${result.symbolTable?.crossReferences || 0}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h4>Generated Code Preview</h4>
+                        <pre style="background: #f7fafc; padding: 1rem; border-radius: 4px; overflow-x: auto;"><code>${result.optimizedCode || result.generatedCode || 'No code generated'}</code></pre>
+                    </div>
+                `;
+                
+                uiManager.updateResults(resultHtml);
+                uiManager.showStatus('Code parsed successfully', 'success');
+                
+                // Update cache hit rate
+                document.getElementById('cache-hits').textContent = `${result.metrics.cacheHitRate.toFixed(1)}%`;
+                
+            } catch (error) {
+                Logger.error('Parse failed', error);
+                uiManager.updateResults(`
+                    <h3>❌ Parse Failed</h3>
+                    <div class="status status-error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                    <p>Please check your code and try again.</p>
+                `);
+                uiManager.showStatus('Parse failed', 'error');
+            } finally {
+                uiManager.isProcessing = false;
+            }
+        }
+        
+        async function validateCode() {
+            if (uiManager.isProcessing) return;
+            
+            const validationInput = document.getElementById('validation-input');
+            if (!validationInput) return;
+            
+            const code = validationInput.value.trim();
+            if (!code) {
+                uiManager.showStatus('Please enter code to validate', 'warning');
+                return;
+            }
+            
+            uiManager.isProcessing = true;
+            uiManager.showStatus('Validating code...', 'info');
+            
+            try {
+                // Simulate validation
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const validationResults = {
+                    htmlValidation: { passed: true, issues: [] },
+                    cssValidation: { passed: true, issues: ['Unused CSS rule: .unused-class'] },
+                    jsValidation: { passed: true, issues: [] },
+                    crossLanguageValidation: { passed: false, issues: ['CSS selector references non-existent HTML element: #missing-element'] }
+                };
+                
+                const resultHtml = `
+                    <h3>🔍 Validation Results</h3>
+                    <div class="grid grid-2">
+                        <div>
+                            <h4>HTML Validation</h4>
+                            <div class="status ${validationResults.htmlValidation.passed ? 'status-success' : 'status-error'}">
+                                ${validationResults.htmlValidation.passed ? '✅ Passed' : '❌ Failed'}
+                            </div>
+                            ${validationResults.htmlValidation.issues.map(issue => `<p class="mt-1">⚠️ ${issue}</p>`).join('')}
+                        </div>
+                        <div>
+                            <h4>CSS Validation</h4>
+                            <div class="status ${validationResults.cssValidation.passed ? 'status-success' : 'status-error'}">
+                                ${validationResults.cssValidation.passed ? '✅ Passed' : '❌ Failed'}
+                            </div>
+                            ${validationResults.cssValidation.issues.map(issue => `<p class="mt-1">⚠️ ${issue}</p>`).join('')}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h4>Cross-Language Validation</h4>
+                        <div class="status ${validationResults.crossLanguageValidation.passed ? 'status-success' : 'status-error'}">
+                            ${validationResults.crossLanguageValidation.passed ? '✅ Passed' : '❌ Failed'}
+                        </div>
+                        ${validationResults.crossLanguageValidation.issues.map(issue => `<p class="mt-1">❌ ${issue}</p>`).join('')}
+                    </div>
+                `;
+                
+                uiManager.updateResults(resultHtml);
+                uiManager.showStatus('Validation completed', 'success');
+                
+            } catch (error) {
+                Logger.error('Validation failed', error);
+                uiManager.showStatus('Validation failed', 'error');
+            } finally {
+                uiManager.isProcessing = false;
+            }
+        }
+        
+        async function analyzeCode() {
+            if (uiManager.isProcessing) return;
+            
+            uiManager.isProcessing = true;
+            uiManager.showStatus('Analyzing current page...', 'info');
+            
+            try {
+                // Analyze current page
+                const analysis = {
+                    htmlElements: document.querySelectorAll('*').length,
+                    cssRules: document.styleSheets[0]?.cssRules?.length || 0,
+                    jsVariables: Object.keys(window).filter(key => typeof window[key] !== 'function').length,
+                    jsFunctions: Object.keys(window).filter(key => typeof window[key] === 'function').length,
+                    performance: {
+                        domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
+                        pageLoad: performance.timing.loadEventEnd - performance.timing.navigationStart
+                    }
+                };
+                
+                const resultHtml = `
+                    <h3>📈 Page Analysis Results</h3>
+                    <div class="grid grid-2">
+                        <div>
+                            <h4>Structure Analysis</h4>
+                            <ul>
+                                <li><strong>HTML Elements:</strong> ${analysis.htmlElements}</li>
+                                <li><strong>CSS Rules:</strong> ${analysis.cssRules}</li>
+                                <li><strong>JS Variables:</strong> ${analysis.jsVariables}</li>
+                                <li><strong>JS Functions:</strong> ${analysis.jsFunctions}</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Performance Analysis</h4>
+                            <ul>
+                                <li><strong>DOM Ready:</strong> ${analysis.performance.domContentLoaded}ms</li>
+                                <li><strong>Page Load:</strong> ${analysis.performance.pageLoad}ms</li>
+                                <li><strong>Memory Usage:</strong> ${(performance.memory?.usedJSHeapSize / 1024 / 1024).toFixed(2) || 'N/A'}MB</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h4>🎯 Optimization Suggestions</h4>
+                        <ul>
+                            <li>✅ Modern CSS features are being used effectively</li>
+                            <li>✅ JavaScript is well-structured with classes and modules</li>
+                            <li>✅ Performance monitoring is implemented</li>
+                            <li>💡 Consider lazy loading for non-critical resources</li>
+                            <li>💡 Implement service worker for offline functionality</li>
+                        </ul>
+                    </div>
+                `;
+                
+                uiManager.updateResults(resultHtml);
+                uiManager.showStatus('Analysis completed', 'success');
+                
+            } catch (error) {
+                Logger.error('Analysis failed', error);
+                uiManager.showStatus('Analysis failed', 'error');
+            } finally {
+                uiManager.isProcessing = false;
+            }
+        }
+        
+        function clearParser() {
+            document.getElementById('code-input').value = '';
+            uiManager.updateResults('<p class="text-center" style="color: #718096;">Results will appear here after running operations...</p>');
+            uiManager.showStatus('Parser cleared', 'info');
+        }
+        
+        function clearValidator() {
+            document.getElementById('validation-input').value = '';
+            uiManager.updateResults('<p class="text-center" style="color: #718096;">Results will appear here after running operations...</p>');
+            uiManager.showStatus('Validator cleared', 'info');
+        }
+        
+        async function demonstrateMultiLanguage() {
+            uiManager.showStatus('Demonstrating multi-language parsing...', 'info');
+            
+            const demoCode = `
+                <div class="demo">
+                    <style>
+                        .demo { color: blue; }
+                    </style>
+                    <script>
+                        document.querySelector('.demo').addEventListener('click', () => {
+                            console.log('Multi-language demo!');
+                        });
+                    </script>
+                </div>
+            `;
+            
+            document.getElementById('code-input').value = demoCode;
+            await parseCode();
+        }
+        
+        async function demonstrateContextSensitive() {
+            uiManager.showStatus('Demonstrating context-sensitive parsing...', 'info');
+            
+            const demoCode = `
+                function parseContext() {
+                    const element = document.getElementById('context-demo');
+                    if (element) {
+                        element.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+                    }
+                }
+            `;
+            
+            document.getElementById('validation-input').value = demoCode;
+            uiManager.switchTab('validator');
+            await validateCode();
+        }
+        
+        async function demonstrateOptimization() {
+            uiManager.showStatus('Demonstrating performance optimization...', 'info');
+            
+            uiManager.switchTab('analyzer');
+            await analyzeCode();
+        }
+        
+        // Initialize application when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            Logger.info('Initializing Minotaur Advanced Demo...');
+            
+            try {
+                uiManager.initialize();
+                uiManager.loadAutoSave();
+                await parser.initialize();
+                
+                // Update initial metrics
+                document.getElementById('cache-hits').textContent = `${parser.cache.getHitRate().toFixed(1)}%`;
+                
+                Logger.info('Application initialized successfully');
+                uiManager.showStatus('Minotaur Demo ready!', 'success');
+                
+            } catch (error) {
+                Logger.error('Failed to initialize application', error);
+                uiManager.showStatus('Failed to initialize application', 'error');
+            }
+        });
+        
+        // Global error handling
+        window.addEventListener('error', (event) => {
+            Logger.error('Global error caught', {
+                message: event.error?.message,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno
+            });
+            
+            uiManager.showStatus('An unexpected error occurred', 'error');
+        });
+        
+        // Performance monitoring
+        window.addEventListener('load', () => {
+            if (performance.mark) {
+                performance.mark('app-loaded');
+                
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                Logger.info(`Application loaded in ${loadTime}ms`);
+                
+                // Update performance metrics in UI
+                document.getElementById('parse-time').textContent = `${loadTime}ms`;
+            }
+        });
+        
+        // Export for testing (if in Node.js environment)
+        if (typeof module !== 'undefined' && module.exports) {
+            module.exports = {
+                MinotaurParser,
+                UIManager,
+                Logger,
+                PerformanceMonitor,
+                CacheManager,
+                parseCode,
+                validateCode,
+                analyzeCode
+            };
+        }
+    </script>
+</body>
+</html>
+

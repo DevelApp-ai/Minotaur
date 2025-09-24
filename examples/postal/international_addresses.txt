@@ -1,0 +1,78 @@
+# International Postal Address Examples
+
+# German Addresses
+Hans Mueller
+Hauptstraße 123
+DE-10115 Berlin
+
+Greta Schmidt
+Bahnhofstraße 45
+DE-80331 München
+
+# French Addresses
+Pierre Dubois
+15 Rue de la Paix
+FR-75001 Paris
+
+Marie Leroy
+27 Avenue des Champs-Élysées
+FR-75008 Paris
+
+# UK Addresses
+James Wilson
+10 Downing Street
+UK-SW1A 2AA London
+
+Elizabeth Brown
+221B Baker Street
+UK-NW1 6XE London
+
+# Canadian Addresses
+John MacDonald
+123 Maple Street
+CA-K1A 0A6 Ottawa
+
+Sarah Thompson
+456 Queen Street West
+CA-M5V 2A4 Toronto
+
+# Australian Addresses
+Michael O'Connor
+789 Collins Street
+AU-3000 Melbourne
+
+Emma Johnson
+321 George Street
+AU-2000 Sydney
+
+# Swedish Addresses
+Erik Andersson
+Drottninggatan 15
+SE-111 51 Stockholm
+
+Anna Johansson
+Götgatan 27
+SE-116 21 Stockholm
+
+# Norwegian Addresses
+Ole Hansen
+Karl Johans gate 10
+NO-0154 Oslo
+
+Ingrid Larsen
+Storgata 25
+NO-0184 Oslo
+
+# Mixed International Format Examples
+Marco Rossi
+Via Roma 100
+IT-00100 Roma
+
+Hiroshi Tanaka
+1-2-3 Shibuya
+JP-150-0002 Tokyo
+
+Carlos Rodriguez
+Calle Mayor 50
+ES-28013 Madrid
+

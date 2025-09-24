@@ -159,7 +159,7 @@ jobs:
       run: dotnet restore ${{ env.SOLUTION_PATH }}
     
     - name: Check code formatting
-      run: dotnet format ${{ env.SOLUTION_PATH }} --verify-no-changes --verbosity diagnostic
+      run: dotnet format ${{ env.SOLUTION_PATH }} --verify-no-changes --verbosity diagnostic --exclude examples/
     
     - name: Run static analysis
       run: |
