@@ -83,19 +83,19 @@ public class ContextAwareEditor
         return new PrecisionLocationTracker(sourceText, sourceFile);
     }
 
-    private async Task<EditContext> BuildEditContextAsync(ContextualEdit edit)
+    private Task<EditContext> BuildEditContextAsync(ContextualEdit edit)
     {
         var targetNode = FindNodeAtPosition(edit.TargetPosition);
         var contextNodes = FindContextNodes(targetNode, edit.ContextRadius);
 
-        return new EditContext
+        return Task.FromResult(new EditContext
         {
             TargetNode = targetNode,
             ContextNodes = contextNodes,
             SourcePosition = edit.TargetPosition,
             EditType = edit.Type,
             Metadata = edit.Metadata
-        };
+        });
     }
 
     private CognitiveGraphNode? FindNodeAtPosition(SourcePosition position)
