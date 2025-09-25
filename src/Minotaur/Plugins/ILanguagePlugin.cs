@@ -73,17 +73,17 @@ public class CompilerBackendRules
     /// Gets or sets the unique identifier for the target language.
     /// </summary>
     public string LanguageId { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the list of code generation rules for different node types.
     /// </summary>
     public List<CodeGenerationRule> GenerationRules { get; set; } = new();
-    
+
     /// <summary>
     /// Gets or sets the list of template rules used for code generation.
     /// </summary>
     public List<TemplateRule> TemplateRules { get; set; } = new();
-    
+
     /// <summary>
     /// Gets or sets additional metadata specific to the backend implementation.
     /// </summary>
@@ -99,12 +99,12 @@ public class CodeGenerationRule
     /// Gets or sets the type of cognitive graph node this rule applies to.
     /// </summary>
     public string NodeType { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the template used to generate code for this node type.
     /// </summary>
     public string GenerationTemplate { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets additional hints and metadata for code generation.
     /// </summary>
@@ -120,17 +120,17 @@ public class TemplateRule
     /// Gets or sets the unique name identifier for this template.
     /// </summary>
     public string TemplateName { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the template content with placeholders for substitution.
     /// </summary>
     public string TemplateContent { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the list of parameters required for this template.
     /// </summary>
     public List<string> RequiredParameters { get; set; } = new();
-    
+
     /// <summary>
     /// Gets or sets additional metadata for the template.
     /// </summary>
@@ -146,27 +146,27 @@ public class CodeFormattingOptions
     /// Gets or sets the indentation style. Valid values are "spaces" or "tabs".
     /// </summary>
     public string IndentStyle { get; set; } = "spaces"; // "spaces" or "tabs"
-    
+
     /// <summary>
     /// Gets or sets the number of spaces or tabs for indentation.
     /// </summary>
     public int IndentSize { get; set; } = 4;
-    
+
     /// <summary>
     /// Gets or sets the line ending character sequence.
     /// </summary>
     public string LineEnding { get; set; } = "\n";
-    
+
     /// <summary>
     /// Gets or sets a value indicating whether to insert a trailing newline at the end of files.
     /// </summary>
     public bool InsertTrailingNewline { get; set; } = true;
-    
+
     /// <summary>
     /// Gets or sets the maximum line length before wrapping is considered.
     /// </summary>
     public int MaxLineLength { get; set; } = 120;
-    
+
     /// <summary>
     /// Gets or sets additional cosmetic formatting options specific to the language.
     /// </summary>
@@ -182,12 +182,12 @@ public class UnparseValidationResult
     /// Gets or sets a value indicating whether the graph can be successfully unparsed.
     /// </summary>
     public bool CanUnparse { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the list of validation errors that prevent unparsing.
     /// </summary>
     public List<UnparseValidationError> Errors { get; set; } = new();
-    
+
     /// <summary>
     /// Gets or sets the list of validation warnings that may affect unparsing quality.
     /// </summary>
@@ -203,17 +203,17 @@ public class UnparseValidationError
     /// Gets or sets the error message describing the validation failure.
     /// </summary>
     public string Message { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the unique identifier of the node that caused the error.
     /// </summary>
     public string NodeId { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the type of the node that caused the error.
     /// </summary>
     public string NodeType { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the severity level of the error.
     /// </summary>
@@ -229,12 +229,12 @@ public class UnparseValidationWarning
     /// Gets or sets the warning message describing the potential issue.
     /// </summary>
     public string Message { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the unique identifier of the node that caused the warning.
     /// </summary>
     public string NodeId { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Gets or sets the type of the node that caused the warning.
     /// </summary>

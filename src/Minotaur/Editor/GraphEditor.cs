@@ -350,7 +350,7 @@ public class GraphModifiedEventArgs : EventArgs
     /// Gets the edit operation that caused the graph modification.
     /// </summary>
     public EditOperation Operation { get; }
-    
+
     /// <summary>
     /// Gets the type of modification that occurred.
     /// </summary>
@@ -377,12 +377,12 @@ public enum GraphModificationType
     /// The modification represents executing an edit operation.
     /// </summary>
     Execute,
-    
+
     /// <summary>
     /// The modification represents undoing an edit operation.
     /// </summary>
     Undo,
-    
+
     /// <summary>
     /// The modification represents redoing an edit operation.
     /// </summary>

@@ -26,42 +26,42 @@ public enum ProjectType
     /// A .NET solution file (.sln).
     /// </summary>
     DotNetSolution,
-    
+
     /// <summary>
     /// A .NET project file (.csproj, .vbproj, .fsproj).
     /// </summary>
     DotNetProject,
-    
+
     /// <summary>
     /// A Node.js project with package.json.
     /// </summary>
     NodeProject,
-    
+
     /// <summary>
     /// A Python project with requirements.txt or setup.py.
     /// </summary>
     PythonProject,
-    
+
     /// <summary>
     /// A Java project with pom.xml or .gradle files.
     /// </summary>
     JavaProject,
-    
+
     /// <summary>
     /// A C++ project with CMakeLists.txt or Makefile.
     /// </summary>
     CppProject,
-    
+
     /// <summary>
     /// A Rust project with Cargo.toml.
     /// </summary>
     RustProject,
-    
+
     /// <summary>
     /// A Go project with go.mod.
     /// </summary>
     GoProject,
-    
+
     /// <summary>
     /// A generic folder without specific project files.
     /// </summary>
@@ -149,27 +149,27 @@ public enum FileType
     /// Source code file containing program logic.
     /// </summary>
     SourceCode,
-    
+
     /// <summary>
     /// Configuration file containing settings and parameters.
     /// </summary>
     Configuration,
-    
+
     /// <summary>
     /// Documentation file containing project or code documentation.
     /// </summary>
     Documentation,
-    
+
     /// <summary>
     /// Resource file containing assets, data, or media files.
     /// </summary>
     Resource,
-    
+
     /// <summary>
     /// Build system file such as makefiles, project files, or build scripts.
     /// </summary>
     BuildFile,
-    
+
     /// <summary>
     /// Test file containing unit tests, integration tests, or test data.
     /// </summary>
@@ -216,62 +216,62 @@ public enum SymbolType
     /// A class definition.
     /// </summary>
     Class,
-    
+
     /// <summary>
     /// An interface definition.
     /// </summary>
     Interface,
-    
+
     /// <summary>
     /// A standalone function.
     /// </summary>
     Function,
-    
+
     /// <summary>
     /// A method within a class or interface.
     /// </summary>
     Method,
-    
+
     /// <summary>
     /// A variable declaration.
     /// </summary>
     Variable,
-    
+
     /// <summary>
     /// A constant value.
     /// </summary>
     Constant,
-    
+
     /// <summary>
     /// A type definition.
     /// </summary>
     Type,
-    
+
     /// <summary>
     /// A namespace declaration.
     /// </summary>
     Namespace,
-    
+
     /// <summary>
     /// A module definition.
     /// </summary>
     Module,
-    
+
     /// <summary>
     /// A property definition.
     /// </summary>
     Property,
-    
+
     /// <summary>
     /// A field definition.
     /// </summary>
     Field,
-    
+
     /// <summary>
     /// An enumeration definition.
     /// </summary>
     Enum,
-    
+
     /// <summary>
     /// A structure definition.
     /// </summary>
@@ -287,22 +287,22 @@ public enum SymbolVisibility
     /// Publicly accessible from any code.
     /// </summary>
     Public,
-    
+
     /// <summary>
     /// Accessible only within the same class or structure.
     /// </summary>
     Private,
-    
+
     /// <summary>
     /// Accessible within the same class or derived classes.
     /// </summary>
     Protected,
-    
+
     /// <summary>
     /// Accessible only within the same assembly or module.
     /// </summary>
     Internal,
-    
+
     /// <summary>
     /// Accessible within the same package (language-specific).
     /// </summary>
@@ -365,22 +365,22 @@ public enum DependencyNature
     /// An import statement or directive.
     /// </summary>
     Import,
-    
+
     /// <summary>
     /// An include directive (typically for C/C++).
     /// </summary>
     Include,
-    
+
     /// <summary>
     /// A reference to another assembly or library.
     /// </summary>
     Reference,
-    
+
     /// <summary>
     /// An embedded resource dependency.
     /// </summary>
     Embed,
-    
+
     /// <summary>
     /// A using statement or namespace import.
     /// </summary>
@@ -422,27 +422,27 @@ public enum RelationshipType
     /// A relationship involving the usage of a namespace.
     /// </summary>
     NamespaceUsage,
-    
+
     /// <summary>
     /// A dependency relationship between types.
     /// </summary>
     TypeDependency,
-    
+
     /// <summary>
     /// A dependency on a resource file.
     /// </summary>
     ResourceDependency,
-    
+
     /// <summary>
     /// A dependency on a configuration file.
     /// </summary>
     ConfigurationDependency,
-    
+
     /// <summary>
     /// An inheritance relationship between types.
     /// </summary>
     InheritanceRelationship,
-    
+
     /// <summary>
     /// A composition relationship between types.
     /// </summary>
@@ -479,27 +479,27 @@ public enum ConfigurationType
     /// Application settings configuration file.
     /// </summary>
     AppSettings,
-    
+
     /// <summary>
     /// Web application configuration file.
     /// </summary>
     WebConfig,
-    
+
     /// <summary>
     /// Application configuration file.
     /// </summary>
     AppConfig,
-    
+
     /// <summary>
     /// Project configuration file.
     /// </summary>
     Project,
-    
+
     /// <summary>
     /// Package configuration file.
     /// </summary>
     Package,
-    
+
     /// <summary>
     /// Build configuration file.
     /// </summary>
@@ -541,17 +541,17 @@ public enum DependencySource
     /// A local dependency from the same system or project.
     /// </summary>
     Local,
-    
+
     /// <summary>
     /// A remote dependency downloaded from an external source.
     /// </summary>
     Remote,
-    
+
     /// <summary>
     /// A system dependency provided by the operating system or platform.
     /// </summary>
     System,
-    
+
     /// <summary>
     /// A package dependency from a package manager or repository.
     /// </summary>
@@ -567,22 +567,22 @@ public enum DependencyType
     /// A dependency required during compilation.
     /// </summary>
     Compilation,
-    
+
     /// <summary>
     /// A dependency required at runtime.
     /// </summary>
     Runtime,
-    
+
     /// <summary>
     /// A dependency required for testing.
     /// </summary>
     Test,
-    
+
     /// <summary>
     /// A dependency required for building the project.
     /// </summary>
     Build,
-    
+
     /// <summary>
     /// A dependency required for development purposes.
     /// </summary>

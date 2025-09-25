@@ -227,32 +227,32 @@ public class ContextualEdit
     /// Gets or sets the type of edit operation to perform.
     /// </summary>
     public EditType Type { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the target position within the source for the edit operation.
     /// </summary>
     public SourcePosition TargetPosition { get; set; } = new(0, 0, 0, 0);
-    
+
     /// <summary>
     /// Gets or sets the new node to be inserted or used in the edit operation.
     /// </summary>
     public CognitiveGraphNode? NewNode { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the new parent node for the edit operation.
     /// </summary>
     public CognitiveGraphNode? NewParent { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the new value to be assigned during the edit operation.
     /// </summary>
     public object? NewValue { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the radius of context nodes to consider around the target position.
     /// </summary>
     public int ContextRadius { get; set; } = 2;
-    
+
     /// <summary>
     /// Gets or sets additional metadata for the edit operation.
     /// </summary>
@@ -268,22 +268,22 @@ public class EditContext
     /// Gets or sets the target node for the edit operation.
     /// </summary>
     public CognitiveGraphNode? TargetNode { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the list of context nodes surrounding the target.
     /// </summary>
     public List<CognitiveGraphNode> ContextNodes { get; set; } = new();
-    
+
     /// <summary>
     /// Gets or sets the source position of the edit operation.
     /// </summary>
     public SourcePosition SourcePosition { get; set; } = new(0, 0, 0, 0);
-    
+
     /// <summary>
     /// Gets or sets the type of edit operation being performed.
     /// </summary>
     public EditType EditType { get; set; }
-    
+
     /// <summary>
     /// Gets or sets additional metadata for the edit context.
     /// </summary>
@@ -299,12 +299,12 @@ public class EditResult
     /// Gets or sets a value indicating whether the edit operation was successful.
     /// </summary>
     public bool IsSuccessful { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the error message if the operation failed.
     /// </summary>
     public string? ErrorMessage { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the list of nodes that were modified during the operation.
     /// </summary>
@@ -349,17 +349,17 @@ public enum EditType
     /// Insert a new node into the graph.
     /// </summary>
     Insert,
-    
+
     /// <summary>
     /// Update an existing node in the graph.
     /// </summary>
     Update,
-    
+
     /// <summary>
     /// Delete a node from the graph.
     /// </summary>
     Delete,
-    
+
     /// <summary>
     /// Move a node to a different position in the graph.
     /// </summary>
@@ -377,7 +377,7 @@ public interface IRuleActivationCallback
     /// <param name="context">The context of the edit operation.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task BeforeEditAsync(EditContext context);
-    
+
     /// <summary>
     /// Called after an edit operation is completed.
     /// </summary>
@@ -398,7 +398,7 @@ public interface ILocationTracker
     /// <param name="offset">The character offset in the source text.</param>
     /// <returns>The source position at the specified offset.</returns>
     SourcePosition GetPositionAt(int offset);
-    
+
     /// <summary>
     /// Gets the source position at the specified line and column.
     /// </summary>
@@ -406,7 +406,7 @@ public interface ILocationTracker
     /// <param name="column">The column number (1-based).</param>
     /// <returns>The source position at the specified line and column.</returns>
     SourcePosition GetPositionAt(int line, int column);
-    
+
     /// <summary>
     /// Gets the character offset at the specified line and column.
     /// </summary>
@@ -414,14 +414,14 @@ public interface ILocationTracker
     /// <param name="column">The column number (1-based).</param>
     /// <returns>The character offset at the specified position.</returns>
     int GetOffsetAt(int line, int column);
-    
+
     /// <summary>
     /// Gets all positions within the specified range.
     /// </summary>
     /// <param name="range">The source position range to query.</param>
     /// <returns>An array of source positions within the range.</returns>
     SourcePosition[] GetPositionsInRange(SourcePosition range);
-    
+
     /// <summary>
     /// Determines whether the specified position is valid within the source text.
     /// </summary>

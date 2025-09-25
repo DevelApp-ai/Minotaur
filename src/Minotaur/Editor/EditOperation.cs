@@ -62,12 +62,12 @@ public class InsertNodeOperation : EditOperation
     /// Gets the unique identifier of the parent node where the new node will be inserted.
     /// </summary>
     public Guid ParentId { get; }
-    
+
     /// <summary>
     /// Gets the cognitive graph node to be inserted.
     /// </summary>
     public CognitiveGraphNode Node { get; }
-    
+
     /// <summary>
     /// Gets the index position where the node will be inserted within the parent's children.
     /// </summary>
@@ -242,12 +242,12 @@ public class ReplaceNodeOperation : EditOperation
     /// Gets the unique identifier of the node to be replaced.
     /// </summary>
     public Guid NodeId { get; }
-    
+
     /// <summary>
     /// Gets the new node that will replace the existing node.
     /// </summary>
     public CognitiveGraphNode Replacement { get; }
-    
+
     /// <summary>
     /// Gets a value indicating whether to preserve the children of the original node.
     /// </summary>
@@ -371,12 +371,12 @@ public class MoveNodeOperation : EditOperation
     /// Gets the unique identifier of the node to be moved.
     /// </summary>
     public Guid NodeId { get; }
-    
+
     /// <summary>
     /// Gets the unique identifier of the new parent node.
     /// </summary>
     public Guid NewParentId { get; }
-    
+
     /// <summary>
     /// Gets the index position in the new parent's children collection.
     /// </summary>

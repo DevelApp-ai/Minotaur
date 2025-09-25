@@ -29,12 +29,12 @@ public class CSharpLanguagePlugin : ILanguagePlugin
     /// Gets the unique identifier for the C# language.
     /// </summary>
     public string LanguageId => "csharp";
-    
+
     /// <summary>
     /// Gets the display name for the C# language.
     /// </summary>
     public string DisplayName => "C#";
-    
+
     /// <summary>
     /// Gets the array of file extensions supported by C#.
     /// </summary>
