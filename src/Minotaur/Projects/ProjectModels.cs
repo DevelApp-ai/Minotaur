@@ -145,11 +145,34 @@ public class ProjectFile
 /// </summary>
 public enum FileType
 {
+    /// <summary>
+    /// Source code file containing program logic.
+    /// </summary>
     SourceCode,
+    
+    /// <summary>
+    /// Configuration file containing settings and parameters.
+    /// </summary>
     Configuration,
+    
+    /// <summary>
+    /// Documentation file containing project or code documentation.
+    /// </summary>
     Documentation,
+    
+    /// <summary>
+    /// Resource file containing assets, data, or media files.
+    /// </summary>
     Resource,
+    
+    /// <summary>
+    /// Build system file such as makefiles, project files, or build scripts.
+    /// </summary>
     BuildFile,
+    
+    /// <summary>
+    /// Test file containing unit tests, integration tests, or test data.
+    /// </summary>
     Test
 }
 
@@ -395,11 +418,34 @@ public class CrossFileRelationship
 /// </summary>
 public enum RelationshipType
 {
+    /// <summary>
+    /// A relationship involving the usage of a namespace.
+    /// </summary>
     NamespaceUsage,
+    
+    /// <summary>
+    /// A dependency relationship between types.
+    /// </summary>
     TypeDependency,
+    
+    /// <summary>
+    /// A dependency on a resource file.
+    /// </summary>
     ResourceDependency,
+    
+    /// <summary>
+    /// A dependency on a configuration file.
+    /// </summary>
     ConfigurationDependency,
+    
+    /// <summary>
+    /// An inheritance relationship between types.
+    /// </summary>
     InheritanceRelationship,
+    
+    /// <summary>
+    /// A composition relationship between types.
+    /// </summary>
     CompositionRelationship
 }
 
@@ -429,11 +475,34 @@ public class ConfigurationFile
 /// </summary>
 public enum ConfigurationType
 {
+    /// <summary>
+    /// Application settings configuration file.
+    /// </summary>
     AppSettings,
+    
+    /// <summary>
+    /// Web application configuration file.
+    /// </summary>
     WebConfig,
+    
+    /// <summary>
+    /// Application configuration file.
+    /// </summary>
     AppConfig,
+    
+    /// <summary>
+    /// Project configuration file.
+    /// </summary>
     Project,
+    
+    /// <summary>
+    /// Package configuration file.
+    /// </summary>
     Package,
+    
+    /// <summary>
+    /// Build configuration file.
+    /// </summary>
     Build
 }
 
@@ -468,9 +537,24 @@ public class ProjectDependency
 /// </summary>
 public enum DependencySource
 {
+    /// <summary>
+    /// A local dependency from the same system or project.
+    /// </summary>
     Local,
+    
+    /// <summary>
+    /// A remote dependency downloaded from an external source.
+    /// </summary>
     Remote,
+    
+    /// <summary>
+    /// A system dependency provided by the operating system or platform.
+    /// </summary>
     System,
+    
+    /// <summary>
+    /// A package dependency from a package manager or repository.
+    /// </summary>
     Package
 }
 
@@ -479,9 +563,28 @@ public enum DependencySource
 /// </summary>
 public enum DependencyType
 {
+    /// <summary>
+    /// A dependency required during compilation.
+    /// </summary>
     Compilation,
+    
+    /// <summary>
+    /// A dependency required at runtime.
+    /// </summary>
     Runtime,
+    
+    /// <summary>
+    /// A dependency required for testing.
+    /// </summary>
     Test,
+    
+    /// <summary>
+    /// A dependency required for building the project.
+    /// </summary>
     Build,
+    
+    /// <summary>
+    /// A dependency required for development purposes.
+    /// </summary>
     Development
 }

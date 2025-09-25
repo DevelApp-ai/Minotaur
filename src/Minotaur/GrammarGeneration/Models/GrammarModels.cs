@@ -351,15 +351,46 @@ public enum ParseErrorType
 /// </summary>
 public class GrammarRefinement
 {
+    /// <summary>
+    /// Gets or sets the type of refinement suggested.
+    /// </summary>
     public RefinementType Type { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a description of the suggested refinement.
+    /// </summary>
     public string Description { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Gets or sets the name of the rule targeted by this refinement.
+    /// </summary>
     public string TargetRule { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Gets or sets the specific suggestion for improving the grammar.
+    /// </summary>
     public string Suggestion { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Gets or sets the confidence level of this refinement suggestion (0.0 to 1.0).
+    /// </summary>
     public double Confidence { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the list of rules that would be affected by this refinement.
+    /// </summary>
     public List<string> AffectedRules { get; set; } = new();
 
+    /// <summary>
+    /// Initializes a new instance of the GrammarRefinement class.
+    /// </summary>
     public GrammarRefinement() { }
 
+    /// <summary>
+    /// Initializes a new instance of the GrammarRefinement class with the specified refinements.
+    /// Note: This constructor currently serves as a placeholder for future aggregation functionality.
+    /// </summary>
+    /// <param name="refinements">The collection of refinements to initialize with.</param>
     public GrammarRefinement(IEnumerable<GrammarRefinement> refinements)
     {
         // This constructor seems incorrect - it should aggregate refinements
@@ -372,13 +403,44 @@ public class GrammarRefinement
 /// </summary>
 public enum RefinementType
 {
+    /// <summary>
+    /// Add a new token rule to the grammar.
+    /// </summary>
     AddTokenRule,
+    
+    /// <summary>
+    /// Modify an existing token rule in the grammar.
+    /// </summary>
     ModifyTokenRule,
+    
+    /// <summary>
+    /// Add a new production rule to the grammar.
+    /// </summary>
     AddProductionRule,
+    
+    /// <summary>
+    /// Modify an existing production rule in the grammar.
+    /// </summary>
     ModifyProductionRule,
+    
+    /// <summary>
+    /// Remove a rule from the grammar.
+    /// </summary>
     RemoveRule,
+    
+    /// <summary>
+    /// Reorder rules to improve parsing efficiency.
+    /// </summary>
     ReorderRules,
+    
+    /// <summary>
+    /// Add precedence information to resolve conflicts.
+    /// </summary>
     AddPrecedence,
+    
+    /// <summary>
+    /// Resolve ambiguity in the grammar rules.
+    /// </summary>
     ResolveAmbiguity
 }
 
@@ -387,13 +449,44 @@ public enum RefinementType
 /// </summary>
 public class LanguageContext
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether the language has nested scoping rules.
+    /// </summary>
     public bool HasNestedScopes { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the language has a type system.
+    /// </summary>
     public bool HasTypeSystem { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the language has a macro system.
+    /// </summary>
     public bool HasMacroSystem { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the language supports comments.
+    /// </summary>
     public bool HasComments { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the language has string literals.
+    /// </summary>
     public bool HasStringLiterals { get; set; }
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the language has numeric literals.
+    /// </summary>
     public bool HasNumericLiterals { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the list of file extensions associated with this language.
+    /// </summary>
     public List<string> FileExtensions { get; set; } = new();
+    
+    /// <summary>
+    /// Gets or sets the default text encoding for files in this language.
+    /// </summary>
     public string DefaultEncoding { get; set; } = "UTF-8";
 }
 
@@ -402,15 +495,58 @@ public class LanguageContext
 /// </summary>
 public class QualityReport
 {
+    /// <summary>
+    /// Gets or sets the percentage of language features covered by the grammar (0.0 to 1.0).
+    /// </summary>
     public double LanguageFeatureCoverage { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the percentage of tokens successfully identified by the grammar (0.0 to 1.0).
+    /// </summary>
     public double TokenCoverage { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the accuracy of the parser in correctly parsing input (0.0 to 1.0).
+    /// </summary>
     public double ParseAccuracy { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the accuracy of semantic analysis performed by the grammar (0.0 to 1.0).
+    /// </summary>
     public double SemanticAccuracy { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the average time taken to parse input using this grammar.
+    /// </summary>
     public TimeSpan ParseSpeed { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the memory usage in bytes when parsing with this grammar.
+    /// </summary>
     public long MemoryUsage { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the number of ambiguous cases detected in the grammar.
+    /// </summary>
     public int AmbiguityCount { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the complexity score of the grammar (higher values indicate more complex grammars).
+    /// </summary>
     public double ComplexityScore { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the readability score of the generated grammar rules (0.0 to 1.0).
+    /// </summary>
     public double ReadabilityScore { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the modularity score indicating how well the grammar is structured (0.0 to 1.0).
+    /// </summary>
     public double ModularityScore { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the timestamp when this quality report was generated.
+    /// </summary>
     public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
 }

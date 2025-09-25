@@ -25,10 +25,26 @@ namespace Minotaur.Plugins;
 /// </summary>
 public class CSharpLanguagePlugin : ILanguagePlugin
 {
+    /// <summary>
+    /// Gets the unique identifier for the C# language.
+    /// </summary>
     public string LanguageId => "csharp";
+    
+    /// <summary>
+    /// Gets the display name for the C# language.
+    /// </summary>
     public string DisplayName => "C#";
+    
+    /// <summary>
+    /// Gets the array of file extensions supported by C#.
+    /// </summary>
     public string[] SupportedExtensions => new[] { ".cs", ".csx" };
 
+    /// <summary>
+    /// Converts a cognitive graph representation back to C# source code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph node to unparse.</param>
+    /// <returns>A task that represents the asynchronous unparse operation, containing the generated C# code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         // Generate C# source code from cognitive graph
