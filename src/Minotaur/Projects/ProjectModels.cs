@@ -189,18 +189,69 @@ public class ExtractedSymbol
 /// </summary>
 public enum SymbolType
 {
+    /// <summary>
+    /// A class definition.
+    /// </summary>
     Class,
+    
+    /// <summary>
+    /// An interface definition.
+    /// </summary>
     Interface,
+    
+    /// <summary>
+    /// A standalone function.
+    /// </summary>
     Function,
+    
+    /// <summary>
+    /// A method within a class or interface.
+    /// </summary>
     Method,
+    
+    /// <summary>
+    /// A variable declaration.
+    /// </summary>
     Variable,
+    
+    /// <summary>
+    /// A constant value.
+    /// </summary>
     Constant,
+    
+    /// <summary>
+    /// A type definition.
+    /// </summary>
     Type,
+    
+    /// <summary>
+    /// A namespace declaration.
+    /// </summary>
     Namespace,
+    
+    /// <summary>
+    /// A module definition.
+    /// </summary>
     Module,
+    
+    /// <summary>
+    /// A property definition.
+    /// </summary>
     Property,
+    
+    /// <summary>
+    /// A field definition.
+    /// </summary>
     Field,
+    
+    /// <summary>
+    /// An enumeration definition.
+    /// </summary>
     Enum,
+    
+    /// <summary>
+    /// A structure definition.
+    /// </summary>
     Struct
 }
 
@@ -209,10 +260,29 @@ public enum SymbolType
 /// </summary>
 public enum SymbolVisibility
 {
+    /// <summary>
+    /// Publicly accessible from any code.
+    /// </summary>
     Public,
+    
+    /// <summary>
+    /// Accessible only within the same class or structure.
+    /// </summary>
     Private,
+    
+    /// <summary>
+    /// Accessible within the same class or derived classes.
+    /// </summary>
     Protected,
+    
+    /// <summary>
+    /// Accessible only within the same assembly or module.
+    /// </summary>
     Internal,
+    
+    /// <summary>
+    /// Accessible within the same package (language-specific).
+    /// </summary>
     Package
 }
 
@@ -268,10 +338,29 @@ public class FileDependency
 /// </summary>
 public enum DependencyNature
 {
+    /// <summary>
+    /// An import statement or directive.
+    /// </summary>
     Import,
+    
+    /// <summary>
+    /// An include directive (typically for C/C++).
+    /// </summary>
     Include,
+    
+    /// <summary>
+    /// A reference to another assembly or library.
+    /// </summary>
     Reference,
+    
+    /// <summary>
+    /// An embedded resource dependency.
+    /// </summary>
     Embed,
+    
+    /// <summary>
+    /// A using statement or namespace import.
+    /// </summary>
     Using
 }
 

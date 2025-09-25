@@ -58,12 +58,32 @@ public abstract class EditOperation
 /// </summary>
 public class InsertNodeOperation : EditOperation
 {
+    /// <summary>
+    /// Gets the unique identifier of the parent node where the new node will be inserted.
+    /// </summary>
     public Guid ParentId { get; }
+    
+    /// <summary>
+    /// Gets the cognitive graph node to be inserted.
+    /// </summary>
     public CognitiveGraphNode Node { get; }
+    
+    /// <summary>
+    /// Gets the index position where the node will be inserted within the parent's children.
+    /// </summary>
     public int Index { get; }
 
+    /// <summary>
+    /// Gets the type of this edit operation.
+    /// </summary>
     public override string OperationType => "InsertNode";
 
+    /// <summary>
+    /// Initializes a new instance of the InsertNodeOperation class.
+    /// </summary>
+    /// <param name="parentId">The unique identifier of the parent node.</param>
+    /// <param name="node">The node to be inserted.</param>
+    /// <param name="index">The index position for insertion.</param>
     public InsertNodeOperation(Guid parentId, CognitiveGraphNode node, int index)
     {
         ParentId = parentId;
@@ -71,6 +91,11 @@ public class InsertNodeOperation : EditOperation
         Index = index;
     }
 
+    /// <summary>
+    /// Executes the insert node operation by adding the node to the specified parent.
+    /// </summary>
+    /// <param name="editor">The graph editor instance to perform the operation on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the parent node is not found.</exception>
     public override void Execute(GraphEditor editor)
     {
         var parent = editor.FindNode(ParentId);
@@ -88,6 +113,11 @@ public class InsertNodeOperation : EditOperation
         Node.Accept(indexBuilder);
     }
 
+    /// <summary>
+    /// Undoes the insert node operation by removing the node from its parent.
+    /// </summary>
+    /// <param name="editor">The graph editor instance to perform the undo operation on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the parent node is not found.</exception>
     public override void Undo(GraphEditor editor)
     {
         var parent = editor.FindNode(ParentId);
@@ -115,6 +145,9 @@ public class InsertNodeOperation : EditOperation
 /// </summary>
 public class RemoveNodeOperation : EditOperation
 {
+    /// <summary>
+    /// Gets the unique identifier of the node to be removed.
+    /// </summary>
     public Guid NodeId { get; }
 
     // State for undo
@@ -122,13 +155,25 @@ public class RemoveNodeOperation : EditOperation
     private int _originalIndex;
     private CognitiveGraphNode? _removedNode;
 
+    /// <summary>
+    /// Gets the type of this edit operation.
+    /// </summary>
     public override string OperationType => "RemoveNode";
 
+    /// <summary>
+    /// Initializes a new instance of the RemoveNodeOperation class.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the node to remove.</param>
     public RemoveNodeOperation(Guid nodeId)
     {
         NodeId = nodeId;
     }
 
+    /// <summary>
+    /// Executes the remove node operation by removing the specified node from the graph.
+    /// </summary>
+    /// <param name="editor">The graph editor instance to perform the operation on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the node is not found or when attempting to remove the root node.</exception>
     public override void Execute(GraphEditor editor)
     {
         var node = editor.FindNode(NodeId);
@@ -152,6 +197,11 @@ public class RemoveNodeOperation : EditOperation
         RemoveFromIndex(editor, node);
     }
 
+    /// <summary>
+    /// Undoes the remove node operation by re-inserting the node back to its original parent.
+    /// </summary>
+    /// <param name="editor">The graph editor instance to perform the undo operation on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the original parent node is not found or when the removed node state is invalid.</exception>
     public override void Undo(GraphEditor editor)
     {
         if (_removedNode == null)
