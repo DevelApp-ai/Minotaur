@@ -156,6 +156,7 @@ public class LanguagePluginManager : IDisposable
         RegisterPlugin(new CSharpLanguagePlugin());
         RegisterPlugin(new JavaScriptLanguagePlugin());
         RegisterPlugin(new PythonLanguagePlugin());
+        RegisterPlugin(new LLVMLanguagePlugin());
     }
 
     public void Dispose()
