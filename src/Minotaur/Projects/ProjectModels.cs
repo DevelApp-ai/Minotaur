@@ -22,14 +22,49 @@ namespace Minotaur.Projects;
 /// </summary>
 public enum ProjectType
 {
+    /// <summary>
+    /// A .NET solution file (.sln).
+    /// </summary>
     DotNetSolution,
+    
+    /// <summary>
+    /// A .NET project file (.csproj, .vbproj, .fsproj).
+    /// </summary>
     DotNetProject,
+    
+    /// <summary>
+    /// A Node.js project with package.json.
+    /// </summary>
     NodeProject,
+    
+    /// <summary>
+    /// A Python project with requirements.txt or setup.py.
+    /// </summary>
     PythonProject,
+    
+    /// <summary>
+    /// A Java project with pom.xml or .gradle files.
+    /// </summary>
     JavaProject,
+    
+    /// <summary>
+    /// A C++ project with CMakeLists.txt or Makefile.
+    /// </summary>
     CppProject,
+    
+    /// <summary>
+    /// A Rust project with Cargo.toml.
+    /// </summary>
     RustProject,
+    
+    /// <summary>
+    /// A Go project with go.mod.
+    /// </summary>
     GoProject,
+    
+    /// <summary>
+    /// A generic folder without specific project files.
+    /// </summary>
     GenericFolder
 }
 

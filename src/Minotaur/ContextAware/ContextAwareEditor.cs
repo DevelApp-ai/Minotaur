@@ -29,6 +29,11 @@ public class ContextAwareEditor
     private readonly GraphEditor _editor;
     private readonly List<IRuleActivationCallback> _callbacks = new();
 
+    /// <summary>
+    /// Initializes a new instance of the ContextAwareEditor with the specified graph editor.
+    /// </summary>
+    /// <param name="editor">The graph editor to use for contextual operations.</param>
+    /// <exception cref="ArgumentNullException">Thrown when editor is null.</exception>
     public ContextAwareEditor(GraphEditor editor)
     {
         _editor = editor ?? throw new ArgumentNullException(nameof(editor));
@@ -218,12 +223,39 @@ public class ContextAwareEditor
 /// </summary>
 public class ContextualEdit
 {
+    /// <summary>
+    /// Gets or sets the type of edit operation to perform.
+    /// </summary>
     public EditType Type { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the target position within the source for the edit operation.
+    /// </summary>
     public SourcePosition TargetPosition { get; set; } = new(0, 0, 0, 0);
+    
+    /// <summary>
+    /// Gets or sets the new node to be inserted or used in the edit operation.
+    /// </summary>
     public CognitiveGraphNode? NewNode { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the new parent node for the edit operation.
+    /// </summary>
     public CognitiveGraphNode? NewParent { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the new value to be assigned during the edit operation.
+    /// </summary>
     public object? NewValue { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the radius of context nodes to consider around the target position.
+    /// </summary>
     public int ContextRadius { get; set; } = 2;
+    
+    /// <summary>
+    /// Gets or sets additional metadata for the edit operation.
+    /// </summary>
     public Dictionary<string, object> Metadata { get; set; } = new();
 }
 
@@ -232,10 +264,29 @@ public class ContextualEdit
 /// </summary>
 public class EditContext
 {
+    /// <summary>
+    /// Gets or sets the target node for the edit operation.
+    /// </summary>
     public CognitiveGraphNode? TargetNode { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the list of context nodes surrounding the target.
+    /// </summary>
     public List<CognitiveGraphNode> ContextNodes { get; set; } = new();
+    
+    /// <summary>
+    /// Gets or sets the source position of the edit operation.
+    /// </summary>
     public SourcePosition SourcePosition { get; set; } = new(0, 0, 0, 0);
+    
+    /// <summary>
+    /// Gets or sets the type of edit operation being performed.
+    /// </summary>
     public EditType EditType { get; set; }
+    
+    /// <summary>
+    /// Gets or sets additional metadata for the edit context.
+    /// </summary>
     public Dictionary<string, object> Metadata { get; set; } = new();
 }
 
@@ -244,10 +295,26 @@ public class EditContext
 /// </summary>
 public class EditResult
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether the edit operation was successful.
+    /// </summary>
     public bool IsSuccessful { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the error message if the operation failed.
+    /// </summary>
     public string? ErrorMessage { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the list of nodes that were modified during the operation.
+    /// </summary>
     public List<CognitiveGraphNode> ModifiedNodes { get; set; } = new();
 
+    /// <summary>
+    /// Creates a successful edit result with the specified modified nodes.
+    /// </summary>
+    /// <param name="modifiedNodes">The nodes that were modified during the operation.</param>
+    /// <returns>A successful EditResult instance.</returns>
     public static EditResult Success(IEnumerable<CognitiveGraphNode> modifiedNodes)
     {
         return new EditResult
@@ -257,6 +324,11 @@ public class EditResult
         };
     }
 
+    /// <summary>
+    /// Creates a failed edit result with the specified error message.
+    /// </summary>
+    /// <param name="errorMessage">The error message describing why the operation failed.</param>
+    /// <returns>A failed EditResult instance.</returns>
     public static EditResult Failed(string errorMessage)
     {
         return new EditResult
@@ -273,9 +345,24 @@ public class EditResult
 /// </summary>
 public enum EditType
 {
+    /// <summary>
+    /// Insert a new node into the graph.
+    /// </summary>
     Insert,
+    
+    /// <summary>
+    /// Update an existing node in the graph.
+    /// </summary>
     Update,
+    
+    /// <summary>
+    /// Delete a node from the graph.
+    /// </summary>
     Delete,
+    
+    /// <summary>
+    /// Move a node to a different position in the graph.
+    /// </summary>
     Move
 }
 
@@ -284,7 +371,19 @@ public enum EditType
 /// </summary>
 public interface IRuleActivationCallback
 {
+    /// <summary>
+    /// Called before an edit operation is performed.
+    /// </summary>
+    /// <param name="context">The context of the edit operation.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     Task BeforeEditAsync(EditContext context);
+    
+    /// <summary>
+    /// Called after an edit operation is completed.
+    /// </summary>
+    /// <param name="context">The context of the edit operation.</param>
+    /// <param name="result">The result of the edit operation.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     Task AfterEditAsync(EditContext context, EditResult result);
 }
 
@@ -293,10 +392,41 @@ public interface IRuleActivationCallback
 /// </summary>
 public interface ILocationTracker
 {
+    /// <summary>
+    /// Gets the source position at the specified character offset.
+    /// </summary>
+    /// <param name="offset">The character offset in the source text.</param>
+    /// <returns>The source position at the specified offset.</returns>
     SourcePosition GetPositionAt(int offset);
+    
+    /// <summary>
+    /// Gets the source position at the specified line and column.
+    /// </summary>
+    /// <param name="line">The line number (1-based).</param>
+    /// <param name="column">The column number (1-based).</param>
+    /// <returns>The source position at the specified line and column.</returns>
     SourcePosition GetPositionAt(int line, int column);
+    
+    /// <summary>
+    /// Gets the character offset at the specified line and column.
+    /// </summary>
+    /// <param name="line">The line number (1-based).</param>
+    /// <param name="column">The column number (1-based).</param>
+    /// <returns>The character offset at the specified position.</returns>
     int GetOffsetAt(int line, int column);
+    
+    /// <summary>
+    /// Gets all positions within the specified range.
+    /// </summary>
+    /// <param name="range">The source position range to query.</param>
+    /// <returns>An array of source positions within the range.</returns>
     SourcePosition[] GetPositionsInRange(SourcePosition range);
+    
+    /// <summary>
+    /// Determines whether the specified position is valid within the source text.
+    /// </summary>
+    /// <param name="position">The position to validate.</param>
+    /// <returns>true if the position is valid; otherwise, false.</returns>
     bool IsValidPosition(SourcePosition position);
 }
 
@@ -309,6 +439,12 @@ public class PrecisionLocationTracker : ILocationTracker
     private readonly string? _sourceFile;
     private readonly int[] _lineOffsets;
 
+    /// <summary>
+    /// Initializes a new instance of the PrecisionLocationTracker with the specified source text.
+    /// </summary>
+    /// <param name="sourceText">The source text to track positions within.</param>
+    /// <param name="sourceFile">The optional source file name.</param>
+    /// <exception cref="ArgumentNullException">Thrown when sourceText is null.</exception>
     public PrecisionLocationTracker(string sourceText, string? sourceFile = null)
     {
         _sourceText = sourceText ?? throw new ArgumentNullException(nameof(sourceText));
