@@ -20,6 +20,7 @@ using Minotaur.Editor;
 using Minotaur.Unparser;
 using Minotaur.Parser;
 using Minotaur.Plugins;
+using Minotaur.Demo;
 
 namespace Minotaur.Demo;
 
@@ -46,6 +47,10 @@ class Program
 
         // Demo 5: Plugin System (New!)
         await DemoPluginSystem();
+
+        // Demo 6: Symbolic Analysis (KLEE Alternative)
+        SymbolicAnalysisDemo.RunDemo();
+        SymbolicAnalysisDemo.DemonstrateGrammarIntegration();
 
         Console.WriteLine("\nDemo completed. Press any key to exit...");
         Console.ReadKey();
