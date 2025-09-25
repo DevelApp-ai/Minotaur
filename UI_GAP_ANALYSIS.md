@@ -230,17 +230,25 @@ This analysis compares the current C# console-based Minotaur project with the co
 
 ## Implementation Strategy
 
-### Option 1: Port Old Code
-- **Pros**: Complete feature set, proven design
-- **Cons**: May not integrate well with current C# architecture
+### Option 1: React/TypeScript Web UI (Original Recommendation)
+- **Pros**: Rich ecosystem, rapid development, complex visualizations readily available
+- **Cons**: Mixed technology stack, API integration required
+- **Timeline**: 24 weeks
 
-### Option 2: Incremental Rebuild
-- **Pros**: Better integration with current backend, modern architecture
-- **Cons**: Significant development time, feature gaps during transition
+### Option 2: C# MAUI Cross-Platform App
+- **Pros**: Unified C# codebase, native performance, mobile support, direct integration
+- **Cons**: Custom visualization development required, longer timeline
+- **Timeline**: 28-32 weeks
+- **See**: `UI_MAUI_ANALYSIS.md` and `UI_MAUI_vs_WEB_COMPARISON.md` for detailed analysis
 
-### Option 3: Hybrid Approach
-- **Pros**: Leverage existing UI designs while adapting for current backend
-- **Cons**: Requires careful architectural planning
+### Option 3: MAUI + Blazor Hybrid
+- **Pros**: Native shell with web visualization components, best of both worlds
+- **Cons**: Two technology stacks to maintain
+- **Timeline**: 26 weeks
+
+### Option 4: Incremental Port of Old Code
+- **Pros**: Proven designs, complete feature set
+- **Cons**: Architecture mismatch, significant refactoring needed
 
 ## Conclusion
 
