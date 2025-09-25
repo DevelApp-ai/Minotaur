@@ -33,6 +33,9 @@ public class GrammarGenerator
     private readonly ParseErrorAnalyzer _errorAnalyzer;
     private readonly GrammarValidator _validator;
 
+    /// <summary>
+    /// Initializes a new instance of the GrammarGenerator class.
+    /// </summary>
     public GrammarGenerator()
     {
         _tokenAnalyzer = new TokenPatternAnalyzer();
