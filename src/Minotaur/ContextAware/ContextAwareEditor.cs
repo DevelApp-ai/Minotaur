@@ -452,6 +452,12 @@ public class PrecisionLocationTracker : ILocationTracker
         _lineOffsets = BuildLineOffsets();
     }
 
+    /// <summary>
+    /// Gets the source position (line and column) at the specified character offset.
+    /// </summary>
+    /// <param name="offset">The zero-based character offset in the source text.</param>
+    /// <returns>A <see cref="SourcePosition"/> containing the line, column, and offset information.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="offset"/> is negative or exceeds the source text length.</exception>
     public SourcePosition GetPositionAt(int offset)
     {
         if (offset < 0 || offset > _sourceText.Length)
@@ -473,6 +479,13 @@ public class PrecisionLocationTracker : ILocationTracker
         };
     }
 
+    /// <summary>
+    /// Gets the source position at the specified line and column coordinates.
+    /// </summary>
+    /// <param name="line">The one-based line number.</param>
+    /// <param name="column">The one-based column number.</param>
+    /// <returns>A <see cref="SourcePosition"/> containing the line, column, and calculated offset information.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="line"/> or <paramref name="column"/> are invalid.</exception>
     public SourcePosition GetPositionAt(int line, int column)
     {
         if (line < 1 || line > _lineOffsets.Length)
@@ -493,12 +506,24 @@ public class PrecisionLocationTracker : ILocationTracker
         };
     }
 
+    /// <summary>
+    /// Gets the character offset at the specified line and column coordinates.
+    /// </summary>
+    /// <param name="line">The one-based line number.</param>
+    /// <param name="column">The one-based column number.</param>
+    /// <returns>The zero-based character offset in the source text.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="line"/> or <paramref name="column"/> are invalid.</exception>
     public int GetOffsetAt(int line, int column)
     {
         var position = GetPositionAt(line, column);
         return position.Offset;
     }
 
+    /// <summary>
+    /// Gets all source positions within the specified range.
+    /// </summary>
+    /// <param name="range">The source position range to get positions for, where Length specifies the range size.</param>
+    /// <returns>An array of <see cref="SourcePosition"/> objects covering each character in the range.</returns>
     public SourcePosition[] GetPositionsInRange(SourcePosition range)
     {
         var positions = new List<SourcePosition>();
@@ -511,6 +536,11 @@ public class PrecisionLocationTracker : ILocationTracker
         return positions.ToArray();
     }
 
+    /// <summary>
+    /// Determines whether the specified source position is valid for this source text.
+    /// </summary>
+    /// <param name="position">The source position to validate.</param>
+    /// <returns><c>true</c> if the position is within valid bounds; otherwise, <c>false</c>.</returns>
     public bool IsValidPosition(SourcePosition position)
     {
         return position.Line >= 1 &&

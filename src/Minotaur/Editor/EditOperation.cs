@@ -238,8 +238,19 @@ public class RemoveNodeOperation : EditOperation
 /// </summary>
 public class ReplaceNodeOperation : EditOperation
 {
+    /// <summary>
+    /// Gets the unique identifier of the node to be replaced.
+    /// </summary>
     public Guid NodeId { get; }
+    
+    /// <summary>
+    /// Gets the new node that will replace the existing node.
+    /// </summary>
     public CognitiveGraphNode Replacement { get; }
+    
+    /// <summary>
+    /// Gets a value indicating whether to preserve the children of the original node.
+    /// </summary>
     public bool PreserveChildren { get; }
 
     // State for undo
@@ -247,8 +258,17 @@ public class ReplaceNodeOperation : EditOperation
     private Guid _originalParentId;
     private int _originalIndex;
 
+    /// <summary>
+    /// Gets the type of this edit operation.
+    /// </summary>
     public override string OperationType => "ReplaceNode";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReplaceNodeOperation"/> class.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the node to replace.</param>
+    /// <param name="replacement">The new node to use as replacement.</param>
+    /// <param name="preserveChildren">Whether to preserve the children of the original node.</param>
     public ReplaceNodeOperation(Guid nodeId, CognitiveGraphNode replacement, bool preserveChildren)
     {
         NodeId = nodeId;
@@ -256,6 +276,11 @@ public class ReplaceNodeOperation : EditOperation
         PreserveChildren = preserveChildren;
     }
 
+    /// <summary>
+    /// Executes the replace node operation, replacing the target node with the replacement node.
+    /// </summary>
+    /// <param name="editor">The graph editor to operate on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the target node is not found or is the root node.</exception>
     public override void Execute(GraphEditor editor)
     {
         var node = editor.FindNode(NodeId);
@@ -298,6 +323,11 @@ public class ReplaceNodeOperation : EditOperation
         Replacement.Accept(indexBuilder);
     }
 
+    /// <summary>
+    /// Undoes the replace node operation, restoring the original node.
+    /// </summary>
+    /// <param name="editor">The graph editor to operate on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the operation cannot be undone due to missing state or nodes.</exception>
     public override void Undo(GraphEditor editor)
     {
         if (_originalNode == null)
@@ -337,16 +367,36 @@ public class ReplaceNodeOperation : EditOperation
 /// </summary>
 public class MoveNodeOperation : EditOperation
 {
+    /// <summary>
+    /// Gets the unique identifier of the node to be moved.
+    /// </summary>
     public Guid NodeId { get; }
+    
+    /// <summary>
+    /// Gets the unique identifier of the new parent node.
+    /// </summary>
     public Guid NewParentId { get; }
+    
+    /// <summary>
+    /// Gets the index position in the new parent's children collection.
+    /// </summary>
     public int NewIndex { get; }
 
     // State for undo
     private Guid _originalParentId;
     private int _originalIndex;
 
+    /// <summary>
+    /// Gets the type of this edit operation.
+    /// </summary>
     public override string OperationType => "MoveNode";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveNodeOperation"/> class.
+    /// </summary>
+    /// <param name="nodeId">The unique identifier of the node to move.</param>
+    /// <param name="newParentId">The unique identifier of the new parent node.</param>
+    /// <param name="newIndex">The index position in the new parent's children collection.</param>
     public MoveNodeOperation(Guid nodeId, Guid newParentId, int newIndex)
     {
         NodeId = nodeId;
@@ -354,6 +404,11 @@ public class MoveNodeOperation : EditOperation
         NewIndex = newIndex;
     }
 
+    /// <summary>
+    /// Executes the move node operation, moving the target node to a new parent.
+    /// </summary>
+    /// <param name="editor">The graph editor to operate on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the node or new parent is not found, or when trying to move the root node.</exception>
     public override void Execute(GraphEditor editor)
     {
         var node = editor.FindNode(NodeId);
@@ -382,6 +437,11 @@ public class MoveNodeOperation : EditOperation
         newParent.AddChild(node);
     }
 
+    /// <summary>
+    /// Undoes the move node operation, moving the node back to its original parent.
+    /// </summary>
+    /// <param name="editor">The graph editor to operate on.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the node or original parent is not found.</exception>
     public override void Undo(GraphEditor editor)
     {
         var node = editor.FindNode(NodeId);
