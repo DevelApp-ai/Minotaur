@@ -217,17 +217,14 @@ public class LLVMIRValidationVisitor : CognitiveGraphVisitorBase
         }
 
         // Warn about high complexity
-        if (_complexityScore > 500) // Arbitrary threshold
+        if (_complexityScore > 500 && _complexityScore % 100 == 0) // Arbitrary threshold, and only warn periodically
         {
-            if (_complexityScore % 100 == 0) // Only warn periodically
+            _performanceWarnings.Add(new UnparseValidationWarning
             {
-                _performanceWarnings.Add(new UnparseValidationWarning
-                {
-                    Message = $"High complexity score ({_complexityScore}) - generated LLVM IR may be complex",
-                    NodeId = node.GetHashCode().ToString(),
-                    NodeType = node.GetType().Name
-                });
-            }
+                Message = $"High complexity score ({_complexityScore}) - generated LLVM IR may be complex",
+                NodeId = node.GetHashCode().ToString(),
+                NodeType = node.GetType().Name
+            });
         }
     }
 
