@@ -28,6 +28,12 @@ public class SyntaxStructureAnalyzer
     private readonly Dictionary<string, List<string>> _patterns = new();
     private readonly Dictionary<string, int> _patternFrequency = new();
 
+    /// <summary>
+    /// Discovers syntax patterns from source files and generates production rules.
+    /// </summary>
+    /// <param name="tokens">The token definitions to use for pattern analysis.</param>
+    /// <param name="sourceFiles">The source files to analyze for patterns.</param>
+    /// <returns>The discovered production rules based on syntax patterns.</returns>
     public ProductionRules DiscoverSyntaxPatterns(TokenDefinitions tokens, string[] sourceFiles)
     {
         // Analyze source files for patterns

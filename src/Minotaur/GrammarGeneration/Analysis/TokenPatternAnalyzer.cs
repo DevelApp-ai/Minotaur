@@ -31,6 +31,11 @@ public class TokenPatternAnalyzer
     private readonly List<string> _literalPatterns = new();
     private readonly List<string> _operatorPatterns = new();
 
+    /// <summary>
+    /// Analyzes source code files to discover token patterns and generate token definitions.
+    /// </summary>
+    /// <param name="sourceFiles">The source files to analyze for token patterns.</param>
+    /// <returns>The discovered token definitions based on pattern analysis.</returns>
     public TokenDefinitions AnalyzeSourceCode(string[] sourceFiles)
     {
         var patterns = new List<TokenPattern>();

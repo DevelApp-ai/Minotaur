@@ -27,6 +27,12 @@ public class ParseErrorAnalyzer
     private readonly Dictionary<string, int> _errorFrequency = new();
     private readonly Dictionary<ParseErrorType, List<ParseError>> _errorsByType = new();
 
+    /// <summary>
+    /// Analyzes parse errors to generate grammar refinement suggestions.
+    /// </summary>
+    /// <param name="errors">The parse errors to analyze.</param>
+    /// <param name="currentGrammar">The current grammar that produced the errors.</param>
+    /// <returns>Grammar refinement suggestions based on the error analysis.</returns>
     public GrammarRefinement AnalyzeParseErrors(ParseError[] errors, Grammar currentGrammar)
     {
         var refinements = new List<GrammarRefinement>();

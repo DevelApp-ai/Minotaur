@@ -58,6 +58,11 @@ public partial class StepParserIntegration : IDisposable
     private readonly LanguagePluginManager _pluginManager;
     private bool _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the StepParserIntegration class.
+    /// </summary>
+    /// <param name="config">The parser configuration to use. If null, uses default configuration.</param>
+    /// <param name="pluginManager">The language plugin manager to use. If null, creates a new instance.</param>
     public StepParserIntegration(ParserConfiguration? config = null, LanguagePluginManager? pluginManager = null)
     {
         _config = config ?? new ParserConfiguration();
@@ -277,6 +282,9 @@ public partial class StepParserIntegration : IDisposable
 
     #endregion
 
+    /// <summary>
+    /// Releases all resources used by the StepParserIntegration and disposes of the plugin manager.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)
@@ -292,8 +300,19 @@ public partial class StepParserIntegration : IDisposable
 /// </summary>
 public class ParseValidationResult
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether the source code is valid.
+    /// </summary>
     public bool IsValid { get; set; }
+
+    /// <summary>
+    /// Gets or sets the array of parse errors found during validation.
+    /// </summary>
     public ParseError[] Errors { get; set; } = Array.Empty<ParseError>();
+
+    /// <summary>
+    /// Gets or sets the number of tokens found in the source code.
+    /// </summary>
     public int TokenCount { get; set; }
 }
 
@@ -302,9 +321,24 @@ public class ParseValidationResult
 /// </summary>
 public class ParseError
 {
+    /// <summary>
+    /// Gets or sets the error message describing the parsing issue.
+    /// </summary>
     public string Message { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the type of parse error (e.g., "SyntaxError", "UnexpectedToken").
+    /// </summary>
     public string Type { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the line number where the error occurred.
+    /// </summary>
     public int Line { get; set; }
+
+    /// <summary>
+    /// Gets or sets the column number where the error occurred.
+    /// </summary>
     public int Column { get; set; }
 }
 
@@ -313,6 +347,11 @@ public class ParseError
 /// </summary>
 public static class StepParserIntegrationFactory
 {
+    /// <summary>
+    /// Creates a StepParserIntegration instance configured for C# parsing.
+    /// </summary>
+    /// <param name="pluginManager">Optional language plugin manager. If null, creates a new instance.</param>
+    /// <returns>A configured StepParserIntegration for C# language parsing.</returns>
     public static StepParserIntegration CreateForCSharp(LanguagePluginManager? pluginManager = null)
     {
         return new StepParserIntegration(new ParserConfiguration
@@ -323,6 +362,11 @@ public static class StepParserIntegrationFactory
         }, pluginManager);
     }
 
+    /// <summary>
+    /// Creates a StepParserIntegration instance configured for JavaScript parsing.
+    /// </summary>
+    /// <param name="pluginManager">Optional language plugin manager. If null, creates a new instance.</param>
+    /// <returns>A configured StepParserIntegration for JavaScript language parsing.</returns>
     public static StepParserIntegration CreateForJavaScript(LanguagePluginManager? pluginManager = null)
     {
         return new StepParserIntegration(new ParserConfiguration
@@ -333,6 +377,11 @@ public static class StepParserIntegrationFactory
         }, pluginManager);
     }
 
+    /// <summary>
+    /// Creates a StepParserIntegration instance configured for Python parsing.
+    /// </summary>
+    /// <param name="pluginManager">Optional language plugin manager. If null, creates a new instance.</param>
+    /// <returns>A configured StepParserIntegration for Python language parsing.</returns>
     public static StepParserIntegration CreateForPython(LanguagePluginManager? pluginManager = null)
     {
         return new StepParserIntegration(new ParserConfiguration

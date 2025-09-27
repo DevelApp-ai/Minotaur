@@ -25,6 +25,10 @@ namespace Minotaur.Examples;
 /// </summary>
 public class GrammarGenerationExample
 {
+    /// <summary>
+    /// Runs the grammar generation example demonstrating Minotaur's capabilities.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public static async Task RunAsync()
     {
         Console.WriteLine("🔧 Minotaur Grammar Generation Example");
