@@ -34,11 +34,30 @@ public class LLVMIRValidationVisitor : CognitiveGraphVisitorBase
     private int _totalNodes = 0;
     private int _complexityScore = 0;
 
+    /// <summary>
+    /// Gets a value indicating whether the cognitive graph has structural issues that prevent LLVM IR generation.
+    /// </summary>
     public bool HasStructuralIssues => _hasStructuralIssues;
+
+    /// <summary>
+    /// Gets a value indicating whether the cognitive graph has performance warnings for LLVM IR generation.
+    /// </summary>
     public bool HasPerformanceWarnings => _performanceWarnings.Count > 0;
+
+    /// <summary>
+    /// Gets the list of validation errors found during analysis.
+    /// </summary>
     public List<UnparseValidationError> ValidationErrors => _validationErrors;
+
+    /// <summary>
+    /// Gets the list of performance warnings found during analysis.
+    /// </summary>
     public List<UnparseValidationWarning> PerformanceWarnings => _performanceWarnings;
 
+    /// <summary>
+    /// Visits a cognitive graph node before traversing its children and performs validation.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to validate.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         _nodeDepth++;
@@ -49,6 +68,10 @@ public class LLVMIRValidationVisitor : CognitiveGraphVisitorBase
         CheckPerformanceImplications(node);
     }
 
+    /// <summary>
+    /// Visits a cognitive graph node after traversing its children.
+    /// </summary>
+    /// <param name="node">The cognitive graph node that was visited.</param>
     protected override void AfterVisitNode(CognitiveGraphNode node)
     {
         _nodeDepth--;
@@ -348,8 +371,15 @@ public class LLVMIRValidationVisitor : CognitiveGraphVisitorBase
 /// </summary>
 public class EntryPointDetectionVisitor : CognitiveGraphVisitorBase
 {
+    /// <summary>
+    /// Gets a value indicating whether a parser entry point was detected in the cognitive graph.
+    /// </summary>
     public bool HasEntryPoint { get; private set; } = false;
 
+    /// <summary>
+    /// Visits a cognitive graph node to detect parser entry points.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to analyze for entry point patterns.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         if (node is NonTerminalNode nonTerminal)
@@ -375,8 +405,15 @@ public class EntryPointDetectionVisitor : CognitiveGraphVisitorBase
 /// </summary>
 public class ErrorHandlingDetectionVisitor : CognitiveGraphVisitorBase
 {
+    /// <summary>
+    /// Gets a value indicating whether error handling constructs were detected in the cognitive graph.
+    /// </summary>
     public bool HasErrorHandling { get; private set; } = false;
 
+    /// <summary>
+    /// Visits a cognitive graph node to detect error handling constructs.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to analyze for error handling patterns.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         if (node is NonTerminalNode nonTerminal)

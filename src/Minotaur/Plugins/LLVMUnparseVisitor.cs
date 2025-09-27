@@ -38,6 +38,10 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     private string _currentFunction = "";
     private bool _inFunctionBody = false;
 
+    /// <summary>
+    /// Gets the generated LLVM IR code as a complete module string.
+    /// </summary>
+    /// <returns>The complete LLVM IR module as a string.</returns>
     public string GetGeneratedLLVMIR()
     {
         var result = new StringBuilder();
@@ -95,6 +99,10 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         return result.ToString();
     }
 
+    /// <summary>
+    /// Visits a cognitive graph node and generates appropriate LLVM IR code.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to visit and process.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         switch (node)

@@ -26,10 +26,26 @@ namespace Minotaur.Plugins;
 /// </summary>
 public class LLVMLanguagePlugin : ILanguagePlugin
 {
+    /// <summary>
+    /// Gets the unique identifier for the LLVM language plugin.
+    /// </summary>
     public string LanguageId => "llvm";
+
+    /// <summary>
+    /// Gets the display name for the LLVM language plugin.
+    /// </summary>
     public string DisplayName => "LLVM IR";
+
+    /// <summary>
+    /// Gets the file extensions supported by the LLVM language plugin.
+    /// </summary>
     public string[] SupportedExtensions => new[] { ".ll", ".bc" };
 
+    /// <summary>
+    /// Generates LLVM IR code from a cognitive graph using LLVM-specific unparsing rules.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to unparse into LLVM IR.</param>
+    /// <returns>A task that represents the asynchronous unparsing operation. The task result contains the generated LLVM IR code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         // Generate LLVM IR from cognitive graph
@@ -40,6 +56,11 @@ public class LLVMLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedLLVMIR();
     }
 
+    /// <summary>
+    /// Generates compiler-compiler backend rules for LLVM IR generation.
+    /// These rules define how to generate LLVM IR code for different parser components.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the compiler backend rules for LLVM.</returns>
     public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
     {
         var rules = new CompilerBackendRules
@@ -177,6 +198,10 @@ public class LLVMLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to LLVM IR generation.
+    /// </summary>
+    /// <returns>The formatting options for LLVM IR code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -198,6 +223,11 @@ public class LLVMLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid LLVM IR code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for LLVM IR generation.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
