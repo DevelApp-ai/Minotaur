@@ -186,6 +186,11 @@ public class OperatorUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class WhitespaceUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses a whitespace node by preserving formatting if configured to do so.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing whitespace.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         if (context.Configuration.PreserveFormatting)
@@ -206,6 +211,11 @@ public class WhitespaceUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class CommentUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses a comment node by preserving it if formatting is enabled.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing a comment.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         if (!context.Configuration.IncludeComments)
@@ -242,6 +252,11 @@ public class CommentUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class BlockUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses a block node by handling different block types with appropriate formatting.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing a block structure.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var blockType = GetMetadataString(node, "blockType");
@@ -273,6 +288,11 @@ public class BlockUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class ExpressionUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses an expression node with appropriate parentheses and formatting based on expression type.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing an expression.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var expressionType = GetMetadataString(node, "expressionType");
@@ -298,6 +318,11 @@ public class ExpressionUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class StatementUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses a statement node with appropriate semicolon handling and indentation.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing a statement.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var statementType = GetMetadataString(node, "statementType");
@@ -327,6 +352,11 @@ public class StatementUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class NonTerminalUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses a non-terminal node by allowing its children to be processed by the visitor.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing a non-terminal.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         // Non-terminal nodes typically don't output text themselves
@@ -339,6 +369,11 @@ public class NonTerminalUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class TerminalUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses a terminal node by writing its text content directly to the output.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing a terminal.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var text = GetNodeText(node);
