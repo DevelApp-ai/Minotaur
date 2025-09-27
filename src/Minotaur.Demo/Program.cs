@@ -52,6 +52,9 @@ class Program
         SymbolicAnalysisDemo.RunDemo();
         SymbolicAnalysisDemo.DemonstrateGrammarIntegration();
 
+        // Demo 7: NuGet Plugin-Based Symbolic Analysis (New!)
+        PluginBasedSymbolicAnalysisDemo.RunDemo();
+
         Console.WriteLine("\nDemo completed. Press any key to exit...");
         Console.ReadKey();
     }

@@ -16,6 +16,7 @@
  */
 
 using Minotaur.Core;
+using Minotaur.Analysis.Symbolic;
 
 namespace Minotaur.Plugins;
 
@@ -23,7 +24,7 @@ namespace Minotaur.Plugins;
 /// Built-in C# language plugin for unparsing and compiler backend generation
 /// All grammar and syntax comes from StepParser - plugins handle backend generation
 /// </summary>
-public class CSharpLanguagePlugin : ILanguagePlugin
+public class CSharpLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 {
     /// <summary>
     /// Gets the unique identifier for the C# language.
@@ -144,12 +145,35 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         await Task.CompletedTask;
         return result;
     }
+
+    // ISymbolicAnalysisPlugin implementation
+    private readonly CSharpSymbolicAnalysisPlugin _symbolicAnalysis = new();
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _symbolicAnalysis.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _symbolicAnalysis.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
+    }
 }
 
 /// <summary>
 /// Built-in JavaScript language plugin for unparsing and compiler backend generation
 /// </summary>
-public class JavaScriptLanguagePlugin : ILanguagePlugin
+public class JavaScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 {
     public string LanguageId => "javascript";
     public string DisplayName => "JavaScript";
@@ -215,12 +239,35 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         await Task.CompletedTask;
         return result;
     }
+
+    // ISymbolicAnalysisPlugin implementation
+    private readonly JavaScriptSymbolicAnalysisPlugin _symbolicAnalysis = new();
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _symbolicAnalysis.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _symbolicAnalysis.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
+    }
 }
 
 /// <summary>
 /// Built-in Python language plugin for unparsing and compiler backend generation
 /// </summary>
-public class PythonLanguagePlugin : ILanguagePlugin
+public class PythonLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 {
     public string LanguageId => "python";
     public string DisplayName => "Python";
@@ -285,5 +332,28 @@ public class PythonLanguagePlugin : ILanguagePlugin
         var result = new UnparseValidationResult { CanUnparse = true };
         await Task.CompletedTask;
         return result;
+    }
+
+    // ISymbolicAnalysisPlugin implementation
+    private readonly PythonSymbolicAnalysisPlugin _symbolicAnalysis = new();
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _symbolicAnalysis.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _symbolicAnalysis.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
     }
 }

@@ -17,6 +17,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minotaur.Analysis.Symbolic;
+using Minotaur.Plugins;
 
 namespace Minotaur.Tests.Analysis.Symbolic;
 
@@ -146,9 +147,11 @@ else:
     public void RegisterLanguageAnalyzer_CustomAnalyzer_IsUsed()
     {
         // Arrange
-        var engine = new SymbolicAnalysisEngine();
-        var customAnalyzer = new TestLanguageAnalyzer();
-        engine.RegisterLanguageAnalyzer("test", customAnalyzer);
+        var pluginManager = new LanguagePluginManager();
+        var customPlugin = new TestLanguagePlugin();
+        pluginManager.RegisterPlugin(customPlugin);
+        
+        var engine = new SymbolicAnalysisEngine(null, pluginManager);
 
         var sourceCode = "test code";
         var language = "test";
@@ -223,12 +226,38 @@ else:
 }
 
 /// <summary>
-/// Test implementation of language analyzer for testing purposes
+/// Test implementation of language plugin for testing purposes
 /// </summary>
-public class TestLanguageAnalyzer : ILanguageSymbolicAnalyzer
+public class TestLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 {
-    public string LanguageName => "Test";
+    public string LanguageId => "test";
+    public string DisplayName => "Test Language";
+    public string[] SupportedExtensions => new[] { ".test" };
 
+    public async Task<string> UnparseAsync(Core.CognitiveGraphNode graph)
+    {
+        await Task.CompletedTask;
+        return "test code";
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        await Task.CompletedTask;
+        return new CompilerBackendRules { LanguageId = LanguageId };
+    }
+
+    public CodeFormattingOptions GetFormattingOptions()
+    {
+        return new CodeFormattingOptions();
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph)
+    {
+        await Task.CompletedTask;
+        return new UnparseValidationResult { CanUnparse = true };
+    }
+
+    // ISymbolicAnalysisPlugin implementation
     public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
     {
         return new List<SymbolicError>
@@ -253,6 +282,19 @@ public class TestLanguageAnalyzer : ILanguageSymbolicAnalyzer
                 0.8,
                 "This is a test pattern"
             )
+        };
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return 0.8;
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return new List<TestCase>
+        {
+            new TestCase("test_case", new Dictionary<string, object>(), "Test case")
         };
     }
 }

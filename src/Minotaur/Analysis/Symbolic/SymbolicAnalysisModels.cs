@@ -238,27 +238,6 @@ public class TestCase
 }
 
 /// <summary>
-/// Interface for language-specific symbolic analyzers
-/// </summary>
-public interface ILanguageSymbolicAnalyzer
-{
-    /// <summary>
-    /// Performs symbolic analysis specific to a programming language
-    /// </summary>
-    List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints);
-
-    /// <summary>
-    /// Gets the supported language name
-    /// </summary>
-    string LanguageName { get; }
-
-    /// <summary>
-    /// Gets language-specific error patterns
-    /// </summary>
-    List<ErrorPattern> GetErrorPatterns();
-}
-
-/// <summary>
 /// Represents a language-specific error pattern
 /// </summary>
 public class ErrorPattern

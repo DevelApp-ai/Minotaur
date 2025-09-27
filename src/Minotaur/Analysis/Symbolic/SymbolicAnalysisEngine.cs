@@ -17,27 +17,26 @@
 
 using Minotaur.Core;
 using Minotaur.GrammarGeneration.Models;
+using Minotaur.Plugins;
 
 namespace Minotaur.Analysis.Symbolic;
 
 /// <summary>
 /// Native symbolic analysis engine for Minotaur that provides KLEE-like capabilities
 /// without external dependencies, designed to work seamlessly with StepParser and cognitive graphs.
+/// Uses the NuGet-based plugin system for language-specific analysis.
 /// </summary>
 public class SymbolicAnalysisEngine
 {
     private readonly object? _stepParser;
-    private readonly Dictionary<string, ILanguageSymbolicAnalyzer> _languageAnalyzers;
+    private readonly LanguagePluginManager _pluginManager;
     private readonly ConstraintSolver _constraintSolver;
 
-    public SymbolicAnalysisEngine(object? stepParser = null)
+    public SymbolicAnalysisEngine(object? stepParser = null, LanguagePluginManager? pluginManager = null)
     {
         _stepParser = stepParser;
-        _languageAnalyzers = new Dictionary<string, ILanguageSymbolicAnalyzer>();
+        _pluginManager = pluginManager ?? new LanguagePluginManager();
         _constraintSolver = new ConstraintSolver();
-        
-        // Register built-in language analyzers
-        RegisterBuiltInAnalyzers();
     }
 
     /// <summary>
@@ -106,19 +105,14 @@ public class SymbolicAnalysisEngine
     }
 
     /// <summary>
-    /// Registers a language-specific symbolic analyzer
+    /// Gets the plugin manager used for language-specific analysis
     /// </summary>
-    public void RegisterLanguageAnalyzer(string language, ILanguageSymbolicAnalyzer analyzer)
-    {
-        _languageAnalyzers[language.ToLowerInvariant()] = analyzer;
-    }
+    public LanguagePluginManager PluginManager => _pluginManager;
 
     private void RegisterBuiltInAnalyzers()
     {
-        RegisterLanguageAnalyzer("python", new PythonSymbolicAnalyzer());
-        RegisterLanguageAnalyzer("javascript", new JavaScriptSymbolicAnalyzer());
-        RegisterLanguageAnalyzer("csharp", new CSharpSymbolicAnalyzer());
-        RegisterLanguageAnalyzer("java", new JavaSymbolicAnalyzer());
+        // Language analyzers are now provided by the plugin system
+        // No need to register them here as they're integrated into the language plugins
     }
 
     private CognitiveGraphNode CreateMockAst(string sourceCode, string language)
@@ -300,9 +294,11 @@ public class SymbolicAnalysisEngine
 
     private List<SymbolicError> PerformLanguageSpecificAnalysis(string sourceCode, string language, List<SymbolicConstraint> constraints)
     {
-        if (_languageAnalyzers.TryGetValue(language.ToLowerInvariant(), out var analyzer))
+        var plugin = _pluginManager.GetPlugin(language.ToLowerInvariant());
+        
+        if (plugin is ISymbolicAnalysisPlugin symbolicPlugin)
         {
-            return analyzer.AnalyzeSymbolic(sourceCode, constraints);
+            return symbolicPlugin.AnalyzeSymbolic(sourceCode, constraints);
         }
 
         return new List<SymbolicError>();
