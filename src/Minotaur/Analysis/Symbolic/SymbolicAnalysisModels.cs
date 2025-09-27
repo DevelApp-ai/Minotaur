@@ -212,42 +212,42 @@ public enum ConstraintType
     /// Variable assignment constraint
     /// </summary>
     VariableAssignment,
-    
+
     /// <summary>
     /// Conditional branch constraint
     /// </summary>
     ConditionalBranch,
-    
+
     /// <summary>
     /// Array access constraint
     /// </summary>
     ArrayAccess,
-    
+
     /// <summary>
     /// Null check constraint
     /// </summary>
     NullCheck,
-    
+
     /// <summary>
     /// Data flow constraint
     /// </summary>
     DataFlow,
-    
+
     /// <summary>
     /// Structural pattern constraint
     /// </summary>
     StructuralPattern,
-    
+
     /// <summary>
     /// Function call constraint
     /// </summary>
     FunctionCall,
-    
+
     /// <summary>
     /// Loop bound constraint
     /// </summary>
     LoopBound,
-    
+
     /// <summary>
     /// Type constraint
     /// </summary>
@@ -263,17 +263,17 @@ public class TestCase
     /// Gets the name of the test case
     /// </summary>
     public string Name { get; }
-    
+
     /// <summary>
     /// Gets the input values for the test case
     /// </summary>
     public Dictionary<string, object> Inputs { get; }
-    
+
     /// <summary>
     /// Gets the expected behavior description
     /// </summary>
     public string ExpectedBehavior { get; }
-    
+
     /// <summary>
     /// Gets or sets the generated code for the test case
     /// </summary>
@@ -302,22 +302,22 @@ public class ErrorPattern
     /// Gets the name of the error pattern
     /// </summary>
     public string Name { get; }
-    
+
     /// <summary>
     /// Gets the type of symbolic error this pattern detects
     /// </summary>
     public SymbolicErrorType ErrorType { get; }
-    
+
     /// <summary>
     /// Gets the regular expression pattern used for detection
     /// </summary>
     public string Pattern { get; }
-    
+
     /// <summary>
     /// Gets the default confidence level for this pattern
     /// </summary>
     public double DefaultConfidence { get; }
-    
+
     /// <summary>
     /// Gets the suggested fix for this error pattern
     /// </summary>
