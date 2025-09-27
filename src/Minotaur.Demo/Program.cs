@@ -59,7 +59,7 @@ class Program
         Console.ReadKey();
     }
 
-    static async Task DemoBasicGraphEditing()
+    static Task DemoBasicGraphEditing()
     {
         Console.WriteLine("1. Basic Graph Editing Demo");
         Console.WriteLine("===========================");
@@ -103,6 +103,7 @@ class Program
         Console.WriteLine($"After redo: {root.Children.Count} children");
 
         Console.WriteLine();
+        return Task.CompletedTask;
     }
 
     static async Task DemoCodeUnparsing()
@@ -285,18 +286,21 @@ class Program
             {
                 using var editor = await parser.ParseToEditableGraphAsync(sourceCode);
                 Console.WriteLine("Successfully created editable graph from source code!");
-                Console.WriteLine($"Root node type: {editor.Root.NodeType}");
-                Console.WriteLine($"Child count: {editor.Root.Children.Count}");
+                Console.WriteLine($"Root node type: {editor.Root?.NodeType ?? "null"}");
+                Console.WriteLine($"Child count: {editor.Root?.Children.Count ?? 0}");
 
                 // Demonstrate that we can still edit the parsed graph
                 var comment = new TerminalNode("This was parsed from source", "comment");
-                editor.InsertNode(editor.Root.Id, comment);
-                Console.WriteLine("Added comment node to parsed graph");
+                if (editor.Root != null)
+                {
+                    editor.InsertNode(editor.Root.Id, comment);
+                    Console.WriteLine("Added comment node to parsed graph");
 
-                // Unparse back to code
-                using var unparser = new GraphUnparser();
-                var generatedCode = await unparser.UnparseAsync(editor.Root);
-                Console.WriteLine($"Generated code: {generatedCode.Trim()}");
+                    // Unparse back to code
+                    using var unparser = new GraphUnparser();
+                    var generatedCode = await unparser.UnparseAsync(editor.Root);
+                    Console.WriteLine($"Generated code: {generatedCode.Trim()}");
+                }
             }
             catch (Exception ex)
             {

@@ -337,7 +337,18 @@ public class GrammarGenerator
 /// </summary>
 public class GrammarGenerationProgress
 {
+    /// <summary>
+    /// Gets or sets the current stage of grammar generation.
+    /// </summary>
     public string Stage { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the progress percentage (0-100) of the current stage.
+    /// </summary>
     public int Progress { get; set; }
+
+    /// <summary>
+    /// Gets or sets additional details about the current stage.
+    /// </summary>
     public string? Details { get; set; }
 }

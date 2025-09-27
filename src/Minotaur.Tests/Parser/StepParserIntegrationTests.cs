@@ -225,14 +225,14 @@ public class StepParserIntegrationTests
         try
         {
             using var initialEditor = await integration.ParseToEditableGraphAsync(initialSource);
-            initialEditor.Root.Metadata["userAdded"] = "test";
+            initialEditor.Root!.Metadata["userAdded"] = "test";
 
             // Act
             using var updatedEditor = await integration.UpdateGraphAsync(initialEditor, newSource);
 
             // Assert
-            Assert.IsTrue(updatedEditor.Root.Metadata.ContainsKey("userAdded"));
-            Assert.AreEqual("test", updatedEditor.Root.Metadata["userAdded"]);
+            Assert.IsTrue(updatedEditor.Root!.Metadata.ContainsKey("userAdded"));
+            Assert.AreEqual("test", updatedEditor.Root!.Metadata["userAdded"]);
         }
         catch (Exception)
         {

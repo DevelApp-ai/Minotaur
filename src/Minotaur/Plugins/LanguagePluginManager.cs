@@ -29,6 +29,9 @@ public class LanguagePluginManager : IDisposable
     private readonly Dictionary<string, string> _extensionToLanguage;
     private bool _disposed;
 
+    /// <summary>
+    /// Initializes a new instance of the LanguagePluginManager class and loads built-in language plugins.
+    /// </summary>
     public LanguagePluginManager()
     {
         _loadedPlugins = new Dictionary<string, ILanguagePlugin>(StringComparer.OrdinalIgnoreCase);
@@ -156,8 +159,12 @@ public class LanguagePluginManager : IDisposable
         RegisterPlugin(new CSharpLanguagePlugin());
         RegisterPlugin(new JavaScriptLanguagePlugin());
         RegisterPlugin(new PythonLanguagePlugin());
+        RegisterPlugin(new LLVMLanguagePlugin());
     }
 
+    /// <summary>
+    /// Releases all resources used by the LanguagePluginManager and disposes of loaded plugins.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)

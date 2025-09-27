@@ -430,9 +430,28 @@ public class GrammarValidator
 /// </summary>
 public class GrammarValidationResult
 {
+    /// <summary>
+    /// Gets or sets the grammar that was validated.
+    /// </summary>
     public Grammar Grammar { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the grammar is valid.
+    /// </summary>
     public bool IsValid { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of validation errors found in the grammar.
+    /// </summary>
     public List<string> Errors { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the list of validation warnings for the grammar.
+    /// </summary>
     public List<string> Warnings { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the quality report containing metrics and analysis of the grammar.
+    /// </summary>
     public QualityReport QualityReport { get; set; } = new();
 }

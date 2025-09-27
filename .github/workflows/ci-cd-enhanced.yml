@@ -9,7 +9,7 @@ on:
     types: [ published ]
 
 permissions:
-  contents: read
+  contents: write
   packages: write
   actions: read
   checks: write
@@ -275,12 +275,12 @@ jobs:
         path: ./packages
 
     - name: Create Pre-release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ needs.calculate-version.outputs.full-version }}
-        release_name: Minotaur v${{ needs.calculate-version.outputs.full-version }}
+        name: Minotaur v${{ needs.calculate-version.outputs.full-version }}
         body: |
           ## Minotaur Pre-release v${{ needs.calculate-version.outputs.full-version }}
           
@@ -300,6 +300,7 @@ jobs:
           **Note**: This is a pre-release version intended for testing.
         draft: false
         prerelease: true
+        files: ./packages/*.nupkg
 
   release:
     runs-on: ubuntu-latest
