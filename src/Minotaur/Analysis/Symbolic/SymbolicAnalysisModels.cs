@@ -208,14 +208,49 @@ public class SymbolicConstraint
 /// </summary>
 public enum ConstraintType
 {
+    /// <summary>
+    /// Variable assignment constraint
+    /// </summary>
     VariableAssignment,
+    
+    /// <summary>
+    /// Conditional branch constraint
+    /// </summary>
     ConditionalBranch,
+    
+    /// <summary>
+    /// Array access constraint
+    /// </summary>
     ArrayAccess,
+    
+    /// <summary>
+    /// Null check constraint
+    /// </summary>
     NullCheck,
+    
+    /// <summary>
+    /// Data flow constraint
+    /// </summary>
     DataFlow,
+    
+    /// <summary>
+    /// Structural pattern constraint
+    /// </summary>
     StructuralPattern,
+    
+    /// <summary>
+    /// Function call constraint
+    /// </summary>
     FunctionCall,
+    
+    /// <summary>
+    /// Loop bound constraint
+    /// </summary>
     LoopBound,
+    
+    /// <summary>
+    /// Type constraint
+    /// </summary>
     TypeConstraint
 }
 
@@ -224,11 +259,32 @@ public enum ConstraintType
 /// </summary>
 public class TestCase
 {
+    /// <summary>
+    /// Gets the name of the test case
+    /// </summary>
     public string Name { get; }
+    
+    /// <summary>
+    /// Gets the input values for the test case
+    /// </summary>
     public Dictionary<string, object> Inputs { get; }
+    
+    /// <summary>
+    /// Gets the expected behavior description
+    /// </summary>
     public string ExpectedBehavior { get; }
+    
+    /// <summary>
+    /// Gets or sets the generated code for the test case
+    /// </summary>
     public string? GeneratedCode { get; set; }
 
+    /// <summary>
+    /// Initializes a new instance of the TestCase class
+    /// </summary>
+    /// <param name="name">The name of the test case</param>
+    /// <param name="inputs">The input values for the test case</param>
+    /// <param name="expectedBehavior">The expected behavior description</param>
     public TestCase(string name, Dictionary<string, object> inputs, string expectedBehavior)
     {
         Name = name;
@@ -242,12 +298,39 @@ public class TestCase
 /// </summary>
 public class ErrorPattern
 {
+    /// <summary>
+    /// Gets the name of the error pattern
+    /// </summary>
     public string Name { get; }
+    
+    /// <summary>
+    /// Gets the type of symbolic error this pattern detects
+    /// </summary>
     public SymbolicErrorType ErrorType { get; }
+    
+    /// <summary>
+    /// Gets the regular expression pattern used for detection
+    /// </summary>
     public string Pattern { get; }
+    
+    /// <summary>
+    /// Gets the default confidence level for this pattern
+    /// </summary>
     public double DefaultConfidence { get; }
+    
+    /// <summary>
+    /// Gets the suggested fix for this error pattern
+    /// </summary>
     public string? FixSuggestion { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the ErrorPattern class
+    /// </summary>
+    /// <param name="name">The name of the error pattern</param>
+    /// <param name="errorType">The type of symbolic error</param>
+    /// <param name="pattern">The regular expression pattern</param>
+    /// <param name="defaultConfidence">The default confidence level</param>
+    /// <param name="fixSuggestion">The suggested fix</param>
     public ErrorPattern(
         string name,
         SymbolicErrorType errorType,
@@ -268,6 +351,11 @@ public class ErrorPattern
 /// </summary>
 public class ConstraintSolver
 {
+    /// <summary>
+    /// Solves symbolic constraints to generate test cases and error conditions
+    /// </summary>
+    /// <param name="constraints">The list of constraints to solve</param>
+    /// <returns>A list of constraint solutions with assignments and probabilities</returns>
     public List<ConstraintSolution> SolveConstraints(List<SymbolicConstraint> constraints)
     {
         var solutions = new List<ConstraintSolution>();
@@ -346,7 +434,7 @@ public class ConstraintSolver
         {
             solutions.Add(new ConstraintSolution(
                 constraint,
-                new Dictionary<string, object> { ["value"] = (object?)null },
+                new Dictionary<string, object> { ["value"] = null! },
                 0.8
             ));
         }

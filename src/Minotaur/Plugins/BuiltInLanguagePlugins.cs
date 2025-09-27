@@ -163,21 +163,42 @@ public class CSharpLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     // ISymbolicAnalysisPlugin implementation
     private readonly CSharpSymbolicAnalysisPlugin _symbolicAnalysis = new();
 
+    /// <summary>
+    /// Analyzes C# source code for symbolic errors using language-specific patterns
+    /// </summary>
+    /// <param name="sourceCode">The C# source code to analyze</param>
+    /// <param name="constraints">Symbolic constraints extracted from the code</param>
+    /// <returns>List of detected symbolic errors</returns>
     public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
     {
         return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
     }
 
+    /// <summary>
+    /// Gets C#-specific error patterns that can be detected by symbolic analysis
+    /// </summary>
+    /// <returns>List of error patterns for C#</returns>
     public List<ErrorPattern> GetErrorPatterns()
     {
         return _symbolicAnalysis.GetErrorPatterns();
     }
 
+    /// <summary>
+    /// Gets the confidence level for detecting a specific error type in C#
+    /// </summary>
+    /// <param name="errorType">The type of error to check confidence for</param>
+    /// <returns>Confidence level between 0.0 and 1.0</returns>
     public double GetErrorConfidence(SymbolicErrorType errorType)
     {
         return _symbolicAnalysis.GetErrorConfidence(errorType);
     }
 
+    /// <summary>
+    /// Generates test cases that could trigger the specified error in C# code
+    /// </summary>
+    /// <param name="error">The symbolic error to generate test cases for</param>
+    /// <param name="sourceCode">The original C# source code</param>
+    /// <returns>List of test cases that could trigger the error</returns>
     public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
     {
         return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
@@ -287,21 +308,33 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     // ISymbolicAnalysisPlugin implementation
     private readonly JavaScriptSymbolicAnalysisPlugin _symbolicAnalysis = new();
 
+    /// <summary>
+    /// Analyzes JavaScript source code for symbolic errors using language-specific patterns
+    /// </summary>
     public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
     {
         return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
     }
 
+    /// <summary>
+    /// Gets JavaScript-specific error patterns that can be detected by symbolic analysis
+    /// </summary>
     public List<ErrorPattern> GetErrorPatterns()
     {
         return _symbolicAnalysis.GetErrorPatterns();
     }
 
+    /// <summary>
+    /// Gets the confidence level for detecting a specific error type in JavaScript
+    /// </summary>
     public double GetErrorConfidence(SymbolicErrorType errorType)
     {
         return _symbolicAnalysis.GetErrorConfidence(errorType);
     }
 
+    /// <summary>
+    /// Generates test cases that could trigger the specified error in JavaScript code
+    /// </summary>
     public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
     {
         return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
@@ -411,21 +444,33 @@ public class PythonLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     // ISymbolicAnalysisPlugin implementation
     private readonly PythonSymbolicAnalysisPlugin _symbolicAnalysis = new();
 
+    /// <summary>
+    /// Analyzes Python source code for symbolic errors using language-specific patterns
+    /// </summary>
     public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
     {
         return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
     }
 
+    /// <summary>
+    /// Gets Python-specific error patterns that can be detected by symbolic analysis
+    /// </summary>
     public List<ErrorPattern> GetErrorPatterns()
     {
         return _symbolicAnalysis.GetErrorPatterns();
     }
 
+    /// <summary>
+    /// Gets the confidence level for detecting a specific error type in Python
+    /// </summary>
     public double GetErrorConfidence(SymbolicErrorType errorType)
     {
         return _symbolicAnalysis.GetErrorConfidence(errorType);
     }
 
+    /// <summary>
+    /// Generates test cases that could trigger the specified error in Python code
+    /// </summary>
     public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
     {
         return _symbolicAnalysis.GenerateTestCases(error, sourceCode);

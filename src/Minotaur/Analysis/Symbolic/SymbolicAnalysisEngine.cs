@@ -406,7 +406,7 @@ public class SymbolicAnalysisEngine
                 break;
 
             case SymbolicErrorType.NullPointerAccess:
-                input["nullable_value"] = (object?)null;
+                input["nullable_value"] = null!;
                 break;
 
             case SymbolicErrorType.DivisionByZero:

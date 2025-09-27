@@ -86,7 +86,7 @@ public class CSharpSymbolicAnalysisPlugin : ISymbolicAnalysisPlugin
             case SymbolicErrorType.NullPointerAccess:
                 testCases.Add(new TestCase(
                     "null_reference_test",
-                    new Dictionary<string, object> { ["object"] = (object?)null },
+                    new Dictionary<string, object> { ["object"] = null! },
                     "NullReferenceException should be thrown"
                 ));
                 break;
@@ -296,7 +296,7 @@ public class PythonSymbolicAnalysisPlugin : ISymbolicAnalysisPlugin
             case SymbolicErrorType.NullPointerAccess:
                 testCases.Add(new TestCase(
                     "none_access_test",
-                    new Dictionary<string, object> { ["value"] = (object?)null },
+                    new Dictionary<string, object> { ["value"] = null! },
                     "AttributeError should be raised"
                 ));
                 break;
@@ -509,7 +509,7 @@ public class JavaScriptSymbolicAnalysisPlugin : ISymbolicAnalysisPlugin
             case SymbolicErrorType.NullPointerAccess:
                 testCases.Add(new TestCase(
                     "null_access_test",
-                    new Dictionary<string, object> { ["object"] = (object?)null },
+                    new Dictionary<string, object> { ["object"] = null! },
                     "TypeError should be thrown"
                 ));
                 break;
