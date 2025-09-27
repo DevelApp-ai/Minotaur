@@ -85,7 +85,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         }
 
         // Add generated IR
-        result.Append(_llvmIR.ToString());
+        result.Append(_llvmIR, 0, _llvmIR.Length);
 
         // Add function attributes
         result.AppendLine();
