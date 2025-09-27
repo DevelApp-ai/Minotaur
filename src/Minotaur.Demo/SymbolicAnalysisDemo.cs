@@ -133,7 +133,7 @@ public void ProcessFile(string filename)
             {
                 Console.WriteLine($"  - {error.Type} at {error.Location}: {error.Message}");
                 Console.WriteLine($"    Confidence: {error.Confidence:P1}, Severity: {error.Severity}");
-                
+
                 if (error.TestCases.Any())
                 {
                     Console.WriteLine($"    Test cases generated: {error.TestCases.Count}");
@@ -188,9 +188,9 @@ public void ProcessFile(string filename)
     public static void DemonstrateGrammarIntegration()
     {
         Console.WriteLine("\n=== Grammar-Integrated Symbolic Analysis ===");
-        
+
         var engine = new SymbolicAnalysisEngine();
-        
+
         // Example of how symbolic analysis could enhance grammar error detection
         var codeWithGrammarIssues = @"
 // Missing semicolon
@@ -207,7 +207,7 @@ if (x > 0 {
         Console.WriteLine(codeWithGrammarIssues);
 
         var result = engine.AnalyzeCode(codeWithGrammarIssues, "javascript");
-        
+
         Console.WriteLine("\nSymbolic analysis results:");
         PrintAnalysisResult(result);
 

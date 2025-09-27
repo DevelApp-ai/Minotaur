@@ -39,7 +39,7 @@ public class PluginBasedSymbolicAnalysisDemo
         {
             var hasSymbolicAnalysis = plugin.Value is ISymbolicAnalysisPlugin;
             Console.WriteLine($"  - {plugin.Value.DisplayName} ({plugin.Key}): {(hasSymbolicAnalysis ? "✅ Symbolic Analysis" : "❌ No Symbolic Analysis")}");
-            
+
             if (hasSymbolicAnalysis)
             {
                 var symbolicPlugin = (ISymbolicAnalysisPlugin)plugin.Value;
@@ -152,7 +152,7 @@ function processData(obj) {
         Console.WriteLine("✅ **Maintainable**: Each language plugin can be versioned independently");
         Console.WriteLine("✅ **Testable**: Plugins can be tested in isolation");
         Console.WriteLine("✅ **Consistent API**: Same interface for all language-specific operations");
-        
+
         Console.WriteLine("\nPlugin System Architecture:");
         Console.WriteLine("┌─────────────────────────────────────────────────┐");
         Console.WriteLine("│            SymbolicAnalysisEngine              │");

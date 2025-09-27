@@ -150,7 +150,7 @@ else:
         var pluginManager = new LanguagePluginManager();
         var customPlugin = new TestLanguagePlugin();
         pluginManager.RegisterPlugin(customPlugin);
-        
+
         var engine = new SymbolicAnalysisEngine(null, pluginManager);
 
         var sourceCode = "test code";

@@ -58,7 +58,7 @@ public class SymbolicAnalysisResult
     /// <summary>
     /// Gets the coverage percentage (simplified metric)
     /// </summary>
-    public double CoveragePercentage => ExecutionPaths.Count > 0 ? 
+    public double CoveragePercentage => ExecutionPaths.Count > 0 ?
         ExecutionPaths.Sum(p => p.Probability) / ExecutionPaths.Count : 0.0;
 }
 

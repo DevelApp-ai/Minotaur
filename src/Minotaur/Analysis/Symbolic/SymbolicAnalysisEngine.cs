@@ -146,7 +146,7 @@ public class SymbolicAnalysisEngine
         for (int i = 0; i < lines.Length; i++)
         {
             var line = lines[i];
-            
+
             // Look for variable assignments
             if (System.Text.RegularExpressions.Regex.IsMatch(line, @"^\s*\w+\s*="))
             {
@@ -192,7 +192,7 @@ public class SymbolicAnalysisEngine
         for (int i = 0; i < lines.Length; i++)
         {
             var line = lines[i].Trim();
-            
+
             if (line.StartsWith("if ") || line.StartsWith("elif ") || line.StartsWith("while "))
             {
                 constraints.Add(new SymbolicConstraint(
@@ -210,7 +210,7 @@ public class SymbolicAnalysisEngine
     private List<SymbolicConstraint> ExtractDataFlowConstraints(string sourceCode)
     {
         var constraints = new List<SymbolicConstraint>();
-        
+
         // Simple data flow analysis based on variable usage patterns
         var variables = new HashSet<string>();
         var lines = sourceCode.Split('\n');
@@ -241,10 +241,10 @@ public class SymbolicAnalysisEngine
     private List<SymbolicConstraint> ExtractAstConstraints(CognitiveGraphNode ast)
     {
         var constraints = new List<SymbolicConstraint>();
-        
+
         // Walk the AST and extract structural constraints
         WalkAstForConstraints(ast, constraints);
-        
+
         return constraints;
     }
 
@@ -268,10 +268,10 @@ public class SymbolicAnalysisEngine
     private List<ExecutionPath> AnalyzeExecutionPaths(List<SymbolicConstraint> constraints, CognitiveGraphNode? ast)
     {
         var paths = new List<ExecutionPath>();
-        
+
         // Simple path analysis based on conditional constraints
         var branches = constraints.Where(c => c.Type == ConstraintType.ConditionalBranch).ToList();
-        
+
         if (branches.Count == 0)
         {
             // Single execution path
@@ -283,8 +283,8 @@ public class SymbolicAnalysisEngine
             foreach (var branch in branches)
             {
                 paths.Add(new ExecutionPath(
-                    $"branch_{branch.Location.Line}", 
-                    constraints, 
+                    $"branch_{branch.Location.Line}",
+                    constraints,
                     0.5)); // Simplified probability
             }
         }
@@ -295,7 +295,7 @@ public class SymbolicAnalysisEngine
     private List<SymbolicError> PerformLanguageSpecificAnalysis(string sourceCode, string language, List<SymbolicConstraint> constraints)
     {
         var plugin = _pluginManager.GetPlugin(language.ToLowerInvariant());
-        
+
         if (plugin is ISymbolicAnalysisPlugin symbolicPlugin)
         {
             return symbolicPlugin.AnalyzeSymbolic(sourceCode, constraints);
@@ -310,22 +310,22 @@ public class SymbolicAnalysisEngine
 
         // Detect potential null pointer access
         errors.AddRange(DetectNullPointerErrors(constraints));
-        
+
         // Detect potential array bounds errors
         errors.AddRange(DetectArrayBoundsErrors(constraints));
-        
+
         // Detect potential division by zero
         errors.AddRange(DetectDivisionByZeroErrors(constraints));
-        
+
         return errors;
     }
 
     private List<SymbolicError> DetectNullPointerErrors(List<SymbolicConstraint> constraints)
     {
         var errors = new List<SymbolicError>();
-        
+
         var nullConstraints = constraints.Where(c => c.Type == ConstraintType.NullCheck).ToList();
-        
+
         foreach (var constraint in nullConstraints)
         {
             errors.Add(new SymbolicError(
@@ -335,16 +335,16 @@ public class SymbolicAnalysisEngine
                 0.7
             ));
         }
-        
+
         return errors;
     }
 
     private List<SymbolicError> DetectArrayBoundsErrors(List<SymbolicConstraint> constraints)
     {
         var errors = new List<SymbolicError>();
-        
+
         var arrayConstraints = constraints.Where(c => c.Type == ConstraintType.ArrayAccess).ToList();
-        
+
         foreach (var constraint in arrayConstraints)
         {
             errors.Add(new SymbolicError(
@@ -354,18 +354,18 @@ public class SymbolicAnalysisEngine
                 0.6
             ));
         }
-        
+
         return errors;
     }
 
     private List<SymbolicError> DetectDivisionByZeroErrors(List<SymbolicConstraint> constraints)
     {
         var errors = new List<SymbolicError>();
-        
+
         // Look for division operations in constraints
-        var divisionConstraints = constraints.Where(c => 
+        var divisionConstraints = constraints.Where(c =>
             c.Expression.Contains("/") || c.Expression.Contains("div")).ToList();
-        
+
         foreach (var constraint in divisionConstraints)
         {
             errors.Add(new SymbolicError(
@@ -375,28 +375,28 @@ public class SymbolicAnalysisEngine
                 0.5
             ));
         }
-        
+
         return errors;
     }
 
     private List<TestCase> GenerateTestCases(SymbolicError error, List<SymbolicConstraint> constraints)
     {
         var testCases = new List<TestCase>();
-        
+
         // Generate a basic test case that might trigger the error
         testCases.Add(new TestCase(
             $"test_{error.Type}_{error.Location.Line}",
             GenerateTestInput(error, constraints),
             error.Message
         ));
-        
+
         return testCases;
     }
 
     private Dictionary<string, object> GenerateTestInput(SymbolicError error, List<SymbolicConstraint> constraints)
     {
         var input = new Dictionary<string, object>();
-        
+
         // Generate inputs based on error type
         switch (error.Type)
         {
@@ -404,16 +404,16 @@ public class SymbolicAnalysisEngine
                 input["array_size"] = 5;
                 input["access_index"] = 10; // Out of bounds
                 break;
-                
+
             case SymbolicErrorType.NullPointerAccess:
                 input["nullable_value"] = (object?)null;
                 break;
-                
+
             case SymbolicErrorType.DivisionByZero:
                 input["divisor"] = 0;
                 break;
         }
-        
+
         return input;
     }
 }
