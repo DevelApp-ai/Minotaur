@@ -122,7 +122,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         {
             // Generate basic token matching IR
             AppendIndentedIR($"; Terminal: {node.Text}");
-            
+
             // Only generate inline IR if we're inside a function body
             if (_inFunctionBody)
             {
@@ -135,7 +135,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     private void GenerateNonTerminalIR(NonTerminalNode node)
     {
         var ruleName = SanitizeIdentifier(node.RuleName);
-        
+
         switch (node.RuleName.ToLowerInvariant())
         {
             case "program":
@@ -168,7 +168,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         var text = GetNodeText(node);
         var identifier = SanitizeIdentifier(text);
         AppendIndentedIR($"; Identifier: {identifier}");
-        
+
         var identifierVar = GetNextSSAName("identifier");
         AppendIndentedIR($"{identifierVar} = call %ast_node* @create_identifier_node(i8* getelementptr inbounds ([{text.Length + 1} x i8], [{text.Length + 1} x i8]* @.str.{GetStringLiteralId(text)}, i64 0, i64 0))");
     }
@@ -177,9 +177,9 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     {
         var text = GetNodeText(node);
         AppendIndentedIR($"; Literal: {text}");
-        
+
         var literalVar = GetNextSSAName("literal");
-        
+
         // Try to determine literal type from the text
         if (IsStringLiteral(text))
         {
@@ -208,33 +208,33 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         AppendIR($"\n; Main parser function for {ruleName}");
         AppendIR($"define %ast_node* @{_currentFunction}(%parser_state* %state) {{");
         IncreaseIndent();
-        
+
         AppendIndentedIR("entry:");
         IncreaseIndent();
-        
+
         AppendIndentedIR("; Initialize parser state");
         AppendIndentedIR("%parser_initialized = call i32 @initialize_parser_state(%parser_state* %state)");
         AppendIndentedIR("%init_check = icmp eq i32 %parser_initialized, 1");
         AppendIndentedIR("br i1 %init_check, label %parse_start, label %error_exit");
-        
+
         DecreaseIndent();
         AppendIndentedIR("\nparse_start:");
         IncreaseIndent();
-        
+
         AppendIndentedIR("; Begin main parsing logic");
         var resultVar = GetNextSSAName("parse_result");
         AppendIndentedIR($"{resultVar} = call %ast_node* @parse_grammar_start(%parser_state* %state)");
         AppendIndentedIR($"ret %ast_node* {resultVar}");
-        
+
         DecreaseIndent();
         AppendIndentedIR("\nerror_exit:");
         IncreaseIndent();
         AppendIndentedIR("ret %ast_node* null");
-        
+
         DecreaseIndent();
         DecreaseIndent();
         AppendIR("}");
-        
+
         _inFunctionBody = false;
     }
 
@@ -242,35 +242,35 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     {
         var functionName = $"parse_{ruleName}";
         _inFunctionBody = true;
-        
+
         AppendIR($"\n; Parser function for {ruleName} rule");
         AppendIR($"define %ast_node* @{functionName}(%parser_state* %state) {{");
         IncreaseIndent();
-        
+
         AppendIndentedIR("entry:");
         IncreaseIndent();
-        
+
         // Generate state machine logic for rule parsing
         AppendIndentedIR($"; Parse {ruleName} using state machine");
         AppendIndentedIR("%current_token = call %token* @get_current_token(%parser_state* %state)");
-        AppendIndentedIR("%token_type = getelementptr inbounds %token, %token* %current_token, i32 0, i32 0");  
+        AppendIndentedIR("%token_type = getelementptr inbounds %token, %token* %current_token, i32 0, i32 0");
         AppendIndentedIR("%type_value = load i32, i32* %token_type, align 4");
-        
+
         // Generate switch statement for different token types
         AppendIndentedIR("switch i32 %type_value, label %parse_error [");
         IncreaseIndent();
-        
+
         // Add cases for different parsing alternatives
         AppendIndentedIR("i32 1, label %parse_alternative_1");
         AppendIndentedIR("i32 2, label %parse_alternative_2");
         AppendIndentedIR("i32 3, label %parse_alternative_3");
-        
+
         DecreaseIndent();
         AppendIndentedIR("]");
-        
+
         // Generate alternative parsing blocks
         GenerateParsingAlternatives(ruleName);
-        
+
         DecreaseIndent();
         DecreaseIndent();
         AppendIR("}");
@@ -286,7 +286,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         var result1 = GetNextSSAName("alt1_result");
         AppendIndentedIR($"{result1} = call %ast_node* @parse_alternative_1_%{ruleName}(%parser_state* %state)");
         AppendIndentedIR("br label %parse_success");
-        
+
         // Alternative 2
         DecreaseIndent();
         AppendIndentedIR("\nparse_alternative_2:");
@@ -295,7 +295,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         var result2 = GetNextSSAName("alt2_result");
         AppendIndentedIR($"{result2} = call %ast_node* @parse_alternative_2_%{ruleName}(%parser_state* %state)");
         AppendIndentedIR("br label %parse_success");
-        
+
         // Alternative 3
         DecreaseIndent();
         AppendIndentedIR("\nparse_alternative_3:");
@@ -304,7 +304,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         var result3 = GetNextSSAName("alt3_result");
         AppendIndentedIR($"{result3} = call %ast_node* @parse_alternative_3_%{ruleName}(%parser_state* %state)");
         AppendIndentedIR("br label %parse_success");
-        
+
         // Success block with PHI node
         DecreaseIndent();
         AppendIndentedIR("\nparse_success:");
@@ -312,7 +312,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         var phiResult = GetNextSSAName("parse_result");
         AppendIndentedIR($"{phiResult} = phi %ast_node* [ {result1}, %parse_alternative_1 ], [ {result2}, %parse_alternative_2 ], [ {result3}, %parse_alternative_3 ]");
         AppendIndentedIR($"ret %ast_node* {phiResult}");
-        
+
         // Error block
         DecreaseIndent();
         AppendIndentedIR("\nparse_error:");
@@ -326,23 +326,23 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     {
         var functionName = $"parse_{ruleName}";
         _inFunctionBody = true;
-        
+
         AppendIR($"\n; Generic parser function for {ruleName}");
         AppendIR($"define %ast_node* @{functionName}(%parser_state* %state) {{");
         IncreaseIndent();
-        
+
         AppendIndentedIR("entry:");
         IncreaseIndent();
-        
+
         AppendIndentedIR($"; Generic parsing logic for {ruleName}");
         var genericResult = GetNextSSAName("generic_result");
         AppendIndentedIR($"{genericResult} = call %ast_node* @create_nonterminal_node(i8* getelementptr inbounds ([{ruleName.Length + 1} x i8], [{ruleName.Length + 1} x i8]* @.str.{GetStringLiteralId(ruleName)}, i64 0, i64 0))");
         AppendIndentedIR($"ret %ast_node* {genericResult}");
-        
+
         DecreaseIndent();
         DecreaseIndent();
         AppendIR("}");
-        
+
         _inFunctionBody = false;
     }
 
@@ -357,24 +357,24 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     private void GenerateLexerFunctionIR(string tokenName)
     {
         var functionName = $"lex_{SanitizeIdentifier(tokenName)}";
-        
+
         AppendIR($"\n; Lexer function for {tokenName} token");
         AppendIR($"define i32 @{functionName}(%parser_state* %state) {{");
         IncreaseIndent();
-        
+
         AppendIndentedIR("entry:");
         IncreaseIndent();
-        
+
         AppendIndentedIR($"; Tokenize {tokenName}");
         AppendIndentedIR("%input_ptr = getelementptr inbounds %parser_state, %parser_state* %state, i32 0, i32 1");
         AppendIndentedIR("%input = load i8*, i8** %input_ptr");
         AppendIndentedIR("%position_ptr = getelementptr inbounds %parser_state, %parser_state* %state, i32 0, i32 2");
         AppendIndentedIR("%position = load i32, i32* %position_ptr");
-        
+
         var tokenResult = GetNextSSAName("token_result");
         AppendIndentedIR($"{tokenResult} = call i32 @match_{SanitizeIdentifier(tokenName)}_token(i8* %input, i32 %position)");
         AppendIndentedIR($"ret i32 {tokenResult}");
-        
+
         DecreaseIndent();
         DecreaseIndent();
         AppendIR("}");
@@ -386,7 +386,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
         {
             _ssaCounters[baseName] = 0;
         }
-        
+
         return $"%{baseName}{_ssaCounters[baseName]++}";
     }
 
@@ -446,8 +446,8 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     private bool IsIdentifierRule(string ruleName)
     {
         var lowerRule = ruleName.ToLowerInvariant();
-        return lowerRule.Contains("identifier") || 
-               lowerRule.Contains("name") || 
+        return lowerRule.Contains("identifier") ||
+               lowerRule.Contains("name") ||
                lowerRule.Contains("id") ||
                lowerRule == "var" ||
                lowerRule == "variable";
@@ -456,8 +456,8 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
     private bool IsLiteralRule(string ruleName)
     {
         var lowerRule = ruleName.ToLowerInvariant();
-        return lowerRule.Contains("literal") || 
-               lowerRule.Contains("constant") || 
+        return lowerRule.Contains("literal") ||
+               lowerRule.Contains("constant") ||
                lowerRule.Contains("number") ||
                lowerRule.Contains("string") ||
                lowerRule.Contains("char") ||
@@ -466,7 +466,7 @@ public class LLVMUnparseVisitor : CognitiveGraphVisitorBase
 
     private bool IsStringLiteral(string text)
     {
-        return (text.StartsWith('"') && text.EndsWith('"')) || 
+        return (text.StartsWith('"') && text.EndsWith('"')) ||
                (text.StartsWith('\'') && text.EndsWith('\''));
     }
 }

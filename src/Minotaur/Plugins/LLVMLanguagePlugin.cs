@@ -54,8 +54,8 @@ public class LLVMLanguagePlugin : ILanguagePlugin
             {
                 NodeType = "parser_function",
                 GenerationTemplate = "define %ast_node* @parse_{rule_name}(%parser_state* %state) {\nentry:\n{body}\nret %ast_node* %result\n}",
-                GenerationHints = new Dictionary<string, object> 
-                { 
+                GenerationHints = new Dictionary<string, object>
+                {
                     ["SSAForm"] = true,
                     ["OptimizationLevel"] = "O2",
                     ["TargetTriple"] = "x86_64-unknown-linux-gnu"
@@ -63,40 +63,40 @@ public class LLVMLanguagePlugin : ILanguagePlugin
             },
             new CodeGenerationRule
             {
-                NodeType = "lexer_function", 
+                NodeType = "lexer_function",
                 GenerationTemplate = "define i32 @lex_{token_name}(%lexer_state* %state) {\nentry:\n{body}\nret i32 %token_type\n}",
-                GenerationHints = new Dictionary<string, object> 
-                { 
+                GenerationHints = new Dictionary<string, object>
+                {
                     ["StateTransition"] = true,
-                    ["FastPath"] = true 
+                    ["FastPath"] = true
                 }
             },
             new CodeGenerationRule
             {
                 NodeType = "ast_creation",
                 GenerationTemplate = "define %ast_node* @create_{node_type}({parameters}) {\nentry:\n{allocation}\n{initialization}\nret %ast_node* %node\n}",
-                GenerationHints = new Dictionary<string, object> 
-                { 
+                GenerationHints = new Dictionary<string, object>
+                {
                     ["MemoryManagement"] = "malloc",
-                    ["ZeroCopy"] = true 
+                    ["ZeroCopy"] = true
                 }
             },
             new CodeGenerationRule
             {
                 NodeType = "state_machine",
                 GenerationTemplate = "define i32 @state_machine_%{name}(%parser_context* %ctx) {\nentry:\n%current_state = load i32, i32* getelementptr inbounds (%parser_context, %parser_context* %ctx, i32 0, i32 0)\nswitch i32 %current_state, label %error_state [\n{state_cases}\n]\n{state_blocks}\n}",
-                GenerationHints = new Dictionary<string, object> 
-                { 
+                GenerationHints = new Dictionary<string, object>
+                {
                     ["ControlFlowOptimization"] = true,
-                    ["BranchPrediction"] = true 
+                    ["BranchPrediction"] = true
                 }
             },
             new CodeGenerationRule
             {
                 NodeType = "error_recovery",
                 GenerationTemplate = "define i32 @error_recovery(%parser_state* %state, i32 %error_code) {\nentry:\n{sync_token_check}\n{recovery_strategy}\nret i32 %recovery_result\n}",
-                GenerationHints = new Dictionary<string, object> 
-                { 
+                GenerationHints = new Dictionary<string, object>
+                {
                     ["ErrorStrategy"] = "PanicMode",
                     ["SynchronizationTokens"] = new[] { "semicolon", "rbrace", "eof" }
                 }
@@ -141,7 +141,7 @@ public class LLVMLanguagePlugin : ILanguagePlugin
             },
             new TemplateRule
             {
-                TemplateName = "optimization_attributes", 
+                TemplateName = "optimization_attributes",
                 TemplateContent = "; Function attributes for optimization\nattributes #0 = { nounwind uwtable \"frame-pointer\"=\"non-leaf\" \"min-legal-vector-width\"=\"0\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\nattributes #1 = { \"frame-pointer\"=\"non-leaf\" \"no-trapping-math\"=\"true\" \"stack-protector-buffer-size\"=\"8\" \"target-cpu\"=\"x86-64\" \"target-features\"=\"+cx8,+fxsr,+mmx,+sse,+sse2,+x87\" \"tune-cpu\"=\"generic\" }\n",
                 RequiredParameters = new List<string>(),
                 TemplateMetadata = new Dictionary<string, object>
@@ -158,11 +158,11 @@ public class LLVMLanguagePlugin : ILanguagePlugin
             ["CompilerType"] = "LLVM",
             ["IRVersion"] = "15.0",
             ["TargetArchitectures"] = new[] { "x86_64", "aarch64", "arm", "riscv64", "wasm32" },
-            ["OptimizationPasses"] = new[] 
-            { 
-                "mem2reg", "instcombine", "reassociate", "gvn", "simplifycfg", 
+            ["OptimizationPasses"] = new[]
+            {
+                "mem2reg", "instcombine", "reassociate", "gvn", "simplifycfg",
                 "tailcallelim", "inline", "argpromotion", "scalarrepl", "earlyCSE",
-                "correlated-propagation", "loop-unroll" 
+                "correlated-propagation", "loop-unroll"
             },
             ["CrossCompilation"] = true,
             ["NativeCodeGeneration"] = true,

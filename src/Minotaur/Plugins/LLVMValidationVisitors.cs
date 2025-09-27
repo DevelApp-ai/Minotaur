@@ -308,8 +308,8 @@ public class LLVMIRValidationVisitor : CognitiveGraphVisitorBase
         if (node is NonTerminalNode nonTerminal)
         {
             var ruleName = nonTerminal.RuleName.ToLowerInvariant();
-            return ruleName.Contains("identifier") || 
-                   ruleName.Contains("name") || 
+            return ruleName.Contains("identifier") ||
+                   ruleName.Contains("name") ||
                    ruleName.Contains("id") ||
                    ruleName == "var" ||
                    ruleName == "variable";
@@ -322,8 +322,8 @@ public class LLVMIRValidationVisitor : CognitiveGraphVisitorBase
         if (node is NonTerminalNode nonTerminal)
         {
             var ruleName = nonTerminal.RuleName.ToLowerInvariant();
-            return ruleName.Contains("literal") || 
-                   ruleName.Contains("constant") || 
+            return ruleName.Contains("literal") ||
+                   ruleName.Contains("constant") ||
                    ruleName.Contains("number") ||
                    ruleName.Contains("string") ||
                    ruleName.Contains("char") ||
@@ -355,11 +355,11 @@ public class EntryPointDetectionVisitor : CognitiveGraphVisitorBase
         if (node is NonTerminalNode nonTerminal)
         {
             var ruleName = nonTerminal.RuleName.ToLowerInvariant();
-            
+
             // Common entry point rule names
-            if (ruleName == "program" || 
-                ruleName == "compilation_unit" || 
-                ruleName == "start" || 
+            if (ruleName == "program" ||
+                ruleName == "compilation_unit" ||
+                ruleName == "start" ||
                 ruleName == "root" ||
                 ruleName == "document" ||
                 ruleName == "module")
@@ -382,7 +382,7 @@ public class ErrorHandlingDetectionVisitor : CognitiveGraphVisitorBase
         if (node is NonTerminalNode nonTerminal)
         {
             var ruleName = nonTerminal.RuleName.ToLowerInvariant();
-            
+
             // Look for error handling rule patterns
             if (ruleName.Contains("error") ||
                 ruleName.Contains("exception") ||
@@ -396,7 +396,7 @@ public class ErrorHandlingDetectionVisitor : CognitiveGraphVisitorBase
         else if (node is TerminalNode terminal)
         {
             var text = terminal.Text.ToLowerInvariant();
-            
+
             // Look for error handling keywords
             if (text.Contains("try") ||
                 text.Contains("catch") ||
