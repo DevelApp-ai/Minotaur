@@ -117,6 +117,9 @@ public class GraphUnparser : IDisposable
         RegisterStrategy("terminal", new TerminalUnparseStrategy());
     }
 
+    /// <summary>
+    /// Releases all resources used by the GraphUnparser and disposes of registered strategies.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)

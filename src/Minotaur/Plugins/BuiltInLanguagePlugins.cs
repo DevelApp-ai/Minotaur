@@ -56,6 +56,11 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
+    /// <summary>
+    /// Generates compiler-compiler backend rules for C# code generation.
+    /// These rules define how to generate C# code for different parser components.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the compiler backend rules for C#.</returns>
     public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
     {
         var rules = new CompilerBackendRules
@@ -107,6 +112,10 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to C# code generation.
+    /// </summary>
+    /// <returns>The formatting options for C# code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -125,6 +134,11 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid C# code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
@@ -151,10 +165,26 @@ public class CSharpLanguagePlugin : ILanguagePlugin
 /// </summary>
 public class JavaScriptLanguagePlugin : ILanguagePlugin
 {
+    /// <summary>
+    /// Gets the unique identifier for the JavaScript language.
+    /// </summary>
     public string LanguageId => "javascript";
+
+    /// <summary>
+    /// Gets the display name for the JavaScript language.
+    /// </summary>
     public string DisplayName => "JavaScript";
+
+    /// <summary>
+    /// Gets the file extensions supported by JavaScript.
+    /// </summary>
     public string[] SupportedExtensions => new[] { ".js", ".mjs", ".jsx" };
 
+    /// <summary>
+    /// Converts a cognitive graph representation back to JavaScript source code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to unparse into JavaScript code.</param>
+    /// <returns>A task that represents the asynchronous unparsing operation. The task result contains the generated JavaScript code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         var visitor = new JavaScriptUnparseVisitor();
@@ -164,6 +194,11 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
+    /// <summary>
+    /// Generates compiler-compiler backend rules for JavaScript code generation.
+    /// These rules define how to generate JavaScript code for different parser components.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the compiler backend rules for JavaScript.</returns>
     public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
     {
         var rules = new CompilerBackendRules
@@ -192,6 +227,10 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to JavaScript code generation.
+    /// </summary>
+    /// <returns>The formatting options for JavaScript code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -209,6 +248,11 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid JavaScript code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
@@ -222,10 +266,26 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
 /// </summary>
 public class PythonLanguagePlugin : ILanguagePlugin
 {
+    /// <summary>
+    /// Gets the unique identifier for the Python language.
+    /// </summary>
     public string LanguageId => "python";
+
+    /// <summary>
+    /// Gets the display name for the Python language.
+    /// </summary>
     public string DisplayName => "Python";
+
+    /// <summary>
+    /// Gets the file extensions supported by Python.
+    /// </summary>
     public string[] SupportedExtensions => new[] { ".py", ".pyw" };
 
+    /// <summary>
+    /// Converts a cognitive graph representation back to Python source code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to unparse into Python code.</param>
+    /// <returns>A task that represents the asynchronous unparsing operation. The task result contains the generated Python code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         var visitor = new PythonUnparseVisitor();
@@ -235,6 +295,11 @@ public class PythonLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
+    /// <summary>
+    /// Generates compiler-compiler backend rules for Python code generation.
+    /// These rules define how to generate Python code for different parser components.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the compiler backend rules for Python.</returns>
     public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
     {
         var rules = new CompilerBackendRules
@@ -263,6 +328,10 @@ public class PythonLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to Python code generation.
+    /// </summary>
+    /// <returns>The formatting options for Python code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -280,6 +349,11 @@ public class PythonLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid Python code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
