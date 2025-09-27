@@ -126,11 +126,11 @@ jobs:
     
     - name: Scan licenses
       run: |
-        dotnet-project-licenses --input src/Minotaur.sln --output-format json --output license-report.json --include-transitive
-        dotnet-project-licenses --input src/Minotaur.sln --output-format table --include-transitive
+        dotnet-project-licenses --input src/Minotaur.sln --include-transitive | tee license-report.txt
+        echo "License scan completed. Output saved to license-report.txt"
     
     - name: Upload license report
       uses: actions/upload-artifact@v4
       with:
         name: license-report
-        path: license-report.json
+        path: license-report.txt
