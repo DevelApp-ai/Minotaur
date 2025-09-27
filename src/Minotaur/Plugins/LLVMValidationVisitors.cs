@@ -206,17 +206,14 @@ public class LLVMIRValidationVisitor : CognitiveGraphVisitorBase
         // Check for potential performance issues in LLVM IR generation
 
         // Warn about very large graphs
-        if (_totalNodes > 1000) // Arbitrary threshold
+        if (_totalNodes > 1000 && _totalNodes % 500 == 0) // Arbitrary threshold, only warn periodically to avoid spam
         {
-            if (_totalNodes % 500 == 0) // Only warn periodically to avoid spam
+            _performanceWarnings.Add(new UnparseValidationWarning
             {
-                _performanceWarnings.Add(new UnparseValidationWarning
-                {
-                    Message = $"Large graph detected ({_totalNodes} nodes) - LLVM compilation may be slow",
-                    NodeId = node.GetHashCode().ToString(),
-                    NodeType = node.GetType().Name
-                });
-            }
+                Message = $"Large graph detected ({_totalNodes} nodes) - LLVM compilation may be slow",
+                NodeId = node.GetHashCode().ToString(),
+                NodeType = node.GetType().Name
+            });
         }
 
         // Warn about high complexity
