@@ -29,6 +29,10 @@ public class CSharpUnparseVisitor : CognitiveGraphVisitorBase
     private readonly StringBuilder _code = new();
     private int _indentLevel = 0;
 
+    /// <summary>
+    /// Gets the generated C# source code.
+    /// </summary>
+    /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
     protected override void BeforeVisitNode(CognitiveGraphNode node)
@@ -122,6 +126,10 @@ public class JavaScriptUnparseVisitor : CognitiveGraphVisitorBase
     private readonly StringBuilder _code = new();
     private int _indentLevel = 0;
 
+    /// <summary>
+    /// Gets the generated JavaScript source code.
+    /// </summary>
+    /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
     protected override void BeforeVisitNode(CognitiveGraphNode node)
@@ -183,6 +191,10 @@ public class PythonUnparseVisitor : CognitiveGraphVisitorBase
     private readonly StringBuilder _code = new();
     private int _indentLevel = 0;
 
+    /// <summary>
+    /// Gets the generated Python source code.
+    /// </summary>
+    /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
     protected override void BeforeVisitNode(CognitiveGraphNode node)

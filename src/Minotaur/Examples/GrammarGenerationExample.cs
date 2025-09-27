@@ -41,7 +41,7 @@ public class GrammarGenerationExample
         {
             // Generate grammar for a simple language
             Console.WriteLine("🔄 Generating grammar for SimpleScript language...");
-            
+
             var sourceFiles = new[]
             {
                 "/tmp/sample1.sscript",
@@ -185,8 +185,8 @@ for (var item in items) {
 
         // Rule statistics
         var totalAlternatives = grammar.ProductionRules.Rules.Sum(r => r.Alternatives.Count);
-        var avgAlternatives = grammar.ProductionRules.Rules.Count > 0 
-            ? (double)totalAlternatives / grammar.ProductionRules.Rules.Count 
+        var avgAlternatives = grammar.ProductionRules.Rules.Count > 0
+            ? (double)totalAlternatives / grammar.ProductionRules.Rules.Count
             : 0;
 
         Console.WriteLine();

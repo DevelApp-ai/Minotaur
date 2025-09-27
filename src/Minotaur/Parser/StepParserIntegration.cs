@@ -131,27 +131,6 @@ public partial class StepParserIntegration : IDisposable
 
             // Use DevelApp.StepParser for validation - plugins are NOT used for parsing
             return await ValidateWithStepParserAsync(sourceCode);
-
-            // Basic validation - check for balanced braces as an example
-            var braceCount = sourceCode.Count(c => c == '{') - sourceCode.Count(c => c == '}');
-            var parenCount = sourceCode.Count(c => c == '(') - sourceCode.Count(c => c == ')');
-
-            if (braceCount != 0 || parenCount != 0)
-            {
-                return new ParseValidationResult
-                {
-                    IsValid = false,
-                    Errors = new[] { new ParseError { Message = "Unbalanced braces or parentheses", Type = "SyntaxError" } },
-                    TokenCount = EstimateTokenCount(sourceCode)
-                };
-            }
-
-            return new ParseValidationResult
-            {
-                IsValid = true,
-                Errors = Array.Empty<ParseError>(),
-                TokenCount = EstimateTokenCount(sourceCode)
-            };
         }
         catch (Exception ex)
         {

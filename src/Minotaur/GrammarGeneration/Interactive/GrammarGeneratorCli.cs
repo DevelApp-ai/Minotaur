@@ -45,7 +45,7 @@ public class GrammarGeneratorCli
             }
 
             var command = args[0].ToLower();
-            
+
             return command switch
             {
                 "generate" => await HandleGenerateCommand(args.Skip(1).ToArray()),
@@ -64,7 +64,7 @@ public class GrammarGeneratorCli
     private async Task<int> HandleGenerateCommand(string[] args)
     {
         var options = ParseGenerateOptions(args);
-        
+
         if (options == null)
         {
             PrintGenerateUsage();
