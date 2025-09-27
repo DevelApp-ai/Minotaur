@@ -71,6 +71,11 @@ public abstract class UnparseStrategyBase : IUnparseStrategy
 /// </summary>
 public class IdentifierUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses an identifier node by writing its text content to the output context.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing an identifier.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var text = GetNodeText(node);
@@ -86,6 +91,11 @@ public class IdentifierUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class LiteralUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses a literal node by writing its formatted value to the output context.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing a literal value.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var text = GetNodeText(node);
@@ -139,6 +149,11 @@ public class LiteralUnparseStrategy : UnparseStrategyBase
 /// </summary>
 public class OperatorUnparseStrategy : UnparseStrategyBase
 {
+    /// <summary>
+    /// Unparses an operator node by writing it with appropriate spacing to the output context.
+    /// </summary>
+    /// <param name="node">The cognitive graph node representing an operator.</param>
+    /// <param name="context">The unparsing context to write the output to.</param>
     public override void UnparseNode(CognitiveGraphNode node, UnparseContext context)
     {
         var text = GetNodeText(node);

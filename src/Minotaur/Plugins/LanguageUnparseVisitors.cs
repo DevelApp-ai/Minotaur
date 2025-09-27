@@ -35,6 +35,10 @@ public class CSharpUnparseVisitor : CognitiveGraphVisitorBase
     /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
+    /// <summary>
+    /// Visits a cognitive graph node before traversing its children and generates appropriate C# code.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to visit and process.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         switch (node)
@@ -132,6 +136,10 @@ public class JavaScriptUnparseVisitor : CognitiveGraphVisitorBase
     /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
+    /// <summary>
+    /// Visits a cognitive graph node before traversing its children and generates appropriate JavaScript code.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to visit and process.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         switch (node)
@@ -197,6 +205,10 @@ public class PythonUnparseVisitor : CognitiveGraphVisitorBase
     /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
+    /// <summary>
+    /// Visits a cognitive graph node before traversing its children and generates appropriate Python code.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to visit and process.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         switch (node)

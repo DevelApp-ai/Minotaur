@@ -107,6 +107,10 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to C# code generation.
+    /// </summary>
+    /// <returns>The formatting options for C# code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -125,6 +129,11 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid C# code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
@@ -192,6 +201,10 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to JavaScript code generation.
+    /// </summary>
+    /// <returns>The formatting options for JavaScript code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -209,6 +222,11 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid JavaScript code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
@@ -263,6 +281,10 @@ public class PythonLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to Python code generation.
+    /// </summary>
+    /// <returns>The formatting options for Python code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -280,6 +302,11 @@ public class PythonLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid Python code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
