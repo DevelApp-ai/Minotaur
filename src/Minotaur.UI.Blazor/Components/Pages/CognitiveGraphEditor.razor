@@ -132,12 +132,12 @@
                         @if (selectedNode is IdentifierNode idNode)
                         {
                             <div class="mb-2">
-                                <label class="form-label">Identifier:</label>
-                                <input @bind="idNode.Identifier" class="form-control form-control-sm" disabled="@(!isEditMode)" />
+                                <label class="form-label">Text:</label>
+                                <input @bind="idNode.Text" class="form-control form-control-sm" disabled="@(!isEditMode)" />
                             </div>
                             <div class="mb-2">
-                                <label class="form-label">Scope:</label>
-                                <input @bind="idNode.Scope" class="form-control form-control-sm" disabled="@(!isEditMode)" />
+                                <label class="form-label">Namespace:</label>
+                                <input @bind="idNode.Namespace" class="form-control form-control-sm" disabled="@(!isEditMode)" />
                             </div>
                         }
                         
@@ -354,8 +354,8 @@
             var identifierNode = new IdentifierNode 
             { 
                 NodeType = "Identifier", 
-                Identifier = "MainMethod",
-                Scope = "Global"
+                Text = "MainMethod",
+                Namespace = "Global"
             };
             
             var literalNode = new LiteralNode 
@@ -422,7 +422,7 @@
 
     private async Task AddIdentifierNode()
     {
-        await AddNode(new IdentifierNode { NodeType = "Identifier", Identifier = "NewIdentifier", Scope = "Local" });
+        await AddNode(new IdentifierNode { NodeType = "Identifier", Text = "NewIdentifier", Namespace = "Local" });
     }
 
     private async Task AddLiteralNode()
@@ -607,8 +607,8 @@
         {
             TerminalNode t => t.Text?.Length > 8 ? t.Text[..8] + "..." : t.Text ?? "Term",
             NonTerminalNode nt => nt.RuleName?.Length > 8 ? nt.RuleName[..8] + "..." : nt.RuleName ?? "Rule",
-            IdentifierNode id => id.Identifier?.Length > 8 ? id.Identifier[..8] + "..." : id.Identifier ?? "ID",
-            LiteralNode lit => lit.Value?.Length > 8 ? lit.Value[..8] + "..." : lit.Value ?? "Lit",
+            IdentifierNode id => (id.Text?.Length > 8 ? id.Text[..8] + "..." : id.Text) ?? "ID",
+            LiteralNode lit => (lit.Value?.ToString()?.Length > 8 ? lit.Value.ToString()?[..8] + "..." : lit.Value?.ToString()) ?? "Lit",
             _ => "Node"
         };
     }
@@ -619,8 +619,8 @@
         {
             TerminalNode t => new { t.Text, t.TokenType },
             NonTerminalNode nt => new { nt.RuleName, ChildCount = nt.Children.Count },
-            IdentifierNode id => new { id.Identifier, id.Scope },
-            LiteralNode lit => new { lit.Value, lit.LiteralType },
+            IdentifierNode id => new { id.Text, id.Namespace },
+            LiteralNode lit => new { Value = lit.Value?.ToString() ?? "", lit.LiteralType },
             _ => new { }
         };
     }

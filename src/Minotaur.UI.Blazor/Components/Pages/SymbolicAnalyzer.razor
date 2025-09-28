@@ -1,0 +1,748 @@
+@page "/symbolic-analyzer"
+@using Minotaur.Analysis.Symbolic
+@using Minotaur.Core
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Symbolic Analyzer - Minotaur</PageTitle>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-brain me-2"></i>
+                    Symbolic Analyzer
+                </h2>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary" @onclick="StartAnalysis" disabled="@isAnalyzing">
+                        <i class="fas fa-play me-1"></i>
+                        @(isAnalyzing ? "Analyzing..." : "Start Analysis")
+                    </button>
+                    <button type="button" class="btn btn-secondary" @onclick="ClearResults">
+                        <i class="fas fa-trash me-1"></i>
+                        Clear
+                    </button>
+                    <button type="button" class="btn btn-info" @onclick="ExportResults">
+                        <i class="fas fa-download me-1"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Input Panel -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-code me-2"></i>
+                        Source Code Input
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="languageSelect" class="form-label">Language</label>
+                        <select class="form-select" id="languageSelect" @bind="selectedLanguage">
+                            <option value="csharp">C#</option>
+                            <option value="java">Java</option>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="cpp">C++</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sourceCode" class="form-label">Source Code</label>
+                        <textarea class="form-control source-editor" id="sourceCode" rows="15" 
+                                  @bind="sourceCode" placeholder="Enter your source code here..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="deepAnalysis" @bind="enableDeepAnalysis">
+                            <label class="form-check-label" for="deepAnalysis">
+                                Enable Deep Analysis
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="crossReference" @bind="enableCrossReference">
+                            <label class="form-check-label" for="crossReference">
+                                Cross-Reference Analysis
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="semanticAnalysis" @bind="enableSemanticAnalysis">
+                            <label class="form-check-label" for="semanticAnalysis">
+                                Semantic Analysis
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sample Code Templates -->
+                    <div class="mb-3">
+                        <label class="form-label">Sample Templates</label>
+                        <div class="btn-group-vertical d-grid gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"class\")">
+                                Class Definition
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"method\")">
+                                Method Implementation
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"algorithm\")">
+                                Algorithm Example
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(activeTab == "overview" ? "active" : "")" 
+                                    @onclick="() => SetActiveTab(\"overview\")">
+                                <i class="fas fa-chart-pie me-1"></i>
+                                Overview
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(activeTab == "symbols" ? "active" : "")" 
+                                    @onclick="() => SetActiveTab(\"symbols\")">
+                                <i class="fas fa-sitemap me-1"></i>
+                                Symbol Table
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(activeTab == "dependencies" ? "active" : "")" 
+                                    @onclick="() => SetActiveTab(\"dependencies\")">
+                                <i class="fas fa-project-diagram me-1"></i>
+                                Dependencies
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(activeTab == "graph" ? "active" : "")" 
+                                    @onclick="() => SetActiveTab(\"graph\")">
+                                <i class="fas fa-share-alt me-1"></i>
+                                Cognitive Graph
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    @if (isAnalyzing)
+                    {
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Analyzing...</span>
+                            </div>
+                            <h5>Performing Symbolic Analysis</h5>
+                            <p class="text-muted">Analyzing code structure, symbols, and dependencies...</p>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     style="width: @(analysisProgress)%"></div>
+                            </div>
+                        </div>
+                    }
+                    else if (analysisResult != null)
+                    {
+                        <div class="tab-content">
+                            @if (activeTab == "overview")
+                            {
+                                <div class="analysis-overview">
+                                    <!-- Key Metrics -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-3">
+                                            <div class="metric-card">
+                                                <div class="metric-value">@analysisResult.TotalSymbols</div>
+                                                <div class="metric-label">Total Symbols</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="metric-card">
+                                                <div class="metric-value">@analysisResult.ComplexityScore</div>
+                                                <div class="metric-label">Complexity Score</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="metric-card">
+                                                <div class="metric-value">@analysisResult.DependencyCount</div>
+                                                <div class="metric-label">Dependencies</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="metric-card">
+                                                <div class="metric-value">@analysisResult.QualityScore</div>
+                                                <div class="metric-label">Quality Score</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Analysis Summary -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Symbol Distribution</h6>
+                                            <div class="symbol-distribution">
+                                                @foreach (var symbolType in analysisResult.SymbolDistribution)
+                                                {
+                                                    <div class="distribution-item">
+                                                        <div class="d-flex justify-content-between">
+                                                            <span>@symbolType.Key</span>
+                                                            <span class="fw-bold">@symbolType.Value</span>
+                                                        </div>
+                                                        <div class="progress progress-sm">
+                                                            <div class="progress-bar" style="width: @(symbolType.Value * 100 / analysisResult.TotalSymbols)%"></div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Code Quality Indicators</h6>
+                                            <div class="quality-indicators">
+                                                <div class="indicator-item">
+                                                    <span>Maintainability</span>
+                                                    <div class="indicator-bar">
+                                                        <div class="indicator-fill good" style="width: @(analysisResult.MaintainabilityIndex)%"></div>
+                                                    </div>
+                                                    <span class="indicator-value">@analysisResult.MaintainabilityIndex%</span>
+                                                </div>
+                                                <div class="indicator-item">
+                                                    <span>Testability</span>
+                                                    <div class="indicator-bar">
+                                                        <div class="indicator-fill average" style="width: @(analysisResult.TestabilityScore)%"></div>
+                                                    </div>
+                                                    <span class="indicator-value">@analysisResult.TestabilityScore%</span>
+                                                </div>
+                                                <div class="indicator-item">
+                                                    <span>Documentation</span>
+                                                    <div class="indicator-bar">
+                                                        <div class="indicator-fill poor" style="width: @(analysisResult.DocumentationCoverage)%"></div>
+                                                    </div>
+                                                    <span class="indicator-value">@analysisResult.DocumentationCoverage%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (activeTab == "symbols")
+                            {
+                                <div class="symbol-table">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Type</th>
+                                                    <th>Scope</th>
+                                                    <th>Location</th>
+                                                    <th>References</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var symbol in analysisResult.Symbols)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <i class="@GetSymbolIcon(symbol.Type) me-2"></i>
+                                                            <strong>@symbol.Name</strong>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-@GetSymbolTypeBadgeColor(symbol.Type)">
+                                                                @symbol.Type
+                                                            </span>
+                                                        </td>
+                                                        <td>@symbol.Scope</td>
+                                                        <td>
+                                                            <code>@symbol.Location</code>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-secondary">@symbol.ReferenceCount</span>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+                            else if (activeTab == "dependencies")
+                            {
+                                <div class="dependencies-view">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Incoming Dependencies</h6>
+                                            <div class="dependency-list">
+                                                @foreach (var dep in analysisResult.IncomingDependencies)
+                                                {
+                                                    <div class="dependency-item">
+                                                        <i class="fas fa-arrow-right text-success me-2"></i>
+                                                        <span class="dependency-name">@dep.Name</span>
+                                                        <span class="badge bg-info ms-2">@dep.Type</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Outgoing Dependencies</h6>
+                                            <div class="dependency-list">
+                                                @foreach (var dep in analysisResult.OutgoingDependencies)
+                                                {
+                                                    <div class="dependency-item">
+                                                        <i class="fas fa-arrow-left text-warning me-2"></i>
+                                                        <span class="dependency-name">@dep.Name</span>
+                                                        <span class="badge bg-info ms-2">@dep.Type</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (activeTab == "graph")
+                            {
+                                <div class="cognitive-graph-view">
+                                    <div class="graph-controls mb-3">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-secondary" @onclick="ZoomIn">
+                                                <i class="fas fa-search-plus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" @onclick="ZoomOut">
+                                                <i class="fas fa-search-minus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" @onclick="FitToScreen">
+                                                <i class="fas fa-expand-arrows-alt"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" @onclick="ToggleLayout">
+                                                <i class="fas fa-sitemap"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="graph-container" id="symbolic-graph-container">
+                                        <!-- Cognitive Graph Visualization -->
+                                        <svg id="symbolic-graph-svg" width="100%" height="400">
+                                            @if (analysisResult.CognitiveGraph != null)
+                                            {
+                                                @* Render cognitive graph nodes and connections *@
+                                                @foreach (var node in GetGraphNodes())
+                                                {
+                                                    <g class="graph-node" transform="translate(@(node.X), @(node.Y))">
+                                                        <rect class="node-background @node.Type.ToLower()" width="120" height="40" rx="5"></rect>
+                                                        <text class="node-text" x="60" y="25" text-anchor="middle">@node.Name</text>
+                                                    </g>
+                                                }
+                                                @foreach (var edge in GetGraphEdges())
+                                                {
+                                                    <line class="graph-edge" x1="@edge.X1" y1="@edge.Y1" x2="@edge.X2" y2="@edge.Y2" 
+                                                          marker-end="url(#arrowhead)"></line>
+                                                }
+                                                <defs>
+                                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                                        <polygon points="0 0, 10 3.5, 0 7" fill="#666"></polygon>
+                                                    </marker>
+                                                </defs>
+                                            }
+                                        </svg>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-brain display-3 mb-3"></i>
+                            <h5>Ready for Symbolic Analysis</h5>
+                            <p>Enter your source code and click "Start Analysis" to begin</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string sourceCode = "";
+    private string selectedLanguage = "csharp";
+    private bool enableDeepAnalysis = true;
+    private bool enableCrossReference = true;
+    private bool enableSemanticAnalysis = false;
+    private bool isAnalyzing = false;
+    private int analysisProgress = 0;
+    private string activeTab = "overview";
+    private SymbolicAnalysisResult? analysisResult;
+
+    private async Task StartAnalysis()
+    {
+        if (string.IsNullOrWhiteSpace(sourceCode)) return;
+
+        isAnalyzing = true;
+        analysisProgress = 0;
+        StateHasChanged();
+
+        try
+        {
+            // Simulate analysis progress
+            for (int i = 0; i <= 100; i += 10)
+            {
+                analysisProgress = i;
+                StateHasChanged();
+                await Task.Delay(200);
+            }
+
+            var options = new SymbolicAnalysisOptions
+            {
+                Language = selectedLanguage,
+                EnableDeepAnalysis = enableDeepAnalysis,
+                EnableCrossReference = enableCrossReference,
+                EnableSemanticAnalysis = enableSemanticAnalysis
+            };
+
+            // Simulate analysis results
+            analysisResult = new SymbolicAnalysisResult
+            {
+                TotalSymbols = 15,
+                ComplexityScore = 8.5,
+                QualityScore = 82,
+                DependencyCount = 3,
+                MaintainabilityIndex = 75,
+                TestabilityScore = 68,
+                DocumentationCoverage = 45,
+                SymbolDistribution = new Dictionary<string, int>
+                {
+                    { "Methods", 8 },
+                    { "Classes", 2 },
+                    { "Properties", 5 }
+                },
+                Symbols = new List<SymbolInfo>
+                {
+                    new SymbolInfo { Name = "Calculator", Type = "Class", Scope = "Global", Location = "Calculator.cs:1", ReferenceCount = 3 },
+                    new SymbolInfo { Name = "Add", Type = "Method", Scope = "Calculator", Location = "Calculator.cs:5", ReferenceCount = 2 }
+                },
+                IncomingDependencies = new List<DependencyInfo>
+                {
+                    new DependencyInfo { Name = "System.Math", Type = "Namespace" }
+                },
+                OutgoingDependencies = new List<DependencyInfo>
+                {
+                    new DependencyInfo { Name = "ICalculator", Type = "Interface" }
+                },
+                CognitiveGraph = null // Would contain actual cognitive graph
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Analysis error: {ex.Message}");
+        }
+        finally
+        {
+            isAnalyzing = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClearResults()
+    {
+        analysisResult = null;
+        sourceCode = "";
+        StateHasChanged();
+    }
+
+    private async Task ExportResults()
+    {
+        if (analysisResult == null) return;
+
+        var jsonResult = System.Text.Json.JsonSerializer.Serialize(analysisResult, new System.Text.Json.JsonSerializerOptions 
+        { 
+            WriteIndented = true 
+        });
+        
+        await JSRuntime.InvokeVoidAsync("downloadFile", "symbolic-analysis.json", jsonResult, "application/json");
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+        StateHasChanged();
+    }
+
+    private void LoadSample(string sampleType)
+    {
+        sourceCode = sampleType switch
+        {
+            "class" => @"public class Calculator
+{
+    private double _result;
+    
+    public double Add(double a, double b)
+    {
+        _result = a + b;
+        return _result;
+    }
+    
+    public double GetResult() => _result;
+}",
+            "method" => @"public void ProcessData(List<string> items)
+{
+    var processed = items
+        .Where(x => !string.IsNullOrEmpty(x))
+        .Select(x => x.Trim().ToUpper())
+        .GroupBy(x => x.Length)
+        .ToDictionary(g => g.Key, g => g.ToList());
+        
+    foreach (var group in processed)
+    {
+        Console.WriteLine($""Length {group.Key}: {group.Value.Count} items"");
+    }
+}",
+            "algorithm" => @"public int BinarySearch(int[] array, int target)
+{
+    int left = 0;
+    int right = array.Length - 1;
+    
+    while (left <= right)
+    {
+        int mid = left + (right - left) / 2;
+        
+        if (array[mid] == target)
+            return mid;
+        else if (array[mid] < target)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+    
+    return -1;
+}",
+            _ => ""
+        };
+        StateHasChanged();
+    }
+
+    private string GetSymbolIcon(string symbolType) => symbolType.ToLower() switch
+    {
+        "class" => "fas fa-cube text-primary",
+        "method" => "fas fa-cog text-success",
+        "property" => "fas fa-circle text-info",
+        "field" => "fas fa-square text-warning",
+        "interface" => "fas fa-layer-group text-secondary",
+        "variable" => "fas fa-tag text-muted",
+        _ => "fas fa-dot-circle text-muted"
+    };
+
+    private string GetSymbolTypeBadgeColor(string symbolType) => symbolType.ToLower() switch
+    {
+        "class" => "primary",
+        "method" => "success",
+        "property" => "info",
+        "field" => "warning",
+        "interface" => "secondary",
+        "variable" => "light",
+        _ => "secondary"
+    };
+
+    private List<GraphNode> GetGraphNodes()
+    {
+        if (analysisResult?.CognitiveGraph == null) return new();
+        
+        // Convert cognitive graph to visual nodes
+        return analysisResult.Symbols.Select((symbol, index) => new GraphNode
+        {
+            Name = symbol.Name,
+            Type = symbol.Type,
+            X = 50 + (index % 5) * 150,
+            Y = 50 + (index / 5) * 80
+        }).ToList();
+    }
+
+    private List<GraphEdge> GetGraphEdges()
+    {
+        if (analysisResult?.CognitiveGraph == null) return new();
+        
+        // Convert cognitive graph connections to visual edges
+        var nodes = GetGraphNodes();
+        var edges = new List<GraphEdge>();
+        
+        for (int i = 0; i < nodes.Count - 1; i++)
+        {
+            edges.Add(new GraphEdge
+            {
+                X1 = nodes[i].X + 120,
+                Y1 = nodes[i].Y + 20,
+                X2 = nodes[i + 1].X,
+                Y2 = nodes[i + 1].Y + 20
+            });
+        }
+        
+        return edges;
+    }
+
+    private async Task ZoomIn() => await JSRuntime.InvokeVoidAsync("console.log", "Zoom in");
+    private async Task ZoomOut() => await JSRuntime.InvokeVoidAsync("console.log", "Zoom out");
+    private async Task FitToScreen() => await JSRuntime.InvokeVoidAsync("console.log", "Fit to screen");
+    private async Task ToggleLayout() => await JSRuntime.InvokeVoidAsync("console.log", "Toggle layout");
+
+    private class GraphNode
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public double X { get; set; }
+        public double Y { get; set; }
+    }
+
+    private class GraphEdge
+    {
+        public double X1 { get; set; }
+        public double Y1 { get; set; }
+        public double X2 { get; set; }
+        public double Y2 { get; set; }
+    }
+
+    public class SymbolicAnalysisOptions
+    {
+        public string Language { get; set; } = "";
+        public bool EnableDeepAnalysis { get; set; }
+        public bool EnableCrossReference { get; set; }
+        public bool EnableSemanticAnalysis { get; set; }
+    }
+
+    public class SymbolicAnalysisResult
+    {
+        public int TotalSymbols { get; set; }
+        public double ComplexityScore { get; set; }
+        public int QualityScore { get; set; }
+        public int DependencyCount { get; set; }
+        public int MaintainabilityIndex { get; set; }
+        public int TestabilityScore { get; set; }
+        public int DocumentationCoverage { get; set; }
+        public Dictionary<string, int> SymbolDistribution { get; set; } = new();
+        public List<SymbolInfo> Symbols { get; set; } = new();
+        public List<DependencyInfo> IncomingDependencies { get; set; } = new();
+        public List<DependencyInfo> OutgoingDependencies { get; set; } = new();
+        public object? CognitiveGraph { get; set; }
+    }
+
+    public class SymbolInfo
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Scope { get; set; } = "";
+        public string Location { get; set; } = "";
+        public int ReferenceCount { get; set; }
+    }
+
+    public class DependencyInfo
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+    }
+}
+
+<style>
+    .source-editor {
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .metric-card {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .metric-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .distribution-item {
+        margin-bottom: 10px;
+    }
+
+    .progress-sm {
+        height: 5px;
+    }
+
+    .indicator-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+
+    .indicator-bar {
+        flex: 1;
+        height: 20px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .indicator-fill {
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+
+    .indicator-fill.good { background: #28a745; }
+    .indicator-fill.average { background: #ffc107; }
+    .indicator-fill.poor { background: #dc3545; }
+
+    .indicator-value {
+        min-width: 40px;
+        text-align: right;
+        font-weight: bold;
+    }
+
+    .dependency-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .dependency-name {
+        font-weight: 500;
+    }
+
+    .graph-container {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .graph-node .node-background {
+        fill: #f8f9fa;
+        stroke: #007bff;
+        stroke-width: 2;
+    }
+
+    .graph-node .node-background.class { fill: #e3f2fd; stroke: #1976d2; }
+    .graph-node .node-background.method { fill: #e8f5e8; stroke: #388e3c; }
+    .graph-node .node-background.property { fill: #fff3e0; stroke: #f57c00; }
+
+    .graph-node .node-text {
+        fill: #333;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .graph-edge {
+        stroke: #666;
+        stroke-width: 1.5;
+    }
+</style>
