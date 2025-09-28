@@ -579,24 +579,24 @@
 
     private string GetNodeClass(CognitiveGraphNode node)
     {
-        return node switch
+        return node.GetType().Name switch
         {
-            TerminalNode => "terminal-node",
-            NonTerminalNode => "nonterminal-node",
-            IdentifierNode => "identifier-node",
-            LiteralNode => "literal-node",
+            nameof(TerminalNode) => "terminal-node",
+            nameof(NonTerminalNode) => "nonterminal-node", 
+            nameof(IdentifierNode) => "identifier-node",
+            nameof(LiteralNode) => "literal-node",
             _ => "unknown-node"
         };
     }
 
     private string GetNodeColor(CognitiveGraphNode node)
     {
-        return node switch
+        return node.GetType().Name switch
         {
-            TerminalNode => "#28a745",
-            NonTerminalNode => "#17a2b8",
-            IdentifierNode => "#ffc107",
-            LiteralNode => "#6c757d",
+            nameof(TerminalNode) => "#28a745",
+            nameof(NonTerminalNode) => "#17a2b8",
+            nameof(IdentifierNode) => "#ffc107", 
+            nameof(LiteralNode) => "#6c757d",
             _ => "#343a40"
         };
     }
