@@ -16,6 +16,7 @@
  */
 
 using Minotaur.Core;
+using Minotaur.Analysis.Symbolic;
 
 namespace Minotaur.Plugins;
 
@@ -23,12 +24,28 @@ namespace Minotaur.Plugins;
 /// Built-in C# language plugin for unparsing and compiler backend generation
 /// All grammar and syntax comes from StepParser - plugins handle backend generation
 /// </summary>
-public class CSharpLanguagePlugin : ILanguagePlugin
+public class CSharpLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 {
+    /// <summary>
+    /// Gets the unique identifier for the C# language.
+    /// </summary>
     public string LanguageId => "csharp";
+
+    /// <summary>
+    /// Gets the display name for the C# language.
+    /// </summary>
     public string DisplayName => "C#";
+
+    /// <summary>
+    /// Gets the array of file extensions supported by C#.
+    /// </summary>
     public string[] SupportedExtensions => new[] { ".cs", ".csx" };
 
+    /// <summary>
+    /// Converts a cognitive graph representation back to C# source code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph node to unparse.</param>
+    /// <returns>A task that represents the asynchronous unparse operation, containing the generated C# code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         // Generate C# source code from cognitive graph
@@ -40,6 +57,11 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
+    /// <summary>
+    /// Generates compiler-compiler backend rules for C# code generation.
+    /// These rules define how to generate C# code for different parser components.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the compiler backend rules for C#.</returns>
     public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
     {
         var rules = new CompilerBackendRules
@@ -91,6 +113,10 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to C# code generation.
+    /// </summary>
+    /// <returns>The formatting options for C# code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -109,6 +135,11 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid C# code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
@@ -128,17 +159,77 @@ public class CSharpLanguagePlugin : ILanguagePlugin
         await Task.CompletedTask;
         return result;
     }
+
+    // ISymbolicAnalysisPlugin implementation
+    private readonly CSharpSymbolicAnalysisPlugin _symbolicAnalysis = new();
+
+    /// <summary>
+    /// Analyzes C# source code for symbolic errors using language-specific patterns
+    /// </summary>
+    /// <param name="sourceCode">The C# source code to analyze</param>
+    /// <param name="constraints">Symbolic constraints extracted from the code</param>
+    /// <returns>List of detected symbolic errors</returns>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    /// <summary>
+    /// Gets C#-specific error patterns that can be detected by symbolic analysis
+    /// </summary>
+    /// <returns>List of error patterns for C#</returns>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _symbolicAnalysis.GetErrorPatterns();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for detecting a specific error type in C#
+    /// </summary>
+    /// <param name="errorType">The type of error to check confidence for</param>
+    /// <returns>Confidence level between 0.0 and 1.0</returns>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _symbolicAnalysis.GetErrorConfidence(errorType);
+    }
+
+    /// <summary>
+    /// Generates test cases that could trigger the specified error in C# code
+    /// </summary>
+    /// <param name="error">The symbolic error to generate test cases for</param>
+    /// <param name="sourceCode">The original C# source code</param>
+    /// <returns>List of test cases that could trigger the error</returns>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
+    }
 }
 
 /// <summary>
 /// Built-in JavaScript language plugin for unparsing and compiler backend generation
 /// </summary>
-public class JavaScriptLanguagePlugin : ILanguagePlugin
+public class JavaScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 {
+    /// <summary>
+    /// Gets the unique identifier for the JavaScript language.
+    /// </summary>
     public string LanguageId => "javascript";
+
+    /// <summary>
+    /// Gets the display name for the JavaScript language.
+    /// </summary>
     public string DisplayName => "JavaScript";
+
+    /// <summary>
+    /// Gets the file extensions supported by JavaScript.
+    /// </summary>
     public string[] SupportedExtensions => new[] { ".js", ".mjs", ".jsx" };
 
+    /// <summary>
+    /// Converts a cognitive graph representation back to JavaScript source code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to unparse into JavaScript code.</param>
+    /// <returns>A task that represents the asynchronous unparsing operation. The task result contains the generated JavaScript code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         var visitor = new JavaScriptUnparseVisitor();
@@ -148,6 +239,11 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
+    /// <summary>
+    /// Generates compiler-compiler backend rules for JavaScript code generation.
+    /// These rules define how to generate JavaScript code for different parser components.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the compiler backend rules for JavaScript.</returns>
     public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
     {
         var rules = new CompilerBackendRules
@@ -176,6 +272,10 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to JavaScript code generation.
+    /// </summary>
+    /// <returns>The formatting options for JavaScript code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -193,23 +293,79 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid JavaScript code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
         await Task.CompletedTask;
         return result;
     }
+
+    // ISymbolicAnalysisPlugin implementation
+    private readonly JavaScriptSymbolicAnalysisPlugin _symbolicAnalysis = new();
+
+    /// <summary>
+    /// Analyzes JavaScript source code for symbolic errors using language-specific patterns
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    /// <summary>
+    /// Gets JavaScript-specific error patterns that can be detected by symbolic analysis
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _symbolicAnalysis.GetErrorPatterns();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for detecting a specific error type in JavaScript
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _symbolicAnalysis.GetErrorConfidence(errorType);
+    }
+
+    /// <summary>
+    /// Generates test cases that could trigger the specified error in JavaScript code
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
+    }
 }
 
 /// <summary>
 /// Built-in Python language plugin for unparsing and compiler backend generation
 /// </summary>
-public class PythonLanguagePlugin : ILanguagePlugin
+public class PythonLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 {
+    /// <summary>
+    /// Gets the unique identifier for the Python language.
+    /// </summary>
     public string LanguageId => "python";
+
+    /// <summary>
+    /// Gets the display name for the Python language.
+    /// </summary>
     public string DisplayName => "Python";
+
+    /// <summary>
+    /// Gets the file extensions supported by Python.
+    /// </summary>
     public string[] SupportedExtensions => new[] { ".py", ".pyw" };
 
+    /// <summary>
+    /// Converts a cognitive graph representation back to Python source code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to unparse into Python code.</param>
+    /// <returns>A task that represents the asynchronous unparsing operation. The task result contains the generated Python code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
         var visitor = new PythonUnparseVisitor();
@@ -219,6 +375,11 @@ public class PythonLanguagePlugin : ILanguagePlugin
         return visitor.GetGeneratedCode();
     }
 
+    /// <summary>
+    /// Generates compiler-compiler backend rules for Python code generation.
+    /// These rules define how to generate Python code for different parser components.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the compiler backend rules for Python.</returns>
     public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
     {
         var rules = new CompilerBackendRules
@@ -247,6 +408,10 @@ public class PythonLanguagePlugin : ILanguagePlugin
         return rules;
     }
 
+    /// <summary>
+    /// Gets the code formatting options specific to Python code generation.
+    /// </summary>
+    /// <returns>The formatting options for Python code generation.</returns>
     public CodeFormattingOptions GetFormattingOptions()
     {
         return new CodeFormattingOptions
@@ -264,10 +429,50 @@ public class PythonLanguagePlugin : ILanguagePlugin
         };
     }
 
+    /// <summary>
+    /// Validates that a cognitive graph can be unparsed to valid Python code.
+    /// </summary>
+    /// <param name="graph">The cognitive graph to validate for unparsing.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
         await Task.CompletedTask;
         return result;
+    }
+
+    // ISymbolicAnalysisPlugin implementation
+    private readonly PythonSymbolicAnalysisPlugin _symbolicAnalysis = new();
+
+    /// <summary>
+    /// Analyzes Python source code for symbolic errors using language-specific patterns
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _symbolicAnalysis.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    /// <summary>
+    /// Gets Python-specific error patterns that can be detected by symbolic analysis
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _symbolicAnalysis.GetErrorPatterns();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for detecting a specific error type in Python
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _symbolicAnalysis.GetErrorConfidence(errorType);
+    }
+
+    /// <summary>
+    /// Generates test cases that could trigger the specified error in Python code
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
     }
 }

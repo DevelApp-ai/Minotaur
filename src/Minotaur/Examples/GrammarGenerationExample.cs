@@ -25,6 +25,10 @@ namespace Minotaur.Examples;
 /// </summary>
 public class GrammarGenerationExample
 {
+    /// <summary>
+    /// Runs the grammar generation example demonstrating Minotaur's capabilities.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public static async Task RunAsync()
     {
         Console.WriteLine("🔧 Minotaur Grammar Generation Example");
@@ -41,7 +45,7 @@ public class GrammarGenerationExample
         {
             // Generate grammar for a simple language
             Console.WriteLine("🔄 Generating grammar for SimpleScript language...");
-            
+
             var sourceFiles = new[]
             {
                 "/tmp/sample1.sscript",
@@ -185,8 +189,8 @@ for (var item in items) {
 
         // Rule statistics
         var totalAlternatives = grammar.ProductionRules.Rules.Sum(r => r.Alternatives.Count);
-        var avgAlternatives = grammar.ProductionRules.Rules.Count > 0 
-            ? (double)totalAlternatives / grammar.ProductionRules.Rules.Count 
+        var avgAlternatives = grammar.ProductionRules.Rules.Count > 0
+            ? (double)totalAlternatives / grammar.ProductionRules.Rules.Count
             : 0;
 
         Console.WriteLine();

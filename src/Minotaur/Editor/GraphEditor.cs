@@ -317,11 +317,18 @@ public class GraphEditor : IDisposable
         _nodeIndex.TryRemove(nodeId, out _);
     }
 
+    /// <summary>
+    /// Raises the <see cref="GraphModified"/> event.
+    /// </summary>
+    /// <param name="e">The event arguments containing details about the graph modification.</param>
     protected virtual void OnGraphModified(GraphModifiedEventArgs e)
     {
         GraphModified?.Invoke(this, e);
     }
 
+    /// <summary>
+    /// Releases all resources used by the <see cref="GraphEditor"/>.
+    /// </summary>
     public void Dispose()
     {
         if (!_disposed)
@@ -339,9 +346,21 @@ public class GraphEditor : IDisposable
 /// </summary>
 public class GraphModifiedEventArgs : EventArgs
 {
+    /// <summary>
+    /// Gets the edit operation that caused the graph modification.
+    /// </summary>
     public EditOperation Operation { get; }
+
+    /// <summary>
+    /// Gets the type of modification that occurred.
+    /// </summary>
     public GraphModificationType ModificationType { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GraphModifiedEventArgs"/> class.
+    /// </summary>
+    /// <param name="operation">The edit operation that caused the modification.</param>
+    /// <param name="modificationType">The type of modification that occurred.</param>
     public GraphModifiedEventArgs(EditOperation operation, GraphModificationType modificationType)
     {
         Operation = operation;
@@ -354,8 +373,19 @@ public class GraphModifiedEventArgs : EventArgs
 /// </summary>
 public enum GraphModificationType
 {
+    /// <summary>
+    /// The modification represents executing an edit operation.
+    /// </summary>
     Execute,
+
+    /// <summary>
+    /// The modification represents undoing an edit operation.
+    /// </summary>
     Undo,
+
+    /// <summary>
+    /// The modification represents redoing an edit operation.
+    /// </summary>
     Redo
 }
 

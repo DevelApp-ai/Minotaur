@@ -31,30 +31,35 @@ public class TokenPatternAnalyzer
     private readonly List<string> _literalPatterns = new();
     private readonly List<string> _operatorPatterns = new();
 
+    /// <summary>
+    /// Analyzes source code files to discover token patterns and generate token definitions.
+    /// </summary>
+    /// <param name="sourceFiles">The source files to analyze for token patterns.</param>
+    /// <returns>The discovered token definitions based on pattern analysis.</returns>
     public TokenDefinitions AnalyzeSourceCode(string[] sourceFiles)
     {
         var patterns = new List<TokenPattern>();
-        
+
         // Analyze all source files
         foreach (var sourceFile in sourceFiles)
         {
             AnalyzeFile(sourceFile);
         }
-        
+
         // 1. Identify literals and operators
         patterns.AddRange(ExtractLiteralPatterns());
         patterns.AddRange(ExtractOperatorPatterns());
-        
+
         // 2. Identify keywords vs identifiers
         patterns.AddRange(AnalyzeKeywordPatterns());
-        
+
         // 3. Identify structural patterns (brackets, delimiters)
         patterns.AddRange(ExtractStructuralPatterns());
-        
+
         // 4. Identify comments and whitespace
         patterns.AddRange(ExtractCommentPatterns());
         patterns.AddRange(ExtractWhitespacePatterns());
-        
+
         return new TokenDefinitions(patterns);
     }
 
@@ -63,19 +68,19 @@ public class TokenPatternAnalyzer
         try
         {
             var content = File.ReadAllText(filePath);
-            
+
             // Tokenize basic patterns
             var tokens = BasicTokenize(content);
-            
+
             foreach (var token in tokens)
             {
                 _tokenFrequency[token] = _tokenFrequency.GetValueOrDefault(token, 0) + 1;
-                
+
                 // Classify token type
                 if (IsIdentifierPattern(token))
                 {
                     _identifierPatterns.Add(token);
-                    
+
                     // Check if it might be a keyword (appears frequently, follows naming conventions)
                     if (_tokenFrequency[token] > 3 && IsKeywordCandidate(token))
                     {
@@ -102,11 +107,11 @@ public class TokenPatternAnalyzer
     private List<string> BasicTokenize(string content)
     {
         var tokens = new List<string>();
-        
+
         // Simple tokenization - split by common delimiters but preserve them
         var regex = new Regex(@"(\w+|[^\w\s]|\s+)", RegexOptions.Compiled);
         var matches = regex.Matches(content);
-        
+
         foreach (Match match in matches)
         {
             var token = match.Value;
@@ -115,7 +120,7 @@ public class TokenPatternAnalyzer
                 tokens.Add(token.Trim());
             }
         }
-        
+
         return tokens.Where(t => !string.IsNullOrEmpty(t)).ToList();
     }
 
@@ -141,7 +146,7 @@ public class TokenPatternAnalyzer
         // - All lowercase or have specific patterns
         // - Appear frequently
         // - Have specific semantic meaning
-        return token.All(char.IsLower) || 
+        return token.All(char.IsLower) ||
                Regex.IsMatch(token, @"^[a-z]+(_[a-z]+)*$") ||
                CommonKeywords.Contains(token.ToLower());
     }
@@ -156,7 +161,7 @@ public class TokenPatternAnalyzer
     private List<TokenPattern> ExtractLiteralPatterns()
     {
         var patterns = new List<TokenPattern>();
-        
+
         // String literals
         patterns.Add(new TokenPattern
         {
@@ -167,7 +172,7 @@ public class TokenPatternAnalyzer
             Confidence = 0.9,
             Examples = _literalPatterns.Where(p => p.StartsWith("\"")).Take(5).ToList()
         });
-        
+
         // Numeric literals
         patterns.Add(new TokenPattern
         {
@@ -178,7 +183,7 @@ public class TokenPatternAnalyzer
             Confidence = 0.9,
             Examples = _literalPatterns.Where(p => Regex.IsMatch(p, @"^\d")).Take(5).ToList()
         });
-        
+
         return patterns;
     }
 
@@ -186,7 +191,7 @@ public class TokenPatternAnalyzer
     {
         var patterns = new List<TokenPattern>();
         var operators = _operatorPatterns.Distinct().OrderByDescending(op => _tokenFrequency.GetValueOrDefault(op, 0));
-        
+
         foreach (var op in operators.Take(20)) // Top 20 most common operators
         {
             patterns.Add(new TokenPattern
@@ -199,20 +204,20 @@ public class TokenPatternAnalyzer
                 Examples = new List<string> { op }
             });
         }
-        
+
         return patterns;
     }
 
     private List<TokenPattern> AnalyzeKeywordPatterns()
     {
         var patterns = new List<TokenPattern>();
-        
+
         // Identify keywords by frequency and common patterns
         var keywordCandidates = _potentialKeywords
             .Where(kw => _tokenFrequency[kw] >= 2) // Appears at least twice
             .OrderByDescending(kw => _tokenFrequency[kw])
             .Take(50); // Top 50 keyword candidates
-        
+
         foreach (var keyword in keywordCandidates)
         {
             patterns.Add(new TokenPattern
@@ -226,7 +231,7 @@ public class TokenPatternAnalyzer
                 Examples = new List<string> { keyword }
             });
         }
-        
+
         // General identifier pattern
         patterns.Add(new TokenPattern
         {
@@ -237,14 +242,14 @@ public class TokenPatternAnalyzer
             Confidence = 0.95,
             Examples = _identifierPatterns.Where(id => !_potentialKeywords.Contains(id)).Take(5).ToList()
         });
-        
+
         return patterns;
     }
 
     private List<TokenPattern> ExtractStructuralPatterns()
     {
         var patterns = new List<TokenPattern>();
-        
+
         var structuralTokens = new Dictionary<string, string>
         {
             { "(", "LPAREN" },
@@ -258,7 +263,7 @@ public class TokenPatternAnalyzer
             { ".", "DOT" },
             { ":", "COLON" }
         };
-        
+
         foreach (var (token, name) in structuralTokens)
         {
             if (_tokenFrequency.ContainsKey(token))
@@ -274,14 +279,14 @@ public class TokenPatternAnalyzer
                 });
             }
         }
-        
+
         return patterns;
     }
 
     private List<TokenPattern> ExtractCommentPatterns()
     {
         var patterns = new List<TokenPattern>();
-        
+
         // Common comment patterns
         patterns.Add(new TokenPattern
         {
@@ -292,7 +297,7 @@ public class TokenPatternAnalyzer
             Confidence = 0.8,
             Examples = new List<string> { "// comment" }
         });
-        
+
         patterns.Add(new TokenPattern
         {
             Name = "BLOCK_COMMENT",
@@ -302,14 +307,14 @@ public class TokenPatternAnalyzer
             Confidence = 0.8,
             Examples = new List<string> { "/* comment */" }
         });
-        
+
         return patterns;
     }
 
     private List<TokenPattern> ExtractWhitespacePatterns()
     {
         var patterns = new List<TokenPattern>();
-        
+
         patterns.Add(new TokenPattern
         {
             Name = "WHITESPACE",
@@ -319,7 +324,7 @@ public class TokenPatternAnalyzer
             Confidence = 0.99,
             Examples = new List<string> { " ", "\t", "\n" }
         });
-        
+
         return patterns;
     }
 }

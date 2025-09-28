@@ -26,6 +26,9 @@ public class GrammarGeneratorCli
 {
     private readonly GrammarGenerator _generator;
 
+    /// <summary>
+    /// Initializes a new instance of the GrammarGeneratorCli class.
+    /// </summary>
     public GrammarGeneratorCli()
     {
         _generator = new GrammarGenerator();
@@ -45,7 +48,7 @@ public class GrammarGeneratorCli
             }
 
             var command = args[0].ToLower();
-            
+
             return command switch
             {
                 "generate" => await HandleGenerateCommand(args.Skip(1).ToArray()),
@@ -64,7 +67,7 @@ public class GrammarGeneratorCli
     private async Task<int> HandleGenerateCommand(string[] args)
     {
         var options = ParseGenerateOptions(args);
-        
+
         if (options == null)
         {
             PrintGenerateUsage();
@@ -326,6 +329,11 @@ public class GrammarGeneratorCli
 /// </summary>
 public static class Program
 {
+    /// <summary>
+    /// The main entry point for the grammar generator CLI application.
+    /// </summary>
+    /// <param name="args">Command line arguments.</param>
+    /// <returns>Exit code indicating success (0) or failure (non-zero).</returns>
     public static async Task<int> Main(string[] args)
     {
         var cli = new GrammarGeneratorCli();

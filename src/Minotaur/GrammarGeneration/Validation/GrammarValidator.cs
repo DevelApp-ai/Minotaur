@@ -71,9 +71,9 @@ public class GrammarValidator
         }
 
         // Check for start rule
-        var hasStartRule = grammar.ProductionRules.Rules.Any(r => 
+        var hasStartRule = grammar.ProductionRules.Rules.Any(r =>
             r.Name == "program" || r.Name == "start" || r.Name == "compilation_unit");
-        
+
         if (!hasStartRule)
         {
             result.Warnings.Add("Grammar should have a start rule (program, start, or compilation_unit)");
@@ -175,7 +175,7 @@ public class GrammarValidator
         }
 
         var coverage = totalLines > 0 ? (double)coveredLines / totalLines : 1.0;
-        
+
         if (coverage < 0.8)
         {
             result.Warnings.Add($"Low grammar coverage: {coverage:P1} of source code is recognized");
@@ -210,9 +210,9 @@ public class GrammarValidator
 
         // Calculate feature coverage
         var features = new[] { "variables", "functions", "classes", "control_flow", "expressions" };
-        var coveredFeatures = features.Count(feature => 
+        var coveredFeatures = features.Count(feature =>
             grammar.ProductionRules.Rules.Any(r => r.Name.Contains(feature)));
-        
+
         report.LanguageFeatureCoverage = (double)coveredFeatures / features.Length;
 
         // Calculate token coverage
@@ -298,8 +298,8 @@ public class GrammarValidator
             @"\{|\}|\(|\)|\[|\]" // structural elements
         };
 
-        return patterns.Any(pattern => 
-            System.Text.RegularExpressions.Regex.IsMatch(trimmed, pattern, 
+        return patterns.Any(pattern =>
+            System.Text.RegularExpressions.Regex.IsMatch(trimmed, pattern,
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase));
     }
 
@@ -331,7 +331,7 @@ public class GrammarValidator
         {
             // Simple complexity calculation based on alternatives and nesting
             totalComplexity += rule.Alternatives.Count * 0.1;
-            
+
             foreach (var alternative in rule.Alternatives)
             {
                 var nesting = alternative.Count(c => c == '<');
@@ -356,7 +356,7 @@ public class GrammarValidator
         // Reward consistent naming conventions
         var snakeCaseCount = grammar.ProductionRules.Rules.Count(r => r.Name.Contains('_'));
         var consistencyRatio = (double)snakeCaseCount / grammar.ProductionRules.Rules.Count;
-        
+
         if (consistencyRatio > 0.8 || consistencyRatio < 0.2)
         {
             score += 0.1; // Consistent naming (either mostly snake_case or mostly not)
@@ -430,9 +430,28 @@ public class GrammarValidator
 /// </summary>
 public class GrammarValidationResult
 {
+    /// <summary>
+    /// Gets or sets the grammar that was validated.
+    /// </summary>
     public Grammar Grammar { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the grammar is valid.
+    /// </summary>
     public bool IsValid { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of validation errors found in the grammar.
+    /// </summary>
     public List<string> Errors { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the list of validation warnings for the grammar.
+    /// </summary>
     public List<string> Warnings { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the quality report containing metrics and analysis of the grammar.
+    /// </summary>
     public QualityReport QualityReport { get; set; } = new();
 }

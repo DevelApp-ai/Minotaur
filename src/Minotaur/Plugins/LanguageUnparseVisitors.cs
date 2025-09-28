@@ -29,8 +29,16 @@ public class CSharpUnparseVisitor : CognitiveGraphVisitorBase
     private readonly StringBuilder _code = new();
     private int _indentLevel = 0;
 
+    /// <summary>
+    /// Gets the generated C# source code.
+    /// </summary>
+    /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
+    /// <summary>
+    /// Visits a cognitive graph node before traversing its children and generates appropriate C# code.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to visit and process.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         switch (node)
@@ -122,8 +130,16 @@ public class JavaScriptUnparseVisitor : CognitiveGraphVisitorBase
     private readonly StringBuilder _code = new();
     private int _indentLevel = 0;
 
+    /// <summary>
+    /// Gets the generated JavaScript source code.
+    /// </summary>
+    /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
+    /// <summary>
+    /// Visits a cognitive graph node before traversing its children and generates appropriate JavaScript code.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to visit and process.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         switch (node)
@@ -183,8 +199,16 @@ public class PythonUnparseVisitor : CognitiveGraphVisitorBase
     private readonly StringBuilder _code = new();
     private int _indentLevel = 0;
 
+    /// <summary>
+    /// Gets the generated Python source code.
+    /// </summary>
+    /// <returns>The generated source code as a string.</returns>
     public string GetGeneratedCode() => _code.ToString();
 
+    /// <summary>
+    /// Visits a cognitive graph node before traversing its children and generates appropriate Python code.
+    /// </summary>
+    /// <param name="node">The cognitive graph node to visit and process.</param>
     protected override void BeforeVisitNode(CognitiveGraphNode node)
     {
         switch (node)

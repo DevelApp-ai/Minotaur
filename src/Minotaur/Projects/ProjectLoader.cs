@@ -192,7 +192,7 @@ public class ProjectLoader : IProjectLoader
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<ProjectType>> DetectProjectTypesAsync(string path)
+    public Task<IEnumerable<ProjectType>> DetectProjectTypesAsync(string path)
     {
         var detectedTypes = new List<ProjectType>();
 
@@ -248,28 +248,28 @@ public class ProjectLoader : IProjectLoader
                 detectedTypes.Add(ProjectType.GenericFolder);
         }
 
-        return detectedTypes;
+        return Task.FromResult<IEnumerable<ProjectType>>(detectedTypes);
     }
 
     // Implementation methods continue with full parsing and analysis logic...
     // (Additional methods omitted for brevity - they follow the same pattern)
 
     private static List<string> ExtractProjectPaths(object solutionGraph, string rootPath) => new();
-    private async Task<List<CrossFileRelationship>> AnalyzeCrossProjectRelationships(List<string> projectPaths) => new();
-    private async Task<List<string>> ExtractSourceFiles(object projectGraph, string rootPath) => new();
-    private async Task<ProjectFile> AnalyzeSourceFile(string filePath, string rootPath) => new() { FilePath = filePath };
-    private async Task<List<ExtractedSymbol>> ExtractSymbolsFromGraph(object graph, string filePath) => new();
-    private async Task<List<FileDependency>> ExtractDependenciesFromGraph(object graph, string filePath) => new();
-    private async Task<List<CrossFileRelationship>> ExtractCrossFileRelationships(ProjectFile projectFile) => new();
-    private async Task<List<ProjectDependency>> ExtractProjectDependencies(object projectGraph) => new();
-    private async Task<List<ConfigurationFile>> ExtractConfigurationFiles(string rootPath) => new();
-    private async Task<ConfigurationFile?> AnalyzeConfigurationFile(string filePath) => null;
-    private async Task<List<ProjectDependency>> ExtractFolderDependencies(string folderPath, ProjectType projectType) => new();
-    private async Task<List<ProjectDependency>> ExtractNodeDependencies(string folderPath) => new();
-    private async Task<List<ProjectDependency>> ExtractPythonDependencies(string folderPath) => new();
-    private async Task<List<ProjectDependency>> ExtractJavaDependencies(string folderPath) => new();
-    private async Task<List<ProjectDependency>> ExtractRustDependencies(string folderPath) => new();
-    private async Task<List<ProjectDependency>> ExtractGoDependencies(string folderPath) => new();
+    private Task<List<CrossFileRelationship>> AnalyzeCrossProjectRelationships(List<string> projectPaths) => Task.FromResult(new List<CrossFileRelationship>());
+    private Task<List<string>> ExtractSourceFiles(object projectGraph, string rootPath) => Task.FromResult(new List<string>());
+    private Task<ProjectFile> AnalyzeSourceFile(string filePath, string rootPath) => Task.FromResult(new ProjectFile { FilePath = filePath });
+    private Task<List<ExtractedSymbol>> ExtractSymbolsFromGraph(object graph, string filePath) => Task.FromResult(new List<ExtractedSymbol>());
+    private Task<List<FileDependency>> ExtractDependenciesFromGraph(object graph, string filePath) => Task.FromResult(new List<FileDependency>());
+    private Task<List<CrossFileRelationship>> ExtractCrossFileRelationships(ProjectFile projectFile) => Task.FromResult(new List<CrossFileRelationship>());
+    private Task<List<ProjectDependency>> ExtractProjectDependencies(object projectGraph) => Task.FromResult(new List<ProjectDependency>());
+    private Task<List<ConfigurationFile>> ExtractConfigurationFiles(string rootPath) => Task.FromResult(new List<ConfigurationFile>());
+    private Task<ConfigurationFile?> AnalyzeConfigurationFile(string filePath) => Task.FromResult<ConfigurationFile?>(null);
+    private Task<List<ProjectDependency>> ExtractFolderDependencies(string folderPath, ProjectType projectType) => Task.FromResult(new List<ProjectDependency>());
+    private Task<List<ProjectDependency>> ExtractNodeDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
+    private Task<List<ProjectDependency>> ExtractPythonDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
+    private Task<List<ProjectDependency>> ExtractJavaDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
+    private Task<List<ProjectDependency>> ExtractRustDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
+    private Task<List<ProjectDependency>> ExtractGoDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
     private static bool IsIgnoredPath(string path) => false;
     private static FileType ClassifyFileType(string filePath) => FileType.SourceCode;
     private Dictionary<string, object> ExtractSettingsFromJson(JsonElement element, string prefix = "") => new();
