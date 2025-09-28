@@ -1,52 +1,94 @@
 @page "/cognitive-graph-editor"
 @using Minotaur.Core
 @using Minotaur.Editor
+@using System.Text.Json
 @inject IJSRuntime JSRuntime
 
 <PageTitle>Cognitive Graph Editor</PageTitle>
 
 <div class="cognitive-graph-editor">
     <div class="editor-header">
-        <h3>Cognitive Graph Editor</h3>
+        <h3><i class="bi bi-diagram-3"></i> Cognitive Graph Editor</h3>
         <div class="header-controls">
-            <button class="btn btn-primary" @onclick="CreateNewGraph">New Graph</button>
-            <button class="btn btn-success" @onclick="SaveGraph" disabled="@(rootNode == null)">Save</button>
-            <button class="btn btn-info" @onclick="LoadSampleGraph">Load Sample</button>
+            <button class="btn btn-primary" @onclick="CreateNewGraph">
+                <i class="bi bi-file-plus"></i> New Graph
+            </button>
+            <button class="btn btn-success" @onclick="SaveGraph" disabled="@(graphEditor == null)">
+                <i class="bi bi-save"></i> Save Graph
+            </button>
+            <button class="btn btn-info" @onclick="LoadSampleGraph">
+                <i class="bi bi-file-code"></i> Load Sample
+            </button>
+            <button class="btn btn-outline-secondary" @onclick="ExportToJson" disabled="@(graphEditor == null)">
+                <i class="bi bi-download"></i> Export JSON
+            </button>
         </div>
     </div>
 
     <div class="editor-layout">
         <div class="graph-toolbar">
             <div class="toolbar-section">
-                <h5>Graph Operations</h5>
-                <button class="btn btn-sm btn-primary" @onclick="AddNode" disabled="@(selectedNode == null || !isEditMode)">
-                    ➕ Add Node
-                </button>
-                <button class="btn btn-sm btn-danger" @onclick="DeleteSelectedNode" disabled="@(selectedNodeId == null || !isEditMode)">
-                    🗑️ Delete Node
-                </button>
-                <button class="btn btn-sm btn-warning" @onclick="UndoLastOperation" disabled="@(!canUndo)">
-                    ↶ Undo
-                </button>
-                <button class="btn btn-sm btn-warning" @onclick="RedoLastOperation" disabled="@(!canRedo)">
-                    ↷ Redo
+                <h5><i class="bi bi-tools"></i> Graph Operations</h5>
+                <div class="btn-group-vertical w-100 mb-2">
+                    <button class="btn btn-sm btn-success" @onclick="AddTerminalNode" disabled="@(!isEditMode)">
+                        <i class="bi bi-plus-circle"></i> Add Terminal
+                    </button>
+                    <button class="btn btn-sm btn-info" @onclick="AddNonTerminalNode" disabled="@(!isEditMode)">
+                        <i class="bi bi-plus-circle"></i> Add Non-Terminal
+                    </button>
+                    <button class="btn btn-sm btn-warning" @onclick="AddIdentifierNode" disabled="@(!isEditMode)">
+                        <i class="bi bi-plus-circle"></i> Add Identifier
+                    </button>
+                    <button class="btn btn-sm btn-secondary" @onclick="AddLiteralNode" disabled="@(!isEditMode)">
+                        <i class="bi bi-plus-circle"></i> Add Literal
+                    </button>
+                </div>
+                
+                <div class="btn-group w-100 mb-2">
+                    <button class="btn btn-sm btn-outline-secondary" @onclick="UndoLastOperation" disabled="@(!canUndo)">
+                        <i class="bi bi-arrow-counterclockwise"></i> Undo
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" @onclick="RedoLastOperation" disabled="@(!canRedo)">
+                        <i class="bi bi-arrow-clockwise"></i> Redo
+                    </button>
+                </div>
+                
+                <button class="btn btn-sm btn-danger w-100" @onclick="DeleteSelectedNode" disabled="@(selectedNodeId == null || !isEditMode)">
+                    <i class="bi bi-trash"></i> Delete Selected
                 </button>
             </div>
             
             <div class="toolbar-section">
-                <h5>Edit Mode</h5>
+                <h5><i class="bi bi-toggles"></i> Edit Mode</h5>
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" @bind="isEditMode" id="editModeSwitch">
                     <label class="form-check-label" for="editModeSwitch">
-                        @(isEditMode ? "Edit Mode" : "View Mode")
+                        @(isEditMode ? "✏️ Edit Mode" : "🔒 View Mode")
                     </label>
                 </div>
+                
+                @if (graphEditor != null)
+                {
+                    <div class="mt-3">
+                        <h6>Graph Stats</h6>
+                        <div class="stats-grid">
+                            <div class="stats-item">
+                                <span class="badge bg-primary">@nodeCount</span>
+                                <small>Nodes</small>
+                            </div>
+                            <div class="stats-item">
+                                <span class="badge bg-info">@(canUndo ? "Yes" : "No")</span>
+                                <small>Undo Available</small>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
             
             @if (selectedNode != null)
             {
                 <div class="toolbar-section">
-                    <h5>Node Properties</h5>
+                    <h5><i class="bi bi-gear"></i> Node Properties</h5>
                     <div class="node-properties">
                         <div class="mb-2">
                             <label class="form-label">Node Type:</label>
@@ -55,7 +97,12 @@
                         
                         <div class="mb-2">
                             <label class="form-label">Node ID:</label>
-                            <input value="@selectedNode.Id" readonly class="form-control form-control-sm" />
+                            <div class="input-group input-group-sm">
+                                <input value="@selectedNode.Id.ToString()[..8]..." readonly class="form-control" />
+                                <button class="btn btn-outline-secondary" type="button" @onclick="() => CopyToClipboard(selectedNode.Id.ToString())">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
                         </div>
                         
                         @if (selectedNode is NonTerminalNode ntNode)
@@ -63,6 +110,10 @@
                             <div class="mb-2">
                                 <label class="form-label">Children:</label>
                                 <span class="badge bg-info">@ntNode.Children.Count</span>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Rule Name:</label>
+                                <input @bind="ntNode.RuleName" class="form-control form-control-sm" disabled="@(!isEditMode)" />
                             </div>
                         }
                         
@@ -81,377 +132,497 @@
                         @if (selectedNode is IdentifierNode idNode)
                         {
                             <div class="mb-2">
-                                <label class="form-label">Text:</label>
-                                <input @bind="idNode.Text" class="form-control form-control-sm" disabled="@(!isEditMode)" />
+                                <label class="form-label">Identifier:</label>
+                                <input @bind="idNode.Identifier" class="form-control form-control-sm" disabled="@(!isEditMode)" />
                             </div>
                             <div class="mb-2">
-                                <label class="form-label">Namespace:</label>
-                                <input @bind="idNode.Namespace" class="form-control form-control-sm" disabled="@(!isEditMode)" />
+                                <label class="form-label">Scope:</label>
+                                <input @bind="idNode.Scope" class="form-control form-control-sm" disabled="@(!isEditMode)" />
                             </div>
                         }
                         
                         @if (selectedNode is LiteralNode litNode)
                         {
                             <div class="mb-2">
-                                <label class="form-label">Literal Text:</label>
-                                <input @bind="litNode.Text" class="form-control form-control-sm" disabled="@(!isEditMode)" />
+                                <label class="form-label">Value:</label>
+                                <input @bind="litNode.Value" class="form-control form-control-sm" disabled="@(!isEditMode)" />
                             </div>
                             <div class="mb-2">
-                                <label class="form-label">Literal Value:</label>
-                                <input @bind="literalValue" @bind:after="UpdateLiteralValue" class="form-control form-control-sm" disabled="@(!isEditMode)" />
+                                <label class="form-label">Literal Type:</label>
+                                <select @bind="litNode.LiteralType" class="form-select form-select-sm" disabled="@(!isEditMode)">
+                                    <option value="String">String</option>
+                                    <option value="Number">Number</option>
+                                    <option value="Boolean">Boolean</option>
+                                    <option value="Null">Null</option>
+                                </select>
                             </div>
                         }
                     </div>
                 </div>
             }
         </div>
-        
-        <div class="graph-canvas-container">
-            <div class="canvas-header">
-                <h5>Graph Visualization</h5>
-                <div class="canvas-controls">
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="ZoomIn">🔍+</button>
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="ZoomOut">🔍-</button>
-                    <button class="btn btn-sm btn-outline-secondary" @onclick="ResetView">⌂</button>
-                </div>
-            </div>
-            <div class="graph-canvas" @ref="canvasElement" @onclick="OnCanvasClick">
-                <!-- Graph will be rendered here via JavaScript -->
-                @if (rootNode == null)
-                {
-                    <div class="empty-state">
-                        <div class="empty-icon">📊</div>
-                        <h4>No Graph Loaded</h4>
-                        <p>Create a new graph or load a sample to get started</p>
-                        <button class="btn btn-primary" @onclick="LoadSampleGraph">Load Sample Graph</button>
+
+        <div class="graph-visualization">
+            @if (graphEditor == null)
+            {
+                <div class="loading-state">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Initializing GraphEditor...</span>
                     </div>
-                }
-            </div>
+                    <p class="mt-2">Initializing GraphEditor with Minotaur.Core integration...</p>
+                </div>
+            }
+            else if (nodeCount == 0)
+            {
+                <div class="empty-state">
+                    <div class="empty-content">
+                        <i class="bi bi-diagram-3 empty-icon"></i>
+                        <h4>No Nodes in Graph</h4>
+                        <p>Start by adding nodes using the toolbar, or load a sample graph to get started.</p>
+                        <button class="btn btn-primary" @onclick="LoadSampleGraph">
+                            <i class="bi bi-file-code"></i> Load Sample Graph
+                        </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="graph-canvas" id="graph-canvas">
+                    <svg width="100%" height="100%" viewBox="0 0 800 600" class="graph-svg">
+                        <!-- Background grid -->
+                        <defs>
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e0e0" stroke-width="0.5"/>
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)" />
+                        
+                        <!-- Render nodes -->
+                        @if (graphEditor != null && nodePositions.Any())
+                        {
+                            @foreach (var kvp in nodePositions)
+                            {
+                                var node = nodes.FirstOrDefault(n => n.Id == kvp.Key);
+                                if (node != null)
+                                {
+                                    var pos = kvp.Value;
+                                    var isSelected = selectedNodeId == node.Id;
+                                    var nodeClass = GetNodeClass(node);
+                                    var nodeColor = GetNodeColor(node);
+                                    
+                                    <g class="graph-node @nodeClass @(isSelected ? "selected" : "")" 
+                                       transform="translate(@pos.X, @pos.Y)"
+                                       @onclick="() => SelectNode(node)">
+                                        
+                                        <rect x="-40" y="-20" width="80" height="40" 
+                                              fill="@nodeColor" 
+                                              stroke="@(isSelected ? "#007bff" : "#666")" 
+                                              stroke-width="@(isSelected ? 3 : 1)"
+                                              rx="5" />
+                                        
+                                        <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" 
+                                              fill="white" font-size="12" font-weight="bold">
+                                            @GetNodeDisplayText(node)
+                                        </text>
+                                        
+                                        @if (isSelected)
+                                        {
+                                            <circle cx="45" cy="-25" r="8" fill="#dc3545" class="delete-handle"
+                                                   @onclick="() => DeleteNode(node)" @onclick:stopPropagation="true">
+                                            </circle>
+                                            <text x="45" y="-25" text-anchor="middle" dominant-baseline="middle" 
+                                                  fill="white" font-size="10">×</text>
+                                        }
+                                    </g>
+                                }
+                            }
+                            
+                            <!-- Render connections -->
+                            @foreach (var connection in connections)
+                            {
+                                var fromPos = nodePositions.GetValueOrDefault(connection.FromId);
+                                var toPos = nodePositions.GetValueOrDefault(connection.ToId);
+                                
+                                if (fromPos != default && toPos != default)
+                                {
+                                    <line x1="@fromPos.X" y1="@fromPos.Y" x2="@toPos.X" y2="@toPos.Y" 
+                                          stroke="#666" stroke-width="2" marker-end="url(#arrowhead)" />
+                                }
+                            }
+                            
+                            <!-- Arrow marker definition -->
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                                        refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+                                </marker>
+                            </defs>
+                        }
+                    </svg>
+                </div>
+            }
         </div>
     </div>
     
-    <div class="editor-status">
-        <div class="status-item">
-            <strong>Nodes:</strong> <span class="badge bg-primary">@totalNodes</span>
+    @if (statusMessage != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+            <i class="bi bi-info-circle"></i> @statusMessage
+            <button type="button" class="btn-close" @onclick="() => statusMessage = null"></button>
         </div>
-        <div class="status-item">
-            <strong>Connections:</strong> <span class="badge bg-success">@totalConnections</span>
+    }
+    
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
         </div>
-        <div class="status-item">
-            <strong>Selected:</strong> <span class="badge bg-info">@(selectedNode?.NodeType ?? "None")</span>
-        </div>
-        <div class="status-item">
-            <strong>Mode:</strong> <span class="badge @(isEditMode ? "bg-warning" : "bg-secondary")">@(isEditMode ? "Edit" : "View")</span>
-        </div>
-    </div>
+    }
 </div>
 
 @code {
-    private ElementReference canvasElement;
     private GraphEditor? graphEditor;
-    private CognitiveGraphNode? rootNode;
+    private List<CognitiveGraphNode> nodes = new();
+    private Dictionary<Guid, (double X, double Y)> nodePositions = new();
+    private List<(Guid FromId, Guid ToId)> connections = new();
     private CognitiveGraphNode? selectedNode;
     private Guid? selectedNodeId;
-    private bool isEditMode = false;
+    private bool isEditMode = true;
     private bool canUndo = false;
     private bool canRedo = false;
-    private int totalNodes = 0;
-    private int totalConnections = 0;
-    private string literalValue = "";
+    private int nodeCount = 0;
+    private string? statusMessage;
+    private string? errorMessage;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        try
         {
+            graphEditor = new GraphEditor();
             await LoadSampleGraph();
+            statusMessage = "GraphEditor initialized successfully with Minotaur.Core integration.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to initialize GraphEditor: {ex.Message}";
         }
     }
 
     private async Task CreateNewGraph()
     {
-        rootNode = new NonTerminalNode("root", 0);
-        graphEditor?.Dispose();
-        graphEditor = new GraphEditor(rootNode);
-        
-        await UpdateGraphStats();
-        await RenderCognitiveGraph();
+        try
+        {
+            graphEditor?.Dispose();
+            graphEditor = new GraphEditor();
+            nodes.Clear();
+            nodePositions.Clear();
+            connections.Clear();
+            selectedNode = null;
+            selectedNodeId = null;
+            canUndo = false;
+            canRedo = false;
+            nodeCount = 0;
+            statusMessage = "New graph created successfully.";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to create new graph: {ex.Message}";
+        }
     }
 
     private async Task LoadSampleGraph()
     {
-        // Create a sample cognitive graph representing a simple expression: x + 5
-        var expression = new NonTerminalNode("expression", 0);
-        
-        var leftOperand = new IdentifierNode("x");
-        var operator_node = new TerminalNode("+", "operator");
-        var rightOperand = new LiteralNode("5", "number", 5);
-        
-        expression.AddChild(leftOperand);
-        expression.AddChild(operator_node);
-        expression.AddChild(rightOperand);
-        
-        rootNode = expression;
-        graphEditor?.Dispose();
-        graphEditor = new GraphEditor(rootNode);
-        
-        await UpdateGraphStats();
-        await RenderCognitiveGraph();
-    }
-
-    private async Task SaveGraph()
-    {
-        if (rootNode == null) return;
-        
-        // In a real implementation, this would save to a file or database
-        // For now, we'll just show a message
-        await JSRuntime.InvokeVoidAsync("alert", "Graph saved successfully!");
-    }
-
-    private async Task RenderCognitiveGraph()
-    {
-        if (rootNode == null) return;
-        
-        var graphData = ConvertCognitiveGraphToVisualizationData(rootNode);
-        await JSRuntime.InvokeVoidAsync("renderCognitiveGraph", canvasElement, graphData, isEditMode);
-    }
-
-    private async Task AddNode()
-    {
-        if (selectedNode == null || graphEditor == null) return;
-        
-        if (selectedNode is NonTerminalNode parentNode)
+        try
         {
-            var newNode = new TerminalNode("new_node", "terminal");
-            graphEditor.InsertNode(parentNode.Id, newNode);
+            if (graphEditor == null) return;
+
+            // Create sample nodes using the real Minotaur.Core classes
+            var rootNode = new NonTerminalNode 
+            { 
+                NodeType = "Root", 
+                RuleName = "Program" 
+            };
             
-            await UpdateGraphStats();
-            await RenderCognitiveGraph();
+            var methodNode = new NonTerminalNode 
+            { 
+                NodeType = "MethodDeclaration", 
+                RuleName = "Method" 
+            };
+            
+            var identifierNode = new IdentifierNode 
+            { 
+                NodeType = "Identifier", 
+                Identifier = "MainMethod",
+                Scope = "Global"
+            };
+            
+            var literalNode = new LiteralNode 
+            { 
+                NodeType = "StringLiteral", 
+                Value = "Hello, World!",
+                LiteralType = "String"
+            };
+            
+            var terminalNode = new TerminalNode 
+            { 
+                NodeType = "Keyword", 
+                Text = "public",
+                TokenType = "Keyword"
+            };
+
+            // Add nodes to our tracking collections
+            nodes = new List<CognitiveGraphNode> { rootNode, methodNode, identifierNode, literalNode, terminalNode };
+            
+            // Set up node positions for visualization
+            nodePositions = new Dictionary<Guid, (double X, double Y)>
+            {
+                { rootNode.Id, (400, 100) },
+                { methodNode.Id, (400, 200) },
+                { identifierNode.Id, (250, 300) },
+                { literalNode.Id, (400, 300) },
+                { terminalNode.Id, (550, 300) }
+            };
+            
+            // Set up connections
+            connections = new List<(Guid FromId, Guid ToId)>
+            {
+                (rootNode.Id, methodNode.Id),
+                (methodNode.Id, identifierNode.Id),
+                (methodNode.Id, literalNode.Id),
+                (methodNode.Id, terminalNode.Id)
+            };
+            
+            // Add children relationships
+            methodNode.AddChild(identifierNode);
+            methodNode.AddChild(literalNode);
+            methodNode.AddChild(terminalNode);
+            rootNode.AddChild(methodNode);
+
+            nodeCount = nodes.Count;
+            statusMessage = "Sample graph loaded with cognitive graph structure.";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to load sample graph: {ex.Message}";
+        }
+    }
+
+    private async Task AddTerminalNode()
+    {
+        await AddNode(new TerminalNode { NodeType = "Terminal", Text = "NewTerminal", TokenType = "Unknown" });
+    }
+
+    private async Task AddNonTerminalNode()
+    {
+        await AddNode(new NonTerminalNode { NodeType = "NonTerminal", RuleName = "NewRule" });
+    }
+
+    private async Task AddIdentifierNode()
+    {
+        await AddNode(new IdentifierNode { NodeType = "Identifier", Identifier = "NewIdentifier", Scope = "Local" });
+    }
+
+    private async Task AddLiteralNode()
+    {
+        await AddNode(new LiteralNode { NodeType = "Literal", Value = "NewValue", LiteralType = "String" });
+    }
+
+    private async Task AddNode(CognitiveGraphNode node)
+    {
+        try
+        {
+            if (graphEditor == null) return;
+
+            nodes.Add(node);
+            
+            // Position new node
+            var x = 100 + (nodes.Count % 5) * 150;
+            var y = 100 + (nodes.Count / 5) * 100;
+            nodePositions[node.Id] = (x, y);
+            
+            nodeCount = nodes.Count;
+            canUndo = true;
+            statusMessage = $"Added new {node.GetType().Name} node.";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to add node: {ex.Message}";
         }
     }
 
     private async Task DeleteSelectedNode()
     {
-        if (selectedNodeId == null || graphEditor == null) return;
-        
+        if (selectedNode == null) return;
+        await DeleteNode(selectedNode);
+    }
+
+    private async Task DeleteNode(CognitiveGraphNode node)
+    {
         try
         {
-            graphEditor.RemoveNode(selectedNodeId.Value);
-            selectedNode = null;
-            selectedNodeId = null;
+            if (graphEditor == null) return;
+
+            nodes.Remove(node);
+            nodePositions.Remove(node.Id);
+            connections.RemoveAll(c => c.FromId == node.Id || c.ToId == node.Id);
             
-            await UpdateGraphStats();
-            await RenderCognitiveGraph();
+            if (selectedNode?.Id == node.Id)
+            {
+                selectedNode = null;
+                selectedNodeId = null;
+            }
+            
+            nodeCount = nodes.Count;
+            canUndo = true;
+            statusMessage = $"Deleted {node.GetType().Name} node.";
+            StateHasChanged();
         }
         catch (Exception ex)
         {
-            await JSRuntime.InvokeVoidAsync("alert", $"Cannot delete node: {ex.Message}");
+            errorMessage = $"Failed to delete node: {ex.Message}";
         }
+    }
+
+    private void SelectNode(CognitiveGraphNode node)
+    {
+        selectedNode = node;
+        selectedNodeId = node.Id;
+        StateHasChanged();
     }
 
     private async Task UndoLastOperation()
     {
-        if (graphEditor?.CanUndo == true)
+        try
         {
-            graphEditor.Undo();
-            await UpdateGraphStats();
-            await RenderCognitiveGraph();
+            if (graphEditor?.CanUndo == true)
+            {
+                graphEditor.Undo();
+                canUndo = graphEditor.CanUndo;
+                canRedo = graphEditor.CanRedo;
+                statusMessage = "Undo operation completed.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Undo failed: {ex.Message}";
         }
     }
 
     private async Task RedoLastOperation()
     {
-        if (graphEditor?.CanRedo == true)
+        try
         {
-            graphEditor.Redo();
-            await UpdateGraphStats();
-            await RenderCognitiveGraph();
+            if (graphEditor?.CanRedo == true)
+            {
+                graphEditor.Redo();
+                canUndo = graphEditor.CanUndo;
+                canRedo = graphEditor.CanRedo;
+                statusMessage = "Redo operation completed.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Redo failed: {ex.Message}";
         }
     }
 
-    private async Task ZoomIn()
+    private async Task SaveGraph()
     {
-        await JSRuntime.InvokeVoidAsync("zoomCognitiveGraph", canvasElement, 1.2);
-    }
-
-    private async Task ZoomOut()
-    {
-        await JSRuntime.InvokeVoidAsync("zoomCognitiveGraph", canvasElement, 0.8);
-    }
-
-    private async Task ResetView()
-    {
-        await JSRuntime.InvokeVoidAsync("resetCognitiveGraphView", canvasElement);
-    }
-
-    private async Task OnCanvasClick()
-    {
-        // Handle canvas clicks - could be used for deselecting nodes
-        if (!isEditMode) return;
-        
-        selectedNode = null;
-        selectedNodeId = null;
-        StateHasChanged();
-    }
-
-    private async Task UpdateGraphStats()
-    {
-        totalNodes = rootNode != null ? CountNodes(rootNode) : 0;
-        totalConnections = rootNode != null ? CountConnections(rootNode) : 0;
-        canUndo = graphEditor?.CanUndo ?? false;
-        canRedo = graphEditor?.CanRedo ?? false;
-        StateHasChanged();
-    }
-
-    private void UpdateLiteralValue()
-    {
-        if (selectedNode is LiteralNode litNode && !string.IsNullOrEmpty(literalValue))
+        try
         {
-            // Try to parse the value as different types
-            if (int.TryParse(literalValue, out int intVal))
-            {
-                litNode.Value = intVal;
-            }
-            else if (double.TryParse(literalValue, out double doubleVal))
-            {
-                litNode.Value = doubleVal;
-            }
-            else if (bool.TryParse(literalValue, out bool boolVal))
-            {
-                litNode.Value = boolVal;
-            }
-            else
-            {
-                litNode.Value = literalValue;
-            }
-        }
-    }
-
-    private int CountNodes(CognitiveGraphNode node)
-    {
-        if (node == null) return 0;
-        
-        int count = 1;
-        if (node is NonTerminalNode ntNode)
-        {
-            foreach (var child in ntNode.Children)
-            {
-                count += CountNodes(child);
-            }
-        }
-        return count;
-    }
-
-    private int CountConnections(CognitiveGraphNode node)
-    {
-        if (node == null || !(node is NonTerminalNode ntNode)) return 0;
-        
-        int count = ntNode.Children.Count;
-        foreach (var child in ntNode.Children)
-        {
-            count += CountConnections(child);
-        }
-        return count;
-    }
-
-    private object ConvertCognitiveGraphToVisualizationData(CognitiveGraphNode node)
-    {
-        var nodes = new List<object>();
-        var edges = new List<object>();
-        
-        ConvertNodeRecursive(node, nodes, edges, 0, 0, null);
-        
-        return new { nodes, edges };
-    }
-
-    private void ConvertNodeRecursive(CognitiveGraphNode node, List<object> nodes, List<object> edges, int x, int y, string? parentId)
-    {
-        if (node == null) return;
-
-        var nodeId = node.Id.ToString();
-        
-        nodes.Add(new
-        {
-            id = nodeId,
-            label = GetNodeDisplayText(node),
-            x = x,
-            y = y,
-            type = node.GetType().Name,
-            nodeType = node.NodeType,
-            metadata = node.Metadata,
-            isSelected = selectedNodeId?.ToString() == nodeId
-        });
-
-        if (parentId != null)
-        {
-            edges.Add(new
-            {
-                id = $"{parentId}-{nodeId}",
-                source = parentId,
-                target = nodeId,
-                type = "cognitive"
-            });
-        }
-
-        if (node is NonTerminalNode ntNode)
-        {
-            int childIndex = 0;
-            int childCount = ntNode.Children.Count;
+            if (graphEditor == null) return;
             
-            foreach (var child in ntNode.Children)
+            var graphData = new
             {
-                var childX = x + (childIndex - childCount / 2.0) * 150;
-                var childY = y + 100;
-                
-                ConvertNodeRecursive(child, nodes, edges, (int)childX, childY, nodeId);
-                childIndex++;
-            }
+                Nodes = nodes.Select(n => new
+                {
+                    n.Id,
+                    n.NodeType,
+                    Type = n.GetType().Name,
+                    Position = nodePositions.GetValueOrDefault(n.Id),
+                    Properties = GetNodeProperties(n)
+                }),
+                Connections = connections
+            };
+            
+            var json = JsonSerializer.Serialize(graphData, new JsonSerializerOptions { WriteIndented = true });
+            await JSRuntime.InvokeVoidAsync("downloadFile", "cognitive-graph.json", json, "application/json");
+            statusMessage = "Graph exported successfully.";
         }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to save graph: {ex.Message}";
+        }
+    }
+
+    private async Task ExportToJson()
+    {
+        await SaveGraph();
+    }
+
+    private async Task CopyToClipboard(string text)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            statusMessage = "Copied to clipboard.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to copy to clipboard: {ex.Message}";
+        }
+    }
+
+    private string GetNodeClass(CognitiveGraphNode node)
+    {
+        return node switch
+        {
+            TerminalNode => "terminal-node",
+            NonTerminalNode => "nonterminal-node",
+            IdentifierNode => "identifier-node",
+            LiteralNode => "literal-node",
+            _ => "unknown-node"
+        };
+    }
+
+    private string GetNodeColor(CognitiveGraphNode node)
+    {
+        return node switch
+        {
+            TerminalNode => "#28a745",
+            NonTerminalNode => "#17a2b8",
+            IdentifierNode => "#ffc107",
+            LiteralNode => "#6c757d",
+            _ => "#343a40"
+        };
     }
 
     private string GetNodeDisplayText(CognitiveGraphNode node)
     {
         return node switch
         {
-            IdentifierNode identifier => $"ID: {identifier.Text}",
-            LiteralNode literal => $"Lit: {literal.Value}",
-            TerminalNode terminal => $"{terminal.TokenType}: {terminal.Text}",
-            NonTerminalNode nonTerminal => $"NT: {nonTerminal.RuleName}",
-            _ => node.NodeType
+            TerminalNode t => t.Text?.Length > 8 ? t.Text[..8] + "..." : t.Text ?? "Term",
+            NonTerminalNode nt => nt.RuleName?.Length > 8 ? nt.RuleName[..8] + "..." : nt.RuleName ?? "Rule",
+            IdentifierNode id => id.Identifier?.Length > 8 ? id.Identifier[..8] + "..." : id.Identifier ?? "ID",
+            LiteralNode lit => lit.Value?.Length > 8 ? lit.Value[..8] + "..." : lit.Value ?? "Lit",
+            _ => "Node"
         };
     }
 
-    [JSInvokable]
-    public async Task OnNodeSelected(string nodeId)
+    private object GetNodeProperties(CognitiveGraphNode node)
     {
-        if (Guid.TryParse(nodeId, out var guid))
+        return node switch
         {
-            selectedNodeId = guid;
-            selectedNode = FindNodeById(rootNode, guid);
-            
-            if (selectedNode is LiteralNode litNode)
-            {
-                literalValue = litNode.Value?.ToString() ?? "";
-            }
-            
-            StateHasChanged();
-        }
-    }
-
-    private CognitiveGraphNode? FindNodeById(CognitiveGraphNode? node, Guid id)
-    {
-        if (node == null) return null;
-        if (node.Id == id) return node;
-        
-        if (node is NonTerminalNode ntNode)
-        {
-            foreach (var child in ntNode.Children)
-            {
-                var found = FindNodeById(child, id);
-                if (found != null) return found;
-            }
-        }
-        
-        return null;
+            TerminalNode t => new { t.Text, t.TokenType },
+            NonTerminalNode nt => new { nt.RuleName, ChildCount = nt.Children.Count },
+            IdentifierNode id => new { id.Identifier, id.Scope },
+            LiteralNode lit => new { lit.Value, lit.LiteralType },
+            _ => new { }
+        };
     }
 
     public void Dispose()
@@ -459,138 +630,3 @@
         graphEditor?.Dispose();
     }
 }
-
-<style>
-    .cognitive-graph-editor {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .editor-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .editor-layout {
-        display: flex;
-        flex: 1;
-        overflow: hidden;
-    }
-
-    .graph-toolbar {
-        width: 300px;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-right: 1px solid #dee2e6;
-        overflow-y: auto;
-    }
-
-    .toolbar-section {
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .toolbar-section:last-child {
-        border-bottom: none;
-    }
-
-    .toolbar-section h5 {
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .node-properties .form-label {
-        font-size: 0.8rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-    }
-
-    .graph-canvas-container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-
-    .canvas-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        background-color: #ffffff;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .canvas-header h5 {
-        margin: 0;
-        font-size: 1rem;
-    }
-
-    .canvas-controls {
-        display: flex;
-        gap: 0.25rem;
-    }
-
-    .graph-canvas {
-        flex: 1;
-        position: relative;
-        background-color: #fafafa;
-        background-image: 
-            linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-        background-size: 20px 20px;
-        overflow: hidden;
-    }
-
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        color: #6c757d;
-    }
-
-    .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state h4 {
-        margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-
-    .editor-status {
-        display: flex;
-        gap: 1rem;
-        padding: 0.5rem 1rem;
-        background-color: #f8f9fa;
-        border-top: 1px solid #dee2e6;
-        align-items: center;
-    }
-
-    .status-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-    }
-
-    .btn-sm {
-        font-size: 0.8rem;
-        padding: 0.25rem 0.5rem;
-    }
-</style>

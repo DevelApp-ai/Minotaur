@@ -1,10 +1,20 @@
 using Minotaur.UI.Blazor.Components;
+using Minotaur.Core;
+using Minotaur.Editor;
+using Minotaur.Plugins;
+using Minotaur.GrammarGeneration;
+using Minotaur.Parser;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Register Minotaur services
+builder.Services.AddSingleton<LanguagePluginManager>();
+builder.Services.AddScoped<GraphEditor>();
+builder.Services.AddScoped<GrammarGenerator>();
 
 var app = builder.Build();
 
