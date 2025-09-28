@@ -1,0 +1,790 @@
+@page "/grammar-editor"
+@using Minotaur.Core
+@using Minotaur.Editor
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Grammar Editor</PageTitle>
+
+<div class="grammar-editor">
+    <div class="row h-100">
+        <!-- Left Panel: Grammar Editor -->
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-text"></i> Grammar Editor
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-primary btn-sm" @onclick="NewGrammar">
+                            <i class="bi bi-file-plus"></i> New
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="OpenGrammar">
+                            <i class="bi bi-folder-open"></i> Open
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" @onclick="SaveGrammar" disabled="@(!hasUnsavedChanges)">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+                        <button class="btn btn-primary btn-sm" @onclick="ParseGrammar" disabled="@isParsingGrammar">
+                            @if (isParsingGrammar)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span>Parsing...</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-play-fill"></i>
+                                <span>Parse</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative">
+                    <!-- Grammar Metadata -->
+                    <div class="grammar-metadata border-bottom p-2">
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <input @bind="grammarName" @oninput="OnGrammarMetadataChanged" 
+                                       class="form-control form-control-sm" placeholder="Grammar Name" />
+                            </div>
+                            <div class="col-md-3">
+                                <select @bind="grammarType" class="form-select form-select-sm">
+                                    <option value="lexer">Lexer Grammar</option>
+                                    <option value="parser">Parser Grammar</option>
+                                    <option value="combined">Combined Grammar</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input @bind="grammarVersion" @oninput="OnGrammarMetadataChanged" 
+                                       class="form-control form-control-sm" placeholder="Version" />
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check form-check-inline">
+                                    <input @bind="enableSyntaxHighlighting" 
+                                           class="form-check-input" type="checkbox" id="syntaxHighlighting" />
+                                    <label class="form-check-label" for="syntaxHighlighting">
+                                        Syntax Highlighting
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Editor -->
+                    <div class="code-editor-container">
+                        <div class="editor-gutter">
+                            @for (int i = 1; i <= grammarContent.Split('\n').Length; i++)
+                            {
+                                <div class="line-number @(grammarErrors.Any(e => e.Line == i) ? "error-line" : "")">
+                                    @i
+                                    @if (grammarErrors.Any(e => e.Line == i))
+                                    {
+                                        <i class="bi bi-exclamation-triangle-fill text-danger" 
+                                           title="@string.Join(", ", grammarErrors.Where(e => e.Line == i).Select(e => e.Message))"></i>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <textarea @bind="grammarContent" @oninput="OnGrammarContentChanged" @ref="codeEditorElement"
+                                  class="code-editor @(enableSyntaxHighlighting ? "syntax-highlighted" : "")"
+                                  placeholder="Enter your grammar definition here..."></textarea>
+                    </div>
+
+                    <!-- Status Bar -->
+                    <div class="editor-status-bar">
+                        <div class="status-left">
+                            <span class="status-item">
+                                <i class="bi bi-cursor-text"></i> 
+                                Line @currentLine, Column @currentColumn
+                            </span>
+                            <span class="status-item">
+                                <i class="bi bi-file-text"></i> 
+                                @grammarContent.Split('\n').Length lines, @grammarContent.Length chars
+                            </span>
+                            @if (hasUnsavedChanges)
+                            {
+                                <span class="status-item text-warning">
+                                    <i class="bi bi-circle-fill"></i> Unsaved changes
+                                </span>
+                            }
+                        </div>
+                        <div class="status-right">
+                            @if (grammarErrors.Any())
+                            {
+                                <span class="status-item text-danger">
+                                    <i class="bi bi-exclamation-triangle"></i> 
+                                    @grammarErrors.Count error@(grammarErrors.Count != 1 ? "s" : "")
+                                </span>
+                            }
+                            else if (isGrammarValid)
+                            {
+                                <span class="status-item text-success">
+                                    <i class="bi bi-check-circle"></i> Valid grammar
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Grammar Analysis -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link @(activeTab == "rules" ? "active" : "")" 
+                               @onclick='() => SetActiveTab("rules")' href="#">
+                                <i class="bi bi-list-ul"></i> Rules
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(activeTab == "analysis" ? "active" : "")" 
+                               @onclick='() => SetActiveTab("analysis")' href="#">
+                                <i class="bi bi-graph-up"></i> Analysis
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(activeTab == "errors" ? "active" : "")" 
+                               @onclick='() => SetActiveTab("errors")' href="#">
+                                <i class="bi bi-exclamation-triangle"></i> Errors
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <!-- Rules Tab -->
+                    @if (activeTab == "rules")
+                    {
+                        <div class="grammar-rules">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Grammar Rules (@grammarRules.Count)</h6>
+                                <button class="btn btn-outline-primary btn-sm" @onclick="AddNewRule">
+                                    <i class="bi bi-plus"></i> Add Rule
+                                </button>
+                            </div>
+                            
+                            @if (grammarRules.Any())
+                            {
+                                <div class="rules-list">
+                                    @foreach (var rule in grammarRules)
+                                    {
+                                        <div class="rule-item @(selectedRuleName == rule.Name ? "selected" : "")" 
+                                             @onclick="() => SelectRule(rule.Name)">
+                                            <div class="rule-header">
+                                                <strong>@rule.Name</strong>
+                                                <span class="badge bg-secondary">@rule.Type</span>
+                                            </div>
+                                            <div class="rule-preview">@rule.Definition</div>
+                                            <div class="rule-stats">
+                                                <small class="text-muted">
+                                                    @rule.References references • @rule.Alternatives alternatives
+                                                </small>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-list-ul fs-1"></i>
+                                    <p>No rules defined yet</p>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Analysis Tab -->
+                    @if (activeTab == "analysis")
+                    {
+                        <div class="grammar-analysis">
+                            @if (grammarAnalysis != null)
+                            {
+                                <div class="analysis-metrics">
+                                    <h6>Grammar Metrics</h6>
+                                    <div class="metrics-grid">
+                                        <div class="metric-item">
+                                            <div class="metric-value">@grammarAnalysis.TotalRules</div>
+                                            <div class="metric-label">Total Rules</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-value">@grammarAnalysis.TerminalRules</div>
+                                            <div class="metric-label">Terminal Rules</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-value">@grammarAnalysis.NonTerminalRules</div>
+                                            <div class="metric-label">Non-Terminal Rules</div>
+                                        </div>
+                                        <div class="metric-item">
+                                            <div class="metric-value">@grammarAnalysis.CyclomaticComplexity</div>
+                                            <div class="metric-label">Complexity</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="analysis-warnings mt-3">
+                                    <h6>Analysis Warnings</h6>
+                                    @if (grammarAnalysis.Warnings.Any())
+                                    {
+                                        @foreach (var warning in grammarAnalysis.Warnings)
+                                        {
+                                            <div class="alert alert-warning alert-sm">
+                                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                                <strong>@warning.Type:</strong> @warning.Message
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-success">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            No warnings detected
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="analysis-suggestions mt-3">
+                                    <h6>Optimization Suggestions</h6>
+                                    @if (grammarAnalysis.Suggestions.Any())
+                                    {
+                                        @foreach (var suggestion in grammarAnalysis.Suggestions)
+                                        {
+                                            <div class="suggestion-item">
+                                                <div class="suggestion-header">
+                                                    <i class="bi bi-lightbulb text-warning me-2"></i>
+                                                    <strong>@suggestion.Title</strong>
+                                                </div>
+                                                <div class="suggestion-description">@suggestion.Description</div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            Grammar is well-optimized
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-graph-up fs-1"></i>
+                                    <p>Parse grammar to see analysis</p>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <!-- Errors Tab -->
+                    @if (activeTab == "errors")
+                    {
+                        <div class="grammar-errors">
+                            <h6>Parsing Errors (@grammarErrors.Count)</h6>
+                            @if (grammarErrors.Any())
+                            {
+                                <div class="errors-list">
+                                    @foreach (var error in grammarErrors)
+                                    {
+                                        <div class="error-item" @onclick="() => GoToError(error)">
+                                            <div class="error-header">
+                                                <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+                                                <strong>Line @error.Line, Column @error.Column</strong>
+                                            </div>
+                                            <div class="error-message">@error.Message</div>
+                                            <div class="error-context">
+                                                <code>@error.Context</code>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center text-success">
+                                    <i class="bi bi-check-circle fs-1"></i>
+                                    <p>No errors found</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.grammar-editor {
+    height: calc(100vh - 120px);
+    padding: 1rem;
+}
+
+.code-editor-container {
+    display: flex;
+    height: calc(100vh - 300px);
+}
+
+.editor-gutter {
+    width: 60px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    padding: 0.5rem 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+.line-number {
+    padding: 0 0.5rem;
+    text-align: right;
+    color: #6c757d;
+    position: relative;
+    height: 21px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.line-number.error-line {
+    background-color: #f8d7da;
+}
+
+.code-editor {
+    flex: 1;
+    border: none;
+    resize: none;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0.5rem;
+    outline: none;
+}
+
+.code-editor.syntax-highlighted {
+    background-color: #f8f9fa;
+}
+
+.editor-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    font-size: 0.875rem;
+}
+
+.status-item {
+    margin-right: 1rem;
+}
+
+.status-item:last-child {
+    margin-right: 0;
+}
+
+.rules-list {
+    max-height: calc(100vh - 400px);
+    overflow-y: auto;
+}
+
+.rule-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rule-item:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.rule-item.selected {
+    background-color: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.rule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.rule-preview {
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rule-stats {
+    font-size: 0.75rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.metric-item {
+    text-align: center;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #495057;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.alert-sm {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.suggestion-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    border-left: 3px solid #ffc107;
+}
+
+.suggestion-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.suggestion-description {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.error-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-left: 3px solid #dc3545;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.error-item:hover {
+    background-color: #f8f9fa;
+}
+
+.error-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.error-message {
+    margin-bottom: 0.25rem;
+    color: #495057;
+}
+
+.error-context {
+    font-size: 0.875rem;
+    background-color: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+</style>
+
+@code {
+    private string grammarName = "MyGrammar";
+    private string grammarType = "combined";
+    private string grammarVersion = "1.0.0";
+    private bool enableSyntaxHighlighting = true;
+    private bool hasUnsavedChanges = false;
+    private bool isParsingGrammar = false;
+    private bool isGrammarValid = false;
+    
+    private int currentLine = 1;
+    private int currentColumn = 1;
+    
+    private string activeTab = "rules";
+    private string? selectedRuleName;
+
+    private ElementReference codeEditorElement;
+
+    private string grammarContent = @"grammar MyGrammar;
+
+// Parser rules
+compilationUnit: statement* EOF;
+
+statement: 
+    | variableDeclaration ';'
+    | assignment ';'
+    | ifStatement
+    | whileStatement
+    | blockStatement
+    ;
+
+variableDeclaration: 'var' IDENTIFIER ('=' expression)?;
+assignment: IDENTIFIER '=' expression;
+ifStatement: 'if' '(' expression ')' statement ('else' statement)?;
+whileStatement: 'while' '(' expression ')' statement;
+blockStatement: '{' statement* '}';
+
+expression:
+    | expression ('*' | '/') expression
+    | expression ('+' | '-') expression
+    | '(' expression ')'
+    | IDENTIFIER
+    | NUMBER
+    ;
+
+// Lexer rules
+IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+NUMBER: [0-9]+;
+WS: [ \t\r\n]+ -> skip;";
+
+    private List<GrammarRule> grammarRules = new();
+    private List<GrammarError> grammarErrors = new();
+    private GrammarAnalysis? grammarAnalysis;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ParseGrammar();
+        }
+    }
+
+    private async Task OnGrammarContentChanged(ChangeEventArgs e)
+    {
+        grammarContent = e.Value?.ToString() ?? "";
+        hasUnsavedChanges = true;
+        
+        // Update cursor position (simplified)
+        await UpdateCursorPosition();
+        
+        // Clear previous parsing results
+        isGrammarValid = false;
+        grammarErrors.Clear();
+        
+        StateHasChanged();
+    }
+
+    private void OnGrammarMetadataChanged(ChangeEventArgs e)
+    {
+        hasUnsavedChanges = true;
+        StateHasChanged();
+    }
+
+    private async Task UpdateCursorPosition()
+    {
+        // In a real implementation, this would get the actual cursor position from the textarea
+        // For now, we'll just simulate it
+        currentLine = grammarContent.Split('\n').Length;
+        currentColumn = grammarContent.Split('\n').LastOrDefault()?.Length ?? 0;
+    }
+
+    private async Task NewGrammar()
+    {
+        if (hasUnsavedChanges)
+        {
+            // In real implementation, show confirmation dialog
+        }
+        
+        grammarName = "NewGrammar";
+        grammarContent = "grammar NewGrammar;\n\n// Add your rules here\n";
+        grammarRules.Clear();
+        grammarErrors.Clear();
+        grammarAnalysis = null;
+        hasUnsavedChanges = false;
+        isGrammarValid = false;
+        
+        StateHasChanged();
+    }
+
+    private async Task OpenGrammar()
+    {
+        // In real implementation, this would open a file dialog
+        await Task.Delay(100);
+    }
+
+    private async Task SaveGrammar()
+    {
+        // In real implementation, this would save to file
+        await Task.Delay(200);
+        hasUnsavedChanges = false;
+        StateHasChanged();
+    }
+
+    private async Task ParseGrammar()
+    {
+        if (string.IsNullOrWhiteSpace(grammarContent))
+            return;
+
+        isParsingGrammar = true;
+        grammarErrors.Clear();
+        grammarRules.Clear();
+        
+        StateHasChanged();
+
+        try
+        {
+            // Simulate grammar parsing
+            await Task.Delay(500);
+            
+            // Extract rules (simplified parsing)
+            var lines = grammarContent.Split('\n');
+            
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim();
+                if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith("//"))
+                    continue;
+                    
+                if (trimmed.Contains(':'))
+                {
+                    var parts = trimmed.Split(':', 2);
+                    if (parts.Length == 2)
+                    {
+                        var ruleName = parts[0].Trim();
+                        var ruleBody = parts[1].Trim().TrimEnd(';');
+                        
+                        grammarRules.Add(new GrammarRule
+                        {
+                            Name = ruleName,
+                            Definition = ruleBody.Length > 50 ? ruleBody[..50] + "..." : ruleBody,
+                            Type = char.IsUpper(ruleName[0]) ? "Lexer" : "Parser",
+                            References = Random.Shared.Next(0, 10),
+                            Alternatives = ruleBody.Split('|').Length
+                        });
+                    }
+                }
+            }
+
+            // Generate analysis
+            grammarAnalysis = new GrammarAnalysis
+            {
+                TotalRules = grammarRules.Count,
+                TerminalRules = grammarRules.Count(r => r.Type == "Lexer"),
+                NonTerminalRules = grammarRules.Count(r => r.Type == "Parser"),
+                CyclomaticComplexity = grammarRules.Sum(r => r.Alternatives),
+                Warnings = new List<AnalysisWarning>
+                {
+                    new() { Type = "Left Recursion", Message = "Rule 'expression' may have left recursion issues" }
+                },
+                Suggestions = new List<AnalysisSuggestion>
+                {
+                    new() { Title = "Rule Ordering", Description = "Consider reordering rules for better readability" }
+                }
+            };
+
+            isGrammarValid = true;
+        }
+        catch (Exception ex)
+        {
+            grammarErrors.Add(new GrammarError
+            {
+                Line = 1,
+                Column = 1,
+                Message = ex.Message,
+                Context = "Grammar parsing failed"
+            });
+        }
+        finally
+        {
+            isParsingGrammar = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleSyntaxHighlighting()
+    {
+        StateHasChanged();
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+        StateHasChanged();
+    }
+
+    private void SelectRule(string ruleName)
+    {
+        selectedRuleName = ruleName;
+        StateHasChanged();
+    }
+
+    private async Task AddNewRule()
+    {
+        // In real implementation, this would add a new rule template
+        var newRuleName = $"newRule{grammarRules.Count + 1}";
+        grammarContent += $"\n\n{newRuleName}: /* define rule here */;";
+        hasUnsavedChanges = true;
+        StateHasChanged();
+    }
+
+    private async Task GoToError(GrammarError error)
+    {
+        // In real implementation, this would focus the editor and move cursor to error location
+        await JSRuntime.InvokeVoidAsync("focusElement", codeEditorElement);
+    }
+
+    public class GrammarRule
+    {
+        public string Name { get; set; } = "";
+        public string Definition { get; set; } = "";
+        public string Type { get; set; } = "";
+        public int References { get; set; }
+        public int Alternatives { get; set; }
+    }
+
+    public class GrammarError
+    {
+        public int Line { get; set; }
+        public int Column { get; set; }
+        public string Message { get; set; } = "";
+        public string Context { get; set; } = "";
+    }
+
+    public class GrammarAnalysis
+    {
+        public int TotalRules { get; set; }
+        public int TerminalRules { get; set; }
+        public int NonTerminalRules { get; set; }
+        public int CyclomaticComplexity { get; set; }
+        public List<AnalysisWarning> Warnings { get; set; } = new();
+        public List<AnalysisSuggestion> Suggestions { get; set; } = new();
+    }
+
+    public class AnalysisWarning
+    {
+        public string Type { get; set; } = "";
+        public string Message { get; set; } = "";
+    }
+
+    public class AnalysisSuggestion
+    {
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+}
