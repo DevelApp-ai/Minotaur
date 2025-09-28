@@ -1,0 +1,575 @@
+@page "/step-parser"
+@using Minotaur.Core
+@using Minotaur.Editor
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<PageTitle>StepParser Integration</PageTitle>
+
+<div class="step-parser-integration">
+    <div class="row">
+        <!-- Left Panel: Source Code Editor -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-code-slash"></i> Source Code Editor
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-primary btn-sm" @onclick="ParseSource" disabled="@isParsingInProgress">
+                            @if (isParsingInProgress)
+                            {
+                                <span class="spinner-border spinner-border-sm me-1"></span>
+                                <span>Parsing...</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-play-fill"></i>
+                                <span>Parse</span>
+                            }
+                        </button>
+                        <button class="btn btn-secondary btn-sm" @onclick="ClearResults">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative">
+                    <textarea @bind="sourceCode" @oninput="OnSourceCodeChanged" 
+                              class="form-control source-editor" 
+                              placeholder="Enter your source code here..."
+                              rows="20"></textarea>
+                    
+                    @if (parseErrors.Any())
+                    {
+                        <div class="parse-errors">
+                            @foreach (var error in parseErrors)
+                            {
+                                <div class="error-marker" style="top: @(error.Line * 20)px; left: @(error.Column * 8)px" 
+                                     title="@error.Message">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Step-by-Step Parsing -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-diagram-3"></i> Step-by-Step Parsing
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="PreviousStep" 
+                                disabled="@(!HasParseSteps || currentStepIndex <= 0)">
+                            <i class="bi bi-skip-backward"></i>
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" @onclick="TogglePlayback" 
+                                disabled="@(!HasParseSteps)">
+                            @if (isPlayingBack)
+                            {
+                                <i class="bi bi-pause-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-play-fill"></i>
+                            }
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="NextStep" 
+                                disabled="@(!HasParseSteps || currentStepIndex >= parseSteps.Count - 1)">
+                            <i class="bi bi-skip-forward"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (HasParseSteps)
+                    {
+                        <div class="step-info mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">Step @(currentStepIndex + 1) of @parseSteps.Count</span>
+                                <small class="text-muted">@currentStep?.Timestamp.ToString("HH:mm:ss.fff")</small>
+                            </div>
+                            <div class="mt-2">
+                                <strong>@currentStep?.Operation</strong>
+                                <p class="mb-1 text-muted">@currentStep?.Description</p>
+                                @if (!string.IsNullOrEmpty(currentStep?.RuleName))
+                                {
+                                    <small class="badge bg-secondary">Rule: @currentStep.RuleName</small>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Step Visualization -->
+                        <div class="step-visualization" @ref="stepVisualizationElement">
+                            <!-- This will be populated by JavaScript -->
+                        </div>
+
+                        <!-- Parse Stack -->
+                        <div class="parse-stack mt-3">
+                            <h6>Parse Stack</h6>
+                            <div class="stack-items">
+                                @if (currentStep?.ParseStack != null)
+                                {
+                                    @for (int i = currentStep.ParseStack.Count - 1; i >= 0; i--)
+                                    {
+                                        var stackItem = currentStep.ParseStack[i];
+                                        <div class="stack-item @(i == currentStep.ParseStack.Count - 1 ? "active" : "")">
+                                            <span class="stack-index">@i</span>
+                                            <span class="stack-content">@stackItem</span>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">Stack is empty</div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Input Buffer -->
+                        <div class="input-buffer mt-3">
+                            <h6>Input Buffer</h6>
+                            <div class="buffer-display">
+                                @if (currentStep != null)
+                                {
+                                    <span class="processed">@sourceCode[..Math.Min(currentStep.Position, sourceCode.Length)]</span>
+                                    <span class="current-char">@(currentStep.Position < sourceCode.Length ? sourceCode[currentStep.Position].ToString() : "")</span>
+                                    <span class="remaining">@(currentStep.Position + 1 < sourceCode.Length ? sourceCode[(currentStep.Position + 1)..] : "")</span>
+                                }
+                            </div>
+                            <div class="position-info">
+                                <small class="text-muted">Position: @(currentStep?.Position ?? 0)</small>
+                            </div>
+                        </div>
+                    }
+                    else if (isParsingInProgress)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Parsing...</span>
+                            </div>
+                            <p class="mt-2">Analyzing source code...</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">
+                            <i class="bi bi-diagram-3 fs-1"></i>
+                            <p>Enter source code and click Parse to see step-by-step parsing</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Panel: Parsing Results -->
+    @if (parseResult != null)
+    {
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-check-circle text-success"></i> Parsing Results
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="result-stats">
+                                    <h6>Statistics</h6>
+                                    <ul class="list-unstyled">
+                                        <li><strong>Total Steps:</strong> @parseSteps.Count</li>
+                                        <li><strong>Parse Time:</strong> @parseResult.ParseTime.TotalMilliseconds ms</li>
+                                        <li><strong>Nodes Created:</strong> @parseResult.NodeCount</li>
+                                        <li><strong>Success:</strong> 
+                                            @if (parseResult.IsSuccess)
+                                            {
+                                                <span class="badge bg-success">Yes</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">No</span>
+                                            }
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="result-graph">
+                                    <h6>Final Cognitive Graph</h6>
+                                    <div class="final-graph-container" @ref="finalGraphElement">
+                                        <!-- Final graph visualization will be rendered here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.step-parser-integration {
+    padding: 1rem;
+}
+
+.source-editor {
+    border: none;
+    resize: none;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.parse-errors {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.error-marker {
+    position: absolute;
+    pointer-events: auto;
+}
+
+.step-visualization {
+    min-height: 200px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    background: #f8f9fa;
+}
+
+.stack-items {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.stack-item {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.stack-item.active {
+    background-color: #e3f2fd;
+    font-weight: bold;
+}
+
+.stack-index {
+    width: 30px;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.stack-content {
+    flex: 1;
+    font-family: monospace;
+}
+
+.buffer-display {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.processed {
+    color: #6c757d;
+}
+
+.current-char {
+    background-color: #ffc107;
+    font-weight: bold;
+    padding: 0 2px;
+}
+
+.remaining {
+    color: #495057;
+}
+
+.final-graph-container {
+    min-height: 300px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background: white;
+}
+
+.result-stats ul li {
+    margin-bottom: 0.25rem;
+}
+</style>
+
+@code {
+    private string sourceCode = @"grammar Example;
+start: expression EOF;
+expression: term (('+' | '-') term)*;
+term: factor (('*' | '/') factor)*;
+factor: NUMBER | '(' expression ')';";
+
+    private bool isParsingInProgress = false;
+    private bool isPlayingBack = false;
+    private Timer? playbackTimer;
+
+    private List<ParseStep> parseSteps = new();
+    private List<ParseError> parseErrors = new();
+    private ParseResult? parseResult;
+    private int currentStepIndex = 0;
+
+    private ElementReference stepVisualizationElement;
+    private ElementReference finalGraphElement;
+
+    private bool HasParseSteps => parseSteps.Any();
+    private ParseStep? currentStep => HasParseSteps && currentStepIndex < parseSteps.Count ? parseSteps[currentStepIndex] : null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Initialize JavaScript modules
+            await JSRuntime.InvokeVoidAsync("initializeStepParser");
+        }
+    }
+
+    private async Task ParseSource()
+    {
+        if (string.IsNullOrWhiteSpace(sourceCode))
+            return;
+
+        isParsingInProgress = true;
+        parseSteps.Clear();
+        parseErrors.Clear();
+        parseResult = null;
+        currentStepIndex = 0;
+
+        StateHasChanged();
+
+        try
+        {
+            // Simulate step parser integration
+            // In real implementation, this would use the actual StepParser
+            await SimulateStepParsing();
+        }
+        catch (Exception ex)
+        {
+            parseErrors.Add(new ParseError
+            {
+                Line = 1,
+                Column = 1,
+                Message = ex.Message
+            });
+        }
+        finally
+        {
+            isParsingInProgress = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SimulateStepParsing()
+    {
+        var startTime = DateTime.Now;
+        var steps = new List<ParseStep>();
+
+        // Simulate parsing steps
+        for (int i = 0; i < sourceCode.Length; i += 5)
+        {
+            await Task.Delay(50); // Simulate processing time
+
+            steps.Add(new ParseStep
+            {
+                StepNumber = steps.Count + 1,
+                Timestamp = DateTime.Now,
+                Operation = "SCAN",
+                Description = $"Reading characters at position {i}",
+                Position = i,
+                RuleName = i < 20 ? "grammar" : i < 40 ? "rule" : "expression",
+                ParseStack = GenerateSimulatedStack(i)
+            });
+
+            if (steps.Count % 10 == 0)
+            {
+                steps.Add(new ParseStep
+                {
+                    StepNumber = steps.Count + 1,
+                    Timestamp = DateTime.Now,
+                    Operation = "REDUCE",
+                    Description = "Reducing expression to term",
+                    Position = i,
+                    RuleName = "expression",
+                    ParseStack = GenerateSimulatedStack(i)
+                });
+            }
+        }
+
+        parseSteps = steps;
+        parseResult = new ParseResult
+        {
+            IsSuccess = true,
+            ParseTime = DateTime.Now - startTime,
+            NodeCount = steps.Count / 2,
+            RootNode = new NonTerminalNode("start")
+        };
+
+        await RenderCurrentStep();
+    }
+
+    private List<string> GenerateSimulatedStack(int position)
+    {
+        var stack = new List<string> { "start" };
+        
+        if (position > 10) stack.Add("expression");
+        if (position > 20) stack.Add("term");
+        if (position > 30) stack.Add("factor");
+        
+        return stack;
+    }
+
+    private async Task OnSourceCodeChanged(ChangeEventArgs e)
+    {
+        sourceCode = e.Value?.ToString() ?? "";
+        
+        // Clear previous results when source changes
+        if (parseSteps.Any())
+        {
+            parseSteps.Clear();
+            parseErrors.Clear();
+            parseResult = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ClearResults()
+    {
+        parseSteps.Clear();
+        parseErrors.Clear();
+        parseResult = null;
+        currentStepIndex = 0;
+        isPlayingBack = false;
+        
+        if (playbackTimer != null)
+        {
+            await playbackTimer.DisposeAsync();
+            playbackTimer = null;
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task PreviousStep()
+    {
+        if (currentStepIndex > 0)
+        {
+            currentStepIndex--;
+            await RenderCurrentStep();
+            StateHasChanged();
+        }
+    }
+
+    private async Task NextStep()
+    {
+        if (currentStepIndex < parseSteps.Count - 1)
+        {
+            currentStepIndex++;
+            await RenderCurrentStep();
+            StateHasChanged();
+        }
+    }
+
+    private async Task TogglePlayback()
+    {
+        if (isPlayingBack)
+        {
+            isPlayingBack = false;
+            if (playbackTimer != null)
+            {
+                await playbackTimer.DisposeAsync();
+                playbackTimer = null;
+            }
+        }
+        else
+        {
+            isPlayingBack = true;
+            playbackTimer = new Timer(async _ =>
+            {
+                await InvokeAsync(async () =>
+                {
+                    if (currentStepIndex < parseSteps.Count - 1)
+                    {
+                        await NextStep();
+                    }
+                    else
+                    {
+                        await TogglePlayback();
+                    }
+                });
+            }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task RenderCurrentStep()
+    {
+        if (currentStep != null)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("renderParseStep", stepVisualizationElement, new
+                {
+                    step = currentStep.StepNumber,
+                    operation = currentStep.Operation,
+                    description = currentStep.Description,
+                    position = currentStep.Position,
+                    ruleName = currentStep.RuleName,
+                    stack = currentStep.ParseStack
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error rendering step: {ex.Message}");
+            }
+        }
+    }
+
+    public class ParseStep
+    {
+        public int StepNumber { get; set; }
+        public DateTime Timestamp { get; set; }
+        public string Operation { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int Position { get; set; }
+        public string? RuleName { get; set; }
+        public List<string> ParseStack { get; set; } = new();
+    }
+
+    public class ParseError
+    {
+        public int Line { get; set; }
+        public int Column { get; set; }
+        public string Message { get; set; } = "";
+    }
+
+    public class ParseResult
+    {
+        public bool IsSuccess { get; set; }
+        public TimeSpan ParseTime { get; set; }
+        public int NodeCount { get; set; }
+        public CognitiveGraphNode? RootNode { get; set; }
+    }
+}

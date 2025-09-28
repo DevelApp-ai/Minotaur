@@ -1,0 +1,660 @@
+@page "/project-manager"
+@using Minotaur.Projects
+@using Minotaur.Analysis.Symbolic
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Project Manager - Minotaur</PageTitle>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-folder-open me-2"></i>
+                    Project Manager
+                </h2>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary" @onclick="OpenProject">
+                        <i class="fas fa-folder-open me-1"></i>
+                        Open Project
+                    </button>
+                    <button type="button" class="btn btn-success" @onclick="CreateNewProject">
+                        <i class="fas fa-plus me-1"></i>
+                        New Project
+                    </button>
+                    <button type="button" class="btn btn-info" @onclick="RefreshProjects">
+                        <i class="fas fa-sync me-1"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Project Browser -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-folder me-2"></i>
+                        Project Browser
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Current Directory -->
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Current Directory</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" @bind="currentDirectory" />
+                            <button class="btn btn-outline-secondary" @onclick="BrowseDirectory">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Project List -->
+                    <div class="project-list">
+                        @if (discoveredProjects.Any())
+                        {
+                            @foreach (var project in discoveredProjects)
+                            {
+                                <div class="project-item @(selectedProject?.Name == project.Name ? "selected" : "")" 
+                                     @onclick="() => SelectProject(project)">
+                                    <div class="d-flex align-items-center">
+                                        <i class="@GetProjectIcon(project.Type) me-2"></i>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">@project.Name</div>
+                                            <small class="text-muted">@project.Type</small>
+                                        </div>
+                                        <span class="badge bg-@GetProjectTypeBadgeColor(project.Type)">
+                                            @project.Type
+                                        </span>
+                                    </div>
+                                    <div class="mt-1">
+                                        <small class="text-muted">@project.Path</small>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-folder-open display-4 mb-2"></i>
+                                <p>No projects found in current directory</p>
+                                <small>Try browsing to a different directory or creating a new project</small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Details -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Project Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (selectedProject != null)
+                    {
+                        <div class="project-details">
+                            <div class="detail-group mb-3">
+                                <label class="detail-label">Name</label>
+                                <div class="detail-value">@selectedProject.Name</div>
+                            </div>
+                            
+                            <div class="detail-group mb-3">
+                                <label class="detail-label">Type</label>
+                                <div class="detail-value">
+                                    <span class="badge bg-@GetProjectTypeBadgeColor(selectedProject.Type)">
+                                        @selectedProject.Type
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-group mb-3">
+                                <label class="detail-label">Path</label>
+                                <div class="detail-value">
+                                    <code>@selectedProject.Path</code>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-group mb-3">
+                                <label class="detail-label">Files</label>
+                                <div class="detail-value">
+                                    @selectedProject.Files.Count files detected
+                                </div>
+                            </div>
+
+                            @if (selectedProject.Dependencies.Any())
+                            {
+                                <div class="detail-group mb-3">
+                                    <label class="detail-label">Dependencies</label>
+                                    <div class="detail-value">
+                                        @foreach (var dep in selectedProject.Dependencies.Take(5))
+                                        {
+                                            <span class="badge bg-secondary me-1 mb-1">@dep</span>
+                                        }
+                                        @if (selectedProject.Dependencies.Count > 5)
+                                        {
+                                            <span class="text-muted">and @(selectedProject.Dependencies.Count - 5) more...</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Project Actions -->
+                            <div class="project-actions mt-4">
+                                <button class="btn btn-primary btn-sm me-2" @onclick="LoadProject">
+                                    <i class="fas fa-folder-open me-1"></i>
+                                    Load Project
+                                </button>
+                                <button class="btn btn-secondary btn-sm me-2" @onclick="AnalyzeProject">
+                                    <i class="fas fa-search me-1"></i>
+                                    Analyze
+                                </button>
+                                <button class="btn btn-info btn-sm" @onclick="OpenInEditor">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Edit
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-hand-pointer display-4 mb-2"></i>
+                            <p>Select a project to view details</p>
+                            <small>Click on a project from the browser to see its information</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div class="col-lg-4 col-md-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Analysis Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (analysisResults != null)
+                    {
+                        <div class="analysis-results">
+                            <!-- Analysis Overview -->
+                            <div class="analysis-overview mb-4">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="metric-card">
+                                            <div class="metric-value">@analysisResults.TotalSymbols</div>
+                                            <div class="metric-label">Symbols</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="metric-card">
+                                            <div class="metric-value">@analysisResults.ComplexityScore</div>
+                                            <div class="metric-label">Complexity</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="metric-card">
+                                            <div class="metric-value">@analysisResults.QualityScore</div>
+                                            <div class="metric-label">Quality</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Analysis Tabs -->
+                            <ul class="nav nav-tabs nav-tabs-sm mb-3" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link @(activeAnalysisTab == "symbols" ? "active" : "")" 
+                                            @onclick="() => SetActiveAnalysisTab(\"symbols\")">
+                                        Symbols
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link @(activeAnalysisTab == "issues" ? "active" : "")" 
+                                            @onclick="() => SetActiveAnalysisTab(\"issues\")">
+                                        Issues
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link @(activeAnalysisTab == "metrics" ? "active" : "")" 
+                                            @onclick="() => SetActiveAnalysisTab(\"metrics\")">
+                                        Metrics
+                                    </button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                @if (activeAnalysisTab == "symbols")
+                                {
+                                    <div class="symbols-list">
+                                        @foreach (var symbol in analysisResults.Symbols.Take(10))
+                                        {
+                                            <div class="symbol-item">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="@GetSymbolIcon(symbol.Type) me-2"></i>
+                                                    <div class="flex-grow-1">
+                                                        <div class="symbol-name">@symbol.Name</div>
+                                                        <small class="text-muted">@symbol.Type - @symbol.Location</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else if (activeAnalysisTab == "issues")
+                                {
+                                    <div class="issues-list">
+                                        @foreach (var issue in analysisResults.Issues.Take(10))
+                                        {
+                                            <div class="issue-item severity-@issue.Severity.ToString().ToLower()">
+                                                <div class="d-flex align-items-start">
+                                                    <i class="@GetIssueSeverityIcon(issue.Severity) me-2 mt-1"></i>
+                                                    <div class="flex-grow-1">
+                                                        <div class="issue-message">@issue.Message</div>
+                                                        <small class="text-muted">@issue.Location - @issue.Severity</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else if (activeAnalysisTab == "metrics")
+                                {
+                                    <div class="metrics-list">
+                                        <div class="metric-item">
+                                            <span class="metric-name">Lines of Code</span>
+                                            <span class="metric-value">@analysisResults.LinesOfCode</span>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span class="metric-name">Cyclomatic Complexity</span>
+                                            <span class="metric-value">@analysisResults.CyclomaticComplexity</span>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span class="metric-name">Maintainability Index</span>
+                                            <span class="metric-value">@analysisResults.MaintainabilityIndex</span>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span class="metric-name">Technical Debt</span>
+                                            <span class="metric-value">@analysisResults.TechnicalDebtRatio%</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (isAnalyzing)
+                    {
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Analyzing...</span>
+                            </div>
+                            <p class="text-muted">Analyzing project...</p>
+                            <small>This may take a few moments depending on project size</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-chart-bar display-4 mb-2"></i>
+                            <p>No analysis results yet</p>
+                            <small>Select a project and click "Analyze" to see detailed analysis</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string currentDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+    private List<ProjectInfo> discoveredProjects = new();
+    private ProjectInfo? selectedProject;
+    private AnalysisResult? analysisResults;
+    private bool isAnalyzing;
+    private string activeAnalysisTab = "symbols";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshProjects();
+    }
+
+    private async Task RefreshProjects()
+    {
+        try
+        {
+            // Simulate project discovery for demo
+            discoveredProjects = new List<ProjectInfo>
+            {
+                new ProjectInfo 
+                { 
+                    Name = "Sample .NET Project", 
+                    Type = ProjectType.DotNetProject, 
+                    Path = @"C:\Projects\SampleProject\Sample.csproj",
+                    Files = new List<string> { "Program.cs", "Class1.cs" },
+                    Dependencies = new List<string> { "Microsoft.Extensions.Logging", "Newtonsoft.Json" }
+                },
+                new ProjectInfo 
+                { 
+                    Name = "Node.js API", 
+                    Type = ProjectType.NodeProject, 
+                    Path = @"C:\Projects\NodeAPI\package.json",
+                    Files = new List<string> { "index.js", "routes.js" },
+                    Dependencies = new List<string> { "express", "cors", "body-parser" }
+                }
+            };
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show toast notification
+            Console.WriteLine($"Error discovering projects: {ex.Message}");
+        }
+    }
+
+    private async Task BrowseDirectory()
+    {
+        // In a real implementation, this would open a directory picker dialog
+        // For now, we'll use a simple prompt-like approach
+        var newDirectory = await JSRuntime.InvokeAsync<string>("prompt", "Enter directory path:", currentDirectory);
+        if (!string.IsNullOrEmpty(newDirectory) && Directory.Exists(newDirectory))
+        {
+            currentDirectory = newDirectory;
+            await RefreshProjects();
+        }
+    }
+
+    private void SelectProject(ProjectInfo project)
+    {
+        selectedProject = project;
+        analysisResults = null; // Clear previous analysis
+        StateHasChanged();
+    }
+
+    private async Task LoadProject()
+    {
+        if (selectedProject == null) return;
+
+        try
+        {
+            // In a real implementation, you'd use ProjectLoader.LoadProjectAsync
+            Console.WriteLine($"Project loaded: {selectedProject.Name}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading project: {ex.Message}");
+        }
+    }
+
+    private async Task AnalyzeProject()
+    {
+        if (selectedProject == null) return;
+
+        isAnalyzing = true;
+        StateHasChanged();
+
+        try
+        {
+            // Simulate analysis
+            await Task.Delay(2000);
+            analysisResults = new AnalysisResult
+            {
+                TotalSymbols = 42,
+                ComplexityScore = 7.5,
+                QualityScore = 85,
+                LinesOfCode = 1250,
+                CyclomaticComplexity = 12,
+                MaintainabilityIndex = 75,
+                TechnicalDebtRatio = 8,
+                Symbols = new List<SymbolInfo>
+                {
+                    new SymbolInfo { Name = "Calculator", Type = "Class", Location = "Calculator.cs:5", ReferenceCount = 3 },
+                    new SymbolInfo { Name = "Add", Type = "Method", Location = "Calculator.cs:12", ReferenceCount = 5 }
+                },
+                Issues = new List<IssueInfo>
+                {
+                    new IssueInfo { Message = "Method too complex", Location = "Calculator.cs:25", Severity = "Warning" }
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error analyzing project: {ex.Message}");
+        }
+        finally
+        {
+            isAnalyzing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OpenInEditor()
+    {
+        if (selectedProject == null) return;
+
+        // Navigate to grammar editor with selected project
+        // In a real implementation, you'd use NavigationManager to navigate to /grammar-editor
+        await JSRuntime.InvokeVoidAsync("console.log", $"Opening project in editor: {selectedProject.Name}");
+    }
+
+    private async Task OpenProject()
+    {
+        // Open file dialog to select project
+        await BrowseDirectory();
+    }
+
+    private async Task CreateNewProject()
+    {
+        // In a real implementation, this would open a new project wizard
+        await JSRuntime.InvokeVoidAsync("alert", "New Project wizard would open here");
+    }
+
+    private void SetActiveAnalysisTab(string tab)
+    {
+        activeAnalysisTab = tab;
+        StateHasChanged();
+    }
+
+    private string GetProjectIcon(ProjectType type) => type switch
+    {
+        ProjectType.DotNetSolution => "fas fa-project-diagram text-primary",
+        ProjectType.DotNetProject => "fab fa-microsoft text-info",
+        ProjectType.NodeProject => "fab fa-node-js text-success",
+        ProjectType.PythonProject => "fab fa-python text-warning",
+        ProjectType.JavaProject => "fab fa-java text-danger",
+        ProjectType.CppProject => "fas fa-code text-secondary",
+        _ => "fas fa-file text-muted"
+    };
+
+    private string GetProjectTypeBadgeColor(ProjectType type) => type switch
+    {
+        ProjectType.DotNetSolution => "primary",
+        ProjectType.DotNetProject => "info",
+        ProjectType.NodeProject => "success",
+        ProjectType.PythonProject => "warning",
+        ProjectType.JavaProject => "danger",
+        ProjectType.CppProject => "secondary",
+        _ => "light"
+    };
+
+    private string GetSymbolIcon(string symbolType) => symbolType.ToLower() switch
+    {
+        "class" => "fas fa-cube text-primary",
+        "method" => "fas fa-cog text-success",
+        "property" => "fas fa-circle text-info",
+        "field" => "fas fa-square text-warning",
+        "interface" => "fas fa-layer-group text-secondary",
+        _ => "fas fa-dot-circle text-muted"
+    };
+
+    private string GetIssueSeverityIcon(string severity) => severity.ToLower() switch
+    {
+        "error" => "fas fa-times-circle text-danger",
+        "warning" => "fas fa-exclamation-triangle text-warning",
+        "info" => "fas fa-info-circle text-info",
+        _ => "fas fa-question-circle text-muted"
+    };
+
+    public class ProjectInfo
+    {
+        public string Name { get; set; } = "";
+        public ProjectType Type { get; set; }
+        public string Path { get; set; } = "";
+        public List<string> Files { get; set; } = new();
+        public List<string> Dependencies { get; set; } = new();
+    }
+
+    public class AnalysisResult
+    {
+        public int TotalSymbols { get; set; }
+        public double ComplexityScore { get; set; }
+        public int QualityScore { get; set; }
+        public int LinesOfCode { get; set; }
+        public int CyclomaticComplexity { get; set; }
+        public int MaintainabilityIndex { get; set; }
+        public int TechnicalDebtRatio { get; set; }
+        public List<SymbolInfo> Symbols { get; set; } = new();
+        public List<IssueInfo> Issues { get; set; } = new();
+    }
+
+    public class SymbolInfo
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Location { get; set; } = "";
+        public int ReferenceCount { get; set; }
+    }
+
+    public class IssueInfo
+    {
+        public string Message { get; set; } = "";
+        public string Location { get; set; } = "";
+        public string Severity { get; set; } = "";
+    }
+}
+
+<style>
+    .project-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .project-item {
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .project-item:hover {
+        background-color: #f8f9fa;
+        border-color: #007bff;
+    }
+
+    .project-item.selected {
+        background-color: #e3f2fd;
+        border-color: #007bff;
+    }
+
+    .detail-group {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.875rem;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .detail-value {
+        font-size: 0.9rem;
+    }
+
+    .metric-card {
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .symbol-item, .issue-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .symbol-name {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .issue-item.severity-error {
+        border-left: 3px solid #dc3545;
+        padding-left: 8px;
+    }
+
+    .issue-item.severity-warning {
+        border-left: 3px solid #ffc107;
+        padding-left: 8px;
+    }
+
+    .issue-item.severity-info {
+        border-left: 3px solid #17a2b8;
+        padding-left: 8px;
+    }
+
+    .issue-message {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .metric-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .metric-name {
+        font-weight: 500;
+    }
+
+    .metric-value {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .nav-tabs-sm .nav-link {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+</style>

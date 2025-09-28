@@ -1,0 +1,701 @@
+@page "/plugin-manager"
+@using System.Reflection
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Plugin Manager</PageTitle>
+
+<div class="plugin-manager">
+    <div class="row">
+        <!-- Left Panel: Plugin Discovery -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-search"></i> Plugin Discovery
+                    </h5>
+                    <button class="btn btn-primary btn-sm" @onclick="RefreshPlugins">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Plugin Directories -->
+                    <div class="plugin-directories mb-3">
+                        <h6>Plugin Directories</h6>
+                        <div class="input-group mb-2">
+                            <input @bind="newPluginDirectory" class="form-control form-control-sm" 
+                                   placeholder="Plugin directory path..." />
+                            <button class="btn btn-outline-secondary btn-sm" @onclick="AddPluginDirectory">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <div class="directory-list">
+                            @foreach (var directory in pluginDirectories)
+                            {
+                                <div class="directory-item d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate" title="@directory">@directory</span>
+                                    <button class="btn btn-outline-danger btn-sm" @onclick="() => RemovePluginDirectory(directory)">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Available Plugins -->
+                    <div class="available-plugins">
+                        <h6>Available Plugins (@availablePlugins.Count)</h6>
+                        <div class="plugin-list">
+                            @foreach (var plugin in availablePlugins)
+                            {
+                                <div class="plugin-item @(selectedPlugin?.Id == plugin.Id ? "selected" : "")" 
+                                     @onclick="() => SelectPlugin(plugin)">
+                                    <div class="plugin-icon">
+                                        <i class="bi @GetPluginIcon(plugin.Type)"></i>
+                                    </div>
+                                    <div class="plugin-info">
+                                        <strong>@plugin.Name</strong>
+                                        <small class="text-muted d-block">v@plugin.Version</small>
+                                        <small class="badge bg-secondary">@plugin.Type</small>
+                                    </div>
+                                    <div class="plugin-status">
+                                        @if (loadedPlugins.ContainsKey(plugin.Id))
+                                        {
+                                            <i class="bi bi-check-circle text-success" title="Loaded"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-circle text-muted" title="Not loaded"></i>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel: Plugin Details -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Plugin Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (selectedPlugin != null)
+                    {
+                        <div class="plugin-details">
+                            <div class="plugin-header mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi @GetPluginIcon(selectedPlugin.Type) fs-3 me-2"></i>
+                                    <div>
+                                        <h6 class="mb-0">@selectedPlugin.Name</h6>
+                                        <small class="text-muted">@selectedPlugin.Type Plugin</small>
+                                    </div>
+                                </div>
+                                <div class="plugin-actions">
+                                    @if (loadedPlugins.ContainsKey(selectedPlugin.Id))
+                                    {
+                                        <button class="btn btn-warning btn-sm me-2" @onclick="UnloadPlugin">
+                                            <i class="bi bi-stop-circle"></i> Unload
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" @onclick="ReloadPlugin">
+                                            <i class="bi bi-arrow-clockwise"></i> Reload
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-success btn-sm" @onclick="LoadPlugin">
+                                            <i class="bi bi-play-circle"></i> Load
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="plugin-metadata">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Version:</strong></td>
+                                            <td>@selectedPlugin.Version</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Author:</strong></td>
+                                            <td>@selectedPlugin.Author</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Assembly:</strong></td>
+                                            <td class="text-truncate" title="@selectedPlugin.AssemblyPath">
+                                                @Path.GetFileName(selectedPlugin.AssemblyPath)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Dependencies:</strong></td>
+                                            <td>
+                                                @if (selectedPlugin.Dependencies.Any())
+                                                {
+                                                    @string.Join(", ", selectedPlugin.Dependencies)
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">None</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="plugin-description">
+                                <h6>Description</h6>
+                                <p class="text-muted">@selectedPlugin.Description</p>
+                            </div>
+
+                            <!-- Plugin Configuration -->
+                            @if (selectedPlugin.ConfigurationSchema != null)
+                            {
+                                <div class="plugin-configuration">
+                                    <h6>Configuration</h6>
+                                    <div class="configuration-form">
+                                        @foreach (var configItem in selectedPlugin.ConfigurationSchema)
+                                        {
+                                            <div class="mb-2">
+                                                <label class="form-label">@configItem.Key</label>
+                                                <input @bind="configurationValues[configItem.Key]" class="form-control form-control-sm" 
+                                                       placeholder="@configItem.Key" />
+                                            </div>
+                                        }
+                                        <button class="btn btn-primary btn-sm" @onclick="SavePluginConfiguration">
+                                            <i class="bi bi-check"></i> Save Config
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">
+                            <i class="bi bi-plugin fs-1"></i>
+                            <p>Select a plugin to view details</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Loaded Plugins -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-cpu"></i> Loaded Plugins (@loadedPlugins.Count)
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-warning btn-sm" @onclick="UnloadAllPlugins">
+                            <i class="bi bi-stop-circle"></i> Unload All
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (loadedPlugins.Any())
+                    {
+                        <div class="loaded-plugins-list">
+                            @foreach (var kvp in loadedPlugins)
+                            {
+                                var plugin = kvp.Value;
+                                <div class="loaded-plugin-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="plugin-summary">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi @GetPluginIcon(plugin.Type) me-2"></i>
+                                                <strong>@plugin.Name</strong>
+                                                <span class="badge bg-success ms-2">Active</span>
+                                            </div>
+                                            <small class="text-muted">@plugin.Type Plugin</small>
+                                        </div>
+                                        <div class="plugin-controls">
+                                            <button class="btn btn-outline-secondary btn-sm" 
+                                                    @onclick="() => ShowPluginLogs(plugin.Id)" 
+                                                    title="View Logs">
+                                                <i class="bi bi-journal-text"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-sm" 
+                                                    @onclick="() => UnloadSpecificPlugin(plugin.Id)" 
+                                                    title="Unload">
+                                                <i class="bi bi-stop-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Plugin Performance Metrics -->
+                                    <div class="plugin-metrics mt-2">
+                                        <div class="row text-center">
+                                            <div class="col">
+                                                <small class="text-muted">Memory</small>
+                                                <div class="fw-bold">@plugin.MemoryUsage MB</div>
+                                            </div>
+                                            <div class="col">
+                                                <small class="text-muted">CPU</small>
+                                                <div class="fw-bold">@plugin.CpuUsage%</div>
+                                            </div>
+                                            <div class="col">
+                                                <small class="text-muted">Calls</small>
+                                                <div class="fw-bold">@plugin.CallCount</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">
+                            <i class="bi bi-cpu-fill fs-1"></i>
+                            <p>No plugins currently loaded</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plugin Logs Modal -->
+    @if (showLogsModal && selectedPluginLogs != null)
+    {
+        <div class="modal show d-block" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Plugin Logs - @selectedPluginLogs.PluginName</h5>
+                        <button type="button" class="btn-close" @onclick="CloseLogsModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="plugin-logs">
+                            @foreach (var logEntry in selectedPluginLogs.Entries)
+                            {
+                                <div class="log-entry @GetLogLevelClass(logEntry.Level)">
+                                    <span class="log-timestamp">@logEntry.Timestamp.ToString("HH:mm:ss.fff")</span>
+                                    <span class="log-level">@logEntry.Level</span>
+                                    <span class="log-message">@logEntry.Message</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseLogsModal">Close</button>
+                        <button type="button" class="btn btn-primary" @onclick="ClearPluginLogs">Clear Logs</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop show"></div>
+    }
+</div>
+
+<style>
+.plugin-manager {
+    padding: 1rem;
+}
+
+.plugin-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.plugin-item:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.plugin-item.selected {
+    background-color: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.plugin-icon {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+}
+
+.plugin-info {
+    flex: 1;
+}
+
+.plugin-status {
+    margin-left: 0.5rem;
+}
+
+.directory-item {
+    padding: 0.375rem 0.5rem;
+    margin-bottom: 0.25rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.loaded-plugin-item {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+}
+
+.plugin-metrics {
+    font-size: 0.875rem;
+}
+
+.plugin-logs {
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.log-entry {
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 0.25rem;
+    border-left: 3px solid transparent;
+}
+
+.log-entry.info {
+    border-left-color: #17a2b8;
+    background-color: #d1ecf1;
+}
+
+.log-entry.warning {
+    border-left-color: #ffc107;
+    background-color: #fff3cd;
+}
+
+.log-entry.error {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.log-timestamp {
+    color: #6c757d;
+    margin-right: 0.5rem;
+}
+
+.log-level {
+    font-weight: bold;
+    margin-right: 0.5rem;
+    min-width: 60px;
+    display: inline-block;
+}
+
+.log-message {
+    flex: 1;
+}
+</style>
+
+@code {
+    private List<string> pluginDirectories = new() { "./plugins", "~/plugins" };
+    private string newPluginDirectory = "";
+    
+    private List<PluginInfo> availablePlugins = new();
+    private Dictionary<string, LoadedPlugin> loadedPlugins = new();
+    private PluginInfo? selectedPlugin;
+    private Dictionary<string, string> configurationValues = new();
+
+    private bool showLogsModal = false;
+    private PluginLogs? selectedPluginLogs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshPlugins();
+    }
+
+    private async Task RefreshPlugins()
+    {
+        availablePlugins.Clear();
+        
+        // Simulate plugin discovery
+        availablePlugins.AddRange(new[]
+        {
+            new PluginInfo
+            {
+                Id = "grammar-highlighter",
+                Name = "Grammar Syntax Highlighter",
+                Version = "1.2.0",
+                Author = "Minotaur Team",
+                Type = "Editor",
+                Description = "Provides syntax highlighting for grammar files with advanced coloring and error detection.",
+                AssemblyPath = "./plugins/GrammarHighlighter.dll",
+                Dependencies = new List<string> { "Monaco.Editor" },
+                ConfigurationSchema = new Dictionary<string, string>
+                {
+                    { "Theme", "default" },
+                    { "ShowLineNumbers", "true" },
+                    { "EnableAutoComplete", "true" }
+                }
+            },
+            new PluginInfo
+            {
+                Id = "antlr-parser",
+                Name = "ANTLR Parser Integration",
+                Version = "2.1.0",
+                Author = "Community",
+                Type = "Parser",
+                Description = "Integrates ANTLR parsing capabilities with enhanced error reporting and recovery.",
+                AssemblyPath = "./plugins/ANTLRParser.dll",
+                Dependencies = new List<string> { "Antlr4.Runtime" }
+            },
+            new PluginInfo
+            {
+                Id = "diagram-exporter",
+                Name = "Advanced Diagram Exporter",
+                Version = "1.0.3",
+                Author = "Visualization Team",
+                Type = "Visualization",
+                Description = "Exports railroad diagrams to multiple formats including SVG, PNG, PDF, and interactive HTML.",
+                AssemblyPath = "./plugins/DiagramExporter.dll",
+                Dependencies = new List<string> { "SkiaSharp", "PdfSharp" },
+                ConfigurationSchema = new Dictionary<string, string>
+                {
+                    { "DefaultFormat", "svg" },
+                    { "Quality", "high" },
+                    { "IncludeMetadata", "true" }
+                }
+            },
+            new PluginInfo
+            {
+                Id = "llm-assistant",
+                Name = "LLM Grammar Assistant",
+                Version = "0.9.0",
+                Author = "AI Team",
+                Type = "AI",
+                Description = "AI-powered grammar analysis and suggestions using large language models.",
+                AssemblyPath = "./plugins/LLMAssistant.dll",
+                Dependencies = new List<string> { "OpenAI.API", "HuggingFace.NET" },
+                ConfigurationSchema = new Dictionary<string, string>
+                {
+                    { "ApiKey", "" },
+                    { "Model", "gpt-4" },
+                    { "MaxTokens", "1000" }
+                }
+            },
+            new PluginInfo
+            {
+                Id = "performance-analyzer",
+                Name = "Performance Analyzer",
+                Version = "1.1.2",
+                Author = "Optimization Team",
+                Type = "Analysis",
+                Description = "Analyzes grammar performance and suggests optimizations for better parsing speed.",
+                AssemblyPath = "./plugins/PerformanceAnalyzer.dll",
+                Dependencies = new List<string>()
+            }
+        });
+
+        StateHasChanged();
+    }
+
+    private void AddPluginDirectory()
+    {
+        if (!string.IsNullOrWhiteSpace(newPluginDirectory) && !pluginDirectories.Contains(newPluginDirectory))
+        {
+            pluginDirectories.Add(newPluginDirectory);
+            newPluginDirectory = "";
+            StateHasChanged();
+        }
+    }
+
+    private void RemovePluginDirectory(string directory)
+    {
+        pluginDirectories.Remove(directory);
+        StateHasChanged();
+    }
+
+    private void SelectPlugin(PluginInfo plugin)
+    {
+        selectedPlugin = plugin;
+        StateHasChanged();
+    }
+
+    private async Task LoadPlugin()
+    {
+        if (selectedPlugin == null) return;
+
+        try
+        {
+            // Simulate plugin loading
+            var loadedPlugin = new LoadedPlugin
+            {
+                Id = selectedPlugin.Id,
+                Name = selectedPlugin.Name,
+                Type = selectedPlugin.Type,
+                Version = selectedPlugin.Version,
+                LoadedAt = DateTime.Now,
+                MemoryUsage = Random.Shared.Next(10, 100),
+                CpuUsage = Random.Shared.Next(0, 15),
+                CallCount = 0
+            };
+
+            loadedPlugins[selectedPlugin.Id] = loadedPlugin;
+            
+            // Simulate loading delay
+            await Task.Delay(500);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            // Handle plugin loading error
+            Console.WriteLine($"Failed to load plugin {selectedPlugin.Name}: {ex.Message}");
+        }
+    }
+
+    private async Task UnloadPlugin()
+    {
+        if (selectedPlugin == null || !loadedPlugins.ContainsKey(selectedPlugin.Id)) return;
+
+        loadedPlugins.Remove(selectedPlugin.Id);
+        await Task.Delay(200); // Simulate unloading
+        StateHasChanged();
+    }
+
+    private async Task ReloadPlugin()
+    {
+        await UnloadPlugin();
+        await Task.Delay(100);
+        await LoadPlugin();
+    }
+
+    private async Task UnloadAllPlugins()
+    {
+        loadedPlugins.Clear();
+        await Task.Delay(300);
+        StateHasChanged();
+    }
+
+    private async Task UnloadSpecificPlugin(string pluginId)
+    {
+        loadedPlugins.Remove(pluginId);
+        await Task.Delay(200);
+        StateHasChanged();
+    }
+
+    private async Task SavePluginConfiguration()
+    {
+        if (selectedPlugin?.ConfigurationSchema == null) return;
+
+        // Simulate saving configuration
+        await Task.Delay(200);
+        
+        // In real implementation, this would save to config file or database
+        Console.WriteLine($"Saved configuration for {selectedPlugin.Name}");
+    }
+
+    private void ShowPluginLogs(string pluginId)
+    {
+        var plugin = loadedPlugins.GetValueOrDefault(pluginId);
+        if (plugin == null) return;
+
+        selectedPluginLogs = new PluginLogs
+        {
+            PluginName = plugin.Name,
+            Entries = GenerateSimulatedLogs(plugin.Name)
+        };
+        
+        showLogsModal = true;
+        StateHasChanged();
+    }
+
+    private void CloseLogsModal()
+    {
+        showLogsModal = false;
+        selectedPluginLogs = null;
+        StateHasChanged();
+    }
+
+    private void ClearPluginLogs()
+    {
+        if (selectedPluginLogs != null)
+        {
+            selectedPluginLogs.Entries.Clear();
+            StateHasChanged();
+        }
+    }
+
+    private List<LogEntry> GenerateSimulatedLogs(string pluginName)
+    {
+        return new List<LogEntry>
+        {
+            new() { Timestamp = DateTime.Now.AddMinutes(-10), Level = "INFO", Message = $"Plugin {pluginName} initialized successfully" },
+            new() { Timestamp = DateTime.Now.AddMinutes(-8), Level = "INFO", Message = "Configuration loaded from config.json" },
+            new() { Timestamp = DateTime.Now.AddMinutes(-5), Level = "WARNING", Message = "Deprecated API method used, consider updating" },
+            new() { Timestamp = DateTime.Now.AddMinutes(-2), Level = "INFO", Message = "Processing grammar file: example.g4" },
+            new() { Timestamp = DateTime.Now.AddMinutes(-1), Level = "ERROR", Message = "Failed to parse rule on line 45: unexpected token" }
+        };
+    }
+
+    private string GetPluginIcon(string pluginType) => pluginType switch
+    {
+        "Editor" => "bi-pencil-square",
+        "Parser" => "bi-cpu",
+        "Visualization" => "bi-diagram-3",
+        "AI" => "bi-robot",
+        "Analysis" => "bi-graph-up",
+        _ => "bi-plugin"
+    };
+
+    private string GetLogLevelClass(string level) => level.ToLower() switch
+    {
+        "info" => "info",
+        "warning" => "warning", 
+        "error" => "error",
+        _ => ""
+    };
+
+    public class PluginInfo
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Version { get; set; } = "";
+        public string Author { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string AssemblyPath { get; set; } = "";
+        public List<string> Dependencies { get; set; } = new();
+        public Dictionary<string, string>? ConfigurationSchema { get; set; }
+    }
+
+    public class LoadedPlugin
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Version { get; set; } = "";
+        public DateTime LoadedAt { get; set; }
+        public int MemoryUsage { get; set; }
+        public int CpuUsage { get; set; }
+        public int CallCount { get; set; }
+    }
+
+    public class PluginLogs
+    {
+        public string PluginName { get; set; } = "";
+        public List<LogEntry> Entries { get; set; } = new();
+    }
+
+    public class LogEntry
+    {
+        public DateTime Timestamp { get; set; }
+        public string Level { get; set; } = "";
+        public string Message { get; set; } = "";
+    }
+}
