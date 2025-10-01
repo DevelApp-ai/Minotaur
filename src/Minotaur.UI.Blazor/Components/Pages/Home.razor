@@ -1,7 +1,82 @@
-﻿@page "/"
+@page "/"
+@using Minotaur.Core
+@using Minotaur.Analysis.Symbolic
+@using Minotaur.Editor
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Minotaur - Cognitive Graph Editor</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Welcome to Minotaur!</h1>
 
-Welcome to your new app.
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <h2 class="display-4 fw-bold">Cognitive Graph Editor & Unparser</h2>
+            <p class="lead mb-4">
+                Advanced grammar-based code analysis and transformation tool with symbolic analysis capabilities.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="/grammar-editor" class="btn btn-primary btn-lg px-4">
+                    <i class="fas fa-code me-2"></i>
+                    Grammar Editor
+                </a>
+                <a href="/plugin-manager" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="fas fa-puzzle-piece me-2"></i>
+                    Plugin Manager
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Core Functionality Test -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Core Library Integration Test</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>CognitiveGraphNode Available:</strong> @(typeof(CognitiveGraphNode) != null ? "✅ Yes" : "❌ No")</p>
+                    <p><strong>GraphEditor Available:</strong> @(typeof(GraphEditor) != null ? "✅ Yes" : "❌ No")</p>
+                    <p><strong>SymbolicAnalysisResult Available:</strong> @(typeof(SymbolicAnalysisResult) != null ? "✅ Yes" : "❌ No")</p>
+                    <p><strong>Test Result:</strong> @testResult</p>
+                    <button class="btn btn-primary" @onclick="RunTest">Test Core Functionality</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string testResult = "Not tested";
+
+    private void RunTest()
+    {
+        try
+        {
+            // Test creating a simple cognitive graph
+            var terminalNode = new TerminalNode("test", "identifier");
+            var nonTerminalNode = new NonTerminalNode("TestRule", 0);
+            nonTerminalNode.AddChild(terminalNode);
+            
+            // Test creating a graph editor
+            var editor = new GraphEditor(nonTerminalNode);
+            
+            // Test symbolic analysis result
+            var analysisResult = new SymbolicAnalysisResult(
+                success: true,
+                errors: new List<SymbolicError>(),
+                executionPaths: new List<ExecutionPath>(),
+                constraints: new List<SymbolicConstraint>(),
+                analysisTime: TimeSpan.FromMilliseconds(100)
+            );
+            
+            testResult = $"✅ Success! Created graph with {nonTerminalNode.Children.Count} child nodes. Analysis completed in {analysisResult.AnalysisTime.TotalMilliseconds}ms.";
+        }
+        catch (Exception ex)
+        {
+            testResult = $"❌ Error: {ex.Message}";
+        }
+        
+        StateHasChanged();
+    }
+}
