@@ -581,10 +581,10 @@
     {
         return node.GetType().Name switch
         {
-            nameof(TerminalNode) => "terminal-node",
-            nameof(NonTerminalNode) => "nonterminal-node", 
             nameof(IdentifierNode) => "identifier-node",
             nameof(LiteralNode) => "literal-node",
+            nameof(TerminalNode) => "terminal-node",
+            nameof(NonTerminalNode) => "nonterminal-node", 
             _ => "unknown-node"
         };
     }
@@ -593,10 +593,10 @@
     {
         return node.GetType().Name switch
         {
-            nameof(TerminalNode) => "#28a745",
-            nameof(NonTerminalNode) => "#17a2b8",
             nameof(IdentifierNode) => "#ffc107", 
             nameof(LiteralNode) => "#6c757d",
+            nameof(TerminalNode) => "#28a745",
+            nameof(NonTerminalNode) => "#17a2b8",
             _ => "#343a40"
         };
     }
@@ -605,10 +605,10 @@
     {
         return node switch
         {
-            TerminalNode t => t.Text?.Length > 8 ? t.Text[..8] + "..." : t.Text ?? "Term",
-            NonTerminalNode nt => nt.RuleName?.Length > 8 ? nt.RuleName[..8] + "..." : nt.RuleName ?? "Rule",
             IdentifierNode id => (id.Text?.Length > 8 ? id.Text[..8] + "..." : id.Text) ?? "ID",
             LiteralNode lit => (lit.Value?.ToString()?.Length > 8 ? lit.Value.ToString()?[..8] + "..." : lit.Value?.ToString()) ?? "Lit",
+            TerminalNode t => t.Text?.Length > 8 ? t.Text[..8] + "..." : t.Text ?? "Term",
+            NonTerminalNode nt => nt.RuleName?.Length > 8 ? nt.RuleName[..8] + "..." : nt.RuleName ?? "Rule",
             _ => "Node"
         };
     }
@@ -617,10 +617,10 @@
     {
         return node switch
         {
-            TerminalNode t => new { t.Text, t.TokenType },
-            NonTerminalNode nt => new { nt.RuleName, ChildCount = nt.Children.Count },
             IdentifierNode id => new { id.Text, id.Namespace },
             LiteralNode lit => new { Value = lit.Value?.ToString() ?? "", lit.LiteralType },
+            TerminalNode t => new { t.Text, t.TokenType },
+            NonTerminalNode nt => new { nt.RuleName, ChildCount = nt.Children.Count },
             _ => new { }
         };
     }

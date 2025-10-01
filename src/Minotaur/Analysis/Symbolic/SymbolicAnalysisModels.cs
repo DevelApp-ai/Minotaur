@@ -27,6 +27,20 @@ public class SymbolicAnalysisResult
     public List<ExecutionPath> ExecutionPaths { get; }
     public List<SymbolicConstraint> Constraints { get; }
     public TimeSpan AnalysisTime { get; }
+    
+    // Additional properties for UI integration
+    public int TotalSymbols { get; set; }
+    public double ComplexityScore { get; set; }
+    public int QualityScore { get; set; }
+    public int DependencyCount { get; set; }
+    public int MaintainabilityIndex { get; set; }
+    public int TestabilityScore { get; set; }
+    public int DocumentationCoverage { get; set; }
+    public Dictionary<string, int> SymbolDistribution { get; set; } = new();
+    public List<SymbolInfo> Symbols { get; set; } = new();
+    public List<DependencyInfo> IncomingDependencies { get; set; } = new();
+    public List<DependencyInfo> OutgoingDependencies { get; set; } = new();
+    public object? CognitiveGraph { get; set; }
 
     public SymbolicAnalysisResult(
         bool success,
@@ -461,4 +475,44 @@ public class ConstraintSolution
         Assignment = assignment;
         Probability = probability;
     }
+}
+
+/// <summary>
+/// Represents options for symbolic analysis
+/// </summary>
+public class SymbolicAnalysisOptions
+{
+    public string Language { get; set; } = "C#";
+    public bool EnableDeepAnalysis { get; set; } = true;
+    public bool EnableCrossReference { get; set; } = true;
+    public bool EnableSemanticAnalysis { get; set; } = true;
+    public int MaxDepth { get; set; } = 10;
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(5);
+}
+
+/// <summary>
+/// Represents information about a symbol in the code
+/// </summary>
+public class SymbolInfo
+{
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string Scope { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    public int ReferenceCount { get; set; }
+    public bool IsPublic { get; set; }
+    public bool IsStatic { get; set; }
+    public List<string> Modifiers { get; set; } = new();
+}
+
+/// <summary>
+/// Represents information about a dependency
+/// </summary>
+public class DependencyInfo
+{
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string Version { get; set; } = string.Empty;
+    public bool IsExternal { get; set; }
+    public string? Source { get; set; }
 }

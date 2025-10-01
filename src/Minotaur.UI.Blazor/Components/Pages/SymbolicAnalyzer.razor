@@ -406,7 +406,13 @@
             };
 
             // Simulate analysis results
-            analysisResult = new SymbolicAnalysisResult
+            analysisResult = new SymbolicAnalysisResult(
+                success: true,
+                errors: new List<SymbolicError>(),
+                executionPaths: new List<ExecutionPath>(),
+                constraints: new List<SymbolicConstraint>(),
+                analysisTime: TimeSpan.FromSeconds(2.5)
+            )
             {
                 TotalSymbols = 15,
                 ComplexityScore = 8.5,
@@ -605,44 +611,7 @@
         public double Y2 { get; set; }
     }
 
-    public class SymbolicAnalysisOptions
-    {
-        public string Language { get; set; } = "";
-        public bool EnableDeepAnalysis { get; set; }
-        public bool EnableCrossReference { get; set; }
-        public bool EnableSemanticAnalysis { get; set; }
-    }
 
-    public class SymbolicAnalysisResult
-    {
-        public int TotalSymbols { get; set; }
-        public double ComplexityScore { get; set; }
-        public int QualityScore { get; set; }
-        public int DependencyCount { get; set; }
-        public int MaintainabilityIndex { get; set; }
-        public int TestabilityScore { get; set; }
-        public int DocumentationCoverage { get; set; }
-        public Dictionary<string, int> SymbolDistribution { get; set; } = new();
-        public List<SymbolInfo> Symbols { get; set; } = new();
-        public List<DependencyInfo> IncomingDependencies { get; set; } = new();
-        public List<DependencyInfo> OutgoingDependencies { get; set; } = new();
-        public object? CognitiveGraph { get; set; }
-    }
-
-    public class SymbolInfo
-    {
-        public string Name { get; set; } = "";
-        public string Type { get; set; } = "";
-        public string Scope { get; set; } = "";
-        public string Location { get; set; } = "";
-        public int ReferenceCount { get; set; }
-    }
-
-    public class DependencyInfo
-    {
-        public string Name { get; set; } = "";
-        public string Type { get; set; } = "";
-    }
 }
 
 <style>
