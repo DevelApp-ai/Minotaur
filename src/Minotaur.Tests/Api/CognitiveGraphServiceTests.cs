@@ -153,7 +153,7 @@ public class CognitiveGraphServiceTests
         // Arrange
         var service = CreateService();
         var testGraph = CreateTestGraph();
-        var graphId = service.StoreCognitiveGraph(testGraph);
+        service.StoreCognitiveGraph(testGraph);
         var nodeId = testGraph.Id.ToString();
 
         // Act
