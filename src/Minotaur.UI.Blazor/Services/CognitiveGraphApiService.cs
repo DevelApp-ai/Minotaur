@@ -80,9 +80,17 @@ public class CognitiveGraphApiService : IAsyncDisposable
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
-            Console.WriteLine($"GraphQL query error: {ex.Message}");
+            Console.WriteLine($"GraphQL HTTP request error: {ex.Message}");
+        }
+        catch (TaskCanceledException ex)
+        {
+            Console.WriteLine($"GraphQL request timed out or cancelled: {ex.Message}");
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"GraphQL JSON parsing error: {ex.Message}");
         }
 
         return null;
