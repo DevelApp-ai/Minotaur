@@ -177,9 +177,17 @@ public class CognitiveGraphApiService : IAsyncDisposable
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
         {
-            Console.WriteLine($"Get node query error: {ex.Message}");
+            Console.WriteLine($"HTTP request error in GetNodeAsync: {ex.Message}");
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"JSON parsing error in GetNodeAsync: {ex.Message}");
+        }
+        catch (TaskCanceledException ex)
+        {
+            Console.WriteLine($"Request timeout in GetNodeAsync: {ex.Message}");
         }
 
         return null;
