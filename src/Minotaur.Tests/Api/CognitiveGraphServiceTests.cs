@@ -205,10 +205,10 @@ public class CognitiveGraphServiceTests
         var currentNode = nodeMap.GetValueOrDefault(nodeId);
         int depth = 0;
 
-        while (currentNode?.ParentId != null && nodeMap.ContainsKey(currentNode.ParentId))
+        while (currentNode?.ParentId != null && nodeMap.TryGetValue(currentNode.ParentId, out var parentNode))
         {
             depth++;
-            currentNode = nodeMap[currentNode.ParentId];
+            currentNode = parentNode;
         }
 
         return depth;
