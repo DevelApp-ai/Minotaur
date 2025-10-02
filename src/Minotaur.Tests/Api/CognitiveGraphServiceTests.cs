@@ -35,21 +35,21 @@ public class CognitiveGraphServiceTests
     private CognitiveGraphNode CreateTestGraph()
     {
         var root = new NonTerminalNode("Program", 0);
-        
+
         var classNode = new NonTerminalNode("ClassDeclaration", 1);
         var identifier = new IdentifierNode("TestClass");
         var methodNode = new NonTerminalNode("MethodDeclaration", 2);
         var methodName = new IdentifierNode("TestMethod");
         var literal = new LiteralNode("42", "integer", 42);
         var terminal = new TerminalNode("return", "keyword");
-        
+
         root.AddChild(classNode);
         classNode.AddChild(identifier);
         classNode.AddChild(methodNode);
         methodNode.AddChild(methodName);
         methodNode.AddChild(terminal);
         methodNode.AddChild(literal);
-        
+
         return root;
     }
 
@@ -114,7 +114,7 @@ public class CognitiveGraphServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.NotEmpty(result.Nodes);
-        
+
         // Should only contain nodes up to depth 1
         var maxDepthInResult = 0;
         foreach (var node in result.Nodes)
@@ -180,7 +180,7 @@ public class CognitiveGraphServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.NotEmpty(result);
-        Assert.All(result, node => 
+        Assert.All(result, node =>
             Assert.True(node.DisplayText?.ToLowerInvariant().Contains("test") == true ||
                        node.NodeType.ToLowerInvariant().Contains("test")));
     }

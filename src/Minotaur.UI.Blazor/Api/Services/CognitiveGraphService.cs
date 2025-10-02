@@ -35,9 +35,9 @@ public class CognitiveGraphService
     public async Task<CognitiveGraphResponse> QueryCognitiveGraphAsync(string graphId, CognitiveGraphQuery query)
     {
         var response = new CognitiveGraphResponse();
-        
+
         // Find starting node
-        var startNode = string.IsNullOrEmpty(query.NodeId) 
+        var startNode = string.IsNullOrEmpty(query.NodeId)
             ? FindRootNode(graphId)
             : _nodeCache.Values.FirstOrDefault(n => n.Id.ToString() == query.NodeId);
 
@@ -54,14 +54,14 @@ public class CognitiveGraphService
         while (nodesToProcess.Count > 0 && response.Nodes.Count < 100) // Limit to 100 nodes per query
         {
             var (currentNode, depth) = nodesToProcess.Dequeue();
-            
+
             if (depth > query.MaxDepth || visitedNodes.Contains(currentNode.Id.ToString()))
                 continue;
 
             visitedNodes.Add(currentNode.Id.ToString());
 
             // Apply node type filter
-            if (query.NodeTypes != null && query.NodeTypes.Count > 0 && 
+            if (query.NodeTypes != null && query.NodeTypes.Count > 0 &&
                 !query.NodeTypes.Contains(currentNode.NodeType))
                 continue;
 
@@ -73,7 +73,7 @@ public class CognitiveGraphService
             foreach (var child in currentNode.Children)
             {
                 nodesToProcess.Enqueue((child, depth + 1));
-                
+
                 // Add edge
                 response.Edges.Add(new CognitiveGraphEdgeDto
                 {
@@ -110,18 +110,18 @@ public class CognitiveGraphService
         foreach (var node in _nodeCache.Values.Take(limit))
         {
             bool matches = false;
-            
+
             // Search in node type
             if (node.NodeType.ToLowerInvariant().Contains(searchLower))
                 matches = true;
-            
+
             // Search in terminal node text
-            if (node is TerminalNode terminal && 
+            if (node is TerminalNode terminal &&
                 terminal.Text.ToLowerInvariant().Contains(searchLower))
                 matches = true;
-            
+
             // Search in identifier node name
-            if (node is IdentifierNode identifier && 
+            if (node is IdentifierNode identifier &&
                 identifier.Text.ToLowerInvariant().Contains(searchLower))
                 matches = true;
 
@@ -137,7 +137,7 @@ public class CognitiveGraphService
     private void CacheGraphNodes(CognitiveGraphNode node, string graphId)
     {
         _nodeCache[node.Id.ToString()] = node;
-        
+
         foreach (var child in node.Children)
         {
             CacheGraphNodes(child, graphId);

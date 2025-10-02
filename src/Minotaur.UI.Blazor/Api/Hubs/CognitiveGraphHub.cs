@@ -71,11 +71,11 @@ public class CognitiveGraphHub : Hub
     /// </summary>
     public async Task NotifyGraphUpdated(string graphId, List<string> updatedNodeIds)
     {
-        await Clients.Group($"graph-{graphId}").SendAsync("GraphUpdated", new 
-        { 
-            GraphId = graphId, 
+        await Clients.Group($"graph-{graphId}").SendAsync("GraphUpdated", new
+        {
+            GraphId = graphId,
             UpdatedNodes = updatedNodeIds,
-            Timestamp = DateTime.UtcNow 
+            Timestamp = DateTime.UtcNow
         });
     }
 

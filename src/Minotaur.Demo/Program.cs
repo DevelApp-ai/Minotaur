@@ -9,7 +9,7 @@ public class Program
     public static void Main()
     {
         Console.WriteLine("=== Minotaur Core Library Integration Test ===");
-        
+
         try
         {
             // Test 1: Create CognitiveGraphNode instances
@@ -18,28 +18,28 @@ public class Program
             var identifierNode = new IdentifierNode("myVariable", "MyNamespace");
             var literalNode = new LiteralNode("42", "integer", 42);
             var nonTerminalNode = new NonTerminalNode("Expression", 1);
-            
+
             nonTerminalNode.AddChild(identifierNode);
             nonTerminalNode.AddChild(terminalNode);
             nonTerminalNode.AddChild(literalNode);
-            
+
             Console.WriteLine($"✅ Created NonTerminalNode '{nonTerminalNode.RuleName}' with {nonTerminalNode.Children.Count} children");
             Console.WriteLine($"   - IdentifierNode: {identifierNode.FullName}");
             Console.WriteLine($"   - TerminalNode: {terminalNode.Text} ({terminalNode.TokenType})");
             Console.WriteLine($"   - LiteralNode: {literalNode.Value} ({literalNode.LiteralType})");
-            
+
             // Test 2: Test GraphEditor
             Console.WriteLine("\n2. Testing GraphEditor functionality...");
             var editor = new GraphEditor(nonTerminalNode);
             var newNode = new TerminalNode("world", "string_literal");
             var operation = editor.InsertNode(nonTerminalNode.Id, newNode);
-            
+
             Console.WriteLine($"✅ GraphEditor created and node inserted successfully");
             Console.WriteLine($"   - Operation ID: {operation.Id}");
             Console.WriteLine($"   - Can Undo: {editor.CanUndo}");
             Console.WriteLine($"   - Can Redo: {editor.CanRedo}");
             Console.WriteLine($"   - Root has {editor.Root?.Children.Count} children");
-            
+
             // Test 3: Test SymbolicAnalysis types
             Console.WriteLine("\n3. Testing Symbolic Analysis types...");
             var sourceLocation = new SourceLocation(10, 25, 5);
@@ -49,16 +49,16 @@ public class Program
                 "Potential null pointer access detected",
                 0.85
             );
-            
+
             var constraint = new SymbolicConstraint(
                 ConstraintType.NullCheck,
                 sourceLocation,
                 "Variable must not be null",
                 "variable != null"
             );
-            
+
             var executionPath = new ExecutionPath("path_1", new List<SymbolicConstraint> { constraint }, 0.7);
-            
+
             var analysisResult = new SymbolicAnalysisResult(
                 success: true,
                 errors: new List<SymbolicError> { error },
@@ -71,7 +71,7 @@ public class Program
                 ComplexityScore = 8.5,
                 QualityScore = 82
             };
-            
+
             Console.WriteLine($"✅ SymbolicAnalysisResult created successfully");
             Console.WriteLine($"   - Success: {analysisResult.Success}");
             Console.WriteLine($"   - Errors: {analysisResult.Errors.Count} ({error.Severity} severity)");
@@ -79,7 +79,7 @@ public class Program
             Console.WriteLine($"   - Analysis Time: {analysisResult.AnalysisTime.TotalMilliseconds}ms");
             Console.WriteLine($"   - Total Symbols: {analysisResult.TotalSymbols}");
             Console.WriteLine($"   - Quality Score: {analysisResult.QualityScore}%");
-            
+
             // Test 4: Test additional types
             Console.WriteLine("\n4. Testing additional integration types...");
             var options = new SymbolicAnalysisOptions
@@ -88,7 +88,7 @@ public class Program
                 EnableDeepAnalysis = true,
                 MaxDepth = 10
             };
-            
+
             var symbolInfo = new SymbolInfo
             {
                 Name = "TestMethod",
@@ -96,21 +96,21 @@ public class Program
                 Scope = "TestClass",
                 ReferenceCount = 3
             };
-            
+
             var dependencyInfo = new DependencyInfo
             {
                 Name = "System.Collections.Generic",
                 Type = "Namespace",
                 IsExternal = true
             };
-            
+
             Console.WriteLine($"✅ Additional types created successfully");
             Console.WriteLine($"   - Analysis Options: {options.Language} (Deep: {options.EnableDeepAnalysis})");
             Console.WriteLine($"   - Symbol Info: {symbolInfo.Name} ({symbolInfo.Type})");
             Console.WriteLine($"   - Dependency: {dependencyInfo.Name} ({dependencyInfo.Type})");
-            
+
             Console.WriteLine("\n🎉 All integration tests passed! The Minotaur UI can successfully integrate with the core library.");
-            
+
         }
         catch (Exception ex)
         {

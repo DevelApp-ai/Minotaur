@@ -27,7 +27,7 @@ public class SymbolicAnalysisResult
     public List<ExecutionPath> ExecutionPaths { get; }
     public List<SymbolicConstraint> Constraints { get; }
     public TimeSpan AnalysisTime { get; }
-    
+
     // Additional properties for UI integration
     public int TotalSymbols { get; set; }
     public double ComplexityScore { get; set; }
@@ -40,7 +40,7 @@ public class SymbolicAnalysisResult
     public List<SymbolInfo> Symbols { get; set; } = new();
     public List<DependencyInfo> IncomingDependencies { get; set; } = new();
     public List<DependencyInfo> OutgoingDependencies { get; set; } = new();
-    
+
     /// <summary>
     /// ID reference to the cognitive graph for efficient querying via API
     /// </summary>

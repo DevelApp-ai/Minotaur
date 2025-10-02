@@ -72,11 +72,11 @@ public class CognitiveGraphApiService : IAsyncDisposable
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var jsonDoc = JsonDocument.Parse(responseContent);
-            
+
             if (jsonDoc.RootElement.TryGetProperty("data", out var dataElement) &&
                 dataElement.TryGetProperty("getCognitiveGraph", out var graphElement))
             {
-                return JsonSerializer.Deserialize<CognitiveGraphResponse>(graphElement.GetRawText(), 
+                return JsonSerializer.Deserialize<CognitiveGraphResponse>(graphElement.GetRawText(),
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
         }
