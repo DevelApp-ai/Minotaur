@@ -40,7 +40,11 @@ public class SymbolicAnalysisResult
     public List<SymbolInfo> Symbols { get; set; } = new();
     public List<DependencyInfo> IncomingDependencies { get; set; } = new();
     public List<DependencyInfo> OutgoingDependencies { get; set; } = new();
-    public object? CognitiveGraph { get; set; }
+    
+    /// <summary>
+    /// ID reference to the cognitive graph for efficient querying via API
+    /// </summary>
+    public string? CognitiveGraphId { get; set; }
 
     public SymbolicAnalysisResult(
         bool success,

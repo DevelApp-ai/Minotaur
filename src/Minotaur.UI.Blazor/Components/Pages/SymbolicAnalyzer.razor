@@ -327,7 +327,7 @@
                                     <div class="graph-container" id="symbolic-graph-container">
                                         <!-- Cognitive Graph Visualization -->
                                         <svg id="symbolic-graph-svg" width="100%" height="400">
-                                            @if (analysisResult.CognitiveGraph != null)
+                                            @if (!string.IsNullOrEmpty(analysisResult.CognitiveGraphId))
                                             {
                                                 @* Render cognitive graph nodes and connections *@
                                                 @foreach (var node in GetGraphNodes())
@@ -440,7 +440,7 @@
                 {
                     new DependencyInfo { Name = "ICalculator", Type = "Interface" }
                 },
-                CognitiveGraph = null // Would contain actual cognitive graph
+                CognitiveGraphId = null // Will be set by the GraphQL API service
             };
         }
         catch (Exception ex)
@@ -556,7 +556,7 @@
 
     private List<GraphNode> GetGraphNodes()
     {
-        if (analysisResult?.CognitiveGraph == null) return new();
+        if (string.IsNullOrEmpty(analysisResult?.CognitiveGraphId)) return new();
         
         // Convert cognitive graph to visual nodes
         return analysisResult.Symbols.Select((symbol, index) => new GraphNode
@@ -570,7 +570,7 @@
 
     private List<GraphEdge> GetGraphEdges()
     {
-        if (analysisResult?.CognitiveGraph == null) return new();
+        if (string.IsNullOrEmpty(analysisResult?.CognitiveGraphId)) return new();
         
         // Convert cognitive graph connections to visual edges
         var nodes = GetGraphNodes();

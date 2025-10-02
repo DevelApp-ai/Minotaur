@@ -4,6 +4,9 @@ using Minotaur.Editor;
 using Minotaur.Plugins;
 using Minotaur.GrammarGeneration;
 using Minotaur.Parser;
+using Minotaur.UI.Blazor.Api.Services;
+using Minotaur.UI.Blazor.Api.Hubs;
+using Minotaur.UI.Blazor.Api.GraphQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,22 @@ builder.Services.AddRazorComponents()
 builder.Services.AddSingleton<LanguagePluginManager>();
 builder.Services.AddScoped<GraphEditor>();
 builder.Services.AddScoped<GrammarGenerator>();
+
+// Register API services
+builder.Services.AddSingleton<CognitiveGraphService>();
+builder.Services.AddScoped<CognitiveGraphApiService>();
+builder.Services.AddHttpClient();
+
+// Add SignalR
+builder.Services.AddSignalR();
+
+// Add GraphQL
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddProjections()
+    .AddFiltering()
+    .AddSorting();
 
 var app = builder.Build();
 
@@ -30,6 +49,12 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+// Map GraphQL endpoint
+app.MapGraphQL("/graphql");
+
+// Map SignalR hubs
+app.MapHub<CognitiveGraphHub>("/cognitive-graph-hub");
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
