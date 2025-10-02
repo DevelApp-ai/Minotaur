@@ -163,10 +163,10 @@ public class CognitiveGraphService
         // Set display text based on node type
         dto.DisplayText = node switch
         {
-            TerminalNode terminal => terminal.Text,
-            NonTerminalNode nonTerminal => nonTerminal.RuleName,
             IdentifierNode identifier => identifier.FullName,
             LiteralNode literal => literal.Value?.ToString(),
+            TerminalNode terminal => terminal.Text,
+            NonTerminalNode nonTerminal => nonTerminal.RuleName,
             _ => node.NodeType
         };
 

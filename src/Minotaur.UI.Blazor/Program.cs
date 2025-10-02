@@ -21,7 +21,7 @@ builder.Services.AddScoped<GrammarGenerator>();
 
 // Register API services
 builder.Services.AddSingleton<CognitiveGraphService>();
-builder.Services.AddScoped<CognitiveGraphApiService>();
+builder.Services.AddScoped<Minotaur.UI.Blazor.Services.CognitiveGraphApiService>();
 builder.Services.AddHttpClient();
 
 // Add SignalR

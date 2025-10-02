@@ -84,13 +84,13 @@
                     <div class="mb-3">
                         <label class="form-label">Sample Templates</label>
                         <div class="btn-group-vertical d-grid gap-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"class\")">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick='() => LoadSample("class")'>
                                 Class Definition
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"method\")">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick='() => LoadSample("method")'>
                                 Method Implementation
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"algorithm\")">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick='() => LoadSample("algorithm")'>
                                 Algorithm Example
                             </button>
                         </div>
@@ -106,28 +106,28 @@
                     <ul class="nav nav-tabs card-header-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "overview" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"overview\")">
+                                    @onclick='() => SetActiveTab("overview")'>
                                 <i class="fas fa-chart-pie me-1"></i>
                                 Overview
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "symbols" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"symbols\")">
+                                    @onclick='() => SetActiveTab("symbols")'>
                                 <i class="fas fa-sitemap me-1"></i>
                                 Symbol Table
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "dependencies" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"dependencies\")">
+                                    @onclick='() => SetActiveTab("dependencies")'>
                                 <i class="fas fa-project-diagram me-1"></i>
                                 Dependencies
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "graph" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"graph\")">
+                                    @onclick='() => SetActiveTab("graph")'>
                                 <i class="fas fa-share-alt me-1"></i>
                                 Cognitive Graph
                             </button>
@@ -505,7 +505,7 @@
         
     foreach (var group in processed)
     {
-        Console.WriteLine($"Length {group.Key}: {group.Value.Count} items");
+        Console.WriteLine($""Length {group.Key}: {group.Value.Count} items"");
     }
 }",
             "algorithm" => @"public int BinarySearch(int[] array, int target)
