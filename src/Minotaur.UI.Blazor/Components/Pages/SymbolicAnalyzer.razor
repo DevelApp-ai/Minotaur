@@ -84,13 +84,13 @@
                     <div class="mb-3">
                         <label class="form-label">Sample Templates</label>
                         <div class="btn-group-vertical d-grid gap-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"class\")">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick='() => LoadSample("class")'>
                                 Class Definition
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"method\")">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick='() => LoadSample("method")'>
                                 Method Implementation
                             </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="() => LoadSample(\"algorithm\")">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @onclick='() => LoadSample("algorithm")'>
                                 Algorithm Example
                             </button>
                         </div>
@@ -106,28 +106,28 @@
                     <ul class="nav nav-tabs card-header-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "overview" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"overview\")">
+                                    @onclick='() => SetActiveTab("overview")'>
                                 <i class="fas fa-chart-pie me-1"></i>
                                 Overview
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "symbols" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"symbols\")">
+                                    @onclick='() => SetActiveTab("symbols")'>
                                 <i class="fas fa-sitemap me-1"></i>
                                 Symbol Table
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "dependencies" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"dependencies\")">
+                                    @onclick='() => SetActiveTab("dependencies")'>
                                 <i class="fas fa-project-diagram me-1"></i>
                                 Dependencies
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link @(activeTab == "graph" ? "active" : "")" 
-                                    @onclick="() => SetActiveTab(\"graph\")">
+                                    @onclick='() => SetActiveTab("graph")'>
                                 <i class="fas fa-share-alt me-1"></i>
                                 Cognitive Graph
                             </button>
@@ -327,7 +327,7 @@
                                     <div class="graph-container" id="symbolic-graph-container">
                                         <!-- Cognitive Graph Visualization -->
                                         <svg id="symbolic-graph-svg" width="100%" height="400">
-                                            @if (analysisResult.CognitiveGraph != null)
+                                            @if (!string.IsNullOrEmpty(analysisResult.CognitiveGraphId))
                                             {
                                                 @* Render cognitive graph nodes and connections *@
                                                 @foreach (var node in GetGraphNodes())
@@ -406,7 +406,13 @@
             };
 
             // Simulate analysis results
-            analysisResult = new SymbolicAnalysisResult
+            analysisResult = new SymbolicAnalysisResult(
+                success: true,
+                errors: new List<SymbolicError>(),
+                executionPaths: new List<ExecutionPath>(),
+                constraints: new List<SymbolicConstraint>(),
+                analysisTime: TimeSpan.FromSeconds(2.5)
+            )
             {
                 TotalSymbols = 15,
                 ComplexityScore = 8.5,
@@ -434,7 +440,7 @@
                 {
                     new DependencyInfo { Name = "ICalculator", Type = "Interface" }
                 },
-                CognitiveGraph = null // Would contain actual cognitive graph
+                CognitiveGraphId = null // Will be set by the GraphQL API service
             };
         }
         catch (Exception ex)
@@ -499,7 +505,7 @@
         
     foreach (var group in processed)
     {
-        Console.WriteLine($"Length {group.Key}: {group.Value.Count} items");
+        Console.WriteLine($""Length {group.Key}: {group.Value.Count} items"");
     }
 }",
             "algorithm" => @"public int BinarySearch(int[] array, int target)
@@ -550,7 +556,7 @@
 
     private List<GraphNode> GetGraphNodes()
     {
-        if (analysisResult?.CognitiveGraph == null) return new();
+        if (string.IsNullOrEmpty(analysisResult?.CognitiveGraphId)) return new();
         
         // Convert cognitive graph to visual nodes
         return analysisResult.Symbols.Select((symbol, index) => new GraphNode
@@ -558,13 +564,13 @@
             Name = symbol.Name,
             Type = symbol.Type,
             X = 50 + (index % 5) * 150,
-            Y = 50 + (index / 5) * 80
+            Y = 50 + (index / 5.0) * 80
         }).ToList();
     }
 
     private List<GraphEdge> GetGraphEdges()
     {
-        if (analysisResult?.CognitiveGraph == null) return new();
+        if (string.IsNullOrEmpty(analysisResult?.CognitiveGraphId)) return new();
         
         // Convert cognitive graph connections to visual edges
         var nodes = GetGraphNodes();
@@ -605,44 +611,7 @@
         public double Y2 { get; set; }
     }
 
-    public class SymbolicAnalysisOptions
-    {
-        public string Language { get; set; } = "";
-        public bool EnableDeepAnalysis { get; set; }
-        public bool EnableCrossReference { get; set; }
-        public bool EnableSemanticAnalysis { get; set; }
-    }
 
-    public class SymbolicAnalysisResult
-    {
-        public int TotalSymbols { get; set; }
-        public double ComplexityScore { get; set; }
-        public int QualityScore { get; set; }
-        public int DependencyCount { get; set; }
-        public int MaintainabilityIndex { get; set; }
-        public int TestabilityScore { get; set; }
-        public int DocumentationCoverage { get; set; }
-        public Dictionary<string, int> SymbolDistribution { get; set; } = new();
-        public List<SymbolInfo> Symbols { get; set; } = new();
-        public List<DependencyInfo> IncomingDependencies { get; set; } = new();
-        public List<DependencyInfo> OutgoingDependencies { get; set; } = new();
-        public object? CognitiveGraph { get; set; }
-    }
-
-    public class SymbolInfo
-    {
-        public string Name { get; set; } = "";
-        public string Type { get; set; } = "";
-        public string Scope { get; set; } = "";
-        public string Location { get; set; } = "";
-        public int ReferenceCount { get; set; }
-    }
-
-    public class DependencyInfo
-    {
-        public string Name { get; set; } = "";
-        public string Type { get; set; } = "";
-    }
 }
 
 <style>

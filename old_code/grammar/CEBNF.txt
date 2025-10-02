@@ -1,7 +1,0 @@
-﻿Basis for the CEBNF is commonly used Extended BNF which has no formal definition
-It is like RBNF http://tools.ietf.org/html/rfc5511 except repetition (...) also include * (zero or more), + (one or more) and ? (zero or one)
-with no use of messages, constructs or objects using only terminal, non-terminal
-terminal use of quotes + double quotes and sometimes nothing
-optional markup for non-terminals
-defining code include for parsing
-minus as except

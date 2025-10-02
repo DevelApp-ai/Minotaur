@@ -218,19 +218,19 @@
                             <ul class="nav nav-tabs nav-tabs-sm mb-3" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link @(activeAnalysisTab == "symbols" ? "active" : "")" 
-                                            @onclick="() => SetActiveAnalysisTab(\"symbols\")">
+                                            @onclick='() => SetActiveAnalysisTab("symbols")'>
                                         Symbols
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link @(activeAnalysisTab == "issues" ? "active" : "")" 
-                                            @onclick="() => SetActiveAnalysisTab(\"issues\")">
+                                            @onclick='() => SetActiveAnalysisTab("issues")'>
                                         Issues
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link @(activeAnalysisTab == "metrics" ? "active" : "")" 
-                                            @onclick="() => SetActiveAnalysisTab(\"metrics\")">
+                                            @onclick='() => SetActiveAnalysisTab("metrics")'>
                                         Metrics
                                     </button>
                                 </li>
@@ -327,12 +327,13 @@
     private bool isAnalyzing;
     private string activeAnalysisTab = "symbols";
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        await RefreshProjects();
+        RefreshProjects();
+        return Task.CompletedTask;
     }
 
-    private async Task RefreshProjects()
+    private void RefreshProjects()
     {
         try
         {
@@ -373,7 +374,7 @@
         if (!string.IsNullOrEmpty(newDirectory) && Directory.Exists(newDirectory))
         {
             currentDirectory = newDirectory;
-            await RefreshProjects();
+            RefreshProjects();
         }
     }
 
@@ -384,7 +385,7 @@
         StateHasChanged();
     }
 
-    private async Task LoadProject()
+    private void LoadProject()
     {
         if (selectedProject == null) return;
 

@@ -129,7 +129,7 @@
                                         <tr>
                                             <td><strong>Assembly:</strong></td>
                                             <td class="text-truncate" title="@selectedPlugin.AssemblyPath">
-                                                @Path.GetFileName(selectedPlugin.AssemblyPath)
+                                                @System.IO.Path.GetFileName(selectedPlugin.AssemblyPath)
                                             </td>
                                         </tr>
                                         <tr>
@@ -414,12 +414,13 @@
     private bool showLogsModal = false;
     private PluginLogs? selectedPluginLogs;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        await RefreshPlugins();
+        RefreshPlugins();
+        return Task.CompletedTask;
     }
 
-    private async Task RefreshPlugins()
+    private void RefreshPlugins()
     {
         availablePlugins.Clear();
         
