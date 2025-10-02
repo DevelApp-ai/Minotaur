@@ -294,21 +294,22 @@
     private string? statusMessage;
     private string? errorMessage;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         try
         {
             graphEditor = new GraphEditor();
-            await LoadSampleGraph();
+            LoadSampleGraph();
             statusMessage = "GraphEditor initialized successfully with Minotaur.Core integration.";
         }
         catch (Exception ex)
         {
             errorMessage = $"Failed to initialize GraphEditor: {ex.Message}";
         }
+        return Task.CompletedTask;
     }
 
-    private async Task CreateNewGraph()
+    private void CreateNewGraph()
     {
         try
         {
@@ -331,7 +332,7 @@
         }
     }
 
-    private async Task LoadSampleGraph()
+    private void LoadSampleGraph()
     {
         try
         {
@@ -409,27 +410,27 @@
         }
     }
 
-    private async Task AddTerminalNode()
+    private void AddTerminalNode()
     {
-        await AddNode(new TerminalNode { NodeType = "Terminal", Text = "NewTerminal", TokenType = "Unknown" });
+        AddNode(new TerminalNode { NodeType = "Terminal", Text = "NewTerminal", TokenType = "Unknown" });
     }
 
-    private async Task AddNonTerminalNode()
+    private void AddNonTerminalNode()
     {
-        await AddNode(new NonTerminalNode { NodeType = "NonTerminal", RuleName = "NewRule" });
+        AddNode(new NonTerminalNode { NodeType = "NonTerminal", RuleName = "NewRule" });
     }
 
-    private async Task AddIdentifierNode()
+    private void AddIdentifierNode()
     {
-        await AddNode(new IdentifierNode { NodeType = "Identifier", Text = "NewIdentifier", Namespace = "Local" });
+        AddNode(new IdentifierNode { NodeType = "Identifier", Text = "NewIdentifier", Namespace = "Local" });
     }
 
-    private async Task AddLiteralNode()
+    private void AddLiteralNode()
     {
-        await AddNode(new LiteralNode { NodeType = "Literal", Value = "NewValue", LiteralType = "String" });
+        AddNode(new LiteralNode { NodeType = "Literal", Value = "NewValue", LiteralType = "String" });
     }
 
-    private async Task AddNode(CognitiveGraphNode node)
+    private void AddNode(CognitiveGraphNode node)
     {
         try
         {
@@ -453,13 +454,13 @@
         }
     }
 
-    private async Task DeleteSelectedNode()
+    private void DeleteSelectedNode()
     {
         if (selectedNode == null) return;
-        await DeleteNode(selectedNode);
+        DeleteNode(selectedNode);
     }
 
-    private async Task DeleteNode(CognitiveGraphNode node)
+    private void DeleteNode(CognitiveGraphNode node)
     {
         try
         {
@@ -493,7 +494,7 @@
         StateHasChanged();
     }
 
-    private async Task UndoLastOperation()
+    private void UndoLastOperation()
     {
         try
         {
@@ -511,7 +512,7 @@
         }
     }
 
-    private async Task RedoLastOperation()
+    private void RedoLastOperation()
     {
         try
         {

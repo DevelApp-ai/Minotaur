@@ -32,7 +32,7 @@ public class CognitiveGraphService
     /// <summary>
     /// Query cognitive graph data with efficient pagination and filtering
     /// </summary>
-    public async Task<CognitiveGraphResponse> QueryCognitiveGraphAsync(string graphId, CognitiveGraphQuery query)
+    public Task<CognitiveGraphResponse> QueryCognitiveGraphAsync(string graphId, CognitiveGraphQuery query)
     {
         var response = new CognitiveGraphResponse();
 
@@ -43,7 +43,7 @@ public class CognitiveGraphService
 
         if (startNode == null)
         {
-            return response;
+            return Task.FromResult(response);
         }
 
         // Build response with limited depth
@@ -87,22 +87,22 @@ public class CognitiveGraphService
         response.TotalNodes = CountTotalNodes(startNode);
         response.HasMore = response.Nodes.Count < response.TotalNodes;
 
-        return response;
+        return Task.FromResult(response);
     }
 
     /// <summary>
     /// Get a specific node with its immediate children
     /// </summary>
-    public async Task<CognitiveGraphNodeDto?> GetNodeAsync(string nodeId, bool includeMetadata = false)
+    public Task<CognitiveGraphNodeDto?> GetNodeAsync(string nodeId, bool includeMetadata = false)
     {
         var node = _nodeCache.Values.FirstOrDefault(n => n.Id.ToString() == nodeId);
-        return node != null ? ConvertToDto(node, includeMetadata, true) : null;
+        return Task.FromResult(node != null ? ConvertToDto(node, includeMetadata, true) : null);
     }
 
     /// <summary>
     /// Search nodes by text content or type
     /// </summary>
-    public async Task<List<CognitiveGraphNodeDto>> SearchNodesAsync(string graphId, string searchTerm, int limit = 20)
+    public Task<List<CognitiveGraphNodeDto>> SearchNodesAsync(string graphId, string searchTerm, int limit = 20)
     {
         var results = new List<CognitiveGraphNodeDto>();
         var searchLower = searchTerm.ToLowerInvariant();
@@ -131,7 +131,7 @@ public class CognitiveGraphService
             }
         }
 
-        return results;
+        return Task.FromResult(results);
     }
 
     private void CacheGraphNodes(CognitiveGraphNode node, string graphId)
