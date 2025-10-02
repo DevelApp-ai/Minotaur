@@ -116,12 +116,10 @@ public class CognitiveGraphServiceTests
         Assert.NotEmpty(result.Nodes);
 
         // Should only contain nodes up to depth 1
-        var maxDepthInResult = 0;
-        foreach (var node in result.Nodes)
-        {
-            var nodeDepth = CalculateDepthFromRoot(result.Nodes, node.Id);
-            maxDepthInResult = Math.Max(maxDepthInResult, nodeDepth);
-        }
+        var maxDepthInResult = result.Nodes
+            .Select(node => CalculateDepthFromRoot(result.Nodes, node.Id))
+            .DefaultIfEmpty(0)
+            .Max();
         Assert.True(maxDepthInResult <= 1);
     }
 
