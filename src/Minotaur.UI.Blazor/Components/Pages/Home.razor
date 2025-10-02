@@ -72,9 +72,17 @@
             
             testResult = $"✅ Success! Created graph with {nonTerminalNode.Children.Count} child nodes. Analysis completed in {analysisResult.AnalysisTime.TotalMilliseconds}ms.";
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            testResult = $"❌ Error: {ex.Message}";
+            testResult = $"❌ Invalid argument: {ex.Message}";
+        }
+        catch (InvalidOperationException ex)
+        {
+            testResult = $"❌ Invalid operation: {ex.Message}";
+        }
+        catch (Exception ex) when (!(ex is OutOfMemoryException) && !(ex is StackOverflowException) && !(ex is ThreadAbortException))
+        {
+            testResult = $"❌ Unexpected error: {ex.Message}";
         }
         
         StateHasChanged();
