@@ -575,13 +575,13 @@ WS: [ \t\r\n]+ -> skip;";
         }
     }
 
-    private async Task OnGrammarContentChanged(ChangeEventArgs e)
+    private void OnGrammarContentChanged(ChangeEventArgs e)
     {
         grammarContent = e.Value?.ToString() ?? "";
         hasUnsavedChanges = true;
         
         // Update cursor position (simplified)
-        await UpdateCursorPosition();
+        UpdateCursorPosition();
         
         // Clear previous parsing results
         isGrammarValid = false;
@@ -596,7 +596,7 @@ WS: [ \t\r\n]+ -> skip;";
         StateHasChanged();
     }
 
-    private async Task UpdateCursorPosition()
+    private void UpdateCursorPosition()
     {
         // In a real implementation, this would get the actual cursor position from the textarea
         // For now, we'll just simulate it
@@ -604,7 +604,7 @@ WS: [ \t\r\n]+ -> skip;";
         currentColumn = grammarContent.Split('\n').LastOrDefault()?.Length ?? 0;
     }
 
-    private async Task NewGrammar()
+    private void NewGrammar()
     {
         if (hasUnsavedChanges)
         {
@@ -717,7 +717,7 @@ WS: [ \t\r\n]+ -> skip;";
         }
     }
 
-    private async Task ToggleSyntaxHighlighting()
+    private void ToggleSyntaxHighlighting()
     {
         StateHasChanged();
     }
@@ -734,7 +734,7 @@ WS: [ \t\r\n]+ -> skip;";
         StateHasChanged();
     }
 
-    private async Task AddNewRule()
+    private void AddNewRule()
     {
         // In real implementation, this would add a new rule template
         var newRuleName = $"newRule{grammarRules.Count + 1}";

@@ -327,12 +327,13 @@
     private bool isAnalyzing;
     private string activeAnalysisTab = "symbols";
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        await RefreshProjects();
+        RefreshProjects();
+        return Task.CompletedTask;
     }
 
-    private async Task RefreshProjects()
+    private void RefreshProjects()
     {
         try
         {
@@ -373,7 +374,7 @@
         if (!string.IsNullOrEmpty(newDirectory) && Directory.Exists(newDirectory))
         {
             currentDirectory = newDirectory;
-            await RefreshProjects();
+            RefreshProjects();
         }
     }
 
@@ -384,7 +385,7 @@
         StateHasChanged();
     }
 
-    private async Task LoadProject()
+    private void LoadProject()
     {
         if (selectedProject == null) return;
 

@@ -414,12 +414,13 @@
     private bool showLogsModal = false;
     private PluginLogs? selectedPluginLogs;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        await RefreshPlugins();
+        RefreshPlugins();
+        return Task.CompletedTask;
     }
 
-    private async Task RefreshPlugins()
+    private void RefreshPlugins()
     {
         availablePlugins.Clear();
         
