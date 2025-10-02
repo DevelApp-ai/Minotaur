@@ -60,10 +60,15 @@ public class CognitiveGraphHub : Hub
             var response = await _cognitiveGraphService.QueryCognitiveGraphAsync(graphId, query);
             await Clients.Caller.SendAsync("GraphDataReceived", response);
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            await Clients.Caller.SendAsync("GraphError", ex.Message);
+            await Clients.Caller.SendAsync("GraphError", $"Invalid argument: {ex.Message}");
         }
+        catch (InvalidOperationException ex)
+        {
+            await Clients.Caller.SendAsync("GraphError", $"Operation error: {ex.Message}");
+        }
+        // Add additional known exception types as needed, e.g. custom GraphQueryException
     }
 
     /// <summary>
