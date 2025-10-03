@@ -71,7 +71,7 @@ public class GrammarDetectionManagerTests
     {
         // Arrange
         using var manager = GrammarDetectionManager.CreateDefault();
-        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var tempDir = Path.Join(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(tempDir);
 
         try
