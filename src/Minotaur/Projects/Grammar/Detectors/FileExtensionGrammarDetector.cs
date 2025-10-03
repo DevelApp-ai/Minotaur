@@ -116,7 +116,7 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         {
             DefaultExtensionMappings.TryGetValue(extension, out mapping);
         }
-        
+
         if (mapping != null)
         {
             metadata["source"] = "default-mapping";

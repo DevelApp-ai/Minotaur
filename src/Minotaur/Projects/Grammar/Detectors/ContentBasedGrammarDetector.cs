@@ -268,7 +268,7 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         {
             rules.AddRange(context.Configuration.ContentRules);
         }
-        
+
         lock (_contentRulesLock)
         {
             rules.AddRange(DefaultContentRules);
