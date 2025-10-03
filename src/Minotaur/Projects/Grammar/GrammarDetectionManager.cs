@@ -120,7 +120,7 @@ public class GrammarDetectionManager : IDisposable
         // Look for configuration files in the project root
         foreach (var configFileName in _configurationFileNames)
         {
-            var configPath = Path.Combine(projectRootPath, configFileName);
+            var configPath = Path.Join(projectRootPath, configFileName);
             var config = await GrammarConfiguration.TryLoadFromFileAsync(configPath);
             if (config != null)
             {
