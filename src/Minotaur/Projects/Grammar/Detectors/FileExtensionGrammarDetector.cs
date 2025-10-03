@@ -15,6 +15,8 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Concurrent;
+
 namespace Minotaur.Projects.Grammar.Detectors;
 
 /// <summary>
@@ -58,6 +60,8 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         { ".less", new GrammarMapping { Grammar = "CSS.grammar", Confidence = 0.7 } },
         { ".sql", new GrammarMapping { Grammar = "SQL.grammar", Confidence = 0.8 } }
     };
+
+    private static readonly object _extensionMappingsLock = new();
 
     /// <summary>
     /// Gets the detector identifier.
@@ -107,7 +111,13 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         }
 
         // Use default extension mappings
-        if (DefaultExtensionMappings.TryGetValue(extension, out var mapping))
+        GrammarMapping? mapping;
+        lock (_extensionMappingsLock)
+        {
+            DefaultExtensionMappings.TryGetValue(extension, out mapping);
+        }
+        
+        if (mapping != null)
         {
             metadata["source"] = "default-mapping";
             var version = GrammarVersion.TryParse(mapping.Version, out var parsedVersion) ? parsedVersion : null;
@@ -148,7 +158,10 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         if (!extension.StartsWith("."))
             extension = "." + extension;
 
-        DefaultExtensionMappings[extension] = mapping;
+        lock (_extensionMappingsLock)
+        {
+            DefaultExtensionMappings[extension] = mapping;
+        }
     }
 
     /// <summary>
@@ -157,7 +170,10 @@ public class FileExtensionGrammarDetector : IGrammarDetector
     /// <returns>An array of supported file extensions.</returns>
     public static string[] GetSupportedExtensions()
     {
-        return DefaultExtensionMappings.Keys.ToArray();
+        lock (_extensionMappingsLock)
+        {
+            return DefaultExtensionMappings.Keys.ToArray();
+        }
     }
 
     /// <summary>
@@ -170,6 +186,9 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         if (!extension.StartsWith("."))
             extension = "." + extension;
 
-        return DefaultExtensionMappings.TryGetValue(extension, out var mapping) ? mapping : null;
+        lock (_extensionMappingsLock)
+        {
+            return DefaultExtensionMappings.TryGetValue(extension, out var mapping) ? mapping : null;
+        }
     }
 }

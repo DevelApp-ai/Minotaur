@@ -15,6 +15,7 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace Minotaur.Projects.Grammar.Detectors;
@@ -221,6 +222,8 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         }
     };
 
+    private static readonly object _contentRulesLock = new();
+
     /// <summary>
     /// Gets the detector identifier.
     /// </summary>
@@ -265,7 +268,11 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         {
             rules.AddRange(context.Configuration.ContentRules);
         }
-        rules.AddRange(DefaultContentRules);
+        
+        lock (_contentRulesLock)
+        {
+            rules.AddRange(DefaultContentRules);
+        }
 
         // Sort rules by priority (highest first)
         rules.Sort((a, b) => b.Priority.CompareTo(a.Priority));
@@ -343,8 +350,11 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
     /// <param name="rule">The content detection rule to add.</param>
     public static void AddContentRule(ContentDetectionRule rule)
     {
-        DefaultContentRules.Add(rule);
-        DefaultContentRules.Sort((a, b) => b.Priority.CompareTo(a.Priority));
+        lock (_contentRulesLock)
+        {
+            DefaultContentRules.Add(rule);
+            DefaultContentRules.Sort((a, b) => b.Priority.CompareTo(a.Priority));
+        }
     }
 
     /// <summary>
@@ -353,6 +363,9 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
     /// <returns>A read-only list of content detection rules.</returns>
     public static IReadOnlyList<ContentDetectionRule> GetDefaultRules()
     {
-        return DefaultContentRules.AsReadOnly();
+        lock (_contentRulesLock)
+        {
+            return DefaultContentRules.ToList().AsReadOnly();
+        }
     }
 }
