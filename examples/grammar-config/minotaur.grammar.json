@@ -1,0 +1,111 @@
+{
+  "defaultGrammar": "CSharp10.grammar",
+  "defaultVersion": "10.0",
+  "grammarSearchPaths": [
+    "./grammars",
+    "../grammars",
+    "~/.minotaur/grammars"
+  ],
+  "extensionMappings": {
+    ".cs": {
+      "grammar": "CSharp11.grammar",
+      "version": "11.0",
+      "confidence": 0.95,
+      "fallbacks": ["CSharp10.grammar"],
+      "metadata": {
+        "description": "C# 11 with latest features"
+      }
+    },
+    ".razor": {
+      "grammar": "HTMLEmbedded.grammar",
+      "confidence": 0.9,
+      "fallbacks": ["CSharp11.grammar", "HTML.grammar"],
+      "metadata": {
+        "containsEmbeddedLanguages": ["csharp", "html", "css", "javascript"]
+      }
+    },
+    ".test.cs": {
+      "grammar": "CSharpTest.grammar",
+      "version": "11.0",
+      "confidence": 0.8,
+      "fallbacks": ["CSharp11.grammar"],
+      "metadata": {
+        "testFramework": "xUnit"
+      }
+    }
+  },
+  "pathMappings": {
+    "**/*.test.js": {
+      "grammar": "JavaScriptTest.grammar",
+      "version": "ES2022",
+      "confidence": 0.85,
+      "fallbacks": ["JavaScriptES2022.grammar"]
+    },
+    "src/components/**/*.tsx": {
+      "grammar": "TypeScriptReact.grammar",
+      "version": "4.9",
+      "confidence": 0.9,
+      "fallbacks": ["TypeScript.grammar"]
+    },
+    "api/**/*.py": {
+      "grammar": "Python311.grammar",
+      "version": "3.11",
+      "confidence": 0.95,
+      "metadata": {
+        "framework": "FastAPI"
+      }
+    }
+  },
+  "projectTypeOverrides": {
+    "DotNetProject": {
+      "grammar": "CSharp11.grammar",
+      "version": "11.0",
+      "confidence": 0.9
+    },
+    "NodeProject": {
+      "grammar": "TypeScript.grammar",
+      "version": "4.9",
+      "confidence": 0.85
+    }
+  },
+  "contentRules": [
+    {
+      "name": "csharp-nullable-reference-types",
+      "pattern": "^\\s*#nullable\\s+enable",
+      "mapping": {
+        "grammar": "CSharp11.grammar",
+        "version": "11.0",
+        "confidence": 0.95
+      },
+      "priority": 15,
+      "maxLines": 10
+    },
+    {
+      "name": "typescript-strict-mode",
+      "pattern": "^\\s*\"use strict\";",
+      "mapping": {
+        "grammar": "TypeScriptStrict.grammar",
+        "version": "4.9",
+        "confidence": 0.9
+      },
+      "priority": 12,
+      "maxLines": 5
+    },
+    {
+      "name": "python-async-function",
+      "pattern": "^\\s*async\\s+def\\s+\\w+",
+      "mapping": {
+        "grammar": "Python311Async.grammar",
+        "version": "3.11",
+        "confidence": 0.85
+      },
+      "priority": 8
+    }
+  ],
+  "metadata": {
+    "configVersion": "1.0",
+    "description": "Example grammar configuration for a multi-language project",
+    "author": "Minotaur Development Team",
+    "lastUpdated": "2024-01-15"
+  }
+}

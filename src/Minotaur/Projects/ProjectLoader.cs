@@ -18,6 +18,7 @@
 using System.Text.Json;
 using System.Xml.Linq;
 using Minotaur.Parser;
+using Minotaur.Projects.Grammar;
 
 namespace Minotaur.Projects;
 
@@ -27,6 +28,9 @@ namespace Minotaur.Projects;
 public class ProjectLoader : IProjectLoader
 {
     private readonly StepParserIntegration _stepParser;
+    private readonly GrammarDetectionManager _grammarDetectionManager;
+
+    // Legacy mapping for backward compatibility - now primarily used as fallback
     private static readonly Dictionary<string, string> FileExtensionToGrammar = new()
     {
         { ".cs", "CSharp10.grammar" },
@@ -54,9 +58,11 @@ public class ProjectLoader : IProjectLoader
     /// Initializes a new instance of the ProjectLoader class.
     /// </summary>
     /// <param name="stepParser">StepParser integration for grammar loading</param>
-    public ProjectLoader(StepParserIntegration stepParser)
+    /// <param name="grammarDetectionManager">Grammar detection manager for determining appropriate grammars</param>
+    public ProjectLoader(StepParserIntegration stepParser, GrammarDetectionManager? grammarDetectionManager = null)
     {
         _stepParser = stepParser ?? throw new ArgumentNullException(nameof(stepParser));
+        _grammarDetectionManager = grammarDetectionManager ?? GrammarDetectionManager.CreateDefault();
     }
 
     /// <inheritdoc />
@@ -257,7 +263,41 @@ public class ProjectLoader : IProjectLoader
     private static List<string> ExtractProjectPaths(object solutionGraph, string rootPath) => new();
     private Task<List<CrossFileRelationship>> AnalyzeCrossProjectRelationships(List<string> projectPaths) => Task.FromResult(new List<CrossFileRelationship>());
     private Task<List<string>> ExtractSourceFiles(object projectGraph, string rootPath) => Task.FromResult(new List<string>());
-    private Task<ProjectFile> AnalyzeSourceFile(string filePath, string rootPath) => Task.FromResult(new ProjectFile { FilePath = filePath });
+    private async Task<ProjectFile> AnalyzeSourceFile(string filePath, string rootPath)
+    {
+        var relativePath = Path.GetRelativePath(rootPath, filePath);
+        var fileType = ClassifyFileType(filePath);
+
+        // Detect grammar using the new grammar detection system
+        var grammarResult = await _grammarDetectionManager.DetectGrammarAsync(filePath, rootPath, ProjectType.GenericFolder);
+
+        string? detectedGrammar = null;
+        if (grammarResult.IsSuccessful)
+        {
+            detectedGrammar = grammarResult.GrammarName;
+        }
+        else
+        {
+            // Fallback to legacy extension mapping
+            var extension = Path.GetExtension(filePath);
+            FileExtensionToGrammar.TryGetValue(extension, out detectedGrammar);
+        }
+
+        // Extract symbols and dependencies using StepParser
+        var symbols = await ExtractSymbolsFromGraph(new object(), filePath);
+        var dependencies = await ExtractDependenciesFromGraph(new object(), filePath);
+
+        return new ProjectFile
+        {
+            FilePath = filePath,
+            RelativePath = relativePath,
+            FileType = fileType,
+            EmbeddedGrammar = detectedGrammar,
+            Symbols = symbols,
+            Dependencies = dependencies
+        };
+    }
+
     private Task<List<ExtractedSymbol>> ExtractSymbolsFromGraph(object graph, string filePath) => Task.FromResult(new List<ExtractedSymbol>());
     private Task<List<FileDependency>> ExtractDependenciesFromGraph(object graph, string filePath) => Task.FromResult(new List<FileDependency>());
     private Task<List<CrossFileRelationship>> ExtractCrossFileRelationships(ProjectFile projectFile) => Task.FromResult(new List<CrossFileRelationship>());
@@ -270,7 +310,61 @@ public class ProjectLoader : IProjectLoader
     private Task<List<ProjectDependency>> ExtractJavaDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
     private Task<List<ProjectDependency>> ExtractRustDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
     private Task<List<ProjectDependency>> ExtractGoDependencies(string folderPath) => Task.FromResult(new List<ProjectDependency>());
-    private static bool IsIgnoredPath(string path) => false;
-    private static FileType ClassifyFileType(string filePath) => FileType.SourceCode;
+    private static bool IsIgnoredPath(string path)
+    {
+        var fileName = Path.GetFileName(path);
+        var directory = Path.GetDirectoryName(path) ?? string.Empty;
+
+        // Ignore common build output and dependency directories
+        var ignoredDirectories = new[] { "bin", "obj", "node_modules", ".git", ".vs", "target", "build", "dist" };
+        var ignoredPatterns = new[] { ".tmp", ".temp", ".cache", ".log" };
+
+        return ignoredDirectories.Any(dir => directory.Contains(dir, StringComparison.OrdinalIgnoreCase)) ||
+               ignoredPatterns.Any(pattern => fileName.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static FileType ClassifyFileType(string filePath)
+    {
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
+        var fileName = Path.GetFileName(filePath).ToLowerInvariant();
+
+        // Configuration files
+        if (extension == ".config" || extension == ".json" || extension == ".xml" || extension == ".yaml" || extension == ".yml" ||
+            fileName.Contains("config") || fileName.StartsWith("."))
+        {
+            return FileType.Configuration;
+        }
+
+        // Documentation files
+        if (extension == ".md" || extension == ".txt" || extension == ".rst" || extension == ".adoc")
+        {
+            return FileType.Documentation;
+        }
+
+        // Build files
+        if (fileName.Contains("makefile") || fileName.Contains("dockerfile") || extension == ".gradle" ||
+            fileName.EndsWith(".sln") || fileName.EndsWith(".csproj") || fileName.EndsWith(".vcxproj") ||
+            fileName == "pom.xml" || fileName == "build.gradle" || fileName == "cargo.toml" ||
+            fileName == "package.json" || fileName == "go.mod")
+        {
+            return FileType.BuildFile;
+        }
+
+        // Test files
+        if (fileName.Contains("test") || fileName.Contains("spec") || fileName.Contains("mock"))
+        {
+            return FileType.Test;
+        }
+
+        // Resource files
+        var resourceExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".css", ".scss", ".less", ".woff", ".woff2", ".ttf", ".eot" };
+        if (resourceExtensions.Contains(extension))
+        {
+            return FileType.Resource;
+        }
+
+        // Default to source code
+        return FileType.SourceCode;
+    }
     private Dictionary<string, object> ExtractSettingsFromJson(JsonElement element, string prefix = "") => new();
 }
