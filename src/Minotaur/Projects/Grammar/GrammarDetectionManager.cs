@@ -182,7 +182,7 @@ public class GrammarDetectionManager : IDisposable
         GrammarConfiguration configuration,
         string fileName = "minotaur.grammar.json")
     {
-        var configPath = Path.Combine(projectRootPath, fileName);
+        var configPath = Path.Join(projectRootPath, fileName);
         await configuration.SaveToFileAsync(configPath);
 
         // Update cache
