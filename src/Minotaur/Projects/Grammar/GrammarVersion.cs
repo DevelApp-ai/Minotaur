@@ -126,7 +126,11 @@ public partial class GrammarVersion : IComparable<GrammarVersion>, IEquatable<Gr
             version = Parse(versionString);
             return true;
         }
-        catch
+        catch (ArgumentException)
+        {
+            return false;
+        }
+        catch (FormatException)
         {
             return false;
         }
