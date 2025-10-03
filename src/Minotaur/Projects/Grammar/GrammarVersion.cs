@@ -233,7 +233,9 @@ public partial class GrammarVersion : IComparable<GrammarVersion>, IEquatable<Gr
     /// <returns>True if the objects are equal, false otherwise.</returns>
     public override bool Equals(object? obj)
     {
-        return obj is GrammarVersion other && Equals(other);
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+        return Equals((GrammarVersion)obj);
     }
 
     /// <summary>
