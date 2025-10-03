@@ -34,8 +34,8 @@ public class CompositeGrammarDetector : IGrammarDetector
     /// <param name="requireConsensus">If true, requires multiple detectors to agree on the result.</param>
     /// <param name="minimumConfidence">The minimum confidence level required for a result to be accepted.</param>
     public CompositeGrammarDetector(
-        IEnumerable<IGrammarDetector> detectors, 
-        bool requireConsensus = false, 
+        IEnumerable<IGrammarDetector> detectors,
+        bool requireConsensus = false,
         double minimumConfidence = 0.5)
     {
         _detectors = detectors.OrderByDescending(d => d.Priority).ToList();
@@ -63,7 +63,7 @@ public class CompositeGrammarDetector : IGrammarDetector
         if (!CanDetect(context))
         {
             return GrammarDetectionResult.Failure(
-                "No detectors available or context is invalid", 
+                "No detectors available or context is invalid",
                 DetectorId);
         }
 
@@ -108,7 +108,7 @@ public class CompositeGrammarDetector : IGrammarDetector
         if (!results.Any())
         {
             return GrammarDetectionResult.Failure(
-                "No detectors could process the context", 
+                "No detectors could process the context",
                 DetectorId,
                 metadata);
         }
@@ -122,7 +122,7 @@ public class CompositeGrammarDetector : IGrammarDetector
         {
             metadata["reason"] = "No results met minimum confidence threshold";
             return GrammarDetectionResult.Failure(
-                $"No results met minimum confidence threshold of {_minimumConfidence}", 
+                $"No results met minimum confidence threshold of {_minimumConfidence}",
                 DetectorId,
                 metadata);
         }

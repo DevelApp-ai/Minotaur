@@ -180,7 +180,7 @@ public class GrammarConfiguration
     {
         // Simple glob pattern matching implementation
         // For production use, consider using a dedicated glob matching library
-        
+
         // Convert glob pattern to regex
         var regexPattern = pattern
             .Replace(".", "\\.")

@@ -47,13 +47,13 @@ public class GrammarDetectionManager : IDisposable
     /// <param name="projectType">The detected project type.</param>
     /// <returns>A task that represents the asynchronous detection operation.</returns>
     public async Task<GrammarDetectionResult> DetectGrammarAsync(
-        string filePath, 
-        string projectRootPath, 
+        string filePath,
+        string projectRootPath,
         ProjectType projectType = ProjectType.GenericFolder)
     {
         var configuration = await GetConfigurationAsync(projectRootPath);
         var context = GrammarDetectionContext.Create(filePath, projectRootPath, projectType, configuration);
-        
+
         return await _primaryDetector.DetectGrammarAsync(context);
     }
 
@@ -66,14 +66,14 @@ public class GrammarDetectionManager : IDisposable
     /// <param name="projectType">The detected project type.</param>
     /// <returns>A task that represents the asynchronous detection operation.</returns>
     public async Task<GrammarDetectionResult> DetectGrammarAsync(
-        string filePath, 
+        string filePath,
         string fileContent,
-        string projectRootPath, 
+        string projectRootPath,
         ProjectType projectType = ProjectType.GenericFolder)
     {
         var configuration = await GetConfigurationAsync(projectRootPath);
         var context = GrammarDetectionContext.CreateWithContent(filePath, projectRootPath, fileContent, projectType, configuration);
-        
+
         return await _primaryDetector.DetectGrammarAsync(context);
     }
 
@@ -178,13 +178,13 @@ public class GrammarDetectionManager : IDisposable
     /// <param name="fileName">The configuration file name (defaults to "minotaur.grammar.json").</param>
     /// <returns>A task that represents the asynchronous save operation.</returns>
     public async Task SaveConfigurationAsync(
-        string projectRootPath, 
-        GrammarConfiguration configuration, 
+        string projectRootPath,
+        GrammarConfiguration configuration,
         string fileName = "minotaur.grammar.json")
     {
         var configPath = Path.Combine(projectRootPath, fileName);
         await configuration.SaveToFileAsync(configPath);
-        
+
         // Update cache
         _configurationCache[projectRootPath] = configuration;
     }
@@ -216,7 +216,7 @@ public class GrammarDetectionManager : IDisposable
         {
             var context = GrammarDetectionContext.Create(filePath, projectRootPath, projectType, configuration);
             var result = await _primaryDetector.DetectGrammarAsync(context);
-            
+
             lock (results)
             {
                 results[filePath] = result;

@@ -79,7 +79,7 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         if (!CanDetect(context))
         {
             return GrammarDetectionResult.Failure(
-                "No file extension available for detection", 
+                "No file extension available for detection",
                 DetectorId);
         }
 
@@ -96,7 +96,7 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         {
             metadata["source"] = "project-configuration";
             var version = GrammarVersion.TryParse(configMapping.Version, out var parsedVersion) ? parsedVersion : null;
-            
+
             return GrammarDetectionResult.Success(
                 configMapping.Grammar,
                 version,
@@ -111,7 +111,7 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         {
             metadata["source"] = "default-mapping";
             var version = GrammarVersion.TryParse(mapping.Version, out var parsedVersion) ? parsedVersion : null;
-            
+
             return GrammarDetectionResult.Success(
                 mapping.Grammar,
                 version,
@@ -123,7 +123,7 @@ public class FileExtensionGrammarDetector : IGrammarDetector
 
         await Task.CompletedTask;
         return GrammarDetectionResult.Failure(
-            $"No grammar mapping found for extension '{extension}'", 
+            $"No grammar mapping found for extension '{extension}'",
             DetectorId,
             metadata);
     }

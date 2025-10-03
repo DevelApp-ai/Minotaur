@@ -30,7 +30,7 @@ public class GrammarDetectionManagerTests
         using var manager = GrammarDetectionManager.CreateDefault();
         var tempFile = Path.GetTempFileName();
         var csharpFile = Path.ChangeExtension(tempFile, ".cs");
-        
+
         try
         {
             await File.WriteAllTextAsync(csharpFile, "using System;\nnamespace MyNamespace\n{\n    public class Test { }\n}");
@@ -94,7 +94,7 @@ public class GrammarDetectionManagerTests
             // Assert
             Assert.Equal(3, results.Count);
             Assert.All(results.Values, result => Assert.True(result.IsSuccessful));
-            
+
             Assert.Equal("CSharp10.grammar", results[files[0]].GrammarName);
             Assert.Equal("JavaScriptES2022.grammar", results[files[1]].GrammarName);
             Assert.Equal("Python311.grammar", results[files[2]].GrammarName);

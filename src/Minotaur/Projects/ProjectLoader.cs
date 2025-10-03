@@ -29,7 +29,7 @@ public class ProjectLoader : IProjectLoader
 {
     private readonly StepParserIntegration _stepParser;
     private readonly GrammarDetectionManager _grammarDetectionManager;
-    
+
     // Legacy mapping for backward compatibility - now primarily used as fallback
     private static readonly Dictionary<string, string> FileExtensionToGrammar = new()
     {
@@ -270,7 +270,7 @@ public class ProjectLoader : IProjectLoader
 
         // Detect grammar using the new grammar detection system
         var grammarResult = await _grammarDetectionManager.DetectGrammarAsync(filePath, rootPath, ProjectType.GenericFolder);
-        
+
         string? detectedGrammar = null;
         if (grammarResult.IsSuccessful)
         {
@@ -297,7 +297,7 @@ public class ProjectLoader : IProjectLoader
             Dependencies = dependencies
         };
     }
-    
+
     private Task<List<ExtractedSymbol>> ExtractSymbolsFromGraph(object graph, string filePath) => Task.FromResult(new List<ExtractedSymbol>());
     private Task<List<FileDependency>> ExtractDependenciesFromGraph(object graph, string filePath) => Task.FromResult(new List<FileDependency>());
     private Task<List<CrossFileRelationship>> ExtractCrossFileRelationships(ProjectFile projectFile) => Task.FromResult(new List<CrossFileRelationship>());
@@ -314,33 +314,33 @@ public class ProjectLoader : IProjectLoader
     {
         var fileName = Path.GetFileName(path);
         var directory = Path.GetDirectoryName(path) ?? string.Empty;
-        
+
         // Ignore common build output and dependency directories
         var ignoredDirectories = new[] { "bin", "obj", "node_modules", ".git", ".vs", "target", "build", "dist" };
         var ignoredPatterns = new[] { ".tmp", ".temp", ".cache", ".log" };
-        
+
         return ignoredDirectories.Any(dir => directory.Contains(dir, StringComparison.OrdinalIgnoreCase)) ||
                ignoredPatterns.Any(pattern => fileName.Contains(pattern, StringComparison.OrdinalIgnoreCase));
     }
-    
+
     private static FileType ClassifyFileType(string filePath)
     {
         var extension = Path.GetExtension(filePath).ToLowerInvariant();
         var fileName = Path.GetFileName(filePath).ToLowerInvariant();
-        
+
         // Configuration files
         if (extension == ".config" || extension == ".json" || extension == ".xml" || extension == ".yaml" || extension == ".yml" ||
             fileName.Contains("config") || fileName.StartsWith("."))
         {
             return FileType.Configuration;
         }
-        
+
         // Documentation files
         if (extension == ".md" || extension == ".txt" || extension == ".rst" || extension == ".adoc")
         {
             return FileType.Documentation;
         }
-        
+
         // Build files
         if (fileName.Contains("makefile") || fileName.Contains("dockerfile") || extension == ".gradle" ||
             fileName.EndsWith(".sln") || fileName.EndsWith(".csproj") || fileName.EndsWith(".vcxproj") ||
@@ -349,20 +349,20 @@ public class ProjectLoader : IProjectLoader
         {
             return FileType.BuildFile;
         }
-        
+
         // Test files
         if (fileName.Contains("test") || fileName.Contains("spec") || fileName.Contains("mock"))
         {
             return FileType.Test;
         }
-        
+
         // Resource files
         var resourceExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".css", ".scss", ".less", ".woff", ".woff2", ".ttf", ".eot" };
         if (resourceExtensions.Contains(extension))
         {
             return FileType.Resource;
         }
-        
+
         // Default to source code
         return FileType.SourceCode;
     }

@@ -241,7 +241,7 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         if (!CanDetect(context))
         {
             return GrammarDetectionResult.Failure(
-                "No file content available for analysis", 
+                "No file content available for analysis",
                 DetectorId);
         }
 
@@ -249,7 +249,7 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         if (string.IsNullOrEmpty(content))
         {
             return GrammarDetectionResult.Failure(
-                "File content is empty", 
+                "File content is empty",
                 DetectorId);
         }
 
@@ -281,7 +281,7 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
             metadata["matchLine"] = match.lineNumber;
 
             var version = GrammarVersion.TryParse(match.rule.Mapping.Version, out var parsedVersion) ? parsedVersion : null;
-            
+
             return GrammarDetectionResult.Success(
                 match.rule.Mapping.Grammar,
                 version,
@@ -292,7 +292,7 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         }
 
         return GrammarDetectionResult.Failure(
-            "No content patterns matched", 
+            "No content patterns matched",
             DetectorId,
             metadata);
     }

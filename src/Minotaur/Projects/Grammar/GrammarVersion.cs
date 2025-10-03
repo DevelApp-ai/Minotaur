@@ -117,7 +117,7 @@ public partial class GrammarVersion : IComparable<GrammarVersion>, IEquatable<Gr
     public static bool TryParse(string? versionString, out GrammarVersion? version)
     {
         version = null;
-        
+
         if (string.IsNullOrWhiteSpace(versionString))
             return false;
 
@@ -252,13 +252,13 @@ public partial class GrammarVersion : IComparable<GrammarVersion>, IEquatable<Gr
     public override string ToString()
     {
         var version = $"{Major}.{Minor}.{Patch}";
-        
+
         if (!string.IsNullOrEmpty(PreRelease))
             version += $"-{PreRelease}";
-            
+
         if (!string.IsNullOrEmpty(BuildMetadata))
             version += $"+{BuildMetadata}";
-            
+
         return version;
     }
 
