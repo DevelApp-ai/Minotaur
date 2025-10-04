@@ -26,9 +26,9 @@ jobs:
   calculate-version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.gitversion.outputs.SemVer }}
-      prerelease: ${{ steps.gitversion.outputs.PreReleaseTag }}
-      full-version: ${{ steps.gitversion.outputs.FullSemVer }}
+      version: ${{ steps.final-version.outputs.version }}
+      prerelease: ${{ steps.final-version.outputs.prerelease }}
+      full-version: ${{ steps.final-version.outputs.full-version }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -46,11 +46,39 @@ jobs:
       with:
         useConfigFile: true
 
+    - name: Adjust version for pull requests
+      id: final-version
+      run: |
+        VERSION="${{ steps.gitversion.outputs.SemVer }}"
+        PRERELEASE="${{ steps.gitversion.outputs.PreReleaseTag }}"
+        FULL_VERSION="${{ steps.gitversion.outputs.FullSemVer }}"
+        
+        # Check if this is a pull request and adjust version accordingly
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.base_ref }}" == "main" ]]; then
+            # Pull request to main -> use beta
+            if [[ "$PRERELEASE" == "PullRequest" ]]; then
+              PRERELEASE="beta"
+              FULL_VERSION="${VERSION}-beta.PR${{ github.event.number }}"
+            fi
+          else
+            # Pull request to other branches -> use alpha
+            if [[ "$PRERELEASE" == "PullRequest" ]]; then
+              PRERELEASE="alpha"
+              FULL_VERSION="${VERSION}-alpha.PR${{ github.event.number }}"
+            fi
+          fi
+        fi
+        
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "prerelease=${PRERELEASE}" >> $GITHUB_OUTPUT
+        echo "full-version=${FULL_VERSION}" >> $GITHUB_OUTPUT
+
     - name: Display Version
       run: |
-        echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
-        echo "PreReleaseTag: ${{ steps.gitversion.outputs.PreReleaseTag }}"
-        echo "FullSemVer: ${{ steps.gitversion.outputs.FullSemVer }}"
+        echo "Version: ${{ steps.final-version.outputs.version }}"
+        echo "PreReleaseTag: ${{ steps.final-version.outputs.prerelease }}"
+        echo "FullSemVer: ${{ steps.final-version.outputs.full-version }}"
 
   build-and-test:
     runs-on: ubuntu-latest
@@ -255,6 +283,29 @@ jobs:
       with:
         name: nuget-packages
         path: ./packages/*.nupkg
+
+  publish-pr-package:
+    runs-on: ubuntu-latest
+    needs: [calculate-version, build-and-test, package]
+    if: github.event_name == 'pull_request'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download packages
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./packages
+
+    - name: Publish to GitHub Packages
+      run: |
+        dotnet nuget push ./packages/*.nupkg \
+          --api-key ${{ secrets.GITHUB_TOKEN }} \
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          --skip-duplicate
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   prerelease:
     runs-on: ubuntu-latest
