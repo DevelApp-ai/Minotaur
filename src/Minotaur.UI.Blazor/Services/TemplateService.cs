@@ -14,14 +14,14 @@ public class TemplateService
     private readonly JsonSerializerOptions _jsonOptions;
 
     public TemplateService(
-        HttpClient httpClient, 
-        ILogger<TemplateService> logger, 
+        HttpClient httpClient,
+        ILogger<TemplateService> logger,
         IConfiguration configuration)
     {
         _httpClient = httpClient;
         _logger = logger;
         _templateBaseUrl = configuration.GetValue<string>("Templates:BaseUrl") ?? "https://templates.minotaur.dev/api/v1";
-        
+
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -43,13 +43,13 @@ public class TemplateService
             }
 
             var response = await _httpClient.GetAsync(url);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var templates = await response.Content.ReadFromJsonAsync<List<CodeTemplate>>(_jsonOptions);
                 return templates ?? new List<CodeTemplate>();
             }
-            
+
             _logger.LogWarning("Failed to fetch featured templates: {StatusCode}", response.StatusCode);
             return GetMockTemplates(category);
         }
@@ -81,13 +81,13 @@ public class TemplateService
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{_templateBaseUrl}/templates/search", searchRequest, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var searchResult = await response.Content.ReadFromJsonAsync<SearchResult<CodeTemplate>>(_jsonOptions);
                 return searchResult?.Items ?? new List<CodeTemplate>();
             }
-            
+
             _logger.LogWarning("Template search failed: {StatusCode}", response.StatusCode);
             return GetMockSearchResults(query, category, language);
         }
@@ -106,19 +106,19 @@ public class TemplateService
         try
         {
             var response = await _httpClient.GetAsync($"{_templateBaseUrl}/templates/{templateId}");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<CodeTemplate>(_jsonOptions);
             }
-            
+
             _logger.LogWarning("Failed to get template {TemplateId}: {StatusCode}", templateId, response.StatusCode);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting template: {TemplateId}", templateId);
         }
-        
+
         return null;
     }
 
@@ -140,20 +140,20 @@ public class TemplateService
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{_templateBaseUrl}/templates/render", renderRequest, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<TemplateRenderResult>(_jsonOptions);
                 return result ?? TemplateRenderResult.Failed("Invalid response");
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             return TemplateRenderResult.Failed($"Render failed: {errorContent}");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rendering template: {TemplateId}", template.Id);
-            
+
             // Fallback to local rendering for demo
             return await RenderTemplateLocallyAsync(template, parameters, targetDirectory);
         }
@@ -167,20 +167,20 @@ public class TemplateService
         try
         {
             var response = await _httpClient.PostAsync($"{_templateBaseUrl}/templates/{templateId}/install", null);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<InstallationResult>(_jsonOptions);
                 return result ?? InstallationResult.Failed("Invalid response");
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             return InstallationResult.Failed($"Installation failed: {errorContent}");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error installing template: {TemplateId}", templateId);
-            
+
             // Mock successful installation for demo
             await Task.Delay(1500);
             return InstallationResult.Successful("1.0.0", new List<string> { $"{templateId}.template" });
@@ -195,7 +195,7 @@ public class TemplateService
         try
         {
             var response = await _httpClient.GetAsync($"{_templateBaseUrl}/user/templates/installed");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var templates = await response.Content.ReadFromJsonAsync<List<CodeTemplate>>(_jsonOptions);
@@ -206,7 +206,7 @@ public class TemplateService
         {
             _logger.LogError(ex, "Error getting installed templates");
         }
-        
+
         return new List<CodeTemplate>();
     }
 
@@ -231,13 +231,13 @@ public class TemplateService
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{_templateBaseUrl}/templates/publish", publishRequest, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<PublishResult>(_jsonOptions);
                 return result ?? PublishResult.Failed("Invalid response");
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             return PublishResult.Failed($"Publishing failed: {errorContent}");
         }
@@ -256,7 +256,7 @@ public class TemplateService
         try
         {
             var response = await _httpClient.GetAsync($"{_templateBaseUrl}/templates/categories");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var categories = await response.Content.ReadFromJsonAsync<Dictionary<string, int>>(_jsonOptions);
@@ -273,7 +273,7 @@ public class TemplateService
         {
             _logger.LogError(ex, "Error getting template categories");
         }
-        
+
         // Return mock data
         return GetMockCategories();
     }
@@ -286,7 +286,7 @@ public class TemplateService
         try
         {
             var response = await _httpClient.GetAsync($"{_templateBaseUrl}/templates/languages");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var languages = await response.Content.ReadFromJsonAsync<List<string>>(_jsonOptions);
@@ -297,7 +297,7 @@ public class TemplateService
         {
             _logger.LogError(ex, "Error getting supported languages");
         }
-        
+
         return GetMockLanguages();
     }
 
@@ -310,10 +310,10 @@ public class TemplateService
 
         if (string.IsNullOrWhiteSpace(template.Name))
             errors.Add("Template name is required");
-            
+
         if (string.IsNullOrWhiteSpace(template.Description))
             errors.Add("Template description is required");
-            
+
         if (!template.Files.Any())
             errors.Add("Template must contain at least one file");
 
@@ -322,14 +322,14 @@ public class TemplateService
         {
             if (string.IsNullOrWhiteSpace(param.Name))
                 errors.Add("Parameter name cannot be empty");
-                
+
             if (param.Required && param.DefaultValue == null)
                 errors.Add($"Required parameter '{param.Name}' must have a default value");
         }
 
         result.Errors = errors;
         result.IsValid = !errors.Any();
-        
+
         return result;
     }
 
@@ -340,24 +340,24 @@ public class TemplateService
     {
         // Simple local rendering for demo purposes
         var result = new TemplateRenderResult { Success = true };
-        
+
         foreach (var file in template.Files)
         {
             try
             {
                 string content = file.Content;
-                
+
                 // Simple parameter replacement (in a real implementation, use a proper template engine)
                 foreach (var param in parameters)
                 {
                     var placeholder = $"{{{{{param.Key}}}}}";
                     content = content.Replace(placeholder, param.Value?.ToString() ?? "");
                 }
-                
-                string targetPath = targetDirectory != null 
+
+                string targetPath = targetDirectory != null
                     ? System.IO.Path.Combine(targetDirectory, file.RelativePath)
                     : file.RelativePath;
-                    
+
                 result.GeneratedFiles.Add(new GeneratedFile
                 {
                     Path = targetPath,
@@ -370,7 +370,7 @@ public class TemplateService
                 result.Errors.Add($"Failed to render {file.RelativePath}: {ex.Message}");
             }
         }
-        
+
         return await Task.FromResult(result);
     }
 
@@ -571,7 +571,7 @@ public class TemplateService
     private List<CodeTemplate> GetMockSearchResults(string query, TemplateCategory? category, string? language)
     {
         var templates = GetMockTemplates(category);
-        
+
         if (!string.IsNullOrEmpty(query))
         {
             templates = templates.Where(t =>
@@ -580,12 +580,12 @@ public class TemplateService
                 t.Tags.Any(tag => tag.Contains(query, StringComparison.OrdinalIgnoreCase))
             ).ToList();
         }
-        
+
         if (!string.IsNullOrEmpty(language))
         {
             templates = templates.Where(t => t.SupportedLanguages.Contains(language)).ToList();
         }
-        
+
         return templates;
     }
 
@@ -608,7 +608,7 @@ public class TemplateService
     {
         return new List<string>
         {
-            "C#", "TypeScript", "JavaScript", "Python", "Java", "Go", 
+            "C#", "TypeScript", "JavaScript", "Python", "Java", "Go",
             "Rust", "C++", "C", "PHP", "Ruby", "Swift", "Kotlin"
         };
     }

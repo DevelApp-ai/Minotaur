@@ -15,22 +15,22 @@ public class MarketplaceService
     private readonly JsonSerializerOptions _jsonOptions;
 
     public MarketplaceService(
-        HttpClient httpClient, 
-        AuthenticationService authService, 
-        ILogger<MarketplaceService> logger, 
+        HttpClient httpClient,
+        AuthenticationService authService,
+        ILogger<MarketplaceService> logger,
         IConfiguration configuration)
     {
         _httpClient = httpClient;
         _authService = authService;
         _logger = logger;
         _marketplaceBaseUrl = configuration.GetValue<string>("Marketplace:BaseUrl") ?? "https://marketplace.minotaur.dev/api/v1";
-        
+
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = false
         };
-        
+
         // Set default timeout
         _httpClient.Timeout = TimeSpan.FromSeconds(30);
     }
@@ -43,14 +43,14 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/featured/{category}?limit={limit}");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var items = JsonSerializer.Deserialize<List<MarketplaceItem>>(json, _jsonOptions);
                 return items ?? new List<MarketplaceItem>();
             }
-            
+
             _logger.LogWarning("Failed to fetch featured items: {StatusCode}", response.StatusCode);
             return GetMockFeaturedItems(category);
         }
@@ -65,8 +65,8 @@ public class MarketplaceService
     /// Search marketplace items with filters
     /// </summary>
     public async Task<List<MarketplaceItem>> SearchItemsAsync(
-        string category, 
-        string query, 
+        string category,
+        string query,
         Dictionary<string, object> filters)
     {
         try
@@ -81,16 +81,16 @@ public class MarketplaceService
 
             var json = JsonSerializer.Serialize(request, _jsonOptions);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            
+
             var response = await _httpClient.PostAsync($"{_marketplaceBaseUrl}/search", content);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseJson = await response.Content.ReadAsStringAsync();
                 var searchResponse = JsonSerializer.Deserialize<MarketplaceSearchResponse>(responseJson, _jsonOptions);
                 return searchResponse?.Items ?? new List<MarketplaceItem>();
             }
-            
+
             _logger.LogWarning("Search request failed: {StatusCode}", response.StatusCode);
             return GetMockSearchResults(category, query, filters);
         }
@@ -111,16 +111,16 @@ public class MarketplaceService
             var request = new { ItemId = itemId, Version = version };
             var json = JsonSerializer.Serialize(request, _jsonOptions);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            
+
             var response = await _httpClient.PostAsync($"{_marketplaceBaseUrl}/install", content);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseJson = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<InstallationResult>(responseJson, _jsonOptions);
                 return result ?? InstallationResult.Failed("Invalid response format");
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             _logger.LogWarning("Installation failed: {StatusCode}, {Error}", response.StatusCode, errorContent);
             return InstallationResult.Failed($"Installation failed: {response.StatusCode}");
@@ -128,7 +128,7 @@ public class MarketplaceService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error installing item: {ItemId}", itemId);
-            
+
             // Mock successful installation for demo purposes
             await Task.Delay(2000); // Simulate installation time
             return InstallationResult.Successful(version, new List<string> { $"{itemId}.grammar", $"{itemId}.metadata" });
@@ -143,14 +143,14 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.DeleteAsync($"{_marketplaceBaseUrl}/install/{itemId}");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseJson = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<InstallationResult>(responseJson, _jsonOptions);
                 return result ?? InstallationResult.Failed("Invalid response format");
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             _logger.LogWarning("Uninstallation failed: {StatusCode}, {Error}", response.StatusCode, errorContent);
             return InstallationResult.Failed($"Uninstallation failed: {response.StatusCode}");
@@ -158,7 +158,7 @@ public class MarketplaceService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error uninstalling item: {ItemId}", itemId);
-            
+
             // Mock successful uninstallation for demo purposes
             await Task.Delay(1000);
             return InstallationResult.Successful("uninstalled");
@@ -173,13 +173,13 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/items/{itemId}");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MarketplaceItem>(json, _jsonOptions);
             }
-            
+
             _logger.LogWarning("Failed to fetch item details: {StatusCode}", response.StatusCode);
             return null;
         }
@@ -199,16 +199,16 @@ public class MarketplaceService
         {
             var json = JsonSerializer.Serialize(request, _jsonOptions);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            
+
             var response = await _httpClient.PostAsync($"{_marketplaceBaseUrl}/publish", content);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var responseJson = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<PublishResult>(responseJson, _jsonOptions);
                 return result ?? PublishResult.Failed("Invalid response format");
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             _logger.LogWarning("Publishing failed: {StatusCode}, {Error}", response.StatusCode, errorContent);
             return PublishResult.Failed($"Publishing failed: {response.StatusCode}");
@@ -228,14 +228,14 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/installed");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var items = JsonSerializer.Deserialize<List<MarketplaceItem>>(json, _jsonOptions);
                 return items ?? new List<MarketplaceItem>();
             }
-            
+
             _logger.LogWarning("Failed to fetch installed items: {StatusCode}", response.StatusCode);
             return new List<MarketplaceItem>();
         }
@@ -254,14 +254,14 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/updates");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var items = JsonSerializer.Deserialize<List<MarketplaceItem>>(json, _jsonOptions);
                 return items ?? new List<MarketplaceItem>();
             }
-            
+
             return new List<MarketplaceItem>();
         }
         catch (Exception ex)
@@ -290,22 +290,22 @@ public class MarketplaceService
 
         if (filters.TryGetValue("language", out var language))
             searchFilters.Language = language?.ToString();
-        
+
         if (filters.TryGetValue("category", out var category))
             searchFilters.Category = category?.ToString();
-        
+
         if (filters.TryGetValue("shiftDetection", out var shiftDetection))
             searchFilters.ShiftDetection = Convert.ToBoolean(shiftDetection);
-        
+
         if (filters.TryGetValue("multiVersion", out var multiVersion))
             searchFilters.MultiVersion = Convert.ToBoolean(multiVersion);
-        
+
         if (filters.TryGetValue("syntaxHighlighting", out var syntaxHighlighting))
             searchFilters.SyntaxHighlighting = Convert.ToBoolean(syntaxHighlighting);
-        
+
         if (filters.TryGetValue("sourceLanguage", out var sourceLanguage))
             searchFilters.SourceLanguage = sourceLanguage?.ToString();
-        
+
         if (filters.TryGetValue("targetLanguage", out var targetLanguage))
             searchFilters.TargetLanguage = targetLanguage?.ToString();
 
@@ -330,22 +330,22 @@ public class MarketplaceService
     private List<MarketplaceItem> GetMockSearchResults(string category, string query, Dictionary<string, object> filters)
     {
         var items = GetMockFeaturedItems(category);
-        
+
         if (!string.IsNullOrEmpty(query))
         {
-            items = items.Where(item => 
+            items = items.Where(item =>
                 item.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                 item.Description.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                 item.Tags.Any(tag => tag.Contains(query, StringComparison.OrdinalIgnoreCase))
             ).ToList();
         }
-        
+
         // Apply filters
         if (filters.TryGetValue("language", out var language) && !string.IsNullOrEmpty(language?.ToString()))
         {
             items = items.Where(item => item.Language == language.ToString()).ToList();
         }
-        
+
         return items;
     }
 
@@ -367,11 +367,11 @@ public class MarketplaceService
                 LastUpdated = DateTime.Now.AddDays(-5),
                 Language = "C#",
                 Tags = new[] { "multi-version", "shift-detection", "syntax-highlighting", "official", "nullable" },
-                Features = new[] 
-                { 
-                    "Multi-version support (C# 8.0-12.0)", 
-                    "Large shift detection", 
-                    "Semantic highlighting", 
+                Features = new[]
+                {
+                    "Multi-version support (C# 8.0-12.0)",
+                    "Large shift detection",
+                    "Semantic highlighting",
                     "Error detection",
                     "Nullable reference types",
                     "Record types support",
@@ -400,11 +400,11 @@ public class MarketplaceService
                 LastUpdated = DateTime.Now.AddDays(-12),
                 Language = "TypeScript",
                 Tags = new[] { "modern", "types", "decorators", "community", "jsx", "react" },
-                Features = new[] 
-                { 
-                    "Latest TypeScript features", 
-                    "Type-aware highlighting", 
-                    "Decorator support", 
+                Features = new[]
+                {
+                    "Latest TypeScript features",
+                    "Type-aware highlighting",
+                    "Decorator support",
                     "JSX integration",
                     "Template literal types",
                     "Conditional types",
@@ -432,11 +432,11 @@ public class MarketplaceService
                 LastUpdated = DateTime.Now.AddDays(-8),
                 Language = "Python",
                 Tags = new[] { "scientific", "numpy", "pandas", "data-science", "machine-learning" },
-                Features = new[] 
-                { 
-                    "NumPy array syntax highlighting", 
-                    "Pandas DataFrame operations", 
-                    "Matplotlib plotting support", 
+                Features = new[]
+                {
+                    "NumPy array syntax highlighting",
+                    "Pandas DataFrame operations",
+                    "Matplotlib plotting support",
                     "Scientific notation",
                     "Type hints for scientific libraries",
                     "Jupyter notebook integration"
@@ -459,11 +459,11 @@ public class MarketplaceService
                 LastUpdated = DateTime.Now.AddDays(-3),
                 Language = "JavaScript",
                 Tags = new[] { "es2024", "modern", "proposals", "pipeline", "pattern-matching" },
-                Features = new[] 
-                { 
-                    "ES2024 language features", 
-                    "Pipeline operator support", 
-                    "Pattern matching syntax", 
+                Features = new[]
+                {
+                    "ES2024 language features",
+                    "Pipeline operator support",
+                    "Pattern matching syntax",
                     "Record and tuple types",
                     "Decorators",
                     "Import assertions"
@@ -492,11 +492,11 @@ public class MarketplaceService
                 LatestVersion = "3.2.1",
                 LastUpdated = DateTime.Now.AddDays(-8),
                 Tags = new[] { "c#", "typescript", "types", "enterprise", "async", "linq" },
-                Features = new[] 
-                { 
-                    "Type preservation", 
-                    "Comment migration", 
-                    "Async/await support", 
+                Features = new[]
+                {
+                    "Type preservation",
+                    "Comment migration",
+                    "Async/await support",
                     "LINQ conversion",
                     "Attribute to decorator mapping",
                     "Namespace to module conversion"
@@ -523,11 +523,11 @@ public class MarketplaceService
                 LatestVersion = "2.4.0",
                 LastUpdated = DateTime.Now.AddDays(-15),
                 Tags = new[] { "java", "kotlin", "null-safety", "idioms", "jetbrains" },
-                Features = new[] 
-                { 
-                    "Null safety conversion", 
-                    "Extension function suggestions", 
-                    "Data class conversion", 
+                Features = new[]
+                {
+                    "Null safety conversion",
+                    "Extension function suggestions",
+                    "Data class conversion",
                     "Coroutines migration",
                     "Smart cast optimization",
                     "Kotlin idiom application"
@@ -556,11 +556,11 @@ public class MarketplaceService
                 LatestVersion = "2.0.4",
                 LastUpdated = DateTime.Now.AddDays(-3),
                 Tags = new[] { "dotnet", "ci-cd", "build", "quality", "azure", "nuget" },
-                Features = new[] 
-                { 
-                    "Multi-target build", 
-                    "Grammar validation", 
-                    "Test automation", 
+                Features = new[]
+                {
+                    "Multi-target build",
+                    "Grammar validation",
+                    "Test automation",
                     "Code quality gates",
                     "NuGet packaging",
                     "Azure deployment",
@@ -583,11 +583,11 @@ public class MarketplaceService
                 LatestVersion = "1.7.2",
                 LastUpdated = DateTime.Now.AddDays(-7),
                 Tags = new[] { "microservices", "kubernetes", "docker", "istio", "progressive-delivery" },
-                Features = new[] 
-                { 
-                    "Container orchestration", 
-                    "Service mesh integration", 
-                    "Progressive deployment", 
+                Features = new[]
+                {
+                    "Container orchestration",
+                    "Service mesh integration",
+                    "Progressive deployment",
                     "Health checks",
                     "Load balancing configuration",
                     "Monitoring setup"
@@ -614,7 +614,7 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/user/favorites");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var favorites = await response.Content.ReadFromJsonAsync<List<MarketplaceItem>>(_jsonOptions);
@@ -625,7 +625,7 @@ public class MarketplaceService
         {
             _logger.LogError(ex, "Error fetching user favorites");
         }
-        
+
         return new List<MarketplaceItem>();
     }
 
@@ -660,7 +660,7 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/user/collections");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var collections = await response.Content.ReadFromJsonAsync<List<Collection>>(_jsonOptions);
@@ -671,7 +671,7 @@ public class MarketplaceService
         {
             _logger.LogError(ex, "Error fetching user collections");
         }
-        
+
         return new List<Collection>();
     }
 
@@ -686,7 +686,7 @@ public class MarketplaceService
         try
         {
             var response = await _httpClient.PostAsJsonAsync($"{_marketplaceBaseUrl}/user/collections", request, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<Collection>(_jsonOptions);
@@ -696,7 +696,7 @@ public class MarketplaceService
         {
             _logger.LogError(ex, "Error creating collection: {CollectionName}", request.Name);
         }
-        
+
         return null;
     }
 
@@ -774,13 +774,13 @@ public class MarketplaceService
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{_marketplaceBaseUrl}/search/enhanced", searchRequest, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var searchResult = await response.Content.ReadFromJsonAsync<SearchResult<MarketplaceItem>>(_jsonOptions);
                 return searchResult?.Items ?? new List<MarketplaceItem>();
             }
-            
+
             _logger.LogWarning("Enhanced search failed: {StatusCode}", response.StatusCode);
             return GetMockSearchResultsWithAuth(category, query, filters, includeCodeTemplates);
         }
@@ -792,25 +792,25 @@ public class MarketplaceService
     }
 
     private List<MarketplaceItem> GetMockSearchResultsWithAuth(
-        string category, 
-        string query, 
+        string category,
+        string query,
         Dictionary<string, object> filters,
         bool includeCodeTemplates)
     {
         var baseResults = GetMockSearchResults(category, query, filters);
-        
+
         // Add code templates if requested
         if (includeCodeTemplates && (category == "templates" || string.IsNullOrEmpty(category)))
         {
             baseResults.AddRange(GetMockCodeTemplates());
         }
-        
+
         // Filter by authentication status
         if (!_authService.IsAuthenticated)
         {
             baseResults = baseResults.Where(item => !item.RequiresAuthentication).ToList();
         }
-        
+
         return baseResults;
     }
 

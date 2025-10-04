@@ -17,20 +17,20 @@ public class AuthenticationService
 
     private UserProfile? _currentUser;
     private string? _accessToken;
-    
+
     public event EventHandler<UserProfile?>? UserChanged;
 
     public AuthenticationService(
-        HttpClient httpClient, 
-        IJSRuntime jsRuntime, 
-        ILogger<AuthenticationService> logger, 
+        HttpClient httpClient,
+        IJSRuntime jsRuntime,
+        ILogger<AuthenticationService> logger,
         IConfiguration configuration)
     {
         _httpClient = httpClient;
         _jsRuntime = jsRuntime;
         _logger = logger;
         _authBaseUrl = configuration.GetValue<string>("Authentication:BaseUrl") ?? "https://auth.minotaur.dev/api/v1";
-        
+
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -52,9 +52,9 @@ public class AuthenticationService
             if (!string.IsNullOrEmpty(token))
             {
                 _accessToken = token;
-                _httpClient.DefaultRequestHeaders.Authorization = 
+                _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                
+
                 // Verify token and get user profile
                 var user = await GetCurrentUserAsync();
                 if (user != null)
@@ -83,7 +83,7 @@ public class AuthenticationService
         try
         {
             var response = await _httpClient.PostAsJsonAsync($"{_authBaseUrl}/auth/login", request, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(_jsonOptions);
@@ -92,17 +92,17 @@ public class AuthenticationService
                     await StoreTokenAsync(tokenResponse.AccessToken);
                     _accessToken = tokenResponse.AccessToken;
                     _currentUser = tokenResponse.User;
-                    
+
                     // Set authorization header for future requests
-                    _httpClient.DefaultRequestHeaders.Authorization = 
+                    _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _accessToken);
-                    
+
                     UserChanged?.Invoke(this, _currentUser);
-                    
+
                     return AuthenticationResult.Success(_currentUser, _accessToken, tokenResponse.RefreshToken);
                 }
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             _logger.LogWarning("Login failed: {StatusCode}, {Error}", response.StatusCode, errorContent);
             return AuthenticationResult.Failed("Invalid credentials");
@@ -122,7 +122,7 @@ public class AuthenticationService
         try
         {
             var response = await _httpClient.PostAsJsonAsync($"{_authBaseUrl}/auth/register", request, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(_jsonOptions);
@@ -131,16 +131,16 @@ public class AuthenticationService
                     await StoreTokenAsync(tokenResponse.AccessToken);
                     _accessToken = tokenResponse.AccessToken;
                     _currentUser = tokenResponse.User;
-                    
-                    _httpClient.DefaultRequestHeaders.Authorization = 
+
+                    _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _accessToken);
-                    
+
                     UserChanged?.Invoke(this, _currentUser);
-                    
+
                     return AuthenticationResult.Success(_currentUser, _accessToken, tokenResponse.RefreshToken);
                 }
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             _logger.LogWarning("Registration failed: {StatusCode}, {Error}", response.StatusCode, errorContent);
             return AuthenticationResult.Failed("Registration failed");
@@ -166,7 +166,7 @@ public class AuthenticationService
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{_authBaseUrl}/auth/social/{provider}", socialRequest, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(_jsonOptions);
@@ -175,16 +175,16 @@ public class AuthenticationService
                     await StoreTokenAsync(tokenResponse.AccessToken);
                     _accessToken = tokenResponse.AccessToken;
                     _currentUser = tokenResponse.User;
-                    
-                    _httpClient.DefaultRequestHeaders.Authorization = 
+
+                    _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _accessToken);
-                    
+
                     UserChanged?.Invoke(this, _currentUser);
-                    
+
                     return AuthenticationResult.Success(_currentUser, _accessToken, tokenResponse.RefreshToken);
                 }
             }
-            
+
             return AuthenticationResult.Failed("Social login failed");
         }
         catch (Exception ex)
@@ -218,7 +218,7 @@ public class AuthenticationService
             _accessToken = null;
             _currentUser = null;
             _httpClient.DefaultRequestHeaders.Authorization = null;
-            
+
             UserChanged?.Invoke(this, null);
         }
     }
@@ -234,7 +234,7 @@ public class AuthenticationService
         try
         {
             var response = await _httpClient.GetAsync($"{_authBaseUrl}/user/profile");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<UserProfile>(_jsonOptions);
@@ -244,7 +244,7 @@ public class AuthenticationService
         {
             _logger.LogError(ex, "Failed to get current user");
         }
-        
+
         return null;
     }
 
@@ -259,7 +259,7 @@ public class AuthenticationService
         try
         {
             var response = await _httpClient.PutAsJsonAsync($"{_authBaseUrl}/user/profile", profile, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 _currentUser = profile;
@@ -271,7 +271,7 @@ public class AuthenticationService
         {
             _logger.LogError(ex, "Failed to update user profile");
         }
-        
+
         return false;
     }
 
@@ -288,7 +288,7 @@ public class AuthenticationService
 
             var refreshRequest = new { RefreshToken = refreshToken };
             var response = await _httpClient.PostAsJsonAsync($"{_authBaseUrl}/auth/refresh", refreshRequest, _jsonOptions);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(_jsonOptions);
@@ -296,10 +296,10 @@ public class AuthenticationService
                 {
                     await StoreTokenAsync(tokenResponse.AccessToken);
                     _accessToken = tokenResponse.AccessToken;
-                    
-                    _httpClient.DefaultRequestHeaders.Authorization = 
+
+                    _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _accessToken);
-                    
+
                     return true;
                 }
             }
@@ -308,7 +308,7 @@ public class AuthenticationService
         {
             _logger.LogError(ex, "Token refresh failed");
         }
-        
+
         return false;
     }
 

@@ -41,17 +41,17 @@ public class InstallationResult
     public string? ErrorMessage { get; set; }
     public string? InstalledVersion { get; set; }
     public List<string> InstalledFiles { get; set; } = new();
-    
+
     public static InstallationResult Successful(string version, List<string>? files = null)
     {
-        return new InstallationResult 
-        { 
-            Success = true, 
+        return new InstallationResult
+        {
+            Success = true,
             InstalledVersion = version,
             InstalledFiles = files ?? new List<string>()
         };
     }
-    
+
     public static InstallationResult Failed(string error)
     {
         return new InstallationResult { Success = false, ErrorMessage = error };
@@ -163,24 +163,24 @@ public enum TemplateCategory
     ControllerTemplate,
     ServiceTemplate,
     ComponentTemplate,
-    
+
     // Project Templates
     WebApiProject,
     BlazorProject,
     ConsoleProject,
     LibraryProject,
-    
+
     // Grammar Templates
     ParserGrammar,
     LexerGrammar,
     CombinedGrammar,
-    
+
     // Pipeline Templates
     CITemplate,
     CDTemplate,
     TestingTemplate,
     DeploymentTemplate,
-    
+
     // Snippet Templates
     CodeSnippet,
     ConfigSnippet,
@@ -224,17 +224,17 @@ public class PublishResult
     public string? ErrorMessage { get; set; }
     public string? PublishedId { get; set; }
     public string? PublishedVersion { get; set; }
-    
+
     public static PublishResult Successful(string id, string version)
     {
-        return new PublishResult 
-        { 
-            Success = true, 
+        return new PublishResult
+        {
+            Success = true,
             PublishedId = id,
             PublishedVersion = version
         };
     }
-    
+
     public static PublishResult Failed(string error)
     {
         return new PublishResult { Success = false, ErrorMessage = error };
@@ -283,10 +283,10 @@ public class AuthenticationResult
     public UserProfile? User { get; set; }
     public string? AccessToken { get; set; }
     public string? RefreshToken { get; set; }
-    
+
     public static AuthenticationResult Success(UserProfile user, string accessToken, string? refreshToken = null) =>
         new AuthenticationResult { IsSuccess = true, User = user, AccessToken = accessToken, RefreshToken = refreshToken };
-        
+
     public static AuthenticationResult Failed(string error) =>
         new AuthenticationResult { IsSuccess = false, ErrorMessage = error };
 }
@@ -356,7 +356,7 @@ public class TemplateRenderResult
     public bool Success { get; set; }
     public List<GeneratedFile> GeneratedFiles { get; set; } = new();
     public List<string> Errors { get; set; } = new();
-    
+
     public static TemplateRenderResult Failed(string error) =>
         new TemplateRenderResult { Success = false, Errors = new List<string> { error } };
 }

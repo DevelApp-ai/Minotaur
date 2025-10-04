@@ -16,13 +16,13 @@ public class GrammarSyntaxHighlightingService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<GrammarSyntaxHighlightingService> _logger;
-    
+
     // Cache for parsed grammar rules and highlighting patterns
     private readonly Dictionary<string, GrammarHighlightingRules> _grammarCache = new();
     private readonly Dictionary<string, List<SyntaxToken>> _tokenCache = new();
 
     public GrammarSyntaxHighlightingService(
-        HttpClient httpClient, 
+        HttpClient httpClient,
         ILogger<GrammarSyntaxHighlightingService> logger)
     {
         _httpClient = httpClient;
@@ -37,7 +37,7 @@ public class GrammarSyntaxHighlightingService
         try
         {
             var cacheKey = $"{grammarName}:{version?.ToString() ?? "latest"}:{content.GetHashCode()}";
-            
+
             // Check cache first
             if (_tokenCache.TryGetValue(cacheKey, out var cachedTokens))
             {
@@ -46,17 +46,17 @@ public class GrammarSyntaxHighlightingService
 
             // Get or create grammar highlighting rules
             var rules = await GetGrammarHighlightingRulesAsync(grammarName, version);
-            
+
             // Tokenize content using grammar rules
             var tokens = TokenizeWithGrammar(content, rules);
-            
+
             // Cache results (with size limit)
             if (_tokenCache.Count > 1000)
             {
                 _tokenCache.Clear();
             }
             _tokenCache[cacheKey] = tokens;
-            
+
             return tokens;
         }
         catch (Exception ex)
@@ -79,16 +79,16 @@ public class GrammarSyntaxHighlightingService
     /// Get grammar-based code completion suggestions
     /// </summary>
     public async Task<List<CompletionItem>> GetCompletionSuggestionsAsync(
-        string content, 
-        int position, 
-        string grammarName, 
+        string content,
+        int position,
+        string grammarName,
         GrammarVersion? version = null)
     {
         try
         {
             var rules = await GetGrammarHighlightingRulesAsync(grammarName, version);
             var context = AnalyzeContext(content, position);
-            
+
             return GenerateCompletions(context, rules);
         }
         catch (Exception ex)
@@ -121,14 +121,14 @@ public class GrammarSyntaxHighlightingService
     private async Task<GrammarHighlightingRules> GetGrammarHighlightingRulesAsync(string grammarName, GrammarVersion? version)
     {
         var cacheKey = $"{grammarName}:{version?.ToString() ?? "latest"}";
-        
+
         if (_grammarCache.TryGetValue(cacheKey, out var cachedRules))
         {
             return cachedRules;
         }
 
         // Try to fetch grammar from API
-        var rules = await FetchGrammarRulesFromApiAsync(grammarName, version) 
+        var rules = await FetchGrammarRulesFromApiAsync(grammarName, version)
                     ?? GenerateDefaultRulesForGrammar(grammarName);
 
         _grammarCache[cacheKey] = rules;
@@ -144,7 +144,7 @@ public class GrammarSyntaxHighlightingService
         {
             // In a real implementation, this would call the grammar service API
             var response = await _httpClient.GetAsync($"/api/grammar/{grammarName}/highlighting-rules?version={version}");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
@@ -167,7 +167,7 @@ public class GrammarSyntaxHighlightingService
         var rules = new GrammarHighlightingRules { GrammarName = grammarName };
 
         // Add common patterns based on grammar name
-        if (grammarName.Contains("CSharp", StringComparison.OrdinalIgnoreCase) || 
+        if (grammarName.Contains("CSharp", StringComparison.OrdinalIgnoreCase) ||
             grammarName.Contains("C#", StringComparison.OrdinalIgnoreCase))
         {
             rules.TokenPatterns.AddRange(GetCSharpPatterns());
@@ -222,7 +222,7 @@ public class GrammarSyntaxHighlightingService
     private SyntaxToken FindNextToken(string content, int position, GrammarHighlightingRules rules)
     {
         var remainingContent = content[position..];
-        
+
         // Try each token pattern in priority order
         foreach (var pattern in rules.TokenPatterns.OrderByDescending(p => p.Priority))
         {
@@ -271,7 +271,7 @@ public class GrammarSyntaxHighlightingService
     private string GenerateHighlightedHtml(string content, List<SyntaxToken> tokens)
     {
         var html = new System.Text.StringBuilder();
-        
+
         foreach (var token in tokens)
         {
             var escapedValue = System.Web.HttpUtility.HtmlEncode(token.Value);
@@ -287,31 +287,31 @@ public class GrammarSyntaxHighlightingService
     private SyntaxCompletionContext AnalyzeContext(string content, int position)
     {
         var context = new SyntaxCompletionContext { Position = position };
-        
+
         // Find current line
         var lineStart = content.LastIndexOf('\n', position - 1) + 1;
         var lineEnd = content.IndexOf('\n', position);
         if (lineEnd == -1) lineEnd = content.Length;
-        
+
         context.CurrentLine = content[lineStart..lineEnd];
         context.CurrentLinePosition = position - lineStart;
-        
+
         // Find current word
         var wordStart = position;
         while (wordStart > 0 && char.IsLetterOrDigit(content[wordStart - 1]))
             wordStart--;
-        
+
         var wordEnd = position;
         while (wordEnd < content.Length && char.IsLetterOrDigit(content[wordEnd]))
             wordEnd++;
-        
+
         context.CurrentWord = content[wordStart..wordEnd];
         context.WordStart = wordStart;
-        
+
         // Analyze surrounding context
         context.PrecedingText = content[Math.Max(0, position - 100)..position];
         context.FollowingText = content[position..Math.Min(content.Length, position + 100)];
-        
+
         return context;
     }
 
@@ -321,7 +321,7 @@ public class GrammarSyntaxHighlightingService
     private List<CompletionItem> GenerateCompletions(SyntaxCompletionContext context, GrammarHighlightingRules rules)
     {
         var completions = new List<CompletionItem>();
-        
+
         // Add keywords that match current prefix
         foreach (var keyword in rules.Keywords)
         {
@@ -356,7 +356,7 @@ public class GrammarSyntaxHighlightingService
     private List<SyntaxError> ValidateWithGrammar(string content, GrammarHighlightingRules rules)
     {
         var errors = new List<SyntaxError>();
-        
+
         // Basic validation patterns
         foreach (var validator in rules.ValidationRules)
         {
@@ -365,7 +365,7 @@ public class GrammarSyntaxHighlightingService
             {
                 var line = content.Take(match.Index).Count(c => c == '\n') + 1;
                 var column = match.Index - content.LastIndexOf('\n', match.Index - 1);
-                
+
                 errors.Add(new SyntaxError
                 {
                     Message = validator.ErrorMessage,
