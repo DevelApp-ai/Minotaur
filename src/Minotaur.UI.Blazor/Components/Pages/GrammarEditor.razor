@@ -3,6 +3,7 @@
 @using Minotaur.Editor
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <PageTitle>Grammar Editor</PageTitle>
 
@@ -24,6 +25,19 @@
                         </button>
                         <button class="btn btn-outline-success btn-sm" @onclick="SaveGrammar" disabled="@(!hasUnsavedChanges)">
                             <i class="bi bi-save"></i> Save
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" @onclick="OpenMarketplace">
+                            <i class="bi bi-shop"></i> Marketplace
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" @onclick="AnalyzeShifts" disabled="@isAnalyzingShifts">
+                            @if (isAnalyzingShifts)
+                            {
+                                <i class="bi bi-arrow-repeat rotating"></i> <text>Analyzing...</text>
+                            }
+                            else
+                            {
+                                <i class="bi bi-graph-up-arrow"></i> <text>Detect Shifts</text>
+                            }
                         </button>
                         <button class="btn btn-primary btn-sm" @onclick="ParseGrammar" disabled="@isParsingGrammar">
                             @if (isParsingGrammar)
@@ -254,9 +268,9 @@
                                             <div class="suggestion-item">
                                                 <div class="suggestion-header">
                                                     <i class="bi bi-lightbulb text-warning me-2"></i>
-                                                    <strong>@suggestion.Title</strong>
+                                                    <strong>@suggestion.Type</strong>
                                                 </div>
-                                                <div class="suggestion-description">@suggestion.Description</div>
+                                                <div class="suggestion-description">@suggestion.Message</div>
                                             </div>
                                         }
                                     }
@@ -522,6 +536,7 @@
     private bool hasUnsavedChanges = false;
     private bool isParsingGrammar = false;
     private bool isGrammarValid = false;
+    private bool isAnalyzingShifts = false;
     
     private int currentLine = 1;
     private int currentColumn = 1;
@@ -694,7 +709,7 @@ WS: [ \t\r\n]+ -> skip;";
                 },
                 Suggestions = new List<AnalysisSuggestion>
                 {
-                    new() { Title = "Rule Ordering", Description = "Consider reordering rules for better readability" }
+                    new() { Type = "Rule Ordering", Message = "Consider reordering rules for better readability", Priority = "Medium", AutoFixAvailable = false }
                 }
             };
 
@@ -748,6 +763,62 @@ WS: [ \t\r\n]+ -> skip;";
         // In real implementation, this would focus the editor and move cursor to error location
         await JSRuntime.InvokeVoidAsync("focusElement", codeEditorElement);
     }
+    
+    private void OpenMarketplace()
+    {
+        // Navigate to marketplace in a new tab/window or show marketplace modal
+        NavigationManager.NavigateTo("/marketplace");
+    }
+    
+    private async Task AnalyzeShifts()
+    {
+        if (string.IsNullOrWhiteSpace(grammarContent))
+        {
+            return;
+        }
+        
+        isAnalyzingShifts = true;
+        StateHasChanged();
+        
+        try
+        {
+            // Simulate shift detection analysis
+            await Task.Delay(2000);
+            
+            // In real implementation, this would call the shift detection service
+            // var shiftAnalysis = await _shiftDetectionService.AnalyzeShifts(grammarContent, grammarVersion);
+            
+            // For demo, add mock analysis results
+            grammarAnalysis.Warnings.Add(new AnalysisWarning
+            {
+                Type = "LegacyPattern",
+                Message = "Consider using modern nullable reference types syntax",
+                Line = 15,
+                Severity = "Medium"
+            });
+            
+            grammarAnalysis.Suggestions.Add(new AnalysisSuggestion
+            {
+                Type = "Modernization",
+                Message = "Upgrade to C# 11.0 features for better performance",
+                Priority = "High",
+                AutoFixAvailable = true
+            });
+            
+            // Switch to analysis tab to show results
+            activeTab = "analysis";
+        }
+        catch (Exception ex)
+        {
+            // Handle error
+            Console.WriteLine($"Shift analysis error: {ex.Message}");
+        }
+        finally
+        {
+            isAnalyzingShifts = false;
+            StateHasChanged();
+        }
+    }
 
     public class GrammarRule
     {
@@ -780,11 +851,15 @@ WS: [ \t\r\n]+ -> skip;";
     {
         public string Type { get; set; } = "";
         public string Message { get; set; } = "";
+        public int Line { get; set; }
+        public string Severity { get; set; } = "";
     }
 
     public class AnalysisSuggestion
     {
-        public string Title { get; set; } = "";
-        public string Description { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Message { get; set; } = "";
+        public string Priority { get; set; } = "";
+        public bool AutoFixAvailable { get; set; }
     }
 }

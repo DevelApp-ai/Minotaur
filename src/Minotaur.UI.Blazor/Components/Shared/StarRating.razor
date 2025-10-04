@@ -1,0 +1,45 @@
+@* Star Rating Component *@
+<div class="star-rating" title="Rating: @Value.ToString("F1")/5.0">
+    @for (int i = 1; i <= 5; i++)
+    {
+        int starIndex = i; // Capture for closure
+        <i class="bi @GetStarClass(starIndex)"></i>
+    }
+</div>
+
+<style>
+.star-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.star-rating i {
+    color: #ffc107;
+    font-size: 0.875rem;
+}
+
+.star-rating i.bi-star {
+    color: #dee2e6;
+}
+</style>
+
+@code {
+    [Parameter] public float Value { get; set; }
+    
+    private string GetStarClass(int starPosition)
+    {
+        if (Value >= starPosition)
+        {
+            return "bi-star-fill";
+        }
+        else if (Value >= starPosition - 0.5)
+        {
+            return "bi-star-half";
+        }
+        else
+        {
+            return "bi-star";
+        }
+    }
+}
