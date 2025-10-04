@@ -15,6 +15,9 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
+using CognitiveGraph;
+using CognitiveGraph.Schema;
+using CognitiveGraph.Accessors;
 using Minotaur.Visitors;
 
 namespace Minotaur.Core;
@@ -51,13 +54,12 @@ public class TerminalNode : CognitiveGraphNode
     }
 
     /// <summary>
-    /// Initializes a new instance of the TerminalNode class with source position.
+    /// Initializes a new instance of the TerminalNode class with underlying node.
     /// </summary>
     /// <param name="text">The text content.</param>
     /// <param name="tokenType">The token type.</param>
-    /// <param name="sourceStart">The source start position.</param>
-    /// <param name="sourceLength">The source length.</param>
-    public TerminalNode(string text, string tokenType, uint sourceStart, uint sourceLength) : base(sourceStart, sourceLength)
+    /// <param name="underlyingNode">The underlying SymbolNode from CognitiveGraph.</param>
+    public TerminalNode(string text, string tokenType, SymbolNode underlyingNode) : base(underlyingNode)
     {
         Text = text;
         TokenType = tokenType;
@@ -138,13 +140,12 @@ public class NonTerminalNode : CognitiveGraphNode
     }
 
     /// <summary>
-    /// Initializes a new instance of the NonTerminalNode class with source position.
+    /// Initializes a new instance of the NonTerminalNode class with underlying node.
     /// </summary>
     /// <param name="ruleName">The rule name.</param>
     /// <param name="productionIndex">The production index.</param>
-    /// <param name="sourceStart">The source start position.</param>
-    /// <param name="sourceLength">The source length.</param>
-    public NonTerminalNode(string ruleName, int productionIndex, uint sourceStart, uint sourceLength) : base(sourceStart, sourceLength)
+    /// <param name="underlyingNode">The underlying SymbolNode from CognitiveGraph.</param>
+    public NonTerminalNode(string ruleName, int productionIndex, SymbolNode underlyingNode) : base(underlyingNode)
     {
         RuleName = ruleName;
         ProductionIndex = productionIndex;

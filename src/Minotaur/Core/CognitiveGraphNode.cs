@@ -16,6 +16,9 @@
  */
 
 using System.Text.Json;
+using CognitiveGraph;
+using CognitiveGraph.Schema;
+using CognitiveGraph.Accessors;
 using Minotaur.Visitors;
 
 namespace Minotaur.Core;
@@ -83,20 +86,19 @@ public abstract class CognitiveGraphNode
     /// <summary>
     /// Initializes a new instance of the CognitiveGraphNode class.
     /// </summary>
-    /// <param name="sourceStart">The source start position.</param>
-    /// <param name="sourceLength">The source length.</param>
-    protected CognitiveGraphNode(uint sourceStart, uint sourceLength)
+    /// <param name="underlyingNode">The underlying SymbolNode from CognitiveGraph.</param>
+    protected CognitiveGraphNode(SymbolNode underlyingNode)
     {
         HasUnderlyingNode = true;
-        UnderlyingSourceStart = sourceStart;
-        UnderlyingSourceLength = sourceLength;
+        UnderlyingSourceStart = underlyingNode.SourceStart;
+        UnderlyingSourceLength = underlyingNode.SourceLength;
 
         // Extract source position from underlying node
         SourcePosition = new SourcePosition(
             Line: 0, // Will be calculated from offset
             Column: 0, // Will be calculated from offset
-            Offset: (int)sourceStart,
-            Length: (int)sourceLength
+            Offset: (int)underlyingNode.SourceStart,
+            Length: (int)underlyingNode.SourceLength
         );
     }
 
