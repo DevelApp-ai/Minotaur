@@ -1,7 +1,46 @@
 # Minotaur Innovative Ideas Catalog
 
 ## Overview
-This catalog outlines innovative ideas and advanced features that could transform Minotaur into a cutting-edge code editor and development platform. These concepts are designed to leverage modern development practices and emerging technologies to create a unique and powerful developer experience.
+This catalog has been split into two focused documents to better organize features by their technical requirements and licensing considerations:
+
+## 📂 Catalog Documents
+
+### 🔓 **[Minotaur Open Source Ideas Catalog](Minotaur_Open_Source_Ideas_Catalog.md)**
+Contains innovative ideas and features for Minotaur's open source grammar editor and parsing platform. These features focus on:
+- Grammar-based syntax highlighting and code completion
+- Visual Studio Code integration and compatibility
+- Advanced grammar analysis tools
+- Real-time collaboration for grammar development
+- Extensible plugin architecture
+- Performance-optimized editor core
+
+### 🤖 **[Golem AI/ML Ideas Catalog](Golem_AI_ML_Ideas_Catalog.md)**
+Contains advanced AI and machine learning powered features for the Golem platform (closed source). These features include:
+- Intelligent automatic linting with machine learning
+- Predictive code analysis and bug detection
+- AI-powered code generation and completion
+- Natural language programming interfaces
+- Advanced security analysis with AI
+- Quantum-enhanced code analysis capabilities
+
+---
+
+## Feature Distribution
+
+| Feature Category | Minotaur (Open Source) | Golem (AI/ML - Closed Source) |
+|------------------|------------------------|--------------------------------|
+| **Grammar-Based Features** | ✅ Core grammar editing, highlighting, completion | ✅ AI-enhanced grammar suggestions |
+| **VS Code Integration** | ✅ Compatibility layer, extensions, marketplace | ✅ AI-powered extension recommendations |
+| **Code Analysis** | ✅ Static analysis, performance profiling | ✅ Predictive analysis, ML-based insights |
+| **Collaboration** | ✅ Real-time editing, version control | ✅ AI-facilitated collaboration |
+| **Security** | ✅ Basic security scanning | ✅ Advanced AI security analysis |
+| **Code Generation** | ✅ Template-based generation | ✅ AI-powered intelligent generation |
+| **Natural Language** | ✅ Documentation generation | ✅ Conversational programming interface |
+
+This separation ensures that:
+- **Minotaur** maintains its open source nature with powerful grammar-centric features
+- **Golem** provides cutting-edge AI capabilities as a commercial offering
+- Both platforms can be developed independently while sharing core infrastructure
 
 ---
 
