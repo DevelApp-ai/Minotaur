@@ -243,7 +243,7 @@ public class GrammarCodeCompletionService
     /// <summary>
     /// Build symbol table from content analysis
     /// </summary>
-    private async Task<List<Symbol>> BuildSymbolTableAsync(string content, string grammarName, GrammarVersion? version)
+    private Task<List<Symbol>> BuildSymbolTableAsync(string content, string grammarName, GrammarVersion? version)
     {
         var symbols = new List<Symbol>();
 
@@ -251,7 +251,7 @@ public class GrammarCodeCompletionService
         var cacheKey = $"{grammarName}:{version}:{content.GetHashCode()}";
         if (_symbolCache.TryGetValue(cacheKey, out var cachedSymbols))
         {
-            return cachedSymbols;
+            return Task.FromResult(cachedSymbols);
         }
 
         // Extract symbols based on grammar rules
@@ -264,13 +264,13 @@ public class GrammarCodeCompletionService
         if (_symbolCache.Count > 100) _symbolCache.Clear();
         _symbolCache[cacheKey] = symbols;
 
-        return symbols;
+        return Task.FromResult(symbols);
     }
 
     /// <summary>
     /// Generate contextual completions based on analysis
     /// </summary>
-    private async Task<List<CompletionItem>> GenerateContextualCompletionsAsync(
+    private Task<List<CompletionItem>> GenerateContextualCompletionsAsync(
         CompletionContext context,
         GrammarCompletionRules rules,
         CompletionOptions options)
@@ -280,7 +280,7 @@ public class GrammarCodeCompletionService
         // Don't provide completions inside strings/comments (unless specifically requested)
         if ((context.IsInString || context.IsInComment) && !options.IncludeInStrings)
         {
-            return completions;
+            return Task.FromResult(completions);
         }
 
         // Generate completions based on trigger kind
@@ -309,11 +309,11 @@ public class GrammarCodeCompletionService
         }
 
         // Sort by relevance
-        return completions
+        return Task.FromResult(completions
             .OrderByDescending(c => c.Priority)
             .ThenBy(c => c.Label)
             .Take(options.MaxResults)
-            .ToList();
+            .ToList());
     }
 
     /// <summary>

@@ -710,7 +710,7 @@ WS: [ \t\r\n]+ -> skip;";
         hasUnsavedChanges = true;
         
         // Update cursor position (simplified)
-        UpdateCursorPosition();
+        await UpdateCursorPosition();
         
         // Clear previous parsing results
         isGrammarValid = false;
@@ -723,14 +723,7 @@ WS: [ \t\r\n]+ -> skip;";
         }
         
         // Trigger real-time validation after a short delay
-        _ = Task.Delay(500).ContinueWith(async _ => 
-        {
-            await InvokeAsync(async () => 
-            {
-                await ValidateGrammarRealTime();
-                StateHasChanged();
-            });
-        });
+        _ = DelayedValidation();
         
         StateHasChanged();
     }
@@ -1128,6 +1121,7 @@ WS: [ \t\r\n]+ -> skip;";
             // var shiftAnalysis = await _shiftDetectionService.AnalyzeShifts(grammarContent, grammarVersion);
             
             // For demo, add mock analysis results
+            grammarAnalysis ??= new GrammarAnalysis();
             grammarAnalysis.Warnings.Add(new AnalysisWarning
             {
                 Type = "LegacyPattern",
@@ -1156,6 +1150,24 @@ WS: [ \t\r\n]+ -> skip;";
         {
             isAnalyzingShifts = false;
             StateHasChanged();
+        }
+    }
+
+    private async Task DelayedValidation()
+    {
+        try
+        {
+            await Task.Delay(500);
+            await InvokeAsync(async () => 
+            {
+                await ValidateGrammarRealTime();
+                StateHasChanged();
+            });
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't throw to avoid unhandled exceptions in fire-and-forget
+            Console.WriteLine($"Delayed validation error: {ex.Message}");
         }
     }
 
