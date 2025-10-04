@@ -289,7 +289,7 @@ public partial class StepParserIntegration : IDisposable
     {
         // Convert the StepParser result to our CognitiveGraphNode format
         // This method would need to be implemented based on the actual StepParser API
-        
+
         if (syntaxTree == null)
         {
             return new NonTerminalNode("empty", 0);
@@ -297,18 +297,18 @@ public partial class StepParserIntegration : IDisposable
 
         // For now, create a basic structure until we have the actual StepParser API documentation
         var root = new NonTerminalNode("compilation_unit", 0);
-        
+
         // Use reflection to examine the syntax tree structure
         var syntaxTreeType = syntaxTree.GetType();
         root.Metadata["syntaxTreeType"] = syntaxTreeType.Name;
-        
+
         try
         {
             // Try to get common properties from the syntax tree
-            var childrenProperty = syntaxTreeType.GetProperty("Children") ?? 
+            var childrenProperty = syntaxTreeType.GetProperty("Children") ??
                                  syntaxTreeType.GetProperty("Nodes") ??
                                  syntaxTreeType.GetProperty("Elements");
-                                 
+
             if (childrenProperty != null)
             {
                 var children = childrenProperty.GetValue(syntaxTree) as System.Collections.IEnumerable;
@@ -348,16 +348,16 @@ public partial class StepParserIntegration : IDisposable
 
         var nodeType = syntaxNode.GetType();
         var nodeName = nodeType.Name;
-        
+
         // Try to determine if this is a terminal or non-terminal node
         var valueProperty = nodeType.GetProperty("Value") ?? nodeType.GetProperty("Text");
         var typeProperty = nodeType.GetProperty("Type") ?? nodeType.GetProperty("Kind");
-        
+
         if (valueProperty != null)
         {
             var value = valueProperty.GetValue(syntaxNode)?.ToString() ?? "";
             var type = typeProperty?.GetValue(syntaxNode)?.ToString() ?? "unknown";
-            
+
             // Create appropriate node type based on content
             if (IsKeyword(value))
             {
@@ -381,12 +381,12 @@ public partial class StepParserIntegration : IDisposable
         {
             // This appears to be a non-terminal node
             var nonTerminal = new NonTerminalNode(nodeName.ToLowerInvariant(), 0);
-            
+
             // Try to add children
-            var childrenProperty = nodeType.GetProperty("Children") ?? 
+            var childrenProperty = nodeType.GetProperty("Children") ??
                                  nodeType.GetProperty("Nodes") ??
                                  nodeType.GetProperty("Elements");
-                                 
+
             if (childrenProperty != null)
             {
                 var children = childrenProperty.GetValue(syntaxNode) as System.Collections.IEnumerable;
@@ -402,7 +402,7 @@ public partial class StepParserIntegration : IDisposable
                     }
                 }
             }
-            
+
             return nonTerminal;
         }
     }
@@ -414,9 +414,9 @@ public partial class StepParserIntegration : IDisposable
     {
         var nodes = new List<CognitiveGraphNode>();
         var tokens = SimpleTokenize(sourceCode);
-        
+
         var statement = new NonTerminalNode("statement", 0);
-        
+
         foreach (var token in tokens.Take(20)) // Reasonable limit for fallback
         {
             CognitiveGraphNode node;
@@ -441,12 +441,12 @@ public partial class StepParserIntegration : IDisposable
 
             statement.AddChild(node);
         }
-        
+
         if (statement.Children.Count > 0)
         {
             nodes.Add(statement);
         }
-        
+
         return nodes;
     }
 
@@ -463,7 +463,7 @@ public partial class StepParserIntegration : IDisposable
         {
             var locationMapType = locationMap.GetType();
             var getLocationMethod = locationMapType.GetMethod("GetLocation");
-            
+
             if (getLocationMethod != null)
             {
                 // Try to get location information for this node
@@ -627,7 +627,7 @@ public partial class StepParserIntegration : IDisposable
     private Type? FindTypeInLoadedAssemblies(params string[] typeNames)
     {
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        
+
         foreach (var assembly in assemblies)
         {
             foreach (var typeName in typeNames)
@@ -635,10 +635,10 @@ public partial class StepParserIntegration : IDisposable
                 try
                 {
                     var type = assembly.GetType(typeName, false, true) ??
-                              assembly.GetTypes().FirstOrDefault(t => 
+                              assembly.GetTypes().FirstOrDefault(t =>
                                   t.Name.Equals(typeName, StringComparison.OrdinalIgnoreCase) ||
                                   t.FullName?.EndsWith(typeName, StringComparison.OrdinalIgnoreCase) == true);
-                    
+
                     if (type != null)
                     {
                         return type;
@@ -650,7 +650,7 @@ public partial class StepParserIntegration : IDisposable
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -662,7 +662,7 @@ public partial class StepParserIntegration : IDisposable
         if (obj == null) return default;
 
         var objType = obj.GetType();
-        
+
         foreach (var propName in propertyNames)
         {
             try
@@ -686,7 +686,7 @@ public partial class StepParserIntegration : IDisposable
                 // Continue trying other property names
             }
         }
-        
+
         return default;
     }
 
@@ -908,7 +908,7 @@ public partial class StepParserIntegration
             // Integrate with DevelApp.StepParser 1.0.1 NuGet package using reflection
             // This approach allows us to work with the actual API structure
             var (lexResult, parseResult) = await InvokeStepParserAsync(sourceCode);
-            
+
             if (lexResult == null || parseResult == null)
             {
                 // If StepParser integration fails, use fallback parsing
@@ -919,7 +919,7 @@ public partial class StepParserIntegration
 
             // Convert StepParser result to CognitiveGraphNode
             var root = ConvertToCognitiveGraphNode(parseResult, sourceCode);
-            
+
             // Set metadata
             root.Metadata["sourceCode"] = sourceCode;
             root.Metadata["language"] = _config.Language;
@@ -937,7 +937,7 @@ public partial class StepParserIntegration
             }
             root.Metadata["tokenCount"] = tokenCount;
             root.Metadata["parseSuccess"] = true;
-            
+
             // Add location information if configured
             if (_config.IncludeLocationInfo)
             {
@@ -972,7 +972,7 @@ public partial class StepParserIntegration
         {
             // Integrate with DevelApp.StepParser 1.0.1 validation using reflection
             var (lexResult, parseResult) = await InvokeStepParserAsync(sourceCode);
-            
+
             var errors = new List<ParseError>();
             int tokenCount = 0;
 
@@ -981,13 +981,13 @@ public partial class StepParserIntegration
                 // Extract information from lexResult using reflection
                 var lexSuccess = GetPropertyValue<bool?>(lexResult, "IsSuccess", "Success", "IsValid") ?? false;
                 tokenCount = GetPropertyValue<int?>(lexResult, "TokenCount", "Count") ?? EstimateTokenCount(sourceCode);
-                
+
                 if (!lexSuccess)
                 {
                     var errorMessage = GetPropertyValue<string>(lexResult, "ErrorMessage", "Error", "Message") ?? "Lexical analysis failed";
                     var errorLine = GetPropertyValue<int?>(lexResult, "ErrorLine", "Line") ?? 1;
                     var errorColumn = GetPropertyValue<int?>(lexResult, "ErrorColumn", "Column") ?? 1;
-                    
+
                     errors.Add(new ParseError
                     {
                         Message = $"Lexical analysis failed: {errorMessage}",
@@ -1000,13 +1000,13 @@ public partial class StepParserIntegration
                 if (parseResult != null)
                 {
                     var parseSuccess = GetPropertyValue<bool?>(parseResult, "IsSuccess", "Success", "IsValid") ?? false;
-                    
+
                     if (!parseSuccess)
                     {
                         var errorMessage = GetPropertyValue<string>(parseResult, "ErrorMessage", "Error", "Message") ?? "Syntax analysis failed";
                         var errorLine = GetPropertyValue<int?>(parseResult, "ErrorLine", "Line") ?? 1;
                         var errorColumn = GetPropertyValue<int?>(parseResult, "ErrorColumn", "Column") ?? 1;
-                        
+
                         errors.Add(new ParseError
                         {
                             Message = $"Syntax analysis failed: {errorMessage}",
@@ -1026,7 +1026,7 @@ public partial class StepParserIntegration
                             var severity = GetPropertyValue<string>(diagnostic, "Severity", "Type", "Level") ?? "Warning";
                             var line = GetPropertyValue<int?>(diagnostic, "Line") ?? 1;
                             var column = GetPropertyValue<int?>(diagnostic, "Column") ?? 1;
-                            
+
                             errors.Add(new ParseError
                             {
                                 Message = message,
@@ -1059,9 +1059,9 @@ public partial class StepParserIntegration
             return new ParseValidationResult
             {
                 IsValid = false,
-                Errors = new[] { new ParseError 
-                { 
-                    Message = ex.Message, 
+                Errors = new[] { new ParseError
+                {
+                    Message = ex.Message,
                     Type = "ValidationException",
                     Line = 1,
                     Column = 1
