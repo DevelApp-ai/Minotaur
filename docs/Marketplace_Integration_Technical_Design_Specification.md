@@ -1428,10 +1428,212 @@ public class PopularParameter
 - Security scanning tests
 
 ### 10.2 Integration Testing
+
+#### 10.2.1 System Interaction Testing
+
+**Authentication & Marketplace Integration Test**
+```csharp
+[Test]
+public async Task Should_Authenticate_And_Access_Marketplace_Content()
+{
+    // Test: Login flow with existing marketplace
+    var authResult = await AuthenticationService.LoginAsync(new LoginRequest 
+    {
+        EmailOrUsername = "test@minotaur.dev",
+        Password = "TestPassword123!"
+    });
+    
+    Assert.IsTrue(authResult.IsSuccess);
+    Assert.IsNotNull(authResult.Token);
+    
+    // Test: Access premium marketplace content
+    var marketplaceItems = await MarketplaceService.SearchItemsWithAuthAsync(
+        category: "grammars",
+        query: "C# advanced",
+        filters: new Dictionary<string, object> { ["isPremium"] = true }
+    );
+    
+    Assert.IsNotEmpty(marketplaceItems);
+    Assert.IsTrue(marketplaceItems.All(item => item.RequiresPremium));
+}
+```
+
+**Template Publishing & Installation Integration Test**
+```csharp
+[Test] 
+public async Task Should_Publish_And_Install_Template_End_To_End()
+{
+    // Test: Publish template to marketplace
+    var template = CreateTestCodeTemplate();
+    var publishResult = await PublishingService.PublishTemplateAsync(template);
+    
+    Assert.IsTrue(publishResult.IsSuccess);
+    Assert.IsNotNull(publishResult.PublishedItemId);
+    
+    // Test: Search finds published template
+    var searchResults = await MarketplaceService.SearchItemsAsync(
+        category: "templates",
+        query: template.Name,
+        filters: new Dictionary<string, object>()
+    );
+    
+    Assert.Contains(publishResult.PublishedItemId, 
+        searchResults.Select(r => r.Id).ToList());
+    
+    // Test: Install template in different project context
+    var installResult = await MarketplaceService.InstallItemAsync(
+        publishResult.PublishedItemId,
+        targetPath: "/test/project"
+    );
+    
+    Assert.IsTrue(installResult.IsSuccess);
+    Assert.IsTrue(File.Exists("/test/project/template.cs"));
+}
+```
+
+#### 10.2.2 Cross-System Compatibility Tests
+
+**Existing Project Integration Test**
+```csharp
+[Test]
+public async Task Should_Integrate_With_Existing_Minotaur_Projects()
+{
+    // Test: Load existing grammar project
+    var existingProject = await ProjectService.LoadProjectAsync("../existing-grammar-project");
+    Assert.IsNotNull(existingProject);
+    
+    // Test: Enhance with marketplace grammars
+    var enhancedGrammar = await MarketplaceService.GetItemAsync("csharp-advanced-grammar");
+    await ProjectService.IntegrateMarketplaceItemAsync(existingProject, enhancedGrammar);
+    
+    // Test: Verify enhanced functionality works
+    var analysisResult = await GrammarAnalysisService.AnalyzeProjectAsync(existingProject);
+    Assert.IsTrue(analysisResult.HasAdvancedFeatures);
+    Assert.Contains("ShiftDetection", analysisResult.EnabledFeatures);
+}
+```
+
+#### 10.2.3 Migration Path Testing
+
+**Legacy System Migration Test**
+```csharp
+[Test]
+public async Task Should_Migrate_Legacy_Configurations_To_Marketplace()
+{
+    // Test: Import legacy grammar configurations
+    var legacyConfig = LoadLegacyConfiguration();
+    var migrationResult = await MigrationService.MigrateToMarketplaceAsync(legacyConfig);
+    
+    Assert.IsTrue(migrationResult.IsSuccess);
+    Assert.IsEmpty(migrationResult.Errors);
+    
+    // Test: Verify marketplace equivalents work
+    foreach (var legacyGrammar in legacyConfig.Grammars)
+    {
+        var marketplaceEquivalent = await MarketplaceService.FindEquivalentAsync(legacyGrammar);
+        Assert.IsNotNull(marketplaceEquivalent);
+        
+        var functionalityTest = await TestGrammarFunctionality(marketplaceEquivalent);
+        Assert.IsTrue(functionalityTest.IsCompatible);
+    }
+}
+```
+
+#### 10.2.4 API Contract Testing
+
+**Marketplace API Contract Validation**
+```csharp
+[Test]
+public async Task Should_Maintain_API_Contract_Compatibility()
+{
+    // Test: Authentication endpoints maintain contract
+    var authResponse = await HttpClient.PostAsync("/auth/login", CreateLoginRequest());
+    Assert.AreEqual(HttpStatusCode.OK, authResponse.StatusCode);
+    
+    var authData = await authResponse.Content.ReadFromJsonAsync<AuthenticationResult>();
+    Assert.IsNotNull(authData.AccessToken);
+    Assert.IsNotNull(authData.User);
+    
+    // Test: Marketplace search maintains contract
+    var searchResponse = await HttpClient.GetAsync(
+        "/marketplace/search?q=grammar&category=grammars&limit=10"
+    );
+    Assert.AreEqual(HttpStatusCode.OK, searchResponse.StatusCode);
+    
+    var searchData = await searchResponse.Content.ReadFromJsonAsync<SearchResponse>();
+    Assert.IsNotNull(searchData.Items);
+    Assert.LessOrEqual(searchData.Items.Count, 10);
+}
+```
+
+#### 10.2.5 Performance Integration Testing
+
+**Load Testing for System Interactions**
+```csharp
+[Test]
+public async Task Should_Handle_Concurrent_Marketplace_Operations()
+{
+    var tasks = new List<Task>();
+    
+    // Simulate concurrent users accessing marketplace
+    for (int i = 0; i < 50; i++)
+    {
+        tasks.Add(SimulateUserMarketplaceSession());
+    }
+    
+    var stopwatch = Stopwatch.StartNew();
+    await Task.WhenAll(tasks);
+    stopwatch.Stop();
+    
+    // Verify performance within acceptable limits
+    Assert.Less(stopwatch.ElapsedMilliseconds, 30000); // 30 seconds max
+}
+
+private async Task SimulateUserMarketplaceSession()
+{
+    // Login, search, install template, logout
+    await AuthenticationService.LoginAsync(CreateRandomUser());
+    await MarketplaceService.SearchItemsAsync("templates", "web-api", filters);
+    await MarketplaceService.InstallItemAsync("web-api-template", "/tmp/test");
+    await AuthenticationService.LogoutAsync();
+}
+```
+
+#### 10.2.6 Data Consistency Testing
+
+**Cross-Service Data Synchronization Test**
+```csharp
+[Test]
+public async Task Should_Maintain_Data_Consistency_Across_Services()
+{
+    // Test: User profile updates sync across services
+    var userUpdate = await UserService.UpdateProfileAsync(userId, newProfile);
+    Assert.IsTrue(userUpdate.IsSuccess);
+    
+    // Verify marketplace service sees updated profile
+    var marketplaceProfile = await MarketplaceService.GetUserProfileAsync(userId);
+    Assert.AreEqual(newProfile.DisplayName, marketplaceProfile.DisplayName);
+    
+    // Verify authentication service sees updated profile
+    var authProfile = await AuthenticationService.GetUserProfileAsync(userId);
+    Assert.AreEqual(newProfile.DisplayName, authProfile.DisplayName);
+    
+    // Test: Template installation updates user collections
+    await MarketplaceService.InstallItemAsync("test-template", "/project");
+    var userCollections = await UserService.GetUserCollectionsAsync(userId);
+    Assert.Contains("test-template", userCollections.InstalledItems);
+}
+```
+
 - End-to-end template publishing workflow
-- Authentication provider integration
+- Authentication provider integration  
 - Marketplace search functionality
 - File upload and download processes
+- Cross-system compatibility validation
+- Legacy configuration migration testing
+- API contract compliance verification
+- Performance under concurrent load
+- Data synchronization across services
 
 ### 10.3 Performance Testing
 - Template rendering performance
@@ -1444,6 +1646,266 @@ public class PopularParameter
 - Template content scanning
 - API rate limiting
 - Input validation
+
+## 10.3 Project Alignment & System Interaction Framework
+
+### 10.3.1 Existing Project Integration Protocol
+
+This section defines how existing Minotaur projects can seamlessly integrate with the new marketplace system while maintaining compatibility and providing a smooth migration path.
+
+#### Project Alignment Strategy
+
+**Configuration Compatibility Matrix**
+```json
+{
+  "compatibilityMapping": {
+    "legacyGrammarFiles": {
+      "antlr4": "marketplace://grammars/antlr-v4-enhanced",
+      "custom": "marketplace://grammars/community-custom"
+    },
+    "parserIntegrations": {
+      "stepParser": "marketplace://parsers/step-parser-v2",
+      "customParser": "marketplace://parsers/extensible-parser"
+    },
+    "plugins": {
+      "languagePlugins": "marketplace://plugins/language-support",
+      "transformationPlugins": "marketplace://plugins/code-transforms"
+    }
+  }
+}
+```
+
+#### System Interaction Contracts
+
+**Inter-Service Communication Protocol**
+```csharp
+public interface ISystemInteractionContract
+{
+    // Authentication state synchronization
+    Task SyncAuthenticationStateAsync(string userId, AuthenticationState state);
+    
+    // Project configuration alignment
+    Task AlignProjectConfigurationAsync(string projectId, MarketplaceConfiguration config);
+    
+    // Resource dependency resolution
+    Task<DependencyResolution> ResolveResourceDependenciesAsync(
+        List<string> requiredResources,
+        ProjectContext context
+    );
+    
+    // Backward compatibility validation
+    Task<CompatibilityReport> ValidateBackwardCompatibilityAsync(
+        string projectPath,
+        MarketplaceIntegration integration
+    );
+}
+```
+
+**Implementation Example**
+```csharp
+public class SystemAlignmentService : ISystemInteractionContract
+{
+    public async Task AlignProjectConfigurationAsync(string projectId, MarketplaceConfiguration config)
+    {
+        // Load existing project configuration
+        var existingConfig = await _projectService.GetConfigurationAsync(projectId);
+        
+        // Create alignment mapping
+        var alignmentPlan = new AlignmentPlan
+        {
+            PreservedSettings = FilterCompatibleSettings(existingConfig),
+            EnhancedFeatures = MapToMarketplaceFeatures(config),
+            MigrationSteps = GenerateMigrationSteps(existingConfig, config)
+        };
+        
+        // Apply alignment with rollback capability
+        using var transaction = await _configService.BeginTransactionAsync();
+        try
+        {
+            await ApplyAlignmentPlan(alignmentPlan);
+            await ValidateConfigurationIntegrity(projectId);
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new AlignmentException("Failed to align project configuration", ex);
+        }
+    }
+    
+    public async Task<DependencyResolution> ResolveResourceDependenciesAsync(
+        List<string> requiredResources, 
+        ProjectContext context)
+    {
+        var resolution = new DependencyResolution();
+        
+        foreach (var resource in requiredResources)
+        {
+            // Check if resource exists in marketplace
+            var marketplaceItem = await _marketplaceService.FindResourceAsync(resource);
+            
+            if (marketplaceItem != null)
+            {
+                // Verify compatibility with project context
+                var compatibility = await _compatibilityService.CheckCompatibilityAsync(
+                    marketplaceItem, context
+                );
+                
+                if (compatibility.IsCompatible)
+                {
+                    resolution.ResolvedResources.Add(new ResolvedResource
+                    {
+                        OriginalId = resource,
+                        MarketplaceId = marketplaceItem.Id,
+                        Version = SelectOptimalVersion(marketplaceItem.Versions, context),
+                        InstallationMethod = DetermineInstallationMethod(marketplaceItem, context)
+                    });
+                }
+                else
+                {
+                    resolution.UnresolvedResources.Add(resource);
+                    resolution.Warnings.AddRange(compatibility.Issues);
+                }
+            }
+            else
+            {
+                // Resource not found in marketplace - check for alternatives
+                var alternatives = await _marketplaceService.FindAlternativesAsync(resource);
+                resolution.Suggestions.Add(new ResourceSuggestion
+                {
+                    OriginalResource = resource,
+                    Alternatives = alternatives,
+                    RecommendedAction = "Consider upgrading to marketplace equivalent"
+                });
+            }
+        }
+        
+        return resolution;
+    }
+}
+```
+
+### 10.3.2 Integration Test Suite for System Alignment
+
+**Comprehensive Integration Test Framework**
+```csharp
+[TestFixture]
+public class SystemAlignmentIntegrationTests
+{
+    [Test]
+    public async Task Should_Align_Legacy_Project_With_Marketplace_Systems()
+    {
+        // Arrange: Create a legacy project structure
+        var legacyProject = await CreateLegacyProjectStructure();
+        var marketplaceConfig = await LoadMarketplaceConfiguration();
+        
+        // Act: Perform system alignment
+        var alignmentResult = await _systemAlignment.AlignProjectConfigurationAsync(
+            legacyProject.Id, 
+            marketplaceConfig
+        );
+        
+        // Assert: Verify successful alignment
+        Assert.IsTrue(alignmentResult.IsSuccess);
+        Assert.IsEmpty(alignmentResult.CriticalErrors);
+        
+        // Verify project still functions with legacy features
+        var legacyFeatureTest = await TestLegacyFeatures(legacyProject);
+        Assert.IsTrue(legacyFeatureTest.AllFeaturesWorking);
+        
+        // Verify new marketplace features are available
+        var marketplaceFeatureTest = await TestMarketplaceFeatures(legacyProject);
+        Assert.IsTrue(marketplaceFeatureTest.NewFeaturesAccessible);
+    }
+    
+    [Test]
+    public async Task Should_Handle_Conflicting_System_Configurations()
+    {
+        // Test scenario: Existing project has custom parsers that conflict with marketplace parsers
+        var projectWithConflicts = await CreateConflictingProject();
+        
+        var resolutionResult = await _systemAlignment.ResolveConfigurationConflictsAsync(
+            projectWithConflicts.Id
+        );
+        
+        Assert.IsTrue(resolutionResult.ConflictsResolved);
+        Assert.IsNotEmpty(resolutionResult.ResolutionSteps);
+        
+        // Verify both old and new systems can coexist
+        var coexistenceTest = await TestSystemCoexistence(projectWithConflicts);
+        Assert.IsTrue(coexistenceTest.CanCoexist);
+    }
+    
+    [Test] 
+    public async Task Should_Maintain_Data_Integrity_During_Migration()
+    {
+        var originalData = await CaptureProjectData();
+        
+        await _systemAlignment.MigrateToMarketplaceIntegrationAsync(originalData.ProjectId);
+        
+        var migratedData = await CaptureProjectData();
+        
+        // Verify critical data is preserved
+        Assert.AreEqual(originalData.GrammarRules.Count, migratedData.GrammarRules.Count);
+        Assert.AreEqual(originalData.UserSettings, migratedData.UserSettings);
+        Assert.IsTrue(migratedData.HasMarketplaceIntegration);
+    }
+}
+```
+
+### 10.3.3 System Interaction Documentation
+
+**Integration Workflow Documentation**
+```yaml
+# Integration workflow for existing projects
+integration_steps:
+  1_assessment:
+    description: "Analyze existing project structure and dependencies"
+    actions:
+      - scan_project_files
+      - identify_grammar_dependencies  
+      - assess_plugin_usage
+      - check_custom_configurations
+    
+  2_compatibility_check:
+    description: "Validate compatibility with marketplace systems"
+    actions:
+      - run_compatibility_matrix
+      - identify_conflicts
+      - suggest_alternatives
+      - generate_migration_plan
+    
+  3_gradual_integration:
+    description: "Incrementally integrate marketplace features"
+    phases:
+      - authentication_integration
+      - marketplace_browsing_access
+      - template_system_activation
+      - advanced_features_enablement
+    
+  4_validation:
+    description: "Verify integrated system functionality"
+    tests:
+      - existing_workflow_preservation
+      - new_feature_accessibility
+      - performance_regression_check
+      - user_experience_validation
+
+# Rollback procedures
+rollback_strategy:
+  triggers:
+    - integration_failure
+    - performance_degradation
+    - user_workflow_disruption
+  
+  procedures:
+    - restore_configuration_snapshot
+    - revert_authentication_changes
+    - disable_marketplace_features
+    - validate_original_functionality
+```
+
+This framework ensures that existing projects can smoothly transition to the marketplace-integrated system while maintaining all current functionality and providing a clear path for accessing enhanced features.
 
 ## 11. Deployment and Infrastructure
 
