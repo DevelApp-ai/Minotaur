@@ -15,9 +15,6 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
-using CognitiveGraph;
-using CognitiveGraph.Schema;
-using CognitiveGraph.Accessors;
 using Minotaur.Core;
 using Minotaur.Visitors;
 using System.Text;

@@ -15,10 +15,6 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
-using CognitiveGraph;
-using CognitiveGraph.Builder;
-using CognitiveGraph.Schema;
-using CognitiveGraph.Accessors;
 using Minotaur.Core;
 using Minotaur.Visitors;
 using System.Collections.Concurrent;
@@ -39,14 +35,9 @@ public class GraphEditor : IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// Gets the underlying CognitiveGraph.CognitiveGraph instance.
+    /// Gets the underlying graph instance (placeholder for future integration).
     /// </summary>
-    public CognitiveGraph.CognitiveGraph? UnderlyingGraph { get; private set; }
-
-    /// <summary>
-    /// Gets the graph builder for creating new nodes.
-    /// </summary>
-    public CognitiveGraphBuilder? GraphBuilder { get; private set; }
+    public object? UnderlyingGraph { get; private set; }
 
     /// <summary>
     /// Gets the root node of the graph being edited.
@@ -72,53 +63,29 @@ public class GraphEditor : IDisposable
     /// Initializes a new instance of the GraphEditor class.
     /// </summary>
     /// <param name="root">The root node of the graph to edit.</param>
-    /// <param name="underlyingGraph">The underlying CognitiveGraph.CognitiveGraph instance.</param>
-    public GraphEditor(CognitiveGraphNode? root = null, CognitiveGraph.CognitiveGraph? underlyingGraph = null)
+    /// <param name="underlyingGraph">The underlying graph instance (optional).</param>
+    public GraphEditor(CognitiveGraphNode? root = null, object? underlyingGraph = null)
     {
         UnderlyingGraph = underlyingGraph;
-        GraphBuilder = new CognitiveGraphBuilder();
 
         if (root != null)
         {
             SetRoot(root);
         }
-        else if (underlyingGraph != null)
-        {
-            // Create wrapper node from underlying graph root
-            var rootNode = underlyingGraph.GetRootNode();
-            // TODO: Create appropriate wrapper based on node type
-            // This is a simplified implementation - in practice would need
-            // more sophisticated node wrapping logic
-        }
     }
 
     /// <summary>
     /// Initializes a new instance of the GraphEditor class from source code.
+    /// Creates a simple demonstration graph structure.
     /// </summary>
     /// <param name="sourceCode">The source code to parse into a cognitive graph.</param>
     public GraphEditor(string sourceCode)
     {
-        GraphBuilder = new CognitiveGraphBuilder();
         // For demonstration, create a simple root node
-        // In practice, this would involve parsing the source code
-        var rootOffset = GraphBuilder.WriteSymbolNode(
-            symbolId: 1,
-            nodeType: 200,
-            sourceStart: 0,
-            sourceLength: (uint)sourceCode.Length,
-            properties: new List<(string key, PropertyValueType type, object value)>
-            {
-                ("NodeType", PropertyValueType.String, "CompilationUnit"),
-                ("Source", PropertyValueType.String, sourceCode)
-            }
-        );
-
-        var buffer = GraphBuilder.Build(rootOffset, sourceCode);
-        UnderlyingGraph = new CognitiveGraph.CognitiveGraph(buffer);
-
-        // Create wrapper root node
-        var underlyingRoot = UnderlyingGraph.GetRootNode();
-        Root = new NonTerminalNode("CompilationUnit", 0, underlyingRoot);
+        // In practice, this would involve proper parsing via StepParser
+        Root = new NonTerminalNode("CompilationUnit", 0, 0, (uint)sourceCode.Length);
+        Root.Metadata["sourceCode"] = sourceCode;
+        Root.Metadata["parserType"] = "Demo";
         RebuildNodeIndex();
     }
 
