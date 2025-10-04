@@ -1,0 +1,1004 @@
+@page "/marketplace"
+@using Minotaur.Core
+@using Minotaur.UI.Blazor.Services
+@using Minotaur.UI.Blazor.Models
+@using Minotaur.UI.Blazor.Components.Shared
+@inject MarketplaceService MarketplaceService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Minotaur Marketplace</PageTitle>
+
+<div class="marketplace-container">
+    <div class="marketplace-header">
+        <h1><i class="bi bi-shop"></i> Minotaur Marketplace</h1>
+        <p class="subtitle">Discover grammars, transpilers, and pipeline templates from the community</p>
+    </div>
+
+    <div class="marketplace-navigation">
+        <div class="category-tabs">
+            <button class="tab-button @(activeCategory == "grammars" ? "active" : "")" 
+                    @onclick="@(() => SetActiveCategory("grammars"))">
+                <i class="bi bi-file-earmark-code"></i> Grammars
+            </button>
+            <button class="tab-button @(activeCategory == "transpilers" ? "active" : "")" 
+                    @onclick="@(() => SetActiveCategory("transpilers"))">
+                <i class="bi bi-arrow-left-right"></i> Transpilers
+            </button>
+            <button class="tab-button @(activeCategory == "templates" ? "active" : "")" 
+                    @onclick="@(() => SetActiveCategory("templates"))">
+                <i class="bi bi-diagram-3"></i> Pipeline Templates
+            </button>
+        </div>
+    </div>
+
+    <div class="search-and-filters">
+        <div class="search-section">
+            <div class="search-input-group">
+                <i class="bi bi-search"></i>
+                <input @bind="searchQuery" @onkeyup="HandleSearchKeyUp" 
+                       placeholder="Search @activeCategory..." class="search-input" />
+                <button @onclick="PerformSearch" class="search-button">Search</button>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            @if (activeCategory == "grammars")
+            {
+                <div class="filter-group">
+                    <label>Language:</label>
+                    <select @bind="selectedLanguage" @bind:after="OnFilterChanged" class="filter-select">
+                        <option value="">All Languages</option>
+                        @foreach (var lang in availableLanguages)
+                        {
+                            <option value="@lang">@lang</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Features:</label>
+                    <div class="feature-checkboxes">
+                        <label class="checkbox-label">
+                            <input type="checkbox" @bind="filterShiftDetection" @bind:after="OnFilterChanged" />
+                            Shift Detection
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" @bind="filterMultiVersion" @bind:after="OnFilterChanged" />
+                            Multi-Version Support
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" @bind="filterSyntaxHighlighting" @bind:after="OnFilterChanged" />
+                            Syntax Highlighting
+                        </label>
+                    </div>
+                </div>
+            }
+            else if (activeCategory == "transpilers")
+            {
+                <div class="filter-group">
+                    <label>From:</label>
+                    <select @bind="sourceLanguage" @bind:after="OnFilterChanged" class="filter-select">
+                        <option value="">Any Language</option>
+                        @foreach (var lang in availableLanguages)
+                        {
+                            <option value="@lang">@lang</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>To:</label>
+                    <select @bind="targetLanguage" @bind:after="OnFilterChanged" class="filter-select">
+                        <option value="">Any Language</option>
+                        @foreach (var lang in availableLanguages)
+                        {
+                            <option value="@lang">@lang</option>
+                        }
+                    </select>
+                </div>
+            }
+            else if (activeCategory == "templates")
+            {
+                <div class="filter-group">
+                    <label>Category:</label>
+                    <select @bind="templateCategory" @bind:after="OnFilterChanged" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="build">Build & Test</option>
+                        <option value="deployment">Deployment</option>
+                        <option value="migration">Code Migration</option>
+                        <option value="quality">Code Quality</option>
+                    </select>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="marketplace-content">
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Loading @activeCategory...</p>
+            </div>
+        }
+        else if (searchResults?.Any() == true)
+        {
+            <div class="results-info">
+                <span>@searchResults.Count result(s) found</span>
+                <div class="sort-options">
+                    <label>Sort by:</label>
+                    <select @bind="sortBy" @bind:after="OnSortChanged" class="sort-select">
+                        <option value="relevance">Relevance</option>
+                        <option value="downloads">Downloads</option>
+                        <option value="rating">Rating</option>
+                        <option value="updated">Last Updated</option>
+                        <option value="name">Name</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="results-grid">
+                @foreach (var item in searchResults)
+                {
+                    <div class="marketplace-item">
+                        <div class="item-header">
+                            <h4 class="item-title">@item.Name</h4>
+                            <div class="item-stats">
+                                <div class="rating">
+                                    <StarRating Value="@item.Rating" />
+                                    <span class="rating-count">(@item.ReviewCount)</span>
+                                </div>
+                                <span class="downloads">@FormatDownloads(item.Downloads) downloads</span>
+                            </div>
+                        </div>
+                        
+                        <p class="item-description">@item.Description</p>
+                        
+                        <div class="item-metadata">
+                            <span class="version">v@item.LatestVersion</span>
+                            <span class="author">by @item.Author</span>
+                            <span class="updated">Updated @item.LastUpdated.ToString("MMM dd, yyyy")</span>
+                            @if (activeCategory == "grammars" && item.Language != null)
+                            {
+                                <span class="language">@item.Language</span>
+                            }
+                        </div>
+                        
+                        @if (item.Tags?.Any() == true)
+                        {
+                            <div class="item-tags">
+                                @foreach (var tag in item.Tags.Take(4))
+                                {
+                                    <span class="tag">@tag</span>
+                                }
+                            </div>
+                        }
+                        
+                        <div class="item-actions">
+                            <button class="btn btn-primary" 
+                                    @onclick="() => InstallItem(item)" 
+                                    disabled="@(item.IsInstalled || isInstalling)">
+                                @if (item.IsInstalled)
+                                {
+                                    <i class="bi bi-check-circle"></i> <text>Installed</text>
+                                }
+                                else if (isInstalling && installingItemId == item.Id)
+                                {
+                                    <i class="bi bi-arrow-repeat"></i> <text>Installing...</text>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-download"></i> <text>Install</text>
+                                }
+                            </button>
+                            
+                            <button class="btn btn-secondary" @onclick="() => ViewItemDetails(item)">
+                                <i class="bi bi-info-circle"></i> Details
+                            </button>
+                            
+                            @if (item.IsInstalled)
+                            {
+                                <button class="btn btn-outline-danger" @onclick="() => UninstallItem(item)">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else if (!isLoading)
+        {
+            <div class="no-results">
+                <i class="bi bi-search"></i>
+                <h3>No @activeCategory found</h3>
+                <p>Try adjusting your search criteria or browse different categories.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Item Details Modal -->
+@if (selectedItem != null)
+{
+    <div class="modal-overlay" @onclick="CloseItemDetails">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h2>@selectedItem.Name</h2>
+                <button @onclick="CloseItemDetails" class="close-button">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="item-details">
+                    <div class="detail-section">
+                        <h4>Description</h4>
+                        <p>@selectedItem.DetailedDescription</p>
+                    </div>
+                    
+                    @if (selectedItem.Features?.Any() == true)
+                    {
+                        <div class="detail-section">
+                            <h4>Features</h4>
+                            <ul class="feature-list">
+                                @foreach (var feature in selectedItem.Features)
+                                {
+                                    <li>@feature</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    
+                    <div class="detail-section">
+                        <h4>Installation</h4>
+                        <div class="installation-info">
+                            <p><strong>Latest Version:</strong> @selectedItem.LatestVersion</p>
+                            <p><strong>Size:</strong> @selectedItem.PackageSize</p>
+                            <p><strong>License:</strong> @selectedItem.License</p>
+                        </div>
+                    </div>
+                    
+                    @if (selectedItem.Dependencies?.Any() == true)
+                    {
+                        <div class="detail-section">
+                            <h4>Dependencies</h4>
+                            <ul class="dependency-list">
+                                @foreach (var dep in selectedItem.Dependencies)
+                                {
+                                    <li>@dep.Name (v@dep.Version)</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" @onclick="CloseItemDetails">Cancel</button>
+                <button class="btn btn-primary" @onclick="() => InstallItem(selectedItem)" disabled="@selectedItem.IsInstalled">
+                    @(selectedItem.IsInstalled ? "Already Installed" : $"Install v{selectedItem.LatestVersion}")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+.marketplace-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.marketplace-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.marketplace-header h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e9ecef;
+    background: white;
+    color: #495057;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-button:hover {
+    border-color: #007bff;
+    background: #f8f9fa;
+}
+
+.tab-button.active {
+    border-color: #007bff;
+    background: #007bff;
+    color: white;
+}
+
+.search-and-filters {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.search-input-group {
+    position: relative;
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto 1rem auto;
+}
+
+.search-input-group i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem 0 0 0.375rem;
+    font-size: 1rem;
+}
+
+.search-button {
+    padding: 0.75rem 1.5rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0 0.375rem 0.375rem 0;
+    cursor: pointer;
+}
+
+.filters-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.filter-select {
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+
+.feature-checkboxes {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.results-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.marketplace-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.marketplace-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.item-title {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.item-stats {
+    text-align: right;
+    font-size: 0.9rem;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.downloads {
+    color: #6c757d;
+}
+
+.item-description {
+    color: #495057;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.item-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.item-metadata span {
+    padding: 0.25rem 0.5rem;
+    background: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.version {
+    background: #e3f2fd !important;
+    color: #1976d2 !important;
+}
+
+.language {
+    background: #f3e5f5 !important;
+    color: #7b1fa2 !important;
+}
+
+.item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tag {
+    padding: 0.25rem 0.5rem;
+    background: #e9ecef;
+    color: #495057;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+.btn-primary:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background: #dc3545;
+    color: white;
+}
+
+.loading-container {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 0.3rem solid #f3f4f6;
+    border-top: 0.3rem solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem auto;
+}
+
+.no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+}
+
+.no-results i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 0.5rem;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    margin: 1rem;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.detail-section {
+    margin-bottom: 2rem;
+}
+
+.detail-section h4 {
+    margin-bottom: 0.75rem;
+    color: #2c3e50;
+}
+
+.feature-list, .dependency-list {
+    padding-left: 1.5rem;
+}
+
+.installation-info p {
+    margin-bottom: 0.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+
+
+
+</style>
+
+@code {
+    private string activeCategory = "grammars";
+    private string searchQuery = "";
+    private bool isLoading = false;
+    private bool isInstalling = false;
+    private string installingItemId = "";
+    
+    // Filter properties
+    private string selectedLanguage = "";
+    private bool filterShiftDetection = false;
+    private bool filterMultiVersion = false;
+    private bool filterSyntaxHighlighting = false;
+    private string sourceLanguage = "";
+    private string targetLanguage = "";
+    private string templateCategory = "";
+    private string sortBy = "relevance";
+    
+    // Data
+    private List<MarketplaceItem> searchResults = new();
+    private MarketplaceItem? selectedItem = null;
+    
+    private readonly List<string> availableLanguages = new()
+    {
+        "C#", "JavaScript", "TypeScript", "Python", "Java", "Go", 
+        "Rust", "C++", "C", "PHP", "Ruby", "Swift", "Kotlin"
+    };
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInitialData();
+    }
+    
+    private async Task LoadInitialData()
+    {
+        isLoading = true;
+        StateHasChanged();
+        
+        try
+        {
+            searchResults = await MarketplaceService.GetFeaturedItemsAsync(activeCategory);
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show a toast notification
+            Console.WriteLine($"Error loading marketplace data: {ex.Message}");
+            searchResults = GetMockData(); // Fallback to mock data for demo
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task SetActiveCategory(string category)
+    {
+        activeCategory = category;
+        ClearFilters();
+        await LoadInitialData();
+    }
+    
+    private void ClearFilters()
+    {
+        searchQuery = "";
+        selectedLanguage = "";
+        filterShiftDetection = false;
+        filterMultiVersion = false;
+        filterSyntaxHighlighting = false;
+        sourceLanguage = "";
+        targetLanguage = "";
+        templateCategory = "";
+        sortBy = "relevance";
+    }
+    
+    private async Task HandleSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await PerformSearch();
+        }
+    }
+    
+    private async Task PerformSearch()
+    {
+        isLoading = true;
+        StateHasChanged();
+        
+        try
+        {
+            var filters = BuildSearchFilters();
+            searchResults = await MarketplaceService.SearchItemsAsync(activeCategory, searchQuery, filters);
+            
+            // Apply sorting
+            searchResults = ApplySorting(searchResults);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error performing search: {ex.Message}");
+            searchResults = GetMockData().Where(item => 
+                string.IsNullOrEmpty(searchQuery) || 
+                item.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                item.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task OnFilterChanged()
+    {
+        await PerformSearch();
+    }
+    
+    private void OnSortChanged()
+    {
+        searchResults = ApplySorting(searchResults);
+        StateHasChanged();
+    }
+    
+    private Dictionary<string, object> BuildSearchFilters()
+    {
+        var filters = new Dictionary<string, object>();
+        
+        if (activeCategory == "grammars")
+        {
+            if (!string.IsNullOrEmpty(selectedLanguage))
+                filters["language"] = selectedLanguage;
+            if (filterShiftDetection)
+                filters["shiftDetection"] = true;
+            if (filterMultiVersion)
+                filters["multiVersion"] = true;
+            if (filterSyntaxHighlighting)
+                filters["syntaxHighlighting"] = true;
+        }
+        else if (activeCategory == "transpilers")
+        {
+            if (!string.IsNullOrEmpty(sourceLanguage))
+                filters["sourceLanguage"] = sourceLanguage;
+            if (!string.IsNullOrEmpty(targetLanguage))
+                filters["targetLanguage"] = targetLanguage;
+        }
+        else if (activeCategory == "templates")
+        {
+            if (!string.IsNullOrEmpty(templateCategory))
+                filters["category"] = templateCategory;
+        }
+        
+        return filters;
+    }
+    
+    private List<MarketplaceItem> ApplySorting(List<MarketplaceItem> items)
+    {
+        return sortBy switch
+        {
+            "downloads" => items.OrderByDescending(x => x.Downloads).ToList(),
+            "rating" => items.OrderByDescending(x => x.Rating).ToList(),
+            "updated" => items.OrderByDescending(x => x.LastUpdated).ToList(),
+            "name" => items.OrderBy(x => x.Name).ToList(),
+            _ => items // relevance - keep current order
+        };
+    }
+    
+    private async Task InstallItem(MarketplaceItem item)
+    {
+        if (item.IsInstalled || isInstalling) return;
+        
+        isInstalling = true;
+        installingItemId = item.Id;
+        StateHasChanged();
+        
+        try
+        {
+            var result = await MarketplaceService.InstallItemAsync(item.Id, item.LatestVersion);
+            if (result.Success)
+            {
+                item.IsInstalled = true;
+                // Could show success notification
+            }
+            else
+            {
+                // Could show error notification
+                Console.WriteLine($"Installation failed: {result.ErrorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Installation error: {ex.Message}");
+        }
+        finally
+        {
+            isInstalling = false;
+            installingItemId = "";
+            StateHasChanged();
+        }
+    }
+    
+    private async Task UninstallItem(MarketplaceItem item)
+    {
+        try
+        {
+            var result = await MarketplaceService.UninstallItemAsync(item.Id);
+            if (result.Success)
+            {
+                item.IsInstalled = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Uninstallation error: {ex.Message}");
+        }
+    }
+    
+    private void ViewItemDetails(MarketplaceItem item)
+    {
+        selectedItem = item;
+        StateHasChanged();
+    }
+    
+    private void CloseItemDetails()
+    {
+        selectedItem = null;
+        StateHasChanged();
+    }
+    
+    private string FormatDownloads(int downloads)
+    {
+        if (downloads >= 1000000)
+            return $"{downloads / 1000000:F1}M";
+        if (downloads >= 1000)
+            return $"{downloads / 1000:F1}K";
+        return downloads.ToString();
+    }
+    
+    // Mock data for demonstration
+    private List<MarketplaceItem> GetMockData()
+    {
+        if (activeCategory == "grammars")
+        {
+            return new List<MarketplaceItem>
+            {
+                new MarketplaceItem
+                {
+                    Id = "csharp-advanced",
+                    Name = "C# Advanced Grammar",
+                    Description = "Enhanced C# grammar with multi-version support and shift detection",
+                    DetailedDescription = "Comprehensive C# grammar supporting versions 8.0 through 12.0 with advanced shift detection capabilities for modernization analysis.",
+                    Author = "Microsoft",
+                    Rating = 4.8f,
+                    ReviewCount = 156,
+                    Downloads = 45230,
+                    LatestVersion = "2.1.0",
+                    LastUpdated = DateTime.Now.AddDays(-5),
+                    Language = "C#",
+                    Tags = new[] { "multi-version", "shift-detection", "syntax-highlighting", "official" },
+                    Features = new[] { "Multi-version support (C# 8.0-12.0)", "Large shift detection", "Semantic highlighting", "Error detection" },
+                    License = "MIT",
+                    PackageSize = "2.4 MB",
+                    IsInstalled = false
+                },
+                new MarketplaceItem
+                {
+                    Id = "typescript-modern",
+                    Name = "TypeScript Modern Grammar",
+                    Description = "Modern TypeScript grammar with comprehensive type support",
+                    DetailedDescription = "Full TypeScript grammar with support for latest features including decorators, template literals, and advanced type constructs.",
+                    Author = "TypeScript Community",
+                    Rating = 4.6f,
+                    ReviewCount = 89,
+                    Downloads = 12540,
+                    LatestVersion = "1.8.3",
+                    LastUpdated = DateTime.Now.AddDays(-12),
+                    Language = "TypeScript",
+                    Tags = new[] { "modern", "types", "decorators", "community" },
+                    Features = new[] { "Latest TypeScript features", "Type-aware highlighting", "Decorator support", "JSX integration" },
+                    License = "Apache 2.0",
+                    PackageSize = "1.8 MB",
+                    IsInstalled = true
+                }
+            };
+        }
+        else if (activeCategory == "transpilers")
+        {
+            return new List<MarketplaceItem>
+            {
+                new MarketplaceItem
+                {
+                    Id = "csharp-to-typescript",
+                    Name = "C# to TypeScript Transpiler",
+                    Description = "High-quality transpilation from C# to TypeScript with type preservation",
+                    DetailedDescription = "Advanced transpiler that converts C# code to TypeScript while preserving type information and maintaining code structure.",
+                    Author = "DevelApp",
+                    Rating = 4.7f,
+                    ReviewCount = 43,
+                    Downloads = 8650,
+                    LatestVersion = "3.2.1",
+                    LastUpdated = DateTime.Now.AddDays(-8),
+                    Tags = new[] { "c#", "typescript", "types", "enterprise" },
+                    Features = new[] { "Type preservation", "Comment migration", "Async/await support", "LINQ conversion" },
+                    License = "Commercial",
+                    PackageSize = "5.2 MB",
+                    IsInstalled = false
+                }
+            };
+        }
+        else // templates
+        {
+            return new List<MarketplaceItem>
+            {
+                new MarketplaceItem
+                {
+                    Id = "dotnet-ci-pipeline",
+                    Name = ".NET CI/CD Pipeline Template",
+                    Description = "Complete CI/CD pipeline template for .NET projects with grammar validation",
+                    DetailedDescription = "Comprehensive pipeline template including build, test, grammar validation, and deployment stages optimized for .NET projects.",
+                    Author = "DevOps Community",
+                    Rating = 4.9f,
+                    ReviewCount = 127,
+                    Downloads = 23100,
+                    LatestVersion = "2.0.4",
+                    LastUpdated = DateTime.Now.AddDays(-3),
+                    Tags = new[] { "dotnet", "ci-cd", "build", "quality" },
+                    Features = new[] { "Multi-target build", "Grammar validation", "Test automation", "Deployment stages" },
+                    License = "MIT",
+                    PackageSize = "850 KB",
+                    IsInstalled = false
+                }
+            };
+        }
+    }
+}
