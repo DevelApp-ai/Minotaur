@@ -1,6 +1,61 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
+@using Minotaur.UI.Blazor.Services
+@using Minotaur.UI.Blazor.Models
+@using Minotaur.UI.Blazor.Components.Shared
+@inject AuthenticationService AuthService
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
         <a class="navbar-brand" href="">Minotaur Grammar Tool</a>
+        
+        <div class="auth-section">
+            @if (AuthService.IsAuthenticated && AuthService.CurrentUser != null)
+            {
+                <div class="user-menu d-flex align-items-center gap-2">
+                    <div class="subscription-badge">
+                        @if (AuthService.CurrentUser.Subscription.Plan == "pro")
+                        {
+                            <span class="badge bg-warning text-dark">PRO</span>
+                        }
+                        else if (AuthService.CurrentUser.Subscription.Plan == "enterprise")
+                        {
+                            <span class="badge bg-success">ENTERPRISE</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">FREE</span>
+                        }
+                    </div>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            @if (!string.IsNullOrEmpty(AuthService.CurrentUser.AvatarUrl))
+                            {
+                                <img src="@AuthService.CurrentUser.AvatarUrl" alt="Avatar" class="avatar me-1" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-person-circle me-1"></i>
+                            }
+                            @AuthService.CurrentUser.DisplayName
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="/collections"><i class="bi bi-collection me-2"></i> My Collections</a></li>
+                            <li><a class="dropdown-item" href="/downloads"><i class="bi bi-download me-2"></i> Downloads</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear me-2"></i> Settings</a></li>
+                            <li><button class="dropdown-item" @onclick="HandleLogout"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</button></li>
+                        </ul>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <button class="btn btn-outline-light btn-sm" @onclick="ShowLogin">
+                    <i class="bi bi-person me-1"></i> Sign In
+                </button>
+            }
+        </div>
     </div>
 </div>
 
@@ -25,6 +80,21 @@
                 <span class="bi bi-shop-nav-menu" aria-hidden="true"></span> Marketplace
             </NavLink>
         </div>
+        
+        @if (AuthService.IsAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="templates">
+                    <span class="bi bi-file-earmark-text-nav-menu" aria-hidden="true"></span> Code Templates
+                </NavLink>
+            </div>
+            
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="collections">
+                    <span class="bi bi-collection-nav-menu" aria-hidden="true"></span> My Collections
+                </NavLink>
+            </div>
+        }
 
         @* Temporarily commented out problematic pages while fixing compilation errors *@
         @*
@@ -78,4 +148,99 @@
         </div>
     </nav>
 </div>
+
+<!-- Login Modal -->
+<LoginModal IsVisible="showLoginModal" 
+            OnClose="CloseLogin" 
+            OnLoginSuccess="OnLoginSuccess" />
+
+<style>
+.auth-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+}
+
+.user-menu .btn {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.user-menu .btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive styles handled by Bootstrap */
+</style>
+
+@code {
+    private bool showLoginModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.InitializeAsync();
+        AuthService.UserChanged += OnUserChanged;
+    }
+
+    private void OnUserChanged(object? sender, UserProfile? user)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ShowLogin()
+    {
+        showLoginModal = true;
+        StateHasChanged();
+    }
+
+    private void CloseLogin()
+    {
+        showLoginModal = false;
+        StateHasChanged();
+    }
+
+    private void OnLoginSuccess(UserProfile user)
+    {
+        showLoginModal = false;
+        StateHasChanged();
+        
+        // Show welcome notification
+        // In a real app, you might use a toast notification service
+    }
+
+    private async Task HandleLogout()
+    {
+        await AuthService.LogoutAsync();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        AuthService.UserChanged -= OnUserChanged;
+    }
+}
 

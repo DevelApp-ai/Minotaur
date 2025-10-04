@@ -7,11 +7,13 @@ public class MarketplaceItem
     public string Description { get; set; } = "";
     public string DetailedDescription { get; set; } = "";
     public string Author { get; set; } = "";
+    public string AuthorId { get; set; } = "";
     public float Rating { get; set; }
     public int ReviewCount { get; set; }
     public int Downloads { get; set; }
     public string LatestVersion { get; set; } = "";
     public DateTime LastUpdated { get; set; }
+    public DateTime CreatedAt { get; set; }
     public string? Language { get; set; }
     public string[] Tags { get; set; } = Array.Empty<string>();
     public string[] Features { get; set; } = Array.Empty<string>();
@@ -19,6 +21,11 @@ public class MarketplaceItem
     public string PackageSize { get; set; } = "";
     public bool IsInstalled { get; set; }
     public List<DependencyInfo>? Dependencies { get; set; }
+    public MarketplaceItemType ItemType { get; set; } = MarketplaceItemType.Grammar;
+    public string? PreviewImageUrl { get; set; }
+    public decimal? Price { get; set; }
+    public string Visibility { get; set; } = "public"; // public, unlisted, private
+    public bool RequiresAuthentication { get; set; } = false;
 }
 
 public class DependencyInfo
@@ -142,7 +149,42 @@ public enum MarketplaceItemType
 {
     Grammar,
     Transpiler,
-    PipelineTemplate
+    PipelineTemplate,
+    CodeTemplate,
+    ProjectTemplate,
+    Snippet
+}
+
+public enum TemplateCategory
+{
+    // Code Templates
+    ClassTemplate,
+    InterfaceTemplate,
+    ControllerTemplate,
+    ServiceTemplate,
+    ComponentTemplate,
+    
+    // Project Templates
+    WebApiProject,
+    BlazorProject,
+    ConsoleProject,
+    LibraryProject,
+    
+    // Grammar Templates
+    ParserGrammar,
+    LexerGrammar,
+    CombinedGrammar,
+    
+    // Pipeline Templates
+    CITemplate,
+    CDTemplate,
+    TestingTemplate,
+    DeploymentTemplate,
+    
+    // Snippet Templates
+    CodeSnippet,
+    ConfigSnippet,
+    DocumentationSnippet
 }
 
 public class MarketplaceSearchRequest
@@ -197,4 +239,155 @@ public class PublishResult
     {
         return new PublishResult { Success = false, ErrorMessage = error };
     }
+}
+
+// Authentication Models
+public class UserProfile
+{
+    public string Id { get; set; } = "";
+    public string Username { get; set; } = "";
+    public string Email { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    public string? AvatarUrl { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastLoginAt { get; set; }
+    public UserSubscription Subscription { get; set; } = new();
+    public UserPreferences Preferences { get; set; } = new();
+    public List<string> Roles { get; set; } = new();
+    public Dictionary<string, object> Metadata { get; set; } = new();
+}
+
+public class UserSubscription
+{
+    public string Plan { get; set; } = "free"; // free, pro, enterprise
+    public DateTime? ExpiresAt { get; set; }
+    public int DownloadsRemaining { get; set; } = 10;
+    public int PrivateRepositoriesLimit { get; set; } = 0;
+    public bool CanPublishPremium { get; set; } = false;
+}
+
+public class UserPreferences
+{
+    public string PreferredLanguage { get; set; } = "en";
+    public string Theme { get; set; } = "dark";
+    public bool EmailNotifications { get; set; } = true;
+    public bool ShowBetaFeatures { get; set; } = false;
+    public List<string> FavoriteCategories { get; set; } = new();
+    public Dictionary<string, object> EditorSettings { get; set; } = new();
+}
+
+public class AuthenticationResult
+{
+    public bool IsSuccess { get; set; }
+    public string? ErrorMessage { get; set; }
+    public UserProfile? User { get; set; }
+    public string? AccessToken { get; set; }
+    public string? RefreshToken { get; set; }
+    
+    public static AuthenticationResult Success(UserProfile user, string accessToken, string? refreshToken = null) =>
+        new AuthenticationResult { IsSuccess = true, User = user, AccessToken = accessToken, RefreshToken = refreshToken };
+        
+    public static AuthenticationResult Failed(string error) =>
+        new AuthenticationResult { IsSuccess = false, ErrorMessage = error };
+}
+
+public class LoginRequest
+{
+    public string EmailOrUsername { get; set; } = "";
+    public string Password { get; set; } = "";
+    public bool RememberMe { get; set; } = false;
+}
+
+public class RegistrationRequest
+{
+    public string Username { get; set; } = "";
+    public string Email { get; set; } = "";
+    public string Password { get; set; } = "";
+    public string ConfirmPassword { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    public bool AcceptTerms { get; set; } = false;
+}
+
+// Code Template Models
+public class CodeTemplate : MarketplaceItem
+{
+    public TemplateCategory Category { get; set; }
+    public string TemplateEngine { get; set; } = "liquid"; // liquid, mustache, razor
+    public List<TemplateFile> Files { get; set; } = new();
+    public List<TemplateParameter> Parameters { get; set; } = new();
+    public TemplateConfiguration Configuration { get; set; } = new();
+    public List<string> SupportedLanguages { get; set; } = new();
+    public Dictionary<string, string> Examples { get; set; } = new();
+}
+
+public class TemplateFile
+{
+    public string RelativePath { get; set; } = "";
+    public string Content { get; set; } = "";
+    public string ContentType { get; set; } = "text/plain";
+    public bool IsTemplate { get; set; } = true;
+    public Dictionary<string, object> Metadata { get; set; } = new();
+}
+
+public class TemplateParameter
+{
+    public string Name { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    public string Type { get; set; } = "string"; // string, int, bool, choice, file
+    public object? DefaultValue { get; set; }
+    public bool Required { get; set; } = true;
+    public string? Description { get; set; }
+    public string? ValidationRegex { get; set; }
+    public List<string>? Choices { get; set; } // For choice type
+    public Dictionary<string, object> Constraints { get; set; } = new();
+}
+
+public class TemplateConfiguration
+{
+    public string MinMinotaurVersion { get; set; } = "1.0.0";
+    public List<string> RequiredExtensions { get; set; } = new();
+    public Dictionary<string, string> VariableReplacements { get; set; } = new();
+    public List<string> PostInstallScripts { get; set; } = new();
+    public bool RequiresProjectContext { get; set; } = false;
+}
+
+public class TemplateRenderResult
+{
+    public bool Success { get; set; }
+    public List<GeneratedFile> GeneratedFiles { get; set; } = new();
+    public List<string> Errors { get; set; } = new();
+    
+    public static TemplateRenderResult Failed(string error) =>
+        new TemplateRenderResult { Success = false, Errors = new List<string> { error } };
+}
+
+public class GeneratedFile
+{
+    public string Path { get; set; } = "";
+    public string Content { get; set; } = "";
+    public string ContentType { get; set; } = "text/plain";
+}
+
+// Collection and Favorites
+public class Collection
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public bool IsPublic { get; set; } = false;
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public List<MarketplaceItem> Items { get; set; } = new();
+    public int ItemCount { get; set; }
+    public string? CoverImageUrl { get; set; }
+    public List<string> Tags { get; set; } = new();
+    public string UserId { get; set; } = "";
+}
+
+public class CreateCollectionRequest
+{
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public bool IsPublic { get; set; } = false;
+    public List<string> Tags { get; set; } = new();
 }

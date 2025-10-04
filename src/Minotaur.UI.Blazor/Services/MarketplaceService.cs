@@ -4,18 +4,24 @@ using Minotaur.UI.Blazor.Models;
 namespace Minotaur.UI.Blazor.Services;
 
 /// <summary>
-/// Service for interacting with the Minotaur marketplace for grammars, transpilers, and pipeline templates
+/// Service for interacting with the Minotaur marketplace for grammars, transpilers, code templates, and pipeline templates
 /// </summary>
 public class MarketplaceService
 {
     private readonly HttpClient _httpClient;
+    private readonly AuthenticationService _authService;
     private readonly ILogger<MarketplaceService> _logger;
     private readonly string _marketplaceBaseUrl;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    public MarketplaceService(HttpClient httpClient, ILogger<MarketplaceService> logger, IConfiguration configuration)
+    public MarketplaceService(
+        HttpClient httpClient, 
+        AuthenticationService authService, 
+        ILogger<MarketplaceService> logger, 
+        IConfiguration configuration)
     {
         _httpClient = httpClient;
+        _authService = authService;
         _logger = logger;
         _marketplaceBaseUrl = configuration.GetValue<string>("Marketplace:BaseUrl") ?? "https://marketplace.minotaur.dev/api/v1";
         
@@ -589,6 +595,312 @@ public class MarketplaceService
                 License = "Apache 2.0",
                 PackageSize = "1.2 MB",
                 IsInstalled = false
+            }
+        };
+    }
+
+    #endregion
+
+    #region Authentication-Aware Methods
+
+    /// <summary>
+    /// Get user's favorite items
+    /// </summary>
+    public async Task<List<MarketplaceItem>> GetUserFavoritesAsync()
+    {
+        if (!_authService.IsAuthenticated)
+            return new List<MarketplaceItem>();
+
+        try
+        {
+            var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/user/favorites");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var favorites = await response.Content.ReadFromJsonAsync<List<MarketplaceItem>>(_jsonOptions);
+                return favorites ?? new List<MarketplaceItem>();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching user favorites");
+        }
+        
+        return new List<MarketplaceItem>();
+    }
+
+    /// <summary>
+    /// Toggle favorite status for an item
+    /// </summary>
+    public async Task<bool> ToggleFavoriteAsync(string itemId)
+    {
+        if (!_authService.IsAuthenticated)
+            return false;
+
+        try
+        {
+            var response = await _httpClient.PostAsync($"{_marketplaceBaseUrl}/user/favorites/{itemId}/toggle", null);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error toggling favorite for item: {ItemId}", itemId);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Get user's collections
+    /// </summary>
+    public async Task<List<Collection>> GetUserCollectionsAsync()
+    {
+        if (!_authService.IsAuthenticated)
+            return new List<Collection>();
+
+        try
+        {
+            var response = await _httpClient.GetAsync($"{_marketplaceBaseUrl}/user/collections");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var collections = await response.Content.ReadFromJsonAsync<List<Collection>>(_jsonOptions);
+                return collections ?? new List<Collection>();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching user collections");
+        }
+        
+        return new List<Collection>();
+    }
+
+    /// <summary>
+    /// Create a new collection
+    /// </summary>
+    public async Task<Collection?> CreateCollectionAsync(CreateCollectionRequest request)
+    {
+        if (!_authService.IsAuthenticated)
+            return null;
+
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{_marketplaceBaseUrl}/user/collections", request, _jsonOptions);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<Collection>(_jsonOptions);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating collection: {CollectionName}", request.Name);
+        }
+        
+        return null;
+    }
+
+    /// <summary>
+    /// Add item to collection
+    /// </summary>
+    public async Task<bool> AddToCollectionAsync(string collectionId, string itemId)
+    {
+        if (!_authService.IsAuthenticated)
+            return false;
+
+        try
+        {
+            var response = await _httpClient.PostAsync($"{_marketplaceBaseUrl}/user/collections/{collectionId}/items/{itemId}", null);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding item {ItemId} to collection {CollectionId}", itemId, collectionId);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Check if user has premium access
+    /// </summary>
+    public bool HasPremiumAccess()
+    {
+        return _authService.CurrentUser?.Subscription.Plan != "free";
+    }
+
+    /// <summary>
+    /// Check if user can download item (based on subscription limits)
+    /// </summary>
+    public bool CanDownloadItem(MarketplaceItem item)
+    {
+        if (!_authService.IsAuthenticated)
+            return !item.RequiresAuthentication;
+
+        var user = _authService.CurrentUser;
+        if (user == null)
+            return false;
+
+        // Check if item requires premium access
+        if (item.Price > 0 && !HasPremiumAccess())
+            return false;
+
+        // Check download limits for free users
+        if (user.Subscription.Plan == "free" && user.Subscription.DownloadsRemaining <= 0)
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Enhanced search with authentication and template support
+    /// </summary>
+    public async Task<List<MarketplaceItem>> SearchItemsWithAuthAsync(
+        string category,
+        string query,
+        Dictionary<string, object> filters,
+        bool includeCodeTemplates = true)
+    {
+        try
+        {
+            var searchRequest = new
+            {
+                Query = query,
+                Category = category,
+                ItemType = ParseItemType(category),
+                Filters = filters,
+                IncludeAuthenticated = _authService.IsAuthenticated,
+                IncludeCodeTemplates = includeCodeTemplates,
+                UserId = _authService.CurrentUser?.Id
+            };
+
+            var response = await _httpClient.PostAsJsonAsync($"{_marketplaceBaseUrl}/search/enhanced", searchRequest, _jsonOptions);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var searchResult = await response.Content.ReadFromJsonAsync<SearchResult<MarketplaceItem>>(_jsonOptions);
+                return searchResult?.Items ?? new List<MarketplaceItem>();
+            }
+            
+            _logger.LogWarning("Enhanced search failed: {StatusCode}", response.StatusCode);
+            return GetMockSearchResultsWithAuth(category, query, filters, includeCodeTemplates);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in enhanced search");
+            return GetMockSearchResultsWithAuth(category, query, filters, includeCodeTemplates);
+        }
+    }
+
+    private List<MarketplaceItem> GetMockSearchResultsWithAuth(
+        string category, 
+        string query, 
+        Dictionary<string, object> filters,
+        bool includeCodeTemplates)
+    {
+        var baseResults = GetMockSearchResults(category, query, filters);
+        
+        // Add code templates if requested
+        if (includeCodeTemplates && (category == "templates" || string.IsNullOrEmpty(category)))
+        {
+            baseResults.AddRange(GetMockCodeTemplates());
+        }
+        
+        // Filter by authentication status
+        if (!_authService.IsAuthenticated)
+        {
+            baseResults = baseResults.Where(item => !item.RequiresAuthentication).ToList();
+        }
+        
+        return baseResults;
+    }
+
+    private List<MarketplaceItem> GetMockCodeTemplates()
+    {
+        return new List<MarketplaceItem>
+        {
+            new MarketplaceItem
+            {
+                Id = "react-component",
+                Name = "React Component Template",
+                Description = "Modern React component with TypeScript and hooks",
+                DetailedDescription = "Complete React functional component with TypeScript, custom hooks, proper prop types, and modern React patterns including context usage and performance optimization.",
+                Author = "React Community",
+                AuthorId = "react-community",
+                Rating = 4.7f,
+                ReviewCount = 234,
+                Downloads = 12450,
+                LatestVersion = "2.1.0",
+                LastUpdated = DateTime.Now.AddDays(-5),
+                CreatedAt = DateTime.Now.AddMonths(-3),
+                Language = "TypeScript",
+                Tags = new[] { "react", "component", "typescript", "hooks", "modern" },
+                License = "MIT",
+                ItemType = MarketplaceItemType.CodeTemplate,
+                PreviewImageUrl = "/images/templates/react-component-preview.png"
+            },
+            new MarketplaceItem
+            {
+                Id = "api-controller",
+                Name = "REST API Controller",
+                Description = "Complete REST API controller with CRUD operations",
+                DetailedDescription = "Full-featured ASP.NET Core API controller template with CRUD operations, validation, error handling, swagger documentation, and unit tests.",
+                Author = "ASP.NET Team",
+                AuthorId = "aspnet-team",
+                Rating = 4.8f,
+                ReviewCount = 189,
+                Downloads = 8760,
+                LatestVersion = "3.0.2",
+                LastUpdated = DateTime.Now.AddDays(-2),
+                CreatedAt = DateTime.Now.AddMonths(-5),
+                Language = "C#",
+                Tags = new[] { "api", "controller", "rest", "crud", "aspnet" },
+                License = "MIT",
+                ItemType = MarketplaceItemType.CodeTemplate,
+                PreviewImageUrl = "/images/templates/api-controller-preview.png"
+            },
+            new MarketplaceItem
+            {
+                Id = "microservice-template",
+                Name = "Microservice Starter",
+                Description = "Complete microservice template with Docker and Kubernetes",
+                DetailedDescription = "Enterprise-ready microservice template with containerization, health checks, logging, monitoring, CI/CD pipeline, and deployment configurations for cloud platforms.",
+                Author = "DevOps Pro",
+                AuthorId = "devops-pro",
+                Rating = 4.9f,
+                ReviewCount = 145,
+                Downloads = 5670,
+                LatestVersion = "1.4.1",
+                LastUpdated = DateTime.Now.AddDays(-1),
+                CreatedAt = DateTime.Now.AddMonths(-7),
+                Language = "C#",
+                Tags = new[] { "microservice", "docker", "kubernetes", "template", "enterprise" },
+                License = "Apache 2.0",
+                ItemType = MarketplaceItemType.ProjectTemplate,
+                RequiresAuthentication = true,
+                Price = 29.99m,
+                PreviewImageUrl = "/images/templates/microservice-preview.png"
+            },
+            new MarketplaceItem
+            {
+                Id = "blazor-component-premium",
+                Name = "Blazor Component Suite Pro",
+                Description = "Professional Blazor component collection with advanced features",
+                DetailedDescription = "Premium collection of advanced Blazor components including data grids, charts, forms, navigation, and specialized UI elements with full customization support.",
+                Author = "UI Masters",
+                AuthorId = "ui-masters",
+                Rating = 4.9f,
+                ReviewCount = 98,
+                Downloads = 3240,
+                LatestVersion = "2.5.0",
+                LastUpdated = DateTime.Now.AddDays(-4),
+                CreatedAt = DateTime.Now.AddMonths(-8),
+                Language = "C#",
+                Tags = new[] { "blazor", "components", "premium", "ui", "professional" },
+                License = "Commercial",
+                ItemType = MarketplaceItemType.CodeTemplate,
+                RequiresAuthentication = true,
+                Price = 149.99m,
+                PreviewImageUrl = "/images/templates/blazor-suite-preview.png"
             }
         };
     }

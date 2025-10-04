@@ -22,7 +22,9 @@ builder.Services.AddScoped<GrammarGenerator>();
 // Register API services
 builder.Services.AddScoped<CognitiveGraphService>();
 builder.Services.AddScoped<Minotaur.UI.Blazor.Services.CognitiveGraphApiService>();
+builder.Services.AddScoped<Minotaur.UI.Blazor.Services.AuthenticationService>();
 builder.Services.AddScoped<Minotaur.UI.Blazor.Services.MarketplaceService>();
+builder.Services.AddScoped<Minotaur.UI.Blazor.Services.TemplateService>();
 builder.Services.AddHttpClient();
 
 // Add SignalR

@@ -1,0 +1,561 @@
+@using Minotaur.UI.Blazor.Models
+@using Minotaur.UI.Blazor.Services
+@inject AuthenticationService AuthService
+@inject IJSRuntime JSRuntime
+
+<div class="auth-modal @(IsVisible ? "show" : "")" @onclick="HandleOverlayClick">
+    <div class="modal-content" @onclick:stopPropagation="true">
+        <div class="modal-header">
+            <h3>@(IsLoginMode ? "Sign In" : "Create Account")</h3>
+            <button @onclick="Close" class="close-btn" type="button">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            @if (IsLoginMode)
+            {
+                <EditForm Model="loginRequest" OnValidSubmit="HandleLogin">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="form-group">
+                        <label for="loginEmail">Email or Username</label>
+                        <InputText id="loginEmail" @bind-Value="loginRequest.EmailOrUsername" class="form-control" placeholder="Enter your email or username" />
+                        <ValidationMessage For="() => loginRequest.EmailOrUsername" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <InputText id="loginPassword" type="password" @bind-Value="loginRequest.Password" class="form-control" placeholder="Enter your password" />
+                        <ValidationMessage For="() => loginRequest.Password" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <InputCheckbox @bind-Value="loginRequest.RememberMe" />
+                            Remember me
+                        </label>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @errorMessage
+                        </div>
+                    }
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block" disabled="@isProcessing">
+                            @if (isProcessing) 
+                            { 
+                                <i class="bi bi-arrow-repeat spinning"></i>
+                                <text>Signing In...</text>
+                            }
+                            else
+                            {
+                                <text>Sign In</text>
+                            }
+                        </button>
+                        
+                        <div class="auth-links">
+                            <button type="button" @onclick="ToggleMode" class="btn btn-link">
+                                Create Account
+                            </button>
+                            <button type="button" @onclick="ShowForgotPassword" class="btn btn-link">
+                                Forgot Password?
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+            else
+            {
+                <EditForm Model="registrationRequest" OnValidSubmit="HandleRegistration">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="form-group">
+                        <label for="regUsername">Username</label>
+                        <InputText id="regUsername" @bind-Value="registrationRequest.Username" class="form-control" placeholder="Choose a username" />
+                        <ValidationMessage For="() => registrationRequest.Username" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <InputText id="regEmail" type="email" @bind-Value="registrationRequest.Email" class="form-control" placeholder="Enter your email" />
+                        <ValidationMessage For="() => registrationRequest.Email" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regDisplayName">Display Name</label>
+                        <InputText id="regDisplayName" @bind-Value="registrationRequest.DisplayName" class="form-control" placeholder="Your display name" />
+                        <ValidationMessage For="() => registrationRequest.DisplayName" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <InputText id="regPassword" type="password" @bind-Value="registrationRequest.Password" class="form-control" placeholder="Create a password" />
+                        <ValidationMessage For="() => registrationRequest.Password" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Confirm Password</label>
+                        <InputText id="regConfirmPassword" type="password" @bind-Value="registrationRequest.ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                        <ValidationMessage For="() => registrationRequest.ConfirmPassword" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <InputCheckbox @bind-Value="registrationRequest.AcceptTerms" />
+                            I accept the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+                        </label>
+                        <ValidationMessage For="() => registrationRequest.AcceptTerms" />
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger">
+                            @errorMessage
+                        </div>
+                    }
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block" disabled="@isProcessing">
+                            @if (isProcessing) 
+                            { 
+                                <i class="bi bi-arrow-repeat spinning"></i>
+                                <text>Creating Account...</text>
+                            }
+                            else
+                            {
+                                <text>Create Account</text>
+                            }
+                        </button>
+                        
+                        <div class="auth-links">
+                            <button type="button" @onclick="ToggleMode" class="btn btn-link">
+                                Already have an account? Sign In
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+            
+            <!-- Social login options -->
+            <div class="social-login">
+                <div class="divider">
+                    <span>Or continue with</span>
+                </div>
+                <div class="social-buttons">
+                    <button @onclick="@(() => LoginWithProvider("github"))" class="btn btn-social btn-github" disabled="@isProcessing">
+                        <i class="bi bi-github"></i> GitHub
+                    </button>
+                    <button @onclick="@(() => LoginWithProvider("google"))" class="btn btn-social btn-google" disabled="@isProcessing">
+                        <i class="bi bi-google"></i> Google
+                    </button>
+                    <button @onclick="@(() => LoginWithProvider("microsoft"))" class="btn btn-social btn-microsoft" disabled="@isProcessing">
+                        <i class="bi bi-microsoft"></i> Microsoft
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.auth-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.auth-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 0.5rem;
+    max-width: 450px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.auth-modal.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.close-btn:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin: 0;
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.form-actions {
+    margin-top: 1.5rem;
+}
+
+.btn {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+.btn-primary:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-link {
+    background: none;
+    color: #007bff;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    border: none;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.auth-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.social-login {
+    margin-top: 1.5rem;
+}
+
+.divider {
+    text-align: center;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e9ecef;
+}
+
+.divider span {
+    background: white;
+    padding: 0 1rem;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+}
+
+.btn-social {
+    padding: 0.75rem;
+    color: white;
+    font-weight: 500;
+}
+
+.btn-github {
+    background: #24292e;
+}
+
+.btn-github:hover:not(:disabled) {
+    background: #1c2023;
+}
+
+.btn-google {
+    background: #ea4335;
+}
+
+.btn-google:hover:not(:disabled) {
+    background: #d33b2c;
+}
+
+.btn-microsoft {
+    background: #0078d4;
+}
+
+.btn-microsoft:hover:not(:disabled) {
+    background: #106ebe;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+.validation-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+</style>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<UserProfile> OnLoginSuccess { get; set; }
+    
+    private bool IsLoginMode { get; set; } = true;
+    private bool isProcessing = false;
+    private string? errorMessage = null;
+    
+    private LoginRequest loginRequest = new();
+    private RegistrationRequest registrationRequest = new();
+
+    protected override void OnParametersSet()
+    {
+        if (IsVisible)
+        {
+            // Reset form state when modal is shown
+            errorMessage = null;
+            isProcessing = false;
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        if (isProcessing) return;
+        
+        isProcessing = true;
+        errorMessage = null;
+        StateHasChanged();
+        
+        try
+        {
+            var result = await AuthService.LoginAsync(loginRequest);
+            
+            if (result.IsSuccess && result.User != null)
+            {
+                await OnLoginSuccess.InvokeAsync(result.User);
+                await Close();
+            }
+            else
+            {
+                errorMessage = result.ErrorMessage ?? "Login failed";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleRegistration()
+    {
+        if (isProcessing) return;
+        
+        // Validate passwords match
+        if (registrationRequest.Password != registrationRequest.ConfirmPassword)
+        {
+            errorMessage = "Passwords do not match";
+            return;
+        }
+        
+        if (!registrationRequest.AcceptTerms)
+        {
+            errorMessage = "You must accept the Terms of Service and Privacy Policy";
+            return;
+        }
+        
+        isProcessing = true;
+        errorMessage = null;
+        StateHasChanged();
+        
+        try
+        {
+            var result = await AuthService.RegisterAsync(registrationRequest);
+            
+            if (result.IsSuccess && result.User != null)
+            {
+                await OnLoginSuccess.InvokeAsync(result.User);
+                await Close();
+            }
+            else
+            {
+                errorMessage = result.ErrorMessage ?? "Registration failed";
+            }
+        }
+        catch (Exception)
+        {
+            errorMessage = "An unexpected error occurred";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task LoginWithProvider(string provider)
+    {
+        if (isProcessing) return Task.CompletedTask;
+        
+        // In a real implementation, this would initiate OAuth flow
+        errorMessage = $"Social login with {provider} is not yet implemented in this demo";
+        StateHasChanged();
+        
+        return Task.CompletedTask;
+    }
+
+    private void ToggleMode()
+    {
+        IsLoginMode = !IsLoginMode;
+        errorMessage = null;
+        
+        // Reset forms
+        loginRequest = new LoginRequest();
+        registrationRequest = new RegistrationRequest();
+        
+        StateHasChanged();
+    }
+
+    private void ShowForgotPassword()
+    {
+        // In a real implementation, this would show forgot password flow
+        errorMessage = "Forgot password functionality is not yet implemented in this demo";
+        StateHasChanged();
+    }
+
+    private async Task Close()
+    {
+        IsVisible = false;
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task HandleOverlayClick()
+    {
+        await Close();
+    }
+}
