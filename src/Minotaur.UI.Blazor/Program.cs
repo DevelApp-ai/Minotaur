@@ -25,6 +25,8 @@ builder.Services.AddScoped<Minotaur.UI.Blazor.Services.CognitiveGraphApiService>
 builder.Services.AddScoped<Minotaur.UI.Blazor.Services.AuthenticationService>();
 builder.Services.AddScoped<Minotaur.UI.Blazor.Services.MarketplaceService>();
 builder.Services.AddScoped<Minotaur.UI.Blazor.Services.TemplateService>();
+builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarSyntaxHighlightingService>();
+builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarCodeCompletionService>();
 builder.Services.AddHttpClient();
 
 // Add SignalR

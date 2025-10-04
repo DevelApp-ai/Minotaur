@@ -1,9 +1,12 @@
 @page "/grammar-editor"
 @using Minotaur.Core
 @using Minotaur.Editor
+@using Minotaur.UI.Blazor.Services
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject GrammarSyntaxHighlightingService SyntaxService
+@inject GrammarCodeCompletionService CompletionService
 
 <PageTitle>Grammar Editor</PageTitle>
 
@@ -99,9 +102,38 @@
                                 </div>
                             }
                         </div>
-                        <textarea @bind="grammarContent" @oninput="OnGrammarContentChanged" @ref="codeEditorElement"
-                                  class="code-editor @(enableSyntaxHighlighting ? "syntax-highlighted" : "")"
-                                  placeholder="Enter your grammar definition here..."></textarea>
+                        @if (enableSyntaxHighlighting && !string.IsNullOrEmpty(highlightedContent))
+                        {
+                            <div class="code-editor-highlighted" @onclick="FocusEditor">
+                                @((MarkupString)highlightedContent)
+                            </div>
+                            <textarea @bind="grammarContent" @oninput="OnGrammarContentChanged" @onkeydown="OnKeyDown" @ref="codeEditorElement"
+                                      class="code-editor code-editor-overlay" 
+                                      placeholder="Enter your grammar definition here..."
+                                      style="position: absolute; background: transparent; color: transparent; caret-color: black; z-index: 2;"></textarea>
+                        }
+                        else
+                        {
+                            <textarea @bind="grammarContent" @oninput="OnGrammarContentChanged" @onkeydown="OnKeyDown" @ref="codeEditorElement"
+                                      class="code-editor"
+                                      placeholder="Enter your grammar definition here..."></textarea>
+                        }
+                        
+                        <!-- Code Completion Dropdown -->
+                        @if (showCompletionDropdown && completionItems.Any())
+                        {
+                            <div class="completion-dropdown" style="top: @(completionDropdownTop)px; left: @(completionDropdownLeft)px;">
+                                @foreach (var item in completionItems.Take(10))
+                                {
+                                    <div class="completion-item @(item == selectedCompletionItem ? "selected" : "")" 
+                                         @onclick="() => InsertCompletion(item)">
+                                        <i class="bi @GetCompletionIcon(item.Kind)"></i>
+                                        <span class="completion-label">@item.Label</span>
+                                        <span class="completion-detail">@item.Detail</span>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
 
                     <!-- Status Bar -->
@@ -383,6 +415,79 @@
     background-color: #f8f9fa;
 }
 
+.code-editor-highlighted {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0.5rem;
+    background-color: #ffffff;
+    border: none;
+    white-space: pre-wrap;
+    overflow: auto;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.code-editor-overlay {
+    position: relative;
+    z-index: 2;
+}
+
+.completion-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.completion-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.completion-item:hover,
+.completion-item.selected {
+    background-color: #e3f2fd;
+}
+
+.completion-item i {
+    margin-right: 8px;
+    width: 16px;
+    color: #666;
+}
+
+.completion-label {
+    font-weight: 500;
+    margin-right: auto;
+}
+
+.completion-detail {
+    font-size: 0.85em;
+    color: #666;
+    margin-left: 8px;
+}
+
+/* Syntax Highlighting Styles */
+.keyword { color: #0000ff; font-weight: bold; }
+.string { color: #a31515; }
+.comment { color: #008000; font-style: italic; }
+.number { color: #098658; }
+.type { color: #2b91af; }
+.operator { color: #000000; font-weight: bold; }
+.identifier { color: #000000; }
+.text { color: #000000; }
+
 .editor-status-bar {
     display: flex;
     justify-content: space-between;
@@ -538,6 +643,15 @@
     private bool isGrammarValid = false;
     private bool isAnalyzingShifts = false;
     
+    // Enhanced syntax highlighting and completion
+    private string highlightedContent = "";
+    private bool showCompletionDropdown = false;
+    private List<CompletionItem> completionItems = new();
+    private CompletionItem? selectedCompletionItem;
+    private int completionDropdownTop = 0;
+    private int completionDropdownLeft = 0;
+    private int currentCursorPosition = 0;
+    
     private int currentLine = 1;
     private int currentColumn = 1;
     
@@ -590,7 +704,7 @@ WS: [ \t\r\n]+ -> skip;";
         }
     }
 
-    private void OnGrammarContentChanged(ChangeEventArgs e)
+    private async Task OnGrammarContentChanged(ChangeEventArgs e)
     {
         grammarContent = e.Value?.ToString() ?? "";
         hasUnsavedChanges = true;
@@ -602,6 +716,22 @@ WS: [ \t\r\n]+ -> skip;";
         isGrammarValid = false;
         grammarErrors.Clear();
         
+        // Update syntax highlighting if enabled
+        if (enableSyntaxHighlighting)
+        {
+            await UpdateSyntaxHighlighting();
+        }
+        
+        // Trigger real-time validation after a short delay
+        _ = Task.Delay(500).ContinueWith(async _ => 
+        {
+            await InvokeAsync(async () => 
+            {
+                await ValidateGrammarRealTime();
+                StateHasChanged();
+            });
+        });
+        
         StateHasChanged();
     }
 
@@ -611,12 +741,221 @@ WS: [ \t\r\n]+ -> skip;";
         StateHasChanged();
     }
 
-    private void UpdateCursorPosition()
+    private async Task UpdateCursorPosition()
     {
-        // In a real implementation, this would get the actual cursor position from the textarea
-        // For now, we'll just simulate it
-        currentLine = grammarContent.Split('\n').Length;
-        currentColumn = grammarContent.Split('\n').LastOrDefault()?.Length ?? 0;
+        try
+        {
+            // Get cursor position from JavaScript
+            var position = await JSRuntime.InvokeAsync<int>("getCursorPosition", codeEditorElement);
+            currentCursorPosition = position;
+            
+            // Calculate line and column
+            var textBeforeCursor = grammarContent.Take(position);
+            currentLine = textBeforeCursor.Count(c => c == '\n') + 1;
+            var lastNewline = grammarContent.LastIndexOf('\n', Math.Max(0, position - 1));
+            currentColumn = position - lastNewline;
+        }
+        catch
+        {
+            // Fallback to simple calculation
+            currentLine = grammarContent.Split('\n').Length;
+            currentColumn = grammarContent.Split('\n').LastOrDefault()?.Length ?? 0;
+        }
+    }
+    
+    private async Task UpdateSyntaxHighlighting()
+    {
+        try
+        {
+            var grammarName = DetermineGrammarType();
+            highlightedContent = await SyntaxService.GetHighlightedHtmlAsync(grammarContent, grammarName);
+        }
+        catch (Exception)
+        {
+            // Fallback to plain text if highlighting fails
+            highlightedContent = System.Web.HttpUtility.HtmlEncode(grammarContent);
+        }
+    }
+    
+    private async Task ShowCodeCompletions()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(grammarContent)) return;
+            
+            var grammarName = DetermineGrammarType();
+            var result = await CompletionService.GetCompletionsAsync(
+                grammarContent, 
+                currentCursorPosition, 
+                grammarName);
+            
+            if (result.IsSuccess && result.Items.Any())
+            {
+                completionItems = result.Items;
+                selectedCompletionItem = completionItems.FirstOrDefault();
+                
+                // Calculate dropdown position (simplified)
+                completionDropdownTop = currentLine * 20; // Approximate line height
+                completionDropdownLeft = currentColumn * 8; // Approximate character width
+                
+                showCompletionDropdown = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception)
+        {
+            // Silently fail completion
+        }
+    }
+    
+    private async Task HandleTabCompletion()
+    {
+        if (showCompletionDropdown && selectedCompletionItem != null)
+        {
+            await InsertCompletion(selectedCompletionItem);
+        }
+    }
+    
+    private void NavigateCompletionItems(int direction)
+    {
+        if (!completionItems.Any()) return;
+        
+        var currentIndex = selectedCompletionItem != null 
+            ? completionItems.IndexOf(selectedCompletionItem) 
+            : -1;
+        
+        var newIndex = Math.Max(0, Math.Min(completionItems.Count - 1, currentIndex + direction));
+        selectedCompletionItem = completionItems[newIndex];
+        
+        StateHasChanged();
+    }
+    
+    private async Task InsertCompletion(CompletionItem item)
+    {
+        try
+        {
+            // Calculate insertion position
+            var wordStart = Math.Max(0, currentCursorPosition - (selectedCompletionItem?.Label?.Length ?? 0));
+            
+            // Replace current word with completion
+            var beforeWord = grammarContent[..wordStart];
+            var afterCursor = grammarContent[currentCursorPosition..];
+            
+            grammarContent = beforeWord + item.InsertText + afterCursor;
+            
+            // Update cursor position
+            currentCursorPosition = wordStart + item.InsertText.Length;
+            
+            showCompletionDropdown = false;
+            hasUnsavedChanges = true;
+            
+            // Update highlighting
+            if (enableSyntaxHighlighting)
+            {
+                await UpdateSyntaxHighlighting();
+            }
+            
+            StateHasChanged();
+            
+            // Focus back to editor
+            await JSRuntime.InvokeVoidAsync("focusElement", codeEditorElement);
+        }
+        catch (Exception)
+        {
+            // Silently handle errors
+        }
+    }
+    
+    private async Task FocusEditor()
+    {
+        await JSRuntime.InvokeVoidAsync("focusElement", codeEditorElement);
+    }
+    
+    private string DetermineGrammarType()
+    {
+        // Determine grammar type based on current grammar type selection or content analysis
+        return grammarType switch
+        {
+            "lexer" => "AntlrLexer",
+            "parser" => "AntlrParser", 
+            "combined" => "AntlrCombined",
+            _ => "AntlrGeneric"
+        };
+    }
+    
+    private string GetCompletionIcon(CompletionItemKind kind)
+    {
+        return kind switch
+        {
+            CompletionItemKind.Keyword => "bi-key",
+            CompletionItemKind.Method => "bi-gear",
+            CompletionItemKind.Property => "bi-diagram3",
+            CompletionItemKind.Class => "bi-box",
+            CompletionItemKind.Interface => "bi-diamond",
+            CompletionItemKind.Variable => "bi-code",
+            _ => "bi-text-left"
+        };
+    }
+    
+    private async Task ValidateGrammarRealTime()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(grammarContent)) return;
+            
+            var grammarName = DetermineGrammarType();
+            var errors = await SyntaxService.ValidateSyntaxAsync(grammarContent, grammarName);
+            
+            // Convert to grammar errors
+            grammarErrors.Clear();
+            grammarErrors.AddRange(errors.Select(e => new GrammarError
+            {
+                Line = e.Line,
+                Column = e.Column,
+                Message = e.Message,
+                Context = "Real-time validation"
+            }));
+        }
+        catch
+        {
+            // Silently handle validation errors
+        }
+    }
+    
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Tab")
+        {
+            // Handle tab completion
+            await HandleTabCompletion();
+        }
+        else if (e.Key == "." || e.Key == " " || char.IsLetter(e.Key.FirstOrDefault()))
+        {
+            // Trigger completion after a short delay
+            await Task.Delay(100);
+            await ShowCodeCompletions();
+        }
+        else if (e.Key == "Escape")
+        {
+            // Hide completion dropdown
+            showCompletionDropdown = false;
+            StateHasChanged();
+        }
+        else if (e.Key == "ArrowDown" && showCompletionDropdown)
+        {
+            // Navigate completion items
+            NavigateCompletionItems(1);
+        }
+        else if (e.Key == "ArrowUp" && showCompletionDropdown)
+        {
+            // Navigate completion items
+            NavigateCompletionItems(-1);
+        }
+        else if (e.Key == "Enter" && showCompletionDropdown && selectedCompletionItem != null)
+        {
+            // Insert selected completion
+            await InsertCompletion(selectedCompletionItem);
+        }
     }
 
     private void NewGrammar()
