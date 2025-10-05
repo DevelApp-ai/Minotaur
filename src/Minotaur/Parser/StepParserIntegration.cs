@@ -333,6 +333,7 @@ public partial class StepParserIntegration : IDisposable
             {
                 root.AddChild(node);
             }
+        }
         catch (TargetInvocationException ex)
         {
             root.Metadata["conversionError"] = ex.Message;
@@ -359,7 +360,6 @@ public partial class StepParserIntegration : IDisposable
             {
                 root.AddChild(node);
             }
-        }
         }
 
         return root;
