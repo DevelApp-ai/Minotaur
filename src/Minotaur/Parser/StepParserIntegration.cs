@@ -311,15 +311,19 @@ public partial class StepParserIntegration : IDisposable
 
             if (childrenProperty != null)
             {
-                var children = childrenProperty.GetValue(syntaxTree) as System.Collections.IEnumerable;
-                if (children != null)
+                var childrenObj = childrenProperty.GetValue(syntaxTree);
+                if (childrenObj != null)
                 {
-                    foreach (var child in children)
+                    var children = childrenObj as System.Collections.IEnumerable;
+                    if (children != null)
                     {
-                        var childNode = ConvertSyntaxNodeToCognitiveNode(child);
-                        if (childNode != null)
+                        foreach (var child in children)
                         {
-                            root.AddChild(childNode);
+                            var childNode = ConvertSyntaxNodeToCognitiveNode(child);
+                            if (childNode != null)
+                            {
+                                root.AddChild(childNode);
+                            }
                         }
                     }
                 }
@@ -335,15 +339,6 @@ public partial class StepParserIntegration : IDisposable
             }
         }
         catch (TargetInvocationException ex)
-        {
-            root.Metadata["conversionError"] = ex.Message;
-            var fallbackNodes = FallbackParsing(sourceCode);
-            foreach (var node in fallbackNodes)
-            {
-                root.AddChild(node);
-            }
-        }
-        catch (NullReferenceException ex)
         {
             root.Metadata["conversionError"] = ex.Message;
             var fallbackNodes = FallbackParsing(sourceCode);
