@@ -7,6 +7,16 @@ on:
     branches: [ main, develop ]
   release:
     types: [ published ]
+  workflow_dispatch:
+    inputs:
+      create_stable_release:
+        description: 'Create v1.0.0 stable release'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+        - 'false'
+        - 'true'
 
 permissions:
   contents: write
@@ -358,7 +368,8 @@ jobs:
     needs: [calculate-version, build-and-test, package]
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.calculate-version.outputs.prerelease == '') ||
-      (github.event_name == 'release' && github.event.action == 'published')
+      (github.event_name == 'release' && github.event.action == 'published') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -374,14 +385,16 @@ jobs:
         name: nuget-packages
         path: ./packages
 
-    - name: Create GitHub Release (for main branch pushes)
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    - name: Create GitHub Release (for main branch pushes and manual dispatch)
+      if: |
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ needs.calculate-version.outputs.version }}
-        name: "Minotaur v${{ needs.calculate-version.outputs.version }} - Stable Release"
+        tag_name: v${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
+        name: "Minotaur v${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }} - Stable Release"
         body: |
           # Minotaur v${{ needs.calculate-version.outputs.version }} - Stable Release
 
@@ -405,7 +418,7 @@ jobs:
           ### 📦 Installation
 
           ```bash
-          dotnet add package DevelApp.Minotaur --version ${{ needs.calculate-version.outputs.version }}
+          dotnet add package DevelApp.Minotaur --version ${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
           ```
 
           ### 🔧 Requirements
@@ -434,10 +447,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Manual job to create v1.0.0 release from tagged commit
+  # Manual job to create v1.0.0 release from main branch
   create-stable-release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/v1.0.0')
+    needs: [calculate-version, build-and-test, code-quality, lint-and-format]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true'
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -450,7 +464,7 @@ jobs:
     - name: Build and Package v1.0.0
       run: |
         dotnet restore ${{ env.SOLUTION_PATH }}
-        dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+        dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore -p:Version=1.0.0 -p:PackageVersion=1.0.0
         dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./packages -p:PackageVersion=1.0.0
 
     - name: Create v1.0.0 Release
