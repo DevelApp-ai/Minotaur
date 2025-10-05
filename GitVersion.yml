@@ -5,29 +5,36 @@ branches:
     regex: ^master$|^main$
     mode: ContinuousDeployment
     increment: Patch
+    source-branches: ['develop', 'feature', 'support', 'hotfix']
   develop:
     regex: ^dev(elop)?(ment)?$
     mode: ContinuousDeployment
     increment: Minor
+    source-branches: []
   feature:
     regex: ^features?[/-]
     mode: ContinuousDeployment
     increment: Minor
+    source-branches: ['develop', 'main', 'support', 'feature']
   copilot:
     regex: ^copilot[/-]
     mode: ContinuousDeployment
     increment: Minor
+    source-branches: ['develop', 'main', 'support', 'feature']
   pull-request:
     regex: ^(pull|pull\-requests|pr)[/-]
     mode: ContinuousDeployment
     increment: Inherit
+    source-branches: ['develop', 'main', 'feature', 'support', 'hotfix']
   hotfix:
     regex: ^hotfix(es)?[/-]
     mode: ContinuousDeployment
     increment: Patch
+    source-branches: ['develop', 'main', 'support']
   support:
     regex: ^support[/-]
     mode: ContinuousDeployment
     increment: Patch
+    source-branches: ['main']
 ignore:
   sha: []
