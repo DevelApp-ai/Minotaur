@@ -325,15 +325,41 @@ public partial class StepParserIntegration : IDisposable
                 }
             }
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            // If we can't parse the syntax tree structure, fall back to basic parsing
             root.Metadata["conversionError"] = ex.Message;
             var fallbackNodes = FallbackParsing(sourceCode);
             foreach (var node in fallbackNodes)
             {
                 root.AddChild(node);
             }
+        catch (TargetInvocationException ex)
+        {
+            root.Metadata["conversionError"] = ex.Message;
+            var fallbackNodes = FallbackParsing(sourceCode);
+            foreach (var node in fallbackNodes)
+            {
+                root.AddChild(node);
+            }
+        }
+        catch (NullReferenceException ex)
+        {
+            root.Metadata["conversionError"] = ex.Message;
+            var fallbackNodes = FallbackParsing(sourceCode);
+            foreach (var node in fallbackNodes)
+            {
+                root.AddChild(node);
+            }
+        }
+        catch (InvalidCastException ex)
+        {
+            root.Metadata["conversionError"] = ex.Message;
+            var fallbackNodes = FallbackParsing(sourceCode);
+            foreach (var node in fallbackNodes)
+            {
+                root.AddChild(node);
+            }
+        }
         }
 
         return root;
