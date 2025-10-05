@@ -430,6 +430,16 @@ jobs:
         prerelease: false
         files: ./packages/*.nupkg
 
+    - name: Publish to GitHub Packages
+      run: |
+        echo "Publishing to GitHub Packages..."
+        dotnet nuget push ./packages/*.nupkg \
+          --api-key ${{ secrets.GITHUB_TOKEN }} \
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          --skip-duplicate
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Publish to NuGet.org
       run: |
         echo "Publishing to NuGet.org..."
@@ -508,6 +518,16 @@ jobs:
         files: ./packages/*.nupkg
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish v1.0.0 to GitHub Packages
+      run: |
+        echo "Publishing v1.0.0 to GitHub Packages..."
+        dotnet nuget push ./packages/*.nupkg \
+          --api-key ${{ secrets.GITHUB_TOKEN }} \
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          --skip-duplicate
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish v1.0.0 to NuGet.org
       run: |
