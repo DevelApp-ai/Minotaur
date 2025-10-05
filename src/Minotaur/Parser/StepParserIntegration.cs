@@ -698,7 +698,8 @@ public partial class StepParserIntegration : IDisposable
                     }
                     if (value != null && typeof(T) == typeof(string))
                     {
-                        return (T)value.ToString();
+                        var stringValue = value.ToString();
+                        return stringValue != null ? (T)(object)stringValue : default;
                     }
                 }
             }
