@@ -1,0 +1,1168 @@
+@page "/version-control"
+@using Minotaur.Core
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Version Control Integration - Minotaur</PageTitle>
+
+<div class="version-control-container">
+    <div class="vc-header">
+        <h2><i class="bi bi-git"></i> Git Version Control Integration</h2>
+        <div class="header-actions">
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" @onclick="InitializeRepository" disabled="@isWorking">
+                    <i class="bi bi-plus-circle"></i> Initialize Repo
+                </button>
+                <button class="btn btn-primary" @onclick="CloneRepository" disabled="@isWorking">
+                    <i class="bi bi-cloud-download"></i> Clone Repo
+                </button>
+                <button class="btn btn-outline-secondary" @onclick="RefreshStatus" disabled="@isWorking">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Repository Status Panel -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="bi bi-folder"></i> Repository Status</h5>
+                </div>
+                <div class="card-body">
+                    @if (repositoryInfo != null)
+                    {
+                        <div class="repo-info">
+                            <div class="info-item">
+                                <strong>Repository:</strong>
+                                <span class="text-primary">@repositoryInfo.Name</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Current Branch:</strong>
+                                <span class="badge bg-success">@repositoryInfo.CurrentBranch</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Status:</strong>
+                                <span class="badge bg-@GetStatusColor(repositoryInfo.Status)">@repositoryInfo.Status</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Last Commit:</strong>
+                                <small class="text-muted">@repositoryInfo.LastCommit</small>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="branch-selector">
+                            <label class="form-label">Switch Branch:</label>
+                            <div class="input-group">
+                                <select class="form-select" @bind="selectedBranch">
+                                    @foreach (var branch in repositoryInfo.Branches)
+                                    {
+                                        <option value="@branch" selected="@(branch == repositoryInfo.CurrentBranch)">@branch</option>
+                                    }
+                                </select>
+                                <button class="btn btn-outline-primary" @onclick="SwitchBranch" disabled="@isWorking">
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="branch-actions mt-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" @bind="newBranchName" placeholder="New branch name">
+                                <button class="btn btn-success" @onclick="CreateBranch" disabled="@(isWorking || string.IsNullOrWhiteSpace(newBranchName))">
+                                    <i class="bi bi-plus"></i> Create
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">
+                            <i class="bi bi-folder-x display-4 mb-3"></i>
+                            <p>No repository initialized</p>
+                            <button class="btn btn-primary" @onclick="InitializeRepository">
+                                <i class="bi bi-plus-circle"></i> Initialize Repository
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Remote Repositories -->
+            @if (repositoryInfo != null)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="bi bi-cloud"></i> Remote Repositories</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (repositoryInfo.Remotes.Any())
+                        {
+                            @foreach (var remote in repositoryInfo.Remotes)
+                            {
+                                <div class="remote-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@remote.Name</strong><br>
+                                            <small class="text-muted">@remote.Url</small>
+                                        </div>
+                                        <div class="btn-group-vertical btn-group-sm">
+                                            <button class="btn btn-outline-primary" @onclick="() => PullFromRemote(remote.Name)" disabled="@isWorking">
+                                                <i class="bi bi-arrow-down"></i> Pull
+                                            </button>
+                                            <button class="btn btn-outline-success" @onclick="() => PushToRemote(remote.Name)" disabled="@isWorking">
+                                                <i class="bi bi-arrow-up"></i> Push
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted">
+                                <i class="bi bi-cloud-slash"></i>
+                                <p class="mb-0">No remotes configured</p>
+                            </div>
+                        }
+                        
+                        <hr>
+                        <div class="add-remote">
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text">Name</span>
+                                <input type="text" class="form-control" @bind="newRemoteName" placeholder="origin">
+                            </div>
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text">URL</span>
+                                <input type="text" class="form-control" @bind="newRemoteUrl" placeholder="https://github.com/user/repo.git">
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100" @onclick="AddRemote" 
+                                    disabled="@(isWorking || string.IsNullOrWhiteSpace(newRemoteName) || string.IsNullOrWhiteSpace(newRemoteUrl))">
+                                <i class="bi bi-plus"></i> Add Remote
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link @(activeTab == "changes" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("changes")'>
+                                <i class="bi bi-file-diff"></i> Changes
+                                @if (fileChanges.Any())
+                                {
+                                    <span class="badge bg-warning ms-1">@fileChanges.Count</span>
+                                }
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link @(activeTab == "history" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("history")'>
+                                <i class="bi bi-clock-history"></i> History
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link @(activeTab == "branches" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("branches")'>
+                                <i class="bi bi-diagram-2"></i> Branches
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link @(activeTab == "collaborate" ? "active" : "")" 
+                                    @onclick='() => SetActiveTab("collaborate")'>
+                                <i class="bi bi-people"></i> Collaborate
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    @if (isWorking)
+                    {
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary mb-2"></div>
+                            <p class="mb-0">@workingMessage</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @if (activeTab == "changes")
+                        {
+                            <div class="changes-view">
+                                @if (fileChanges.Any())
+                                {
+                                    <div class="commit-form mb-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Commit Message</label>
+                                            <input type="text" class="form-control" @bind="commitMessage" placeholder="Enter commit message">
+                                        </div>
+                                        <div class="commit-actions">
+                                            <button class="btn btn-success" @onclick="CommitChanges" 
+                                                    disabled="@(string.IsNullOrWhiteSpace(commitMessage) || !stagedChanges.Any())">
+                                                <i class="bi bi-check-circle"></i> Commit (@stagedChanges.Count files)
+                                            </button>
+                                            <button class="btn btn-outline-secondary" @onclick="StageAllChanges">
+                                                <i class="bi bi-plus-square"></i> Stage All
+                                            </button>
+                                            <button class="btn btn-outline-warning" @onclick="UnstageAllChanges">
+                                                <i class="bi bi-dash-square"></i> Unstage All
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="file-changes">
+                                        <h6>Modified Files</h6>
+                                        @foreach (var file in fileChanges)
+                                        {
+                                            <div class="file-change-item">
+                                                <div class="file-info">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" 
+                                                               checked="@file.IsStaged"
+                                                               @onchange="() => ToggleFileStaging(file)">
+                                                        <label class="form-check-label">
+                                                            <i class="bi bi-@GetFileIcon(file.Path)"></i>
+                                                            <span class="file-path">@file.Path</span>
+                                                            <span class="badge bg-@GetChangeTypeColor(file.ChangeType) ms-2">@file.ChangeType</span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="file-stats">
+                                                        <span class="text-success">+@file.AddedLines</span>
+                                                        <span class="text-danger">-@file.DeletedLines</span>
+                                                    </div>
+                                                </div>
+                                                <div class="file-actions">
+                                                    <button class="btn btn-outline-primary btn-sm" @onclick="() => ViewFileDiff(file)">
+                                                        <i class="bi bi-file-diff"></i> Diff
+                                                    </button>
+                                                    <button class="btn btn-outline-secondary btn-sm" @onclick="() => RevertFile(file)">
+                                                        <i class="bi bi-arrow-counterclockwise"></i> Revert
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-center text-muted py-4">
+                                        <i class="bi bi-check-circle display-4 mb-3 text-success"></i>
+                                        <h5>Working Directory Clean</h5>
+                                        <p>No changes detected in your grammar files.</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else if (activeTab == "history")
+                        {
+                            <div class="history-view">
+                                <div class="commit-list">
+                                    @foreach (var commit in commitHistory)
+                                    {
+                                        <div class="commit-item">
+                                            <div class="commit-info">
+                                                <div class="commit-message">@commit.Message</div>
+                                                <div class="commit-meta">
+                                                    <span class="commit-hash">@commit.Hash</span>
+                                                    <span class="commit-author">@commit.Author</span>
+                                                    <span class="commit-date">@commit.Date.ToString("MMM dd, yyyy")</span>
+                                                </div>
+                                            </div>
+                                            <div class="commit-actions">
+                                                <button class="btn btn-outline-primary btn-sm" @onclick="() => ViewCommit(commit)">
+                                                    <i class="bi bi-eye"></i> View
+                                                </button>
+                                                <button class="btn btn-outline-secondary btn-sm" @onclick="() => CheckoutCommit(commit)">
+                                                    <i class="bi bi-arrow-right"></i> Checkout
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else if (activeTab == "branches")
+                        {
+                            <div class="branches-view">
+                                <div class="branch-visualization">
+                                    <h6>Branch Visualization</h6>
+                                    <div class="branch-graph" id="branch-graph">
+                                        <svg width="100%" height="300" viewBox="0 0 800 300">
+                                            <!-- Branch visualization -->
+                                            @{
+                                                var branchY = 50;
+                                            }
+                                            @foreach (var branch in (repositoryInfo?.Branches ?? new List<string>()))
+                                            {
+                                                var isCurrentBranch = branch == repositoryInfo?.CurrentBranch;
+                                                <g class="branch-line">
+                                                    <line x1="50" y1="@branchY" x2="750" y2="@branchY" 
+                                                          stroke="@(isCurrentBranch ? "#28a745" : "#6c757d")" 
+                                                          stroke-width="@(isCurrentBranch ? "3" : "2")" />
+                                                    <text x="20" y="@(branchY + 5)" class="branch-name" 
+                                                          fill="@(isCurrentBranch ? "#28a745" : "#6c757d")">@branch</text>
+                                                    
+                                                    <!-- Commit nodes -->
+                                                    @for (int i = 0; i < 5; i++)
+                                                    {
+                                                        var x = 100 + i * 150;
+                                                        <circle cx="@x" cy="@branchY" r="6" 
+                                                                fill="@(isCurrentBranch ? "#28a745" : "#6c757d")" 
+                                                                stroke="white" stroke-width="2" />
+                                                    }
+                                                </g>
+                                                branchY += 60;
+                                            }
+                                        </svg>
+                                    </div>
+                                </div>
+
+                                <div class="branch-management mt-4">
+                                    <h6>Branch Management</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Branch</th>
+                                                    <th>Last Commit</th>
+                                                    <th>Ahead/Behind</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var branch in (repositoryInfo?.Branches ?? new List<string>()))
+                                                {
+                                                    var isCurrentBranch = branch == repositoryInfo?.CurrentBranch;
+                                                    <tr class="@(isCurrentBranch ? "table-success" : "")">
+                                                        <td>
+                                                            <i class="bi bi-@(isCurrentBranch ? "check-circle text-success" : "circle")"></i>
+                                                            @branch
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted">2 hours ago</small>
+                                                        </td>
+                                                        <td>
+                                                            @if (!isCurrentBranch)
+                                                            {
+                                                                <span class="badge bg-info">2↑ 1↓</span>
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            <div class="btn-group btn-group-sm">
+                                                                @if (!isCurrentBranch)
+                                                                {
+                                                                    <button class="btn btn-outline-primary" @onclick="() => SwitchToBranch(branch)">
+                                                                        <i class="bi bi-arrow-right"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-outline-success" @onclick="() => MergeBranch(branch)">
+                                                                        <i class="bi bi-arrow-down"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-outline-danger" @onclick="() => DeleteBranch(branch)">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (activeTab == "collaborate")
+                        {
+                            <div class="collaboration-view">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="collaboration-card">
+                                            <h6><i class="bi bi-cloud-download"></i> Pull Requests</h6>
+                                            <div class="pr-list">
+                                                @foreach (var pr in pullRequests)
+                                                {
+                                                    <div class="pr-item">
+                                                        <div class="pr-info">
+                                                            <div class="pr-title">@pr.Title</div>
+                                                            <div class="pr-meta">
+                                                                <span class="badge bg-@GetPRStatusColor(pr.Status)">@pr.Status</span>
+                                                                <small class="text-muted">by @pr.Author</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="pr-actions">
+                                                            <button class="btn btn-outline-primary btn-sm">
+                                                                <i class="bi bi-eye"></i> Review
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <button class="btn btn-primary btn-sm w-100 mt-3" @onclick="CreatePullRequest">
+                                                <i class="bi bi-plus"></i> Create Pull Request
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="collaboration-card">
+                                            <h6><i class="bi bi-people"></i> Collaborators</h6>
+                                            <div class="collaborator-list">
+                                                @foreach (var collab in collaborators)
+                                                {
+                                                    <div class="collaborator-item">
+                                                        <div class="collaborator-info">
+                                                            @if (!string.IsNullOrEmpty(collab.AvatarUrl))
+                                                            {
+                                                                <img src="@collab.AvatarUrl" alt="@collab.Name" class="collaborator-avatar">
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="collaborator-avatar-placeholder">
+                                                                    <i class="bi bi-person"></i>
+                                                                </div>
+                                                            }
+                                                            <div>
+                                                                <div class="collaborator-name">@collab.Name</div>
+                                                                <small class="text-muted">@collab.Role</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="collaborator-status">
+                                                            <i class="bi bi-circle-fill text-@(collab.IsOnline ? "success" : "secondary")"></i>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="invite-collaborator mt-3">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" @bind="inviteEmail" placeholder="Email address">
+                                                    <button class="btn btn-primary" @onclick="InviteCollaborator" 
+                                                            disabled="@(string.IsNullOrWhiteSpace(inviteEmail))">
+                                                        <i class="bi bi-plus"></i> Invite
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (statusMessage != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+            <i class="bi bi-info-circle"></i> @statusMessage
+            <button type="button" class="btn-close" @onclick="() => statusMessage = null"></button>
+        </div>
+    }
+
+    @if (errorMessage != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> @errorMessage
+            <button type="button" class="btn-close" @onclick="() => errorMessage = null"></button>
+        </div>
+    }
+</div>
+
+<style>
+.version-control-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.vc-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.vc-header h2 {
+    color: #333;
+    margin: 0;
+}
+
+.repo-info .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.remote-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.remote-item:last-child {
+    border-bottom: none;
+}
+
+.file-change-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.file-path {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.file-stats {
+    margin-left: auto;
+    margin-right: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.commit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+.commit-message {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.commit-meta {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.commit-hash {
+    font-family: 'Courier New', monospace;
+    background: #f1f1f1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.branch-graph {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.branch-name {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.collaboration-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
+}
+
+.pr-item, .collaborator-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.pr-title {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.pr-meta {
+    font-size: 0.85rem;
+}
+
+.collaborator-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.collaborator-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.collaborator-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.collaborator-name {
+    font-weight: 500;
+}
+
+.commit-form {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.commit-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@@media (max-width: 768px) {
+    .vc-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .file-change-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .commit-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+}
+</style>
+
+@code {
+    private RepositoryInfo? repositoryInfo;
+    private string activeTab = "changes";
+    private bool isWorking = false;
+    private string workingMessage = "";
+    private string? statusMessage;
+    private string? errorMessage;
+
+    // Repository management
+    private string selectedBranch = "";
+    private string newBranchName = "";
+    private string newRemoteName = "";
+    private string newRemoteUrl = "";
+
+    // File changes
+    private List<FileChange> fileChanges = new();
+    private List<FileChange> stagedChanges = new();
+    private string commitMessage = "";
+
+    // History
+    private List<CommitInfo> commitHistory = new();
+
+    // Collaboration
+    private List<PullRequest> pullRequests = new();
+    private List<Collaborator> collaborators = new();
+    private string inviteEmail = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSampleData();
+    }
+
+    private async Task LoadSampleData()
+    {
+        repositoryInfo = new RepositoryInfo
+        {
+            Name = "minotaur-grammars",
+            CurrentBranch = "main",
+            Status = "Clean",
+            LastCommit = "Fix StepParser integration - 2 hours ago",
+            Branches = new List<string> { "main", "feature/new-parser", "hotfix/validation-bug", "develop" },
+            Remotes = new List<RemoteInfo>
+            {
+                new RemoteInfo { Name = "origin", Url = "https://github.com/user/minotaur-grammars.git" },
+                new RemoteInfo { Name = "upstream", Url = "https://github.com/DevelApp-ai/minotaur-grammars.git" }
+            }
+        };
+
+        fileChanges = new List<FileChange>
+        {
+            new FileChange 
+            { 
+                Path = "grammars/csharp-advanced.grammar", 
+                ChangeType = "Modified", 
+                AddedLines = 15, 
+                DeletedLines = 3,
+                IsStaged = false
+            },
+            new FileChange 
+            { 
+                Path = "parsers/StepParserIntegration.cs", 
+                ChangeType = "Modified", 
+                AddedLines = 42, 
+                DeletedLines = 8,
+                IsStaged = true
+            },
+            new FileChange 
+            { 
+                Path = "tests/ParserTests.cs", 
+                ChangeType = "Added", 
+                AddedLines = 28, 
+                DeletedLines = 0,
+                IsStaged = false
+            }
+        };
+
+        commitHistory = new List<CommitInfo>
+        {
+            new CommitInfo 
+            { 
+                Hash = "a7f3b2c1", 
+                Message = "Fix StepParser integration with proper NuGet packages", 
+                Author = "John Doe", 
+                Date = DateTime.Now.AddHours(-2)
+            },
+            new CommitInfo 
+            { 
+                Hash = "b8e4c3d2", 
+                Message = "Add comprehensive tutorial system", 
+                Author = "Jane Smith", 
+                Date = DateTime.Now.AddDays(-1)
+            },
+            new CommitInfo 
+            { 
+                Hash = "c9f5d4e3", 
+                Message = "Enhance symbolic analysis visualization", 
+                Author = "Bob Johnson", 
+                Date = DateTime.Now.AddDays(-2)
+            }
+        };
+
+        pullRequests = new List<PullRequest>
+        {
+            new PullRequest 
+            { 
+                Title = "Add Python grammar support", 
+                Author = "contributor1", 
+                Status = "Open"
+            },
+            new PullRequest 
+            { 
+                Title = "Fix memory leak in parser", 
+                Author = "contributor2", 
+                Status = "Under Review"
+            }
+        };
+
+        collaborators = new List<Collaborator>
+        {
+            new Collaborator 
+            { 
+                Name = "John Doe", 
+                Role = "Owner", 
+                IsOnline = true,
+                AvatarUrl = ""
+            },
+            new Collaborator 
+            { 
+                Name = "Jane Smith", 
+                Role = "Collaborator", 
+                IsOnline = false,
+                AvatarUrl = ""
+            }
+        };
+
+        UpdateStagedChanges();
+        await Task.CompletedTask;
+    }
+
+    private async Task InitializeRepository()
+    {
+        isWorking = true;
+        workingMessage = "Initializing Git repository...";
+        StateHasChanged();
+
+        await Task.Delay(2000);
+
+        repositoryInfo = new RepositoryInfo
+        {
+            Name = "new-minotaur-project",
+            CurrentBranch = "main",
+            Status = "Clean",
+            LastCommit = "Initial commit - just now",
+            Branches = new List<string> { "main" },
+            Remotes = new List<RemoteInfo>()
+        };
+
+        statusMessage = "Repository initialized successfully.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task CloneRepository()
+    {
+        isWorking = true;
+        workingMessage = "Cloning repository...";
+        StateHasChanged();
+
+        await Task.Delay(3000);
+
+        statusMessage = "Repository cloned successfully.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task RefreshStatus()
+    {
+        isWorking = true;
+        workingMessage = "Refreshing repository status...";
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        statusMessage = "Status refreshed.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+        StateHasChanged();
+    }
+
+    private void ToggleFileStaging(FileChange file)
+    {
+        file.IsStaged = !file.IsStaged;
+        UpdateStagedChanges();
+        StateHasChanged();
+    }
+
+    private void UpdateStagedChanges()
+    {
+        stagedChanges = fileChanges.Where(f => f.IsStaged).ToList();
+    }
+
+    private void StageAllChanges()
+    {
+        foreach (var file in fileChanges)
+        {
+            file.IsStaged = true;
+        }
+        UpdateStagedChanges();
+        StateHasChanged();
+    }
+
+    private void UnstageAllChanges()
+    {
+        foreach (var file in fileChanges)
+        {
+            file.IsStaged = false;
+        }
+        UpdateStagedChanges();
+        StateHasChanged();
+    }
+
+    private async Task CommitChanges()
+    {
+        if (string.IsNullOrWhiteSpace(commitMessage) || !stagedChanges.Any()) return;
+
+        isWorking = true;
+        workingMessage = $"Committing {stagedChanges.Count} files...";
+        StateHasChanged();
+
+        await Task.Delay(1500);
+
+        // Remove committed files from changes
+        foreach (var stagedFile in stagedChanges)
+        {
+            fileChanges.Remove(stagedFile);
+        }
+
+        // Add to history
+        commitHistory.Insert(0, new CommitInfo
+        {
+            Hash = GenerateCommitHash(),
+            Message = commitMessage,
+            Author = "You",
+            Date = DateTime.Now
+        });
+
+        commitMessage = "";
+        UpdateStagedChanges();
+        statusMessage = $"Successfully committed {stagedChanges.Count} files.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task SwitchBranch()
+    {
+        if (selectedBranch == repositoryInfo?.CurrentBranch) return;
+
+        isWorking = true;
+        workingMessage = $"Switching to branch '{selectedBranch}'...";
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        if (repositoryInfo != null)
+        {
+            repositoryInfo.CurrentBranch = selectedBranch;
+        }
+
+        statusMessage = $"Switched to branch '{selectedBranch}'.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task CreateBranch()
+    {
+        if (string.IsNullOrWhiteSpace(newBranchName)) return;
+
+        isWorking = true;
+        workingMessage = $"Creating branch '{newBranchName}'...";
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        repositoryInfo?.Branches.Add(newBranchName);
+        statusMessage = $"Branch '{newBranchName}' created successfully.";
+        newBranchName = "";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task AddRemote()
+    {
+        if (string.IsNullOrWhiteSpace(newRemoteName) || string.IsNullOrWhiteSpace(newRemoteUrl)) return;
+
+        isWorking = true;
+        workingMessage = $"Adding remote '{newRemoteName}'...";
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        repositoryInfo?.Remotes.Add(new RemoteInfo { Name = newRemoteName, Url = newRemoteUrl });
+        statusMessage = $"Remote '{newRemoteName}' added successfully.";
+        newRemoteName = "";
+        newRemoteUrl = "";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task PullFromRemote(string remoteName)
+    {
+        isWorking = true;
+        workingMessage = $"Pulling from '{remoteName}'...";
+        StateHasChanged();
+
+        await Task.Delay(2000);
+
+        statusMessage = $"Successfully pulled from '{remoteName}'.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task PushToRemote(string remoteName)
+    {
+        isWorking = true;
+        workingMessage = $"Pushing to '{remoteName}'...";
+        StateHasChanged();
+
+        await Task.Delay(2000);
+
+        statusMessage = $"Successfully pushed to '{remoteName}'.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task SwitchToBranch(string branchName)
+    {
+        selectedBranch = branchName;
+        await SwitchBranch();
+    }
+
+    private async Task MergeBranch(string branchName)
+    {
+        isWorking = true;
+        workingMessage = $"Merging branch '{branchName}'...";
+        StateHasChanged();
+
+        await Task.Delay(2000);
+
+        statusMessage = $"Successfully merged branch '{branchName}'.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task DeleteBranch(string branchName)
+    {
+        isWorking = true;
+        workingMessage = $"Deleting branch '{branchName}'...";
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        repositoryInfo?.Branches.Remove(branchName);
+        statusMessage = $"Branch '{branchName}' deleted successfully.";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    private async Task CreatePullRequest()
+    {
+        statusMessage = "Pull request creation would open in external tool or modal.";
+        await Task.CompletedTask;
+    }
+
+    private async Task InviteCollaborator()
+    {
+        if (string.IsNullOrWhiteSpace(inviteEmail)) return;
+
+        isWorking = true;
+        workingMessage = "Sending invitation...";
+        StateHasChanged();
+
+        await Task.Delay(1500);
+
+        statusMessage = $"Invitation sent to {inviteEmail}.";
+        inviteEmail = "";
+        isWorking = false;
+        StateHasChanged();
+    }
+
+    // Helper methods
+    private string GetStatusColor(string status) => status.ToLower() switch
+    {
+        "clean" => "success",
+        "modified" => "warning",
+        "conflict" => "danger",
+        _ => "secondary"
+    };
+
+    private string GetChangeTypeColor(string changeType) => changeType.ToLower() switch
+    {
+        "added" => "success",
+        "modified" => "warning", 
+        "deleted" => "danger",
+        _ => "secondary"
+    };
+
+    private string GetPRStatusColor(string status) => status.ToLower() switch
+    {
+        "open" => "success",
+        "under review" => "warning",
+        "merged" => "primary",
+        "closed" => "secondary",
+        _ => "secondary"
+    };
+
+    private string GetFileIcon(string filePath)
+    {
+        var extension = System.IO.Path.GetExtension(filePath).ToLower();
+        return extension switch
+        {
+            ".cs" => "file-code",
+            ".grammar" => "file-text",
+            ".json" => "file-earmark-code",
+            ".md" => "file-text",
+            _ => "file"
+        };
+    }
+
+    private void ViewFileDiff(FileChange file) => statusMessage = $"Viewing diff for {file.Path}";
+    private void RevertFile(FileChange file) => statusMessage = $"Reverted changes in {file.Path}";
+    private void ViewCommit(CommitInfo commit) => statusMessage = $"Viewing commit {commit.Hash}";
+    private void CheckoutCommit(CommitInfo commit) => statusMessage = $"Checked out commit {commit.Hash}";
+
+    private string GenerateCommitHash()
+    {
+        var random = new Random();
+        return random.Next(0x10000000, 0x7FFFFFFF).ToString("x8");
+    }
+
+    // Data models
+    public class RepositoryInfo
+    {
+        public string Name { get; set; } = "";
+        public string CurrentBranch { get; set; } = "";
+        public string Status { get; set; } = "";
+        public string LastCommit { get; set; } = "";
+        public List<string> Branches { get; set; } = new();
+        public List<RemoteInfo> Remotes { get; set; } = new();
+    }
+
+    public class RemoteInfo
+    {
+        public string Name { get; set; } = "";
+        public string Url { get; set; } = "";
+    }
+
+    public class FileChange
+    {
+        public string Path { get; set; } = "";
+        public string ChangeType { get; set; } = "";
+        public int AddedLines { get; set; }
+        public int DeletedLines { get; set; }
+        public bool IsStaged { get; set; }
+    }
+
+    public class CommitInfo
+    {
+        public string Hash { get; set; } = "";
+        public string Message { get; set; } = "";
+        public string Author { get; set; } = "";
+        public DateTime Date { get; set; }
+    }
+
+    public class PullRequest
+    {
+        public string Title { get; set; } = "";
+        public string Author { get; set; } = "";
+        public string Status { get; set; } = "";
+    }
+
+    public class Collaborator
+    {
+        public string Name { get; set; } = "";
+        public string Role { get; set; } = "";
+        public bool IsOnline { get; set; }
+        public string AvatarUrl { get; set; } = "";
+    }
+}
