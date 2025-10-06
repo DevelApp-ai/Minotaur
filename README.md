@@ -38,9 +38,14 @@ dotnet add package DevelApp.Minotaur
 
 ### Basic Graph Editing
 
+**Note:** Graph editing functionality has been moved to the `DevelApp.CognitiveGraph.Editor` package for better separation of concerns.
+
+```bash
+dotnet add package DevelApp.CognitiveGraph.Editor
+```
+
 ```csharp
-using GolemCognitiveGraph.Core;
-using GolemCognitiveGraph.Editor;
+using CognitiveGraph.Editor;
 
 // Create a graph editor with a root node
 var root = new NonTerminalNode("expression", 0);
@@ -62,6 +67,7 @@ Console.WriteLine($"Can undo: {editor.CanUndo}");
 ### StepParser Integration
 
 ```csharp
+using CognitiveGraph.Editor; // Requires DevelApp.CognitiveGraph.Editor package
 using GolemCognitiveGraph.Parser;
 using GolemCognitiveGraph.Plugins;
 
@@ -84,6 +90,7 @@ var regeneratedCode = await csharpPlugin.UnparseAsync(editor.Root);
 ### Advanced Context-Aware Editing
 
 ```csharp
+using CognitiveGraph.Editor; // Requires DevelApp.CognitiveGraph.Editor package
 using GolemCognitiveGraph.Advanced;
 
 // Create context-aware editor with precision tracking
@@ -130,11 +137,11 @@ Console.WriteLine($"Generated {backendRules.GenerationRules.Count} rules");
 
 ### Core Components
 
-- **GraphEditor**: Zero-copy graph modification with undo/redo
 - **StepParserIntegration**: Bridge between StepParser and cognitive graphs
 - **LanguagePluginManager**: Runtime plugin discovery and management
-- **ContextAwareEditor**: Advanced editing with location tracking
+- **ContextAwareEditor**: Advanced editing with location tracking (requires DevelApp.CognitiveGraph.Editor)
 - **PrecisionLocationTracker**: High-precision coordinate tracking
+- **GraphEditor**: Zero-copy graph modification with undo/redo (moved to DevelApp.CognitiveGraph.Editor)
 
 ### Architectural Separation
 
@@ -171,10 +178,14 @@ dotnet test src/Minotaur.sln --collect:"XPlat Code Coverage"
 
 ## 🔗 Dependencies
 
-- [DevelApp.CognitiveGraph 1.0.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph/)
+### Core Dependencies
+- [DevelApp.CognitiveGraph 2.0.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph/)
 - [DevelApp.StepLexer 1.0.1](https://www.nuget.org/packages/DevelApp.StepLexer/)
 - [DevelApp.StepParser 1.0.1](https://www.nuget.org/packages/DevelApp.StepParser/)
 - [DevelApp.RuntimePluggableClassFactory 2.0.1](https://www.nuget.org/packages/DevelApp.RuntimePluggableClassFactory/)
+
+### Optional Dependencies (for graph editing)
+- [DevelApp.CognitiveGraph.Editor 2.0.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph.Editor/) - Graph editing backend
 
 ## 📄 License
 
