@@ -1,5 +1,5 @@
 using Minotaur.Core;
-using Minotaur.Editor;
+using CognitiveGraph.Editor; // External package for graph editing
 using Minotaur.UI.Blazor.Api.GraphQL;
 using System.Collections.Concurrent;
 

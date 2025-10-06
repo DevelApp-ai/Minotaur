@@ -19,23 +19,23 @@ This document outlines the migration of the graph editor backend components from
    - Concrete implementations: InsertNodeOperation, RemoveNodeOperation, ReplaceNodeOperation, MoveNodeOperation
    - Target location: `CognitiveGraph/Editor/EditOperation.cs`
 
-### API Components (Optional - could stay in consuming applications)
+### Application-Level Components (Remain in Minotaur)
 
 3. **CognitiveGraphService.cs** (`src/Minotaur.UI.Blazor/Api/Services/CognitiveGraphService.cs`)
-   - Service layer for API access to cognitive graphs
-   - Caching and querying capabilities
-   - Target location: `CognitiveGraph/Api/Services/CognitiveGraphService.cs`
+   - Service layer for API access to cognitive graphs - STAYS in Minotaur
+   - Caching and querying capabilities for web applications
+   - Uses the external CognitiveGraph.Editor package
 
 4. **CognitiveGraphHub.cs** (`src/Minotaur.UI.Blazor/Api/Hubs/CognitiveGraphHub.cs`)
-   - SignalR hub for real-time graph updates
-   - Target location: `CognitiveGraph/Api/Hubs/CognitiveGraphHub.cs`
+   - SignalR hub for real-time graph updates - STAYS in Minotaur
+   - Application-level concern for web communication
+   - Uses the external CognitiveGraph.Editor package
 
-### Dependencies to Add to CognitiveGraph
+### Dependencies for CognitiveGraph (Core Editor Only)
 
-The following dependencies would need to be added to CognitiveGraph.csproj:
+CognitiveGraph will only need core dependencies, no SignalR:
 
 ```xml
-<PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="8.0.0" />
 <PackageReference Include="System.Collections.Concurrent" Version="8.0.0" />
 ```
 
@@ -93,13 +93,13 @@ The following files have been prepared in the `migration_to_cognitive_graph/` di
 
 These files can be copied to the CognitiveGraph repository once the branch is created.
 
-## Migration Status Update
+## Migration Status Update (Corrected)
 
 ### ✅ Completed Tasks:
 
-1. **Backend Components Removed from Minotaur:**
+1. **Core Editor Components Moved to CognitiveGraph:**
    - Deleted `src/Minotaur/Editor/` directory (GraphEditor.cs, EditOperation.cs)
-   - Deleted `src/Minotaur.UI.Blazor/Api/` directory (Services, Hubs)
+   - **Restored** `src/Minotaur.UI.Blazor/Api/` directory (Services, Hubs remain in Minotaur)
    - Created backups in `migration_to_cognitive_graph/backup_*`
 
 2. **Migration Files Prepared:**
