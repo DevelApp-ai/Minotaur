@@ -16,7 +16,8 @@
  */
 
 using Minotaur.Core;
-using Minotaur.Editor;
+// TODO: Replace with external package when available  
+// using CognitiveGraph.Editor;
 using Minotaur.Plugins;
 using System.Reflection;
 using System.Linq;
