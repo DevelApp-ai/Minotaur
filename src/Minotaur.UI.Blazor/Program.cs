@@ -33,6 +33,7 @@ public class Program
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.TemplateService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarSyntaxHighlightingService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarCodeCompletionService>();
+        builder.Services.AddScoped<Minotaur.UI.Blazor.Services.SocraticTutorService>();
         builder.Services.AddHttpClient();
 
         // Add SignalR
