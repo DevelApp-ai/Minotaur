@@ -345,27 +345,60 @@ public class SocraticTutorService
     {
         var feedback = new List<string>();
 
+        // Encouraging opening based on confidence level
         switch (analysis.ConfidenceLevel)
         {
             case ConfidenceLevel.High:
-                feedback.Add("Excellent thinking! You've demonstrated a solid understanding.");
+                var highEncouragements = new[] 
+                {
+                    "Excellent thinking! You've demonstrated a solid understanding.",
+                    "That's a thoughtful response! You're really grasping these concepts.",
+                    "Great insight! Your understanding is coming through clearly."
+                };
+                feedback.Add(highEncouragements[Random.Shared.Next(highEncouragements.Length)]);
                 break;
             case ConfidenceLevel.Medium:
-                feedback.Add("Good start! You're on the right track.");
+                var mediumEncouragements = new[]
+                {
+                    "Good start! You're on the right track.",
+                    "I can see you're thinking about this carefully. You're making progress!",
+                    "That's a solid foundation. Let's build on what you've shared."
+                };
+                feedback.Add(mediumEncouragements[Random.Shared.Next(mediumEncouragements.Length)]);
                 break;
             case ConfidenceLevel.Low:
-                feedback.Add("That's a beginning. Let's explore this further together.");
+                var lowEncouragements = new[]
+                {
+                    "That's a beginning. Let's explore this further together.",
+                    "I appreciate you sharing your thoughts. Every insight helps us learn.",
+                    "Let's work through this together. Your perspective is valuable."
+                };
+                feedback.Add(lowEncouragements[Random.Shared.Next(lowEncouragements.Length)]);
                 break;
         }
 
+        // Acknowledge what they got right
         if (analysis.ConceptsIdentified.Any())
         {
-            feedback.Add($"I notice you mentioned {string.Join(", ", analysis.ConceptsIdentified)}. That's important!");
+            var conceptAcknowledgments = new[]
+            {
+                $"I notice you mentioned {string.Join(", ", analysis.ConceptsIdentified)}. That's exactly what I was hoping to hear!",
+                $"You've identified key concepts: {string.Join(", ", analysis.ConceptsIdentified)}. Well done!",
+                $"Great! You're thinking about {string.Join(", ", analysis.ConceptsIdentified)} - these are crucial ideas."
+            };
+            feedback.Add(conceptAcknowledgments[Random.Shared.Next(conceptAcknowledgments.Length)]);
         }
 
+        // Guide toward missing concepts without being too direct
         if (analysis.ConceptsMissed.Any())
         {
-            feedback.Add($"Let's also think about {string.Join(", ", analysis.ConceptsMissed)}.");
+            var guidingQuestions = new[]
+            {
+                $"Now, let's also consider how {string.Join(", ", analysis.ConceptsMissed)} might fit into this picture.",
+                $"What do you think about the role of {string.Join(", ", analysis.ConceptsMissed)} in this context?",
+                $"I'm curious about your thoughts on {string.Join(", ", analysis.ConceptsMissed)} - how might that connect?"
+            };
+            feedback.Add(guidingQuestions[Random.Shared.Next(guidingQuestions.Length)]);
         }
 
         return string.Join(" ", feedback);
