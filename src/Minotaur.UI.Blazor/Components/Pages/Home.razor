@@ -1,7 +1,6 @@
 @page "/"
 @using Minotaur.Core
 @using Minotaur.Analysis.Symbolic
-@using Minotaur.Editor
 
 <PageTitle>Minotaur - Cognitive Graph Editor</PageTitle>
 
@@ -36,7 +35,7 @@
                 </div>
                 <div class="card-body">
                     <p><strong>CognitiveGraphNode Available:</strong> @(typeof(CognitiveGraphNode) != null ? "✅ Yes" : "❌ No")</p>
-                    <p><strong>GraphEditor Available:</strong> @(typeof(GraphEditor) != null ? "✅ Yes" : "❌ No")</p>
+                    <p><strong>Core Library Available:</strong> @(typeof(CognitiveGraphNode) != null ? "✅ Yes" : "❌ No")</p>
                     <p><strong>SymbolicAnalysisResult Available:</strong> @(typeof(SymbolicAnalysisResult) != null ? "✅ Yes" : "❌ No")</p>
                     <p><strong>Test Result:</strong> @testResult</p>
                     <button class="btn btn-primary" @onclick="RunTest">Test Core Functionality</button>
@@ -57,9 +56,6 @@
             var terminalNode = new TerminalNode("test", "identifier");
             var nonTerminalNode = new NonTerminalNode("TestRule", 0);
             nonTerminalNode.AddChild(terminalNode);
-            
-            // Test creating a graph editor
-            var editor = new GraphEditor(nonTerminalNode);
             
             // Test symbolic analysis result
             var analysisResult = new SymbolicAnalysisResult(

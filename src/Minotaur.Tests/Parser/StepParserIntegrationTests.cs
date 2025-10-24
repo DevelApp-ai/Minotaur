@@ -18,7 +18,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minotaur.Parser;
 using Minotaur.Core;
-using Minotaur.Editor;
 
 namespace Minotaur.Tests.Parser;
 
@@ -64,28 +63,6 @@ public class StepParserIntegrationTests
 
         // Assert
         Assert.IsNotNull(integration);
-    }
-
-    [TestMethod]
-    public async Task ParseToEditableGraphAsync_WithNullSource_ThrowsArgumentException()
-    {
-        // Arrange
-        using var integration = new StepParserIntegration();
-
-        // Act & Assert
-        await Assert.ThrowsExceptionAsync<ArgumentException>(
-            () => integration.ParseToEditableGraphAsync(null!));
-    }
-
-    [TestMethod]
-    public async Task ParseToEditableGraphAsync_WithEmptySource_ThrowsArgumentException()
-    {
-        // Arrange
-        using var integration = new StepParserIntegration();
-
-        // Act & Assert
-        await Assert.ThrowsExceptionAsync<ArgumentException>(
-            () => integration.ParseToEditableGraphAsync(string.Empty));
     }
 
     [TestMethod]
@@ -210,34 +187,5 @@ public class StepParserIntegrationTests
 
         // Assert
         Assert.AreSame(underlyingNode, node.UnderlyingNode);
-    }
-
-    [TestMethod]
-    public async Task UpdateGraphAsync_WithNewSourceCode_PreservesMetadata()
-    {
-        // Arrange
-        using var integration = new StepParserIntegration();
-
-        // Create initial graph (this will likely fail until StepParser APIs are properly integrated)
-        var initialSource = "var x = 42;";
-        var newSource = "var y = 24;";
-
-        try
-        {
-            using var initialEditor = await integration.ParseToEditableGraphAsync(initialSource);
-            initialEditor.Root!.Metadata["userAdded"] = "test";
-
-            // Act
-            using var updatedEditor = await integration.UpdateGraphAsync(initialEditor, newSource);
-
-            // Assert
-            Assert.IsTrue(updatedEditor.Root!.Metadata.ContainsKey("userAdded"));
-            Assert.AreEqual("test", updatedEditor.Root!.Metadata["userAdded"]);
-        }
-        catch (Exception)
-        {
-            // Expected until proper StepParser integration is complete
-            Assert.IsTrue(true, "Integration test expected to fail until StepParser APIs are properly integrated");
-        }
     }
 }

@@ -670,6 +670,6 @@ Effective maintenance practices ensure that embedded grammar parsing systems con
 - **Version:** 1.0.0
 - **Last Updated:** $(date)
 - **Author:** Manus AI
-- **License:** MIT License
+- **License:** GNU Affero General Public License v3.0 (AGPL-3.0)
 - **Repository:** https://github.com/DevelApp-ai/Minotaur
 

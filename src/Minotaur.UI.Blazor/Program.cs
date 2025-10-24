@@ -1,12 +1,8 @@
 using Minotaur.UI.Blazor.Components;
 using Minotaur.Core;
-using Minotaur.Editor;
 using Minotaur.Plugins;
 using Minotaur.GrammarGeneration;
 using Minotaur.Parser;
-using Minotaur.UI.Blazor.Api.Services;
-using Minotaur.UI.Blazor.Api.Hubs;
-using Minotaur.UI.Blazor.Api.GraphQL;
 
 namespace Minotaur.UI.Blazor;
 
@@ -22,29 +18,13 @@ public class Program
 
         // Register Minotaur services
         builder.Services.AddSingleton<LanguagePluginManager>();
-        builder.Services.AddScoped<GraphEditor>();
         builder.Services.AddScoped<GrammarGenerator>();
-
-        // Register API services
-        builder.Services.AddScoped<CognitiveGraphService>();
-        builder.Services.AddScoped<Minotaur.UI.Blazor.Services.CognitiveGraphApiService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.AuthenticationService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.MarketplaceService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.TemplateService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarSyntaxHighlightingService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarCodeCompletionService>();
         builder.Services.AddHttpClient();
-
-        // Add SignalR
-        builder.Services.AddSignalR();
-
-        // Add GraphQL
-        builder.Services
-            .AddGraphQLServer()
-            .AddQueryType<Query>()
-            .AddProjections()
-            .AddFiltering()
-            .AddSorting();
 
         var app = builder.Build();
 
@@ -60,12 +40,6 @@ public class Program
 
         app.UseStaticFiles();
         app.UseAntiforgery();
-
-        // Map GraphQL endpoint
-        app.MapGraphQL("/graphql");
-
-        // Map SignalR hubs
-        app.MapHub<CognitiveGraphHub>("/cognitive-graph-hub");
 
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
