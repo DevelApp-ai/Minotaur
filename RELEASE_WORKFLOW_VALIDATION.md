@@ -147,8 +147,9 @@ Ensure the following secrets are configured in GitHub repository settings:
 # List packages for organization repositories
 gh api /orgs/DevelApp-ai/packages?package_type=nuget
 
-# List packages for user repositories (if applicable)
-gh api /users/OWNER/packages?package_type=nuget
+# List packages for user repositories
+# Replace USERNAME with the actual GitHub username
+gh api /users/USERNAME/packages?package_type=nuget
 
 # Or visit in browser:
 # https://github.com/orgs/DevelApp-ai/packages?repo_name=Minotaur
@@ -156,10 +157,7 @@ gh api /users/OWNER/packages?package_type=nuget
 
 ### Check Package on NuGet.org
 ```bash
-# Search for package
-dotnet package search DevelApp.Minotaur
-
-# Or using nuget CLI directly
+# Search for package using NuGet CLI
 nuget search DevelApp.Minotaur
 
 # Or visit in browser:
