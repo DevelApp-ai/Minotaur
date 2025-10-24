@@ -179,9 +179,9 @@ dotnet test src/Minotaur.sln --collect:"XPlat Code Coverage"
 ## 🔗 Dependencies
 
 ### Core Dependencies
-- [DevelApp.CognitiveGraph 2.0.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph/)
-- [DevelApp.StepLexer 1.0.1](https://www.nuget.org/packages/DevelApp.StepLexer/)
-- [DevelApp.StepParser 1.0.1](https://www.nuget.org/packages/DevelApp.StepParser/)
+- [DevelApp.CognitiveGraph 1.0.2](https://www.nuget.org/packages/DevelApp.CognitiveGraph/) - Includes simplified GraphQL and fluid interface for high-speed integrations
+- [DevelApp.StepLexer 1.9.0](https://www.nuget.org/packages/DevelApp.StepLexer/)
+- [DevelApp.StepParser 1.9.0](https://www.nuget.org/packages/DevelApp.StepParser/)
 - [DevelApp.RuntimePluggableClassFactory 2.0.1](https://www.nuget.org/packages/DevelApp.RuntimePluggableClassFactory/)
 
 ### Optional Dependencies (for graph editing)

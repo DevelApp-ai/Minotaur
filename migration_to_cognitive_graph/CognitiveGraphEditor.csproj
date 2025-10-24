@@ -27,8 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="8.0.0" />
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.0.2" />
     <PackageReference Include="System.Collections.Concurrent" Version="8.0.0" />
   </ItemGroup>
 
