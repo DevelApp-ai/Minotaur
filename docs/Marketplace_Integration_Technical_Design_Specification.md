@@ -1139,7 +1139,7 @@ Content-Type: application/json
 
 {
   "visibility": "public",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "changelog": "Initial release"
 }
 

@@ -377,7 +377,7 @@ public class MarketplaceService
                     "Record types support",
                     "Pattern matching"
                 },
-                License = "MIT",
+                License = "AGPL-3.0-or-later",
                 PackageSize = "2.4 MB",
                 IsInstalled = false,
                 Dependencies = new List<DependencyInfo>
@@ -468,7 +468,7 @@ public class MarketplaceService
                     "Decorators",
                     "Import assertions"
                 },
-                License = "MIT",
+                License = "AGPL-3.0-or-later",
                 PackageSize = "2.8 MB",
                 IsInstalled = false
             }
@@ -566,7 +566,7 @@ public class MarketplaceService
                     "Azure deployment",
                     "Security scanning"
                 },
-                License = "MIT",
+                License = "AGPL-3.0-or-later",
                 PackageSize = "850 KB",
                 IsInstalled = false
             },
@@ -834,7 +834,7 @@ public class MarketplaceService
                 CreatedAt = DateTime.Now.AddMonths(-3),
                 Language = "TypeScript",
                 Tags = new[] { "react", "component", "typescript", "hooks", "modern" },
-                License = "MIT",
+                License = "AGPL-3.0-or-later",
                 ItemType = MarketplaceItemType.CodeTemplate,
                 PreviewImageUrl = "/images/templates/react-component-preview.png"
             },
@@ -854,7 +854,7 @@ public class MarketplaceService
                 CreatedAt = DateTime.Now.AddMonths(-5),
                 Language = "C#",
                 Tags = new[] { "api", "controller", "rest", "crud", "aspnet" },
-                License = "MIT",
+                License = "AGPL-3.0-or-later",
                 ItemType = MarketplaceItemType.CodeTemplate,
                 PreviewImageUrl = "/images/templates/api-controller-preview.png"
             },

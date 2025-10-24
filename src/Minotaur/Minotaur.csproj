@@ -15,7 +15,7 @@
     <Authors>DevelApp AI</Authors>
     <Company>DevelApp AI</Company>
     <Copyright>Copyright © 2024 DevelApp AI</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur2</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur2.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
