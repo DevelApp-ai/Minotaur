@@ -36,48 +36,20 @@ dotnet add package DevelApp.Minotaur
 
 ## 🔧 Quick Start
 
-### Basic Graph Editing
-
-**Note:** Graph editing functionality has been moved to the `DevelApp.CognitiveGraph.Editor` package for better separation of concerns.
-
-```bash
-dotnet add package DevelApp.CognitiveGraph.Editor
-```
-
-```csharp
-using CognitiveGraph.Editor;
-
-// Create a graph editor with a root node
-var root = new NonTerminalNode("expression", 0);
-var editor = new GraphEditor(root);
-
-// Add child nodes
-var left = new TerminalNode("identifier", "x");
-var op = new TerminalNode("operator", "+");
-var right = new LiteralNode("number", 42);
-
-editor.Root.AddChild(left);
-editor.Root.AddChild(op);
-editor.Root.AddChild(right);
-
-// Undo/Redo support
-Console.WriteLine($"Can undo: {editor.CanUndo}");
-```
-
 ### StepParser Integration
 
 ```csharp
-using CognitiveGraph.Editor; // Requires DevelApp.CognitiveGraph.Editor package
-using GolemCognitiveGraph.Parser;
-using GolemCognitiveGraph.Plugins;
+using Minotaur.Parser;
+using Minotaur.Plugins;
+using Minotaur.Core;
 
 // Create integration with plugin manager
 using var pluginManager = new LanguagePluginManager();
-using var integration = StepParserIntegrationFactory.CreateForFile("Example.cs", pluginManager);
+using var integration = new StepParserIntegration();
 
 // Parse source code to cognitive graph
 var sourceCode = "var x = 42;";
-var editor = await integration.ParseToEditableGraphAsync(sourceCode);
+var cognitiveGraph = await integration.ParseToCognitiveGraphAsync(sourceCode);
 
 // Edit the graph
 editor.Root?.AddChild(new TerminalNode("comment", "// Generated"));
@@ -137,11 +109,8 @@ Console.WriteLine($"Generated {backendRules.GenerationRules.Count} rules");
 
 ### Core Components
 
-- **StepParserIntegration**: Bridge between StepParser and cognitive graphs
 - **LanguagePluginManager**: Runtime plugin discovery and management
-- **ContextAwareEditor**: Advanced editing with location tracking (requires DevelApp.CognitiveGraph.Editor)
 - **PrecisionLocationTracker**: High-precision coordinate tracking
-- **GraphEditor**: Zero-copy graph modification with undo/redo (moved to DevelApp.CognitiveGraph.Editor)
 
 ### Architectural Separation
 
@@ -183,9 +152,6 @@ dotnet test src/Minotaur.sln --collect:"XPlat Code Coverage"
 - [DevelApp.StepLexer 1.9.0](https://www.nuget.org/packages/DevelApp.StepLexer/)
 - [DevelApp.StepParser 1.9.0](https://www.nuget.org/packages/DevelApp.StepParser/)
 - [DevelApp.RuntimePluggableClassFactory 2.0.1](https://www.nuget.org/packages/DevelApp.RuntimePluggableClassFactory/)
-
-### Optional Dependencies (for graph editing)
-- [DevelApp.CognitiveGraph.Editor 2.0.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph.Editor/) - Graph editing backend
 
 ## 📄 License
 

@@ -78,20 +78,6 @@ public partial class StepParserIntegration : IDisposable
     public LanguagePluginManager PluginManager => _pluginManager;
 
     /// <summary>
-    /// Parses source code into a cognitive graph using DevelApp.StepParser and creates a GraphEditor for manipulation.
-    /// NOTE: Parsing is handled entirely by StepParser - plugins are only used for unparsing.
-    /// </summary>
-    public async Task<GraphEditor> ParseToEditableGraphAsync(string sourceCode)
-    {
-        if (string.IsNullOrEmpty(sourceCode))
-            throw new ArgumentException("Source code cannot be null or empty", nameof(sourceCode));
-
-        // Parse using DevelApp.StepParser (this is where the actual parsing happens)
-        var rootNode = await ParseWithStepParserAsync(sourceCode);
-        return new GraphEditor(rootNode);
-    }
-
-    /// <summary>
     /// Parses source code and returns the raw cognitive graph without editor wrapper.
     /// Uses DevelApp.StepParser for all parsing operations.
     /// </summary>
@@ -102,22 +88,6 @@ public partial class StepParserIntegration : IDisposable
 
         // Parse using DevelApp.StepParser - this is the authoritative parser
         return await ParseWithStepParserAsync(sourceCode);
-    }
-
-    /// <summary>
-    /// Updates an existing cognitive graph by reparsing modified source code using StepParser
-    /// </summary>
-    public async Task<GraphEditor> UpdateGraphAsync(GraphEditor editor, string newSourceCode)
-    {
-        var newGraph = await ParseToEditableGraphAsync(newSourceCode);
-
-        // Preserve any metadata from the original graph
-        if (editor.Root != null && newGraph.Root != null)
-        {
-            PreserveMetadata(editor.Root, newGraph.Root);
-        }
-
-        return newGraph;
     }
 
     /// <summary>

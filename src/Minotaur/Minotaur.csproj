@@ -11,7 +11,7 @@
     <PackageId>DevelApp.Minotaur</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
     <Title>Minotaur Cognitive Graph Editor</Title>
-    <Description>A zero-copy cognitive graph unparser framework with StepParser integration, extensible plugin system, and advanced location tracking capabilities. Graph editing functionality moved to DevelApp.CognitiveGraph.Editor package.</Description>
+    <Description>A zero-copy cognitive graph unparser framework with StepParser integration, extensible plugin system, and advanced location tracking capabilities.</Description>
     <Authors>DevelApp AI</Authors>
     <Company>DevelApp AI</Company>
     <Copyright>Copyright © 2024 DevelApp AI</Copyright>
