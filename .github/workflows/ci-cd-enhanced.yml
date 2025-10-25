@@ -255,7 +255,6 @@ jobs:
   package:
     runs-on: ubuntu-latest
     needs: [calculate-version, build-and-test, code-quality, lint-and-format]
-    if: github.event_name != 'pull_request'
     outputs:
       package-path: ${{ steps.package.outputs.package-path }}
     steps:
