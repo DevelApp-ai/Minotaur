@@ -1,16 +1,16 @@
-# GrammarForge Capabilities for Real-Time Code Operations
+# Minotaur Capabilities for Real-Time Code Operations
 
 ## Core Architecture for Real-Time Operations
 
 ### 1. Step-by-Step Processing
-GrammarForge implements a **step-based parsing architecture** that enables real-time operations:
+Minotaur implements a **step-based parsing architecture** that enables real-time operations:
 
 - **StepLexer**: Tokenizes input character-by-character with multiple path support
 - **StepParser**: Processes tokens incrementally with parallel path management
 - **Real-time State Tracking**: Maintains current position, tokens, and valid terminals
 
 ### 2. Multi-Path Processing for Context Management
-Similar to refakts' approach to handling ambiguities, GrammarForge uses:
+Similar to refakts' approach to handling ambiguities, Minotaur uses:
 
 - **Lexer Path Management**: Multiple tokenization paths for ambiguous input
 - **Parser Path Splitting**: GLR parser-like approach for handling conflicts
@@ -18,7 +18,7 @@ Similar to refakts' approach to handling ambiguities, GrammarForge uses:
 - **Path Invalidation**: Discarding invalid paths to maintain clean context
 
 ### 3. Rule Activation Callbacks for Real-Time Response
-GrammarForge's callback system enables surgical operations:
+Minotaur's callback system enables surgical operations:
 
 ```typescript
 <rule-name> ::= <expression> => { 
@@ -44,7 +44,7 @@ Context-based switching enables real-time language transitions:
 
 ### Similarities to RefakTS "Clear Path" Philosophy
 
-| RefakTS Feature | GrammarForge Equivalent | Benefit |
+| RefakTS Feature | Minotaur Equivalent | Benefit |
 |----------------|------------------------|---------|
 | Location-based targeting | Position tracking in callbacks | Precise code element targeting |
 | Surgical operations | Rule activation callbacks | Minimal scope changes |
@@ -52,7 +52,7 @@ Context-based switching enables real-time language transitions:
 | AST manipulation | Grammar-driven parsing | Reliable language-aware operations |
 | Find-then-refactor workflow | Select-then-callback pattern | Two-step precision operations |
 
-### GrammarForge Advantages for Real-Time Operations
+### Minotaur Advantages for Real-Time Operations
 
 1. **Language Agnostic**: Works with any language defined by grammar
 2. **Multi-Language Support**: Handles embedded languages natively
