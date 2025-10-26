@@ -136,7 +136,7 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
 /* Present tense - regular verbs add -r or -er */
 <verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> )
 
-<regular-verb-present> ::= <verb-stem> /[er]/
+<regular-verb-present> ::= <verb-stem> ( "er" | "r" )
 
 /* Common regular verb stems */
 <verb-stem> ::= /[a-zæøå]+/
@@ -150,7 +150,7 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
 /* Regular past tense patterns */
 <regular-verb-past> ::= <verb-stem> <regular-past-suffix>
 
-<regular-past-suffix> ::= "ede" | "de" | "te" | "ede"
+<regular-past-suffix> ::= "ede" | "de" | "te"
 
 /* Irregular verbs in past tense - context sensitive with stem changes */
 <irregular-verb-past> ::= @IRREGULAR ( <irregular-past-strong> | <irregular-past-weak> )
