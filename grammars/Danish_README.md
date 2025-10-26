@@ -1,12 +1,13 @@
-# Comprehensive Danish Language Grammar
+# Comprehensive Danish Language Grammar with Sub-Sentences
 
-This grammar provides extensive coverage of the Danish language, from basic sentence structures to complex linguistic phenomena.
+This grammar provides extensive coverage of the Danish language, from basic sentence structures to complex multi-level nested sub-sentences and discourse structures.
 
 ## Grammar Size & Scope
 
-- **774 lines** of comprehensive grammar rules
-- **Comparable to major programming language grammars** (Python: 775 lines, C#: 932 lines)
-- **Production-ready** for natural language processing applications
+- **1,041 lines** of comprehensive grammar rules (expanded from 774 lines)
+- **35% larger than Python** (775 lines), **comparable to C#** (932 lines)
+- **Production-ready** for advanced natural language processing applications
+- **Supports nested sub-sentences** up to 3+ levels of embedding
 
 ## Core Features
 
@@ -180,7 +181,99 @@ i, på, til, fra, med, uden, om, over, under, ved, efter, før, mellem, gennem, 
 - **Negative correlatives**: hverken...eller (neither...nor)
 - **Scope**: Positioned in middle field, after finite verb
 
-### 11. Context-Sensitive Validation (9 rules)
+### 11. Nested Sub-Sentences and Complex Structures (NEW)
+
+#### Nested Subordinate Clauses
+Support for multiple levels of clause embedding:
+- **2-level nesting**: "Jeg tror, at han sagde, at hun kommer" (I think that he said that she is coming)
+- **3-level nesting**: "Han ved, at jeg tror, at hun sagde, at de kommer" (He knows that I think that she said that they are coming)
+- **4+ level nesting**: Supported with readability warnings
+
+#### Coordinated Subordinate Clauses
+Multiple subordinate clauses joined by conjunctions:
+- "Han sagde, at han vil komme, og at han vil hjælpe os" (He said that he will come and that he will help us)
+- "Jeg ved ikke, om han kommer, eller om hun går" (I don't know whether he is coming or whether she is going)
+
+#### Nested Relative Clauses
+Relative clauses containing subordinate clauses:
+- "Manden, som jeg mødte, fortalte mig, at hans søn vil komme hjem" (The man whom I met told me that his son will come home)
+- Multiple relative clauses in sequence
+
+#### Multi-Embedded Sentences
+Sentences with multiple embedding points:
+- Main clause + multiple subordinate clauses at different levels
+- Fronted subordinate + main + trailing subordinate
+- Complex patterns with mixed clause types
+
+#### Split Complex Sentences
+Subordinate clauses separated by main clause:
+- "Når det regner, går jeg hjem, fordi jeg ikke har paraply" (When it rains, I go home because I don't have an umbrella)
+
+#### Parenthetical Clauses
+Inserted remarks within main clause:
+- "Han kommer, tror jeg, i morgen" (He comes, I think, tomorrow)
+- Embedded comments and asides
+
+### 12. Advanced Clause Types (NEW)
+
+#### Complement Clauses
+- **That-clauses**: "at" + subordinate content
+- **Wh-clauses**: Embedded questions
+- **If/whether-clauses**: "om"/"hvis" + subordinate content
+- **Infinitival clauses**: "at" + infinitive + complements
+
+#### Cleft Sentences
+Focusing constructions:
+- **It-cleft**: "Det er Peter, som kom i går" (It is Peter who came yesterday)
+- **Pseudo-cleft**: "Hvad jeg vil have, er fred" (What I want is peace)
+
+#### Correlative Constructions
+Paired conjunctions:
+- **både...og** (both...and)
+- **enten...eller** (either...or)
+- **hverken...eller** (neither...nor)
+- **ikke bare...men også** (not only...but also)
+- **dels...dels** (partly...partly)
+- **jo...desto** (the more...the more)
+
+#### Reported Speech
+Direct and indirect discourse:
+- **Indirect statements**: "Han sagde, at han var træt" (He said that he was tired)
+- **Indirect questions**: "Hun spurgte, hvor han boede" (She asked where he lived)
+- **Free indirect speech**: Multiple main clauses representing internal thoughts
+
+#### Elliptical Structures
+Reduced clauses with missing elements:
+- **Elliptical coordination**: "Han kommer i dag, og hun i morgen" (He comes today, and she tomorrow)
+- **Elliptical responses**: Short answers with implied content
+
+#### Tag Questions
+Confirmation requests:
+- "Du kommer, ikke sandt?" (You're coming, aren't you?)
+- "Han er læge, vel?" (He is a doctor, right?)
+
+### 13. Discourse Structures (NEW)
+
+#### Discourse Markers
+Connecting ideas across sentences:
+- **Temporal**: først, derefter, så, til sidst, endelig, samtidig
+- **Causal**: derfor, således, følgelig, som følge heraf
+- **Contrastive**: derimod, til gengæld, på den anden side, alligevel, dog
+- **Additive**: desuden, endvidere, ydermere, ligeledes
+- **Conclusive**: altså, kort sagt, med andre ord
+
+#### Embedded Clause Sequences
+Multiple subordinate clauses in series:
+- Sequential embedding at same level
+- Coordination of embedded clauses
+- Mixed clause types in sequence
+
+#### Extraposed Clauses
+Postponed subordinate clauses with correlate pronoun:
+- "Det" as placeholder for later clause
+- Heavy constituent movement to final field
+
+### 14. Context-Sensitive Validation (15 rules)
 
 1. **Article-noun gender agreement**: Article gender must match noun
 2. **Subject-verb number agreement**: Subject and verb number should align
@@ -191,6 +284,12 @@ i, på, til, fra, med, uden, om, over, under, ved, efter, før, mellem, gennem, 
 7. **Possessive pronoun agreement**: Must match possessed noun
 8. **Passive voice formation**: Proper use of s-passive or blive-passive
 9. **Comparative/superlative context**: Appropriate use with 'end' and definiteness
+10. **Nested clause depth** (NEW): Warnings for deep nesting (>3 levels)
+11. **Subordinate word order** (NEW): Verb-final order in subordinate clauses
+12. **Correlative matching** (NEW): Paired conjunctions must match
+13. **Clause coherence** (NEW): Reference chains in complex sentences
+14. **Reported speech tense** (NEW): Tense consistency in indirect discourse
+15. **Extraposition validation** (NEW): Proper correlate pronoun usage
 
 ## Advanced Linguistic Features
 
@@ -260,33 +359,42 @@ All patterns support full Danish orthography (a-z, æ, ø, å).
 
 ## Use Cases
 
-This comprehensive grammar enables:
+This comprehensive grammar with sub-sentence support enables:
 
-1. **Natural Language Processing**: Parse and analyze Danish text
-2. **Grammar Checking**: Validate Danish writing for correctness
-3. **Language Learning**: Teach Danish grammar systematically
-4. **Translation Systems**: Source/target language for MT systems
-5. **Linguistic Research**: Analyze Danish language patterns
-6. **Text Generation**: Generate grammatically correct Danish
-7. **Syntax Highlighting**: Advanced editors for Danish text
-8. **Speech Recognition**: Constraint-based language modeling
-9. **Dependency Parsing**: Full syntactic analysis
-10. **Semantic Analysis**: Foundation for meaning extraction
+1. **Natural Language Processing**: Parse and analyze complex Danish text with nested structures
+2. **Grammar Checking**: Validate Danish writing for correctness including deep clause nesting
+3. **Language Learning**: Teach Danish grammar systematically including complex constructions
+4. **Translation Systems**: Source/target language for MT systems with full structural support
+5. **Linguistic Research**: Analyze Danish language patterns and discourse structures
+6. **Text Generation**: Generate grammatically correct Danish with complex sentence structures
+7. **Syntax Highlighting**: Advanced editors for Danish text with nested highlighting
+8. **Speech Recognition**: Constraint-based language modeling for complex utterances
+9. **Dependency Parsing**: Full syntactic analysis including multi-level dependencies
+10. **Semantic Analysis**: Foundation for meaning extraction from complex sentences
+11. **Discourse Analysis** (NEW): Track reference chains and coherence across sub-sentences
+12. **Argument Structure Analysis** (NEW): Analyze complement clauses and their arguments
 
 ## Coverage Comparison
 
-| Feature | Basic Grammar | Comprehensive Grammar |
-|---------|---------------|----------------------|
-| Lines of code | 303 | 774 |
-| Verb tenses | 3 | 6 |
-| Irregular verbs | 9 | 25+ |
-| Voice types | 1 | 3 |
-| Pronoun types | 4 | 7 |
-| Adverb categories | 4 | 6 |
-| Prepositions | 20 | 45+ |
-| Clause types | 4 | 12+ |
-| Context rules | 4 | 9 |
-| Quantifiers | 0 | 20+ |
+| Feature | Basic Grammar | Comprehensive Grammar | With Sub-Sentences |
+|---------|---------------|----------------------|--------------------|
+| Lines of code | 303 | 774 | 1,041 |
+| Verb tenses | 3 | 6 | 6 |
+| Subordinate clause types | 4 | 7 | 9 |
+| Nesting levels | 1 | 2 | 3+ |
+| Clause coordination | Basic | Advanced | Full |
+| Discourse structures | 0 | 0 | 7 types |
+| Elliptical structures | 0 | 0 | Supported |
+| Cleft sentences | 0 | 0 | Supported |
+| Tag questions | 0 | 0 | Supported |
+| Reported speech | 0 | 0 | Full support |
+| Context rules | 4 | 9 | 15 |
+| Irregular verbs | 9 | 25+ | 25+ |
+| Voice types | 1 | 3 | 3 |
+| Pronoun types | 4 | 7 | 7 |
+| Adverb categories | 4 | 6 | 6 |
+| Prepositions | 20 | 45+ | 45+ |
+| Quantifiers | 0 | 20+ | 20+ |
 
 ## Example Sentences
 
@@ -295,12 +403,18 @@ See `Danish_Examples.txt` for 300+ validated sentences demonstrating:
 - Gender and number agreement
 - V2 word order variations
 - Passive voice constructions
-- Relative and subordinate clauses
+- Relative and subordinate clauses (including nested)
 - Comparative and superlative forms
 - Reflexive and reciprocal constructions
 - Compound nouns and genitive case
 - Complex multi-clause sentences
 - Topicalization and inversion
+- **Nested sub-sentences** (2, 3, 4+ levels)
+- **Coordinated subordinate clauses**
+- **Cleft sentences and correlative constructions**
+- **Reported speech and indirect discourse**
+- **Elliptical structures and tag questions**
+- **Discourse markers and connectives**
 
 ## References
 
