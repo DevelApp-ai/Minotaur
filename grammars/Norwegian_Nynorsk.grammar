@@ -1,11 +1,33 @@
-// Norwegian Nynorsk Grammar
-// Comprehensive grammar for Norwegian Nynorsk (dialect-based standard)
-// CEBNF Format with Context-Sensitive Rules
+/*
+ * Norwegian Nynorsk Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Norwegian Nynorsk language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Full noun system (3 genders: masculine, feminine, neuter, 2 numbers)
+ * - Strong and weak adjective declensions
+ * - Context-sensitive agreement rules (gender, number, definiteness)
+ * - V2 word order and topicalization
+ * - Relative clauses and complex subordinate structures
+ * - Multiple tenses (present, past, perfect, pluperfect, future)
+ * - Regional variety distinctions (Western, Central, Northern)
+ * - Dialect-based standard with preserved gender distinctions
+ * 
+ * Copyright (C) 2024 Minotaur Project
+ * Licensed under GNU Affero General Public License v3.0 (AGPL-3.0)
+ */
 
-GRAMMAR Norwegian_Nynorsk
+Grammar: Norwegian_Nynorsk
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
 
-// Token splitting configuration for natural language
-TOKEN_SPLIT " "
+Keywords: og, eller, men, viss, når, fordi, at, som, der, det, den, dei, eg, du, han, ho, vi, de, dykk, meg, deg, henne, oss, min, din, hans, hennar, vår, dykkar, deira, denne, dette, desse, ein, ei, eit, ikkje, kan, vil, skal, må, ha, vere, bli, seg, kvarandre, nei, ja, kanskje, altså, òg, heller, jo, vel, nok, berre, jammen
+
+/* Variety markers for Norwegian Nynorsk regional forms */
+@VARIETY[western]    /* Western Nynorsk - Vestlandsk basis */
+@VARIETY[central]    /* Central/Trøndelag Nynorsk */
+@VARIETY[northern]   /* Northern Nynorsk - Nord-Norge influence */
 
 // ============================================================================
 // SENTENCE STRUCTURES
