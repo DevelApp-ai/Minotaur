@@ -29,31 +29,6 @@ Keywords: ok, eða, en, ef, at, er, var, vera, hafa, með, þú, hann, hon, þat
 @BRANCH[east_norse]    /* East Norse - Denmark, Sweden, Eastern settlements */
 
 // ============================================================================
-// SENTENCE STRUCTURES
-// ============================================================================
-
-<sentence> ::= <declarative-sentence>
-            | <interrogative-sentence>
-            | <imperative-sentence>
-            | <compound-sentence>
-            | <complex-sentence>
-
-<declarative-sentence> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]* "."
-
-<interrogative-sentence> ::= <question-word> <verb> <subject-np> [ <object-np> ]* "?"
-                          | <verb> <subject-np> [ <object-np> ]* "?"
-
-<imperative-sentence> ::= <imperative-verb> [ <object-np> ]* "!"
-
-<compound-sentence> ::= <declarative-sentence> <coordinating-conjunction> <declarative-sentence>
-
-<complex-sentence> ::= <main-clause> <subordinating-conjunction> <subordinate-clause>
-
-<main-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
-
-<subordinate-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
-
-// ============================================================================
 // NOUN PHRASES (4 cases, 3 genders, 3 numbers including dual)
 // ============================================================================
 
@@ -646,7 +621,7 @@ ei"
 
 /* Strong verb class 1 (í → ei → i) */
 <strong-class-1-examples> ::= @VERB_CLASS[1] ( "bíta" | "beit" | "bitu" | "bitinn" )  // bite
-                           | @VERB_CLASS[1] ( "ríða" | "reiðˮ" | "riðu" | "riðinn" )  // ride
+                           | @VERB_CLASS[1] ( "ríða" | "reiðr" | "riðu" | "riðinn" )  // ride
                            | @VERB_CLASS[1] ( "skína" | "skein" | "skinu" | "skininn" )  // shine
 
 /* Strong verb class 2 (jú → au → u) */
@@ -712,12 +687,6 @@ ei"
 <noun-neut-weak-acc-pl> ::= "hjörtu" @GENDER[neuter] @NUMBER[plural] @CASE[accusative] @DECLENSION[weak]
 <noun-neut-weak-dat-pl> ::= "hjörtum" @GENDER[neuter] @NUMBER[plural] @CASE[dative] @DECLENSION[weak]
 <noun-neut-weak-gen-pl> ::= "hjartna" @GENDER[neuter] @NUMBER[plural] @CASE[genitive] @DECLENSION[weak]
-
-// ============================================================================
-// WHITESPACE
-// ============================================================================
-
-<whitespace> ::= /[ \t\n\r]+/
 
 // V2 WORD ORDER RULE (Verb-Second)
 // Old Norse follows V2 word order in main clauses
