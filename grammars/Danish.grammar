@@ -1,0 +1,303 @@
+Grammar: Danish
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Danish Natural Language Grammar
+ * 
+ * This grammar covers Danish language sentence structures with:
+ * - Regular and irregular verb conjugations
+ * - Context-sensitive agreement rules
+ * - Full regular expression support for morphological patterns
+ * - Common and neuter gender agreement
+ * - Definite and indefinite forms
+ * - Multiple tenses (present, past, future, perfect)
+ */
+
+Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du, han, hun, vi, I, de, mig, dig, ham, hende, os, jer, dem, min, din, hans, hendes, vores, jeres, deres, denne, dette, disse, en, et, ikke, kan, vil, skal, må, have, være, blive
+
+/* Top-level sentence structure */
+<sentence> ::= <declarative-sentence>
+            | <interrogative-sentence>
+            | <imperative-sentence>
+            | <compound-sentence>
+
+<declarative-sentence> ::= <subject> <opt-whitespace> <predicate> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+<interrogative-sentence> ::= <question-word>? <opt-whitespace> <verb> <opt-whitespace> <subject> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? "?"
+
+<imperative-sentence> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? "!"?
+
+<compound-sentence> ::= <sentence> <opt-whitespace> <conjunction> <opt-whitespace> <sentence>
+
+/* Subject */
+<subject> ::= <pronoun>
+           | <noun-phrase>
+           | <proper-noun>
+
+<pronoun> ::= <personal-pronoun>
+           | <possessive-pronoun>
+           | <demonstrative-pronoun>
+           | <relative-pronoun>
+
+<personal-pronoun> ::= "jeg" | "du" | "han" | "hun" | "den" | "det" | "vi" | "I" | "de"
+
+<possessive-pronoun> ::= "min" | "mit" | "mine" | "din" | "dit" | "dine" | "hans" | "hendes" | "dens" | "dets" | "vores" | "jeres" | "deres"
+
+<demonstrative-pronoun> ::= "denne" | "dette" | "disse" | "den" | "det" | "de"
+
+<relative-pronoun> ::= "som" | "der" | "hvis" | "hvem" | "hvad"
+
+/* Noun Phrase with gender agreement */
+<noun-phrase> ::= <article>? <opt-whitespace> <adjective>* <opt-whitespace> <noun>
+
+<article> ::= <indefinite-article> | <definite-article>
+
+/* Indefinite articles with gender marking */
+<indefinite-article> ::= @GENDER[common] "en"
+                      | @GENDER[neuter] "et"
+
+/* Definite articles are suffixed in Danish, handled through noun forms */
+<definite-article> ::= ""
+
+/* Nouns with definite/indefinite and plural forms */
+<noun> ::= <noun-common-indef>
+        | <noun-neuter-indef>
+        | <noun-common-def>
+        | <noun-neuter-def>
+        | <noun-plural>
+
+/* Regular common gender nouns (en-words) */
+<noun-common-indef> ::= @GENDER[common] @NUMBER[singular] @DEFINITENESS[indefinite] <common-noun-stem>
+
+<noun-common-def> ::= @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite] <common-noun-stem> "en"
+
+/* Regular neuter gender nouns (et-words) */
+<noun-neuter-indef> ::= @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[indefinite] <neuter-noun-stem>
+
+<noun-neuter-def> ::= @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite] <neuter-noun-stem> "et"
+
+/* Plural forms */
+<noun-plural> ::= @NUMBER[plural] ( <common-noun-stem> | <neuter-noun-stem> ) <plural-suffix>
+
+<plural-suffix> ::= "er" | "e" | "r" | ""
+
+/* Common noun stems - using regex for pattern matching */
+<common-noun-stem> ::= /[a-zæøå]+/
+
+<neuter-noun-stem> ::= /[a-zæøå]+/
+
+<proper-noun> ::= /[A-ZÆØÅ][a-zæøå]*/
+
+/* Adjectives with agreement */
+<adjective> ::= <adjective-common>
+             | <adjective-neuter>
+             | <adjective-plural>
+             | <adjective-definite>
+
+<adjective-common> ::= @AGREEMENT[common] <adjective-stem>
+
+<adjective-neuter> ::= @AGREEMENT[neuter] <adjective-stem> "t"?
+
+<adjective-plural> ::= @AGREEMENT[plural] <adjective-stem> "e"?
+
+<adjective-definite> ::= @AGREEMENT[definite] <adjective-stem> "e"
+
+<adjective-stem> ::= /[a-zæøå]+/
+
+/* Predicate */
+<predicate> ::= <verb-phrase>
+
+<verb-phrase> ::= <auxiliary-verb>? <opt-whitespace> <main-verb> <opt-whitespace> <adverb>?
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= <modal-verb>
+                  | <have-verb>
+                  | <be-verb>
+                  | <become-verb>
+
+<modal-verb> ::= <modal-present> | <modal-past>
+
+<modal-present> ::= "kan" | "vil" | "skal" | "må" | "bør" | "tør"
+
+<modal-past> ::= "kunne" | "ville" | "skulle" | "måtte" | "burde" | "turde"
+
+/* Main verb with tense marking */
+<main-verb> ::= <verb-present>
+             | <verb-past>
+             | <verb-perfect>
+             | <verb-infinitive>
+
+/* Regular verb conjugations using regex patterns */
+<verb-infinitive> ::= "at" <opt-whitespace> <verb-stem>
+
+/* Present tense - regular verbs add -r or -er */
+<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> )
+
+<regular-verb-present> ::= <verb-stem> /[er]/
+
+/* Common regular verb stems */
+<verb-stem> ::= /[a-zæøå]+/
+
+/* Irregular verbs in present tense - context sensitive */
+<irregular-verb-present> ::= @IRREGULAR "er" | "har" | "bliver" | "går" | "kommer" | "ved" | "gør" | "får" | "ser" | "giver" | "siger" | "tager" | "finder" | "står" | "sidder" | "ligger"
+
+/* Past tense - regular verbs add -(e)de or -(e)te */
+<verb-past> ::= @TENSE[past] ( <regular-verb-past> | <irregular-verb-past> )
+
+/* Regular past tense patterns */
+<regular-verb-past> ::= <verb-stem> <regular-past-suffix>
+
+<regular-past-suffix> ::= "ede" | "de" | "te" | "ede"
+
+/* Irregular verbs in past tense - context sensitive with stem changes */
+<irregular-verb-past> ::= @IRREGULAR ( <irregular-past-strong> | <irregular-past-weak> )
+
+/* Strong irregular verbs (vowel change) */
+<irregular-past-strong> ::= "var" | "havde" | "blev" | "gik" | "kom" | "vidste" | "gjorde" | "fik" | "så" | "gav" | "sagde" | "tog" | "fandt" | "stod" | "sad" | "lå"
+
+/* Weak irregular verbs */
+<irregular-past-weak> ::= "kunne" | "ville" | "skulle" | "måtte" | "burde" | "turde"
+
+/* Perfect tense - har/er + past participle */
+<verb-perfect> ::= @TENSE[perfect] <perfect-auxiliary> <opt-whitespace> <past-participle>
+
+<perfect-auxiliary> ::= "har" | "er"
+
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle>
+
+/* Regular past participles */
+<regular-past-participle> ::= <verb-stem> "et" | <verb-stem> "t"
+
+/* Irregular past participles - context sensitive */
+<irregular-past-participle> ::= @IRREGULAR "været" | "haft" | "blevet" | "gået" | "kommet" | "vidst" | "gjort" | "fået" | "set" | "givet" | "sagt" | "taget" | "fundet" | "stået" | "siddet" | "ligget"
+
+/* Common 'have' verb conjugations */
+<have-verb> ::= <have-present> | <have-past> | <have-perfect>
+
+<have-present> ::= @TENSE[present] "har"
+
+<have-past> ::= @TENSE[past] "havde"
+
+<have-perfect> ::= @TENSE[perfect] "har" <opt-whitespace> "haft"
+
+/* Common 'be' verb conjugations */
+<be-verb> ::= <be-present> | <be-past> | <be-perfect>
+
+<be-present> ::= @TENSE[present] "er"
+
+<be-past> ::= @TENSE[past] "var"
+
+<be-perfect> ::= @TENSE[perfect] "har" <opt-whitespace> "været"
+
+/* Common 'become' verb conjugations */
+<become-verb> ::= <become-present> | <become-past> | <become-perfect>
+
+<become-present> ::= @TENSE[present] "bliver"
+
+<become-past> ::= @TENSE[past] "blev"
+
+<become-perfect> ::= @TENSE[perfect] "er" <opt-whitespace> "blevet"
+
+/* Imperative form - base verb stem */
+<verb-imperative> ::= <verb-stem> | <irregular-imperative>
+
+<irregular-imperative> ::= "vær" | "hav" | "bliv"
+
+/* Object */
+<object> ::= <noun-phrase>
+          | <pronoun>
+          | <clause>
+
+<clause> ::= "at" <opt-whitespace> <sentence>
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+             | <adverb-clause>
+
+<adverb> ::= <time-adverb>
+          | <place-adverb>
+          | <manner-adverb>
+          | <degree-adverb>
+
+<time-adverb> ::= "nu" | "da" | "så" | "altid" | "aldrig" | "ofte" | "sjældent" | "snart" | "senere" | "tidligere" | "i går" | "i dag" | "i morgen"
+
+<place-adverb> ::= "her" | "der" | "hvor" | "hjem" | "ud" | "ind" | "op" | "ned" | "oppe" | "nede" | "ude" | "inde"
+
+<manner-adverb> ::= "godt" | "dårligt" | "hurtigt" | "langsomt" | "let" | "svært" | "sammen" | "alene"
+
+<degree-adverb> ::= "meget" | "lidt" | "for" | "så" | "ret" | "ganske" | "helt" | "næsten"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "i" | "på" | "til" | "fra" | "med" | "uden" | "om" | "over" | "under" | "ved" | "efter" | "før" | "mellem" | "gennem" | "hos" | "af" | "for" | "mod" | "bag" | "foran"
+
+/* Adverb clauses */
+<adverb-clause> ::= <subordinating-conjunction> <opt-whitespace> <sentence>
+
+<subordinating-conjunction> ::= "når" | "da" | "hvis" | "fordi" | "selvom" | "mens" | "inden" | "efter" | "så" | "at"
+
+/* Question words */
+<question-word> ::= "hvem" | "hvad" | "hvor" | "hvordan" | "hvorfor" | "hvornår" | "hvilken" | "hvilket" | "hvilke"
+
+/* Conjunctions */
+<conjunction> ::= "og" | "eller" | "men" | "for" | "så" | "samt" | "enten" | "hverken"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Whitespace handling */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+/* Gender agreement between article and noun */
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER
+    THEN VALID
+    ELSE ERROR "Article and noun gender must agree"
+
+/* Number agreement between subject and verb */
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@NUMBER == <verb>.@NUMBER OR <subject> == <pronoun>
+    THEN VALID
+    ELSE WARNING "Consider subject-verb number agreement"
+
+/* Adjective-noun agreement */
+@CONTEXT_RULE[adjective-noun-agreement]:
+    IF <adjective>.@AGREEMENT == <noun>.@GENDER OR <noun>.@DEFINITENESS == "definite"
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun gender/definiteness"
+
+/* Auxiliary verb tense compatibility */
+@CONTEXT_RULE[auxiliary-tense-agreement]:
+    IF <auxiliary-verb>.@TENSE IS_COMPATIBLE_WITH <main-verb>.@TENSE
+    THEN VALID
+    ELSE ERROR "Auxiliary and main verb tenses incompatible"
+
+/* Example sentences demonstrating regular and irregular verbs:
+ *
+ * Regular verbs:
+ * - "Jeg arbejder i København" (I work in Copenhagen) - present regular
+ * - "Han arbejdede i går" (He worked yesterday) - past regular
+ * - "Vi har arbejdet hele dagen" (We have worked all day) - perfect regular
+ *
+ * Irregular verbs:
+ * - "Hun er lærer" (She is a teacher) - present irregular 'være'
+ * - "De var hjemme" (They were home) - past irregular 'være'
+ * - "Jeg har været i Paris" (I have been in Paris) - perfect irregular 'være'
+ * - "Han går til skole" (He goes to school) - present irregular 'gå'
+ * - "Hun gik hjem" (She went home) - past irregular 'gå'
+ * - "Vi har gået meget" (We have walked a lot) - perfect irregular 'gå'
+ *
+ * Context-sensitive examples:
+ * - "En stor hund" (A big dog - common gender agreement)
+ * - "Et stort hus" (A big house - neuter gender agreement)
+ * - "Den store hund" (The big dog - definite form)
+ * - "Det store hus" (The big house - definite form)
+ */

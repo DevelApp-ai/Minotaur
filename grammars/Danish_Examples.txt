@@ -1,0 +1,356 @@
+# Danish Language Example Sentences
+# Demonstrating Regular and Irregular Verbs with Context-Sensitive Rules
+
+## Regular Verbs - Present Tense
+
+Jeg arbejder.
+Du arbejder.
+Han arbejder i København.
+Hun studerer dansk.
+Vi læser en bog.
+I skriver et brev.
+De spiser morgenmad.
+Jeg snakker med ham.
+Du lytter til musik.
+Han bor i Danmark.
+
+## Regular Verbs - Past Tense
+
+Jeg arbejdede i går.
+Du studerede hele natten.
+Han spillede fodbold.
+Hun ringede til mig.
+Vi boede i Paris.
+I besøgte museet.
+De rejste til Tyskland.
+Jeg malede huset.
+Du åbnede døren.
+Han lukkede vinduet.
+
+## Regular Verbs - Perfect Tense
+
+Jeg har arbejdet hele dagen.
+Du har studeret dansk i to år.
+Han har spillet godt.
+Hun har ringet tre gange.
+Vi har boet her længe.
+I har besøgt mange steder.
+De har rejst meget.
+Jeg har malet værelset.
+Du har åbnet brevet.
+Han har lukket butikken.
+
+## Irregular Verb: være (to be)
+
+# Present
+Jeg er lærer.
+Du er student.
+Han er dansk.
+Hun er glad.
+Vi er venner.
+I er hjemme.
+De er i skole.
+
+# Past
+Jeg var træt.
+Du var her.
+Han var i byen.
+Hun var syg.
+Vi var sammen.
+I var på arbejde.
+De var på ferie.
+
+# Perfect
+Jeg har været i Paris.
+Du har været syg.
+Han har været her før.
+Hun har været meget hjælpsom.
+Vi har været på museum.
+I har været gode.
+De har været i Danmark.
+
+## Irregular Verb: have (to have)
+
+# Present
+Jeg har en hund.
+Du har en kat.
+Han har en bil.
+Hun har en cykel.
+Vi har tid.
+I har penge.
+De har børn.
+
+# Past
+Jeg havde en drøm.
+Du havde ret.
+Han havde en idé.
+Hun havde feber.
+Vi havde besøg.
+I havde problemer.
+De havde en fest.
+
+# Perfect
+Jeg har haft det godt.
+Du har haft chancen.
+Han har haft en hård dag.
+Hun har haft influenza.
+Vi har haft mange oplevelser.
+I har haft held.
+De har haft problemer.
+
+## Irregular Verb: blive (to become)
+
+# Present
+Jeg bliver læge.
+Du bliver gammel.
+Han bliver sur.
+Hun bliver glad.
+Vi bliver færdige snart.
+I bliver voksne.
+De bliver bedre.
+
+# Past
+Jeg blev overrasket.
+Du blev forsinket.
+Han blev ked af det.
+Hun blev syg.
+Vi blev enige.
+I blev trætte.
+De blev hjemme.
+
+# Perfect
+Jeg er blevet ældre.
+Du er blevet bedre.
+Han er blevet syg.
+Hun er blevet lærer.
+Vi er blevet færdige.
+I er blevet inviteret.
+De er blevet store.
+
+## Irregular Verb: gå (to go)
+
+# Present
+Jeg går til skole.
+Du går hjem.
+Han går i biografen.
+Hun går ture.
+Vi går i byen.
+I går på arbejde.
+De går tidligt.
+
+# Past
+Jeg gik en tur.
+Du gik hjem.
+Han gik til lægen.
+Hun gik forbi.
+Vi gik sammen.
+I gik ud.
+De gik til fods.
+
+# Perfect
+Jeg har gået meget.
+Du har gået forkert.
+Han har gået i skole.
+Hun har gået rundt.
+Vi har gået langt.
+I har gået hele vejen.
+De har gået hjem.
+
+## Irregular Verb: komme (to come)
+
+# Present
+Jeg kommer nu.
+Du kommer i morgen.
+Han kommer ofte.
+Hun kommer aldrig for sent.
+Vi kommer sammen.
+I kommer snart.
+De kommer ikke.
+
+# Past
+Jeg kom for sent.
+Du kom i går.
+Han kom løbende.
+Hun kom hjem.
+Vi kom til tiden.
+I kom først.
+De kom sidst.
+
+# Perfect
+Jeg er kommet hjem.
+Du er kommet tilbage.
+Han er kommet igen.
+Hun er kommet for at hjælpe.
+Vi er kommet langt.
+I er kommet godt fra start.
+De er kommet med tog.
+
+## Irregular Verb: se (to see)
+
+# Present
+Jeg ser filmen.
+Du ser godt ud.
+Han ser på tv.
+Hun ser frem til det.
+Vi ser hinanden.
+I ser stjernerne.
+De ser ikke noget.
+
+# Past
+Jeg så en film.
+Du så det ikke.
+Han så ud af vinduet.
+Hun så ham i går.
+Vi så koncerten.
+I så en fugl.
+De så ingenting.
+
+# Perfect
+Jeg har set det før.
+Du har set filmen.
+Han har set bedre dage.
+Hun har set ham.
+Vi har set meget.
+I har set alt.
+De har set verden.
+
+## Irregular Verb: give (to give)
+
+# Present
+Jeg giver dig en gave.
+Du giver ham et råd.
+Han giver hende blomster.
+Hun giver mig en bog.
+Vi giver dem penge.
+I giver os tid.
+De giver op.
+
+# Past
+Jeg gav ham pengene.
+Du gav mig ret.
+Han gav hende en ring.
+Hun gav os chancen.
+Vi gav dem besked.
+I gav jeres bedste.
+De gav efter.
+
+# Perfect
+Jeg har givet dig svaret.
+Du har givet dit bedste.
+Han har givet hende blomster.
+Hun har givet os håb.
+Vi har givet dem muligheden.
+I har givet meget.
+De har givet op.
+
+## Gender Agreement - Common Gender (en-words)
+
+en hund
+en stor hund
+den store hund
+en rød bil
+den røde bil
+en gammel mand
+den gamle mand
+en lille kat
+den lille kat
+en god ven
+den gode ven
+
+## Gender Agreement - Neuter Gender (et-words)
+
+et hus
+et stort hus
+det store hus
+et rødt æble
+det røde æble
+et gammelt træ
+det gamle træ
+et lille barn
+det lille barn
+et godt råd
+det gode råd
+
+## Modal Verbs with Regular Verbs
+
+Jeg kan arbejde.
+Du vil studere.
+Han skal komme.
+Hun må gå.
+Vi bør spise.
+I tør springe.
+De kunne læse.
+Jeg ville skrive.
+Du skulle ringe.
+
+## Modal Verbs with Irregular Verbs
+
+Jeg kan være der.
+Du vil have det.
+Han skal gå nu.
+Hun må komme med.
+Vi bør se filmen.
+I tør give det et forsøg.
+De kunne blive hjemme.
+Jeg ville se dig.
+Du skulle have sagt det.
+
+## Compound Sentences
+
+Jeg arbejder og hun studerer.
+Han går hjem men hun bliver.
+Vi spiser nu eller vi spiser senere.
+Du kan komme og jeg kan hjælpe.
+Hun er glad for det blev godt.
+
+## Interrogative Sentences
+
+Hvem er du?
+Hvad laver du?
+Hvor bor du?
+Hvordan har du det?
+Hvorfor kommer du ikke?
+Hvornår går du?
+Hvilket hus er dit?
+Kan du tale dansk?
+Vil du have kaffe?
+Skal vi gå nu?
+
+## Imperative Sentences
+
+Kom her!
+Gå væk!
+Se på mig!
+Hør efter!
+Læs bogen!
+Skriv dit navn!
+Spis din mad!
+Vær stille!
+Hav en god dag!
+Bliv her!
+
+## Subordinate Clauses
+
+Jeg ved at hun kommer.
+Han siger at han arbejder.
+Vi tror at de er hjemme.
+Hun håber at du kan komme.
+De ved at vi har set det.
+Jeg tænker at det er rigtigt.
+Du siger at hun er syg.
+
+## Conditional Sentences
+
+Hvis du kommer bliver vi glade.
+Når han arbejder er han fokuseret.
+Selvom hun er træt fortsætter hun.
+Fordi vi er venner hjælper jeg.
+Mens I spiser kan vi snakke.
+
+## Complex Sentences with Multiple Clauses
+
+Jeg ved at han siger at hun kommer.
+Når du arbejder og jeg studerer bliver vi trætte.
+Hvis vi går nu kan vi komme til tiden.
+Han siger at hun tror at de er hjemme.
+Vi håber at I kan komme når vi har fest.
