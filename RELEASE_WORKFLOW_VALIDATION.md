@@ -17,6 +17,7 @@ The CI/CD workflow (`ci-cd-enhanced.yml`) implements the following release strat
 Removed the `if: github.event_name != 'pull_request'` condition from the `package` job in `.github/workflows/ci-cd-enhanced.yml`.
 
 **Before:**
+{% raw %}
 ```yaml
 package:
   runs-on: ubuntu-latest
@@ -25,8 +26,10 @@ package:
   outputs:
     package-path: ${{ steps.package.outputs.package-path }}
 ```
+{% endraw %}
 
 **After:**
+{% raw %}
 ```yaml
 package:
   runs-on: ubuntu-latest
@@ -35,6 +38,7 @@ package:
   outputs:
     package-path: ${{ steps.package.outputs.package-path }}
 ```
+{% endraw %}
 
 ## Test Scenarios
 

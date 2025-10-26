@@ -1042,6 +1042,7 @@ Authorization: Bearer jwt-token
 
 ### 6.2 Marketplace Endpoints
 
+{% raw %}
 ```http
 GET /marketplace/search
 Query Parameters:
@@ -1108,6 +1109,7 @@ Response:
   }
 }
 ```
+{% endraw %}
 
 ### 6.3 Template Management Endpoints
 
