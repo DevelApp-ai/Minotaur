@@ -1,0 +1,269 @@
+// Norwegian Nynorsk Grammar
+// Comprehensive grammar for Norwegian Nynorsk (dialect-based standard)
+// CEBNF Format with Context-Sensitive Rules
+
+GRAMMAR Norwegian_Nynorsk
+
+// Token splitting configuration for natural language
+TOKEN_SPLIT " "
+
+// ============================================================================
+// SENTENCE STRUCTURES
+// ============================================================================
+
+<sentence> ::= <declarative-sentence>
+            | <interrogative-sentence>
+            | <imperative-sentence>
+            | <compound-sentence>
+            | <complex-sentence>
+
+<declarative-sentence> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]* "."
+
+<interrogative-sentence> ::= <question-word> <verb> <subject-np> [ <object-np> ]* "?"
+                          | <verb> <subject-np> [ <object-np> ]* "?"
+
+<imperative-sentence> ::= <imperative-verb> [ <object-np> ]* "!"
+
+<compound-sentence> ::= <declarative-sentence> <coordinating-conjunction> <declarative-sentence>
+
+<complex-sentence> ::= <main-clause> <subordinating-conjunction> <subordinate-clause>
+
+<main-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+
+<subordinate-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+
+// ============================================================================
+// NOUN PHRASES (3 genders: masculine, feminine, neuter)
+// ============================================================================
+
+<noun-phrase> ::= [ <article> ] [ <adjective> ] <noun>
+               | <pronoun>
+               | <proper-noun>
+
+// Indefinite articles (three genders preserved)
+<article-masc-sg> ::= "ein" @GENDER[masculine] @NUMBER[singular] @DEFINITENESS[indefinite]
+<article-fem-sg> ::= "ei" @GENDER[feminine] @NUMBER[singular] @DEFINITENESS[indefinite]
+<article-neut-sg> ::= "eit" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[indefinite]
+
+// Definite articles (suffixed)
+<definite-suffix-masc> ::= "en" @GENDER[masculine] @DEFINITENESS[definite]
+<definite-suffix-fem> ::= "a" @GENDER[feminine] @DEFINITENESS[definite]
+<definite-suffix-neut> ::= "et" @GENDER[neuter] @DEFINITENESS[definite]
+
+<article> ::= <article-masc-sg> | <article-fem-sg> | <article-neut-sg> | "den" | "det" | "dei"
+
+// ============================================================================
+// NOUNS (three genders: masculine, feminine, neuter)
+// ============================================================================
+
+// Masculine nouns (ein-words)
+<noun-masc> ::= "mann" @GENDER[masculine] @NUMBER[singular]  // man
+             | "mannen" @GENDER[masculine] @NUMBER[singular] @DEFINITENESS[definite]
+             | "menn" @GENDER[masculine] @NUMBER[plural]
+             | "mennene" @GENDER[masculine] @NUMBER[plural] @DEFINITENESS[definite]
+             | "gut" @GENDER[masculine] @NUMBER[singular]  // boy
+             | "guten" @GENDER[masculine] @NUMBER[singular] @DEFINITENESS[definite]
+             | "gutar" @GENDER[masculine] @NUMBER[plural]
+             | "gutane" @GENDER[masculine] @NUMBER[plural] @DEFINITENESS[definite]
+             | "hund" @GENDER[masculine] @NUMBER[singular]  // dog
+             | "hunden" @GENDER[masculine] @NUMBER[singular] @DEFINITENESS[definite]
+             | "hundar" @GENDER[masculine] @NUMBER[plural]
+             | "hundane" @GENDER[masculine] @NUMBER[plural] @DEFINITENESS[definite]
+             | "bil" @GENDER[masculine] @NUMBER[singular]  // car
+             | "bilen" @GENDER[masculine] @NUMBER[singular] @DEFINITENESS[definite]
+             | "bilar" @GENDER[masculine] @NUMBER[plural]
+             | "bilane" @GENDER[masculine] @NUMBER[plural] @DEFINITENESS[definite]
+
+// Feminine nouns (ei-words)
+<noun-fem> ::= "kvinne" @GENDER[feminine] @NUMBER[singular]  // woman
+            | "kvinna" @GENDER[feminine] @NUMBER[singular] @DEFINITENESS[definite]
+            | "kvinne" | "kvinnor" @GENDER[feminine] @NUMBER[plural]
+            | "kvinnene" @GENDER[feminine] @NUMBER[plural] @DEFINITENESS[definite]
+            | "bok" @GENDER[feminine] @NUMBER[singular]  // book
+            | "boka" @GENDER[feminine] @NUMBER[singular] @DEFINITENESS[definite]
+            | "bøker" @GENDER[feminine] @NUMBER[plural]
+            | "bøkene" @GENDER[feminine] @NUMBER[plural] @DEFINITENESS[definite]
+            | "jente" @GENDER[feminine] @NUMBER[singular]  // girl
+            | "jenta" @GENDER[feminine] @NUMBER[singular] @DEFINITENESS[definite]
+            | "jenter" @GENDER[feminine] @NUMBER[plural]
+            | "jentene" @GENDER[feminine] @NUMBER[plural] @DEFINITENESS[definite]
+
+// Neuter nouns (eit-words)
+<noun-neut> ::= "hus" @GENDER[neuter] @NUMBER[singular]  // house
+             | "huset" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+             | "hus" @GENDER[neuter] @NUMBER[plural]
+             | "husa" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+             | "barn" @GENDER[neuter] @NUMBER[singular]  // child
+             | "barnet" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+             | "barn" @GENDER[neuter] @NUMBER[plural]
+             | "barna" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+             | "land" @GENDER[neuter] @NUMBER[singular]  // country
+             | "landet" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+             | "land" @GENDER[neuter] @NUMBER[plural]
+             | "landa" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+
+<noun> ::= <noun-masc> | <noun-fem> | <noun-neut>
+
+// Genitive (possessive -s)
+<genitive-noun> ::= <noun> "s" @CASE[genitive]
+
+<proper-noun> ::= /[A-ZÆØÅ][a-zæøå]*/
+
+// ============================================================================
+// PRONOUNS (dialectal variations)
+// ============================================================================
+
+// Personal pronouns - alternative forms
+<pronoun-1sg> ::= "eg" | "jeg" @NUMBER[singular] @PERSON[1]
+<pronoun-2sg> ::= "du" @NUMBER[singular] @PERSON[2]
+<pronoun-3sg-masc> ::= "han" @NUMBER[singular] @PERSON[3] @GENDER[masculine]
+<pronoun-3sg-fem> ::= "ho" | "hun" @NUMBER[singular] @PERSON[3] @GENDER[feminine]
+<pronoun-3sg-neut> ::= "det" @NUMBER[singular] @PERSON[3] @GENDER[neuter]
+
+<pronoun-1pl> ::= "me" | "vi" @NUMBER[plural] @PERSON[1]
+<pronoun-2pl> ::= "de" | "dere" @NUMBER[plural] @PERSON[2]
+<pronoun-3pl> ::= "dei" | "de" @NUMBER[plural] @PERSON[3]
+
+// Object forms
+<pronoun-object-1sg> ::= "meg" @NUMBER[singular] @PERSON[1]
+<pronoun-object-2sg> ::= "deg" @NUMBER[singular] @PERSON[2]
+<pronoun-object-3sg-masc> ::= "han" | "honom" @NUMBER[singular] @PERSON[3] @GENDER[masculine]
+<pronoun-object-3sg-fem> ::= "ho" | "henne" @NUMBER[singular] @PERSON[3] @GENDER[feminine]
+<pronoun-object-3sg-neut> ::= "det" @NUMBER[singular] @PERSON[3] @GENDER[neuter]
+
+<pronoun-object-1pl> ::= "oss" @NUMBER[plural] @PERSON[1]
+<pronoun-object-2pl> ::= "dykk" | "dere" @NUMBER[plural] @PERSON[2]
+<pronoun-object-3pl> ::= "dei" | "dem" @NUMBER[plural] @PERSON[3]
+
+<pronoun> ::= <pronoun-1sg> | <pronoun-2sg> | <pronoun-3sg-masc> | <pronoun-3sg-fem> | <pronoun-3sg-neut>
+           | <pronoun-1pl> | <pronoun-2pl> | <pronoun-3pl>
+           | <pronoun-object-1sg> | <pronoun-object-2sg> | <pronoun-object-3sg-masc>
+           | <pronoun-object-3sg-fem> | <pronoun-object-3sg-neut>
+           | <pronoun-object-1pl> | <pronoun-object-2pl> | <pronoun-object-3pl>
+
+// Reflexive pronouns
+<reflexive-pronoun> ::= "meg" | "deg" | "seg" | "oss" | "dykk"
+
+// Possessive pronouns
+<possessive-pronoun> ::= "min" | "mitt" | "mine" | "din" | "ditt" | "dine"
+                      | "hans" | "hennar" | "hennes" | "sin" | "sitt" | "sine"
+                      | "vår" | "vårt" | "våre" | "dykkar" | "deira"
+
+// ============================================================================
+// ADJECTIVES (agree with noun in gender, number, definiteness)
+// ============================================================================
+
+<adjective> ::= "stor" | "stort" | "store"  // big
+             | "liten" | "lite" | "små"  // small
+             | "god" | "godt" | "gode"  // good
+             | "gammal" | "gammalt" | "gamle"  // old
+             | "ung" | "ungt" | "unge"  // young
+             | "norsk" | "norsk" | "norske"  // Norwegian
+             | "fin" | "fint" | "fine"  // nice
+
+// Comparative and superlative
+<adjective-comparative> ::= "større" | "mindre" | "betre" | "eldre" | "yngre"
+<adjective-superlative> ::= "størst" | "minst" | "best" | "eldst" | "yngst"
+
+// ============================================================================
+// VERB SYSTEM (dialectal forms)
+// ============================================================================
+
+<verb-phrase> ::= <verb> [ <adverb> ]*
+               | <auxiliary-verb> <past-participle>
+               | <modal-verb> <infinitive>
+
+// Present tense (distinctive Nynorsk forms)
+<verb-present> ::= <verb-stem> "ar" @TENSE[present]  // -ar ending (characteristic of Nynorsk)
+                | <verb-stem> "er" @TENSE[present]
+
+// Past tense
+<verb-past> ::= <verb-stem> "a" | <verb-stem> "de" | <verb-stem> "te" @TENSE[past]
+
+// Irregular verbs (Nynorsk forms)
+<irregular-verb-vere> ::= "er" @TENSE[present] | "var" @TENSE[past] | "vore" @TENSE[perfect]  // to be
+<irregular-verb-ha> ::= "har" @TENSE[present] | "hadde" @TENSE[past] | "hatt" @TENSE[perfect]  // to have
+<irregular-verb-bli> ::= "blir" @TENSE[present] | "vart" @TENSE[past] | "vorte" @TENSE[perfect]  // to become (note: vart/vorte)
+<irregular-verb-gå> ::= "går" @TENSE[present] | "gjekk" @TENSE[past] | "gått" @TENSE[perfect]  // to go
+<irregular-verb-kome> ::= "kjem" | "komer" @TENSE[present] | "kom" @TENSE[past] | "kome" @TENSE[perfect]  // to come
+<irregular-verb-sjå> ::= "ser" @TENSE[present] | "såg" @TENSE[past] | "sett" @TENSE[perfect]  // to see
+<irregular-verb-gjere> ::= "gjer" @TENSE[present] | "gjorde" @TENSE[past] | "gjort" @TENSE[perfect]  // to do
+<irregular-verb-seie> ::= "seier" @TENSE[present] | "sa" @TENSE[past] | "sagt" @TENSE[perfect]  // to say
+<irregular-verb-ta> ::= "tek" | "tar" @TENSE[present] | "tok" @TENSE[past] | "teke" | "tatt" @TENSE[perfect]  // to take
+<irregular-verb-vite> ::= "veit" @TENSE[present] | "visste" @TENSE[past] | "visst" @TENSE[perfect]  // to know
+
+<verb> ::= <verb-present> | <verb-past>
+        | <irregular-verb-vere> | <irregular-verb-ha> | <irregular-verb-bli>
+        | <irregular-verb-gå> | <irregular-verb-kome> | <irregular-verb-sjå>
+        | <irregular-verb-gjere> | <irregular-verb-seie> | <irregular-verb-ta> | <irregular-verb-vite>
+
+<verb-stem> ::= /[a-zæøå]+/
+
+// Auxiliary verbs
+<auxiliary-verb> ::= "har" | "hadde" | "er" | "var"
+
+// Modal verbs
+<modal-verb> ::= "kan" | "kunne"  // can
+              | "må" | "måtte"  // must
+              | "vil" | "ville"  // will
+              | "skal" | "skulle"  // shall
+              | "bør" | "burde"  // should
+
+<past-participle> ::= <verb-stem> "a" | <verb-stem> "t" | <verb-stem> "e"
+
+<infinitive> ::= "å" <verb-stem> "e" | "å" <verb-stem> "a"
+
+<imperative-verb> ::= <verb-stem> | <verb-stem> "e"
+
+// ============================================================================
+// ADVERBS
+// ============================================================================
+
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb>
+
+<time-adverb> ::= "no" | "nå" | "då" | "før" | "sidan" | "alltid" | "aldri"
+               | "i dag" | "i går" | "i morgon" | "i kveld"
+
+<place-adverb> ::= "her" | "der" | "heime" | "ute" | "inne"
+                | "ned" | "opp" | "fram" | "tilbake"
+
+<manner-adverb> ::= "godt" | "dårleg" | "fort" | "sakte" | "rett" | "gale"
+
+<degree-adverb> ::= "veldig" | "så" | "for" | "ganske" | "litt"
+
+// ============================================================================
+// PREPOSITIONS
+// ============================================================================
+
+<preposition> ::= "i" | "på" | "til" | "frå" | "med" | "av" | "for"
+               | "om" | "over" | "under" | "ved" | "hos" | "etter"
+               | "mot" | "gjennom" | "rundt" | "mellom"
+
+<prepositional-phrase> ::= <preposition> <noun-phrase>
+
+// ============================================================================
+// CONJUNCTIONS
+// ============================================================================
+
+<coordinating-conjunction> ::= "og" | "eller" | "men" | "for" | "så"
+
+<subordinating-conjunction> ::= "at" | "viss" | "hvis" | "når" | "fordi" | "sidan"
+                             | "sjølv om" | "før" | "etter" | "medan" | "mens"
+
+// ============================================================================
+// QUESTION WORDS
+// ============================================================================
+
+<question-word> ::= "kven" | "kva" | "når" | "kor" | "korleis" | "kvifor"
+                 | "kvilken" | "kva for ein"
+
+// ============================================================================
+// WHITESPACE AND PUNCTUATION
+// ============================================================================
+
+<whitespace> ::= /[ \t\n\r]+/
+
+// V2 WORD ORDER RULE (Verb-Second)
+// In main clauses, the finite verb must be in second position
+
+// END OF GRAMMAR
