@@ -1,45 +1,43 @@
-# Golem Cognitive Graph Editor & Unparser
+# Minotaur - Cognitive Graph Editing and Unparsing
 
-This implementation provides a zero-copy cognitive graph editing system and unparser based on the technical specification. It includes a sophisticated GraphEditor for performing surgical operations on cognitive graph structures and an Unparser for generating code from the graph.
+This implementation provides a cognitive graph editing system and unparser for the Minotaur compiler-compiler platform. It integrates with DevelApp.StepParser for parsing and provides language plugins for code generation.
 
 ## Architecture Overview
 
 ### Core Components
 
 #### 1. CognitiveGraphNode Base Class
-- **Zero-copy semantics**: Nodes maintain references without copying data
+- **Zero-copy semantics**: Nodes maintain references to underlying parser data
 - **Metadata support**: Extensible key-value metadata storage
 - **Source position tracking**: Location information for position-aware operations
 - **Visitor pattern support**: For traversal and transformation operations
 
-#### 2. GraphEditor Class
-- **Zero-copy modification operations**: Insert, remove, replace, move nodes
-- **Undo/redo support**: Full operation history with command pattern
-- **Node indexing**: Fast lookup by ID for efficient operations
-- **Thread-safe operations**: Concurrent access protection
+#### 2. StepParserIntegration
+- **Parsing via DevelApp.StepParser**: All parsing handled by StepParser NuGet package
+- **Cognitive graph generation**: Converts parse trees to cognitive graphs
+- **Validation support**: Source code validation and error reporting
 
 #### 3. GraphUnparser System
 - **Strategy-based unparsing**: Configurable output strategies per node type
-- **Format preservation**: Optional original formatting preservation
 - **Asynchronous support**: Non-blocking unparsing operations
-- **Stream output**: Direct writing to streams for large outputs
+- **Format preservation**: Maintains code formatting preferences
+
+#### 4. Language Plugin System
+- **Extensible plugins**: Support for multiple language backends
+- **Unparsing strategies**: Language-specific code generation
+- **Compiler backend rules**: Generate code generation templates
 
 ### Key Features
 
 #### Zero-Copy Architecture
 - **Memory efficiency**: Nodes reference existing data without duplication
 - **Performance optimization**: Minimal memory allocation during operations
-- **Direct manipulation**: Edit operations work on original structures
+- **Direct manipulation**: Edit operations work on cognitive graph structures
 
-#### Context-Aware Editing
-- **Metadata preservation**: Node metadata maintained during operations
+#### Direct Graph Editing
+- **Node manipulation**: Add, remove, and modify graph nodes
 - **Structural integrity**: Parent-child relationships automatically managed
 - **Position tracking**: Source location information preserved
-
-#### Advanced Operations
-- **Surgical editing**: Precise node-level modifications
-- **Bulk operations**: Efficient multi-node transformations
-- **History management**: Complete undo/redo with operation tracking
 
 ## Node Types
 
@@ -54,119 +52,88 @@ This implementation provides a zero-copy cognitive graph editing system and unpa
 
 ## Usage Examples
 
-### Basic Graph Construction
+### Basic Graph Construction and Parsing
 ```csharp
-using GolemCognitiveGraph.Core;
-using GolemCognitiveGraph.Editor;
+using Minotaur.Core;
+using Minotaur.Parser;
+using Minotaur.Plugins;
 
-// Create expression: x + 5
-var root = new NonTerminalNode("expression");
-using var editor = new GraphEditor(root);
+// Parse source code to cognitive graph
+using var integration = new StepParserIntegration();
+var sourceCode = "var x = 42;";
+var graph = await integration.ParseToCognitiveGraphAsync(sourceCode);
 
-var x = new IdentifierNode("x");
-var plus = new TerminalNode("+", "operator");
-var five = new LiteralNode("5", "number", 5);
-
-editor.InsertNode(root.Id, x);
-editor.InsertNode(root.Id, plus);
-editor.InsertNode(root.Id, five);
+// Edit the graph
+var comment = new TerminalNode("comment", "// Generated code");
+graph.AddChild(comment);
 ```
 
-### Zero-Copy Editing Operations
+### Code Generation with Language Plugins
 ```csharp
-// Replace a node while preserving children
-var replacement = new IdentifierNode("y");
-editor.ReplaceNode(x.Id, replacement, preserveChildren: true);
+using Minotaur.Plugins;
 
-// Move a node to new parent
-editor.MoveNode(five.Id, newParent.Id);
+// Get language plugin
+var pluginManager = new LanguagePluginManager();
+var csharpPlugin = pluginManager.GetPlugin("csharp");
 
-// Undo/redo operations
-editor.Undo();
-editor.Redo();
+// Generate code from graph
+var code = await csharpPlugin.UnparseAsync(graph);
 ```
 
-### Code Generation
+### Custom Unparsing Strategies
 ```csharp
-using GolemCognitiveGraph.Unparser;
+using Minotaur.Unparser;
 
 var config = new UnparseConfiguration
 {
     FormatOutput = true,
-    IncludeComments = true,
-    MaxLineLength = 120
+    IncludeComments = true
 };
 
 using var unparser = new GraphUnparser(config);
 var code = await unparser.UnparseAsync(root);
 ```
 
-### Custom Unparsing Strategies
-```csharp
-public class CustomStrategy : IUnparseStrategy
-{
-    public void UnparseNode(CognitiveGraphNode node, UnparseContext context)
-    {
-        // Custom unparsing logic
-        context.Write($"CUSTOM[{node.NodeType}]");
-    }
-}
-
-unparser.RegisterStrategy("custom", new CustomStrategy());
-```
-
 ## Implementation Status
 
 ### ✅ Completed Features
-- **Core graph infrastructure**: Node types, visitor pattern, metadata
-- **Zero-copy editing**: GraphEditor with full operation set
-- **Undo/redo system**: Complete operation history management
+- **StepParser Integration**: Full parsing via DevelApp.StepParser 1.9.0
+- **Cognitive graph infrastructure**: Node types, visitor pattern, metadata
+- **Direct graph editing**: Add, remove, and modify nodes
 - **Unparsing framework**: Strategy-based code generation
-- **Thread safety**: Concurrent access protection
-- **Comprehensive testing**: Full test suite with 16 passing tests
+- **Language plugins**: C#, JavaScript, Python, LLVM support
+- **Comprehensive testing**: 111 passing unit tests
+- **Grammar generation**: Automated grammar discovery system
+- **Symbolic analysis**: Advanced code analysis capabilities
 
-### 🔄 Future Enhancements (as needed)
-- **CognitiveGraph NuGet integration**: When package becomes available
-- **Advanced language support**: Specific language unparsing strategies
-- **Performance optimizations**: Memory pooling, bulk operations
-- **Serialization support**: Graph persistence and loading
+### 🔄 Not Implemented
+- **GraphEditor class**: Does not exist - use direct node manipulation
+- **Undo/redo system**: Not implemented
+- **Context-aware editor**: Not implemented
+- **Location tracker**: Not implemented
 
 ## Testing
 
 The implementation includes comprehensive unit tests covering:
-- Graph editing operations (insert, remove, replace, move)
-- Undo/redo functionality
-- Node finding and indexing
+- StepParser integration and validation
+- Graph node operations
+- Language plugin functionality
 - Code unparsing with various strategies
-- Error handling and edge cases
+- Grammar generation and analysis
 
 ```bash
 cd src
-dotnet test GolemCognitiveGraph.Tests
+dotnet test Minotaur.Tests
 ```
-
-## Demo Application
-
-A complete demo application showcases the key features:
-
-```bash
-cd src
-dotnet run --project GolemCognitiveGraph.Demo
-```
-
-The demo demonstrates:
-1. Basic graph construction and editing
-2. Code unparsing with different configurations
-3. Advanced editing operations with undo/redo
 
 ## Dependencies
 
 - **.NET 8.0**: Target framework
-- **System.Memory**: Memory management optimizations
-- **System.Text.Json**: JSON serialization support
+- **DevelApp.CognitiveGraph 1.0.2**: Cognitive graph data structures
+- **DevelApp.StepLexer 1.9.0**: Tokenization
+- **DevelApp.StepParser 1.9.0**: Parsing
+- **DevelApp.RuntimePluggableClassFactory 2.0.1**: Plugin system
 
 ## Notes
 
-This implementation provides a solid foundation for the Golem Cognitive Graph Editor & Unparser system. It implements the core concepts described in the technical specification while maintaining extensibility for future enhancements. The zero-copy architecture ensures optimal performance for surgical editing operations on large code structures.
-
-When the CognitiveGraph 1.0.0 NuGet package becomes available, this implementation can be easily integrated or serve as a reference for the integration.
+This implementation provides the foundation for the Minotaur compiler-compiler platform. It integrates with production-ready parsing libraries and provides extensible language plugin support for code generation.
