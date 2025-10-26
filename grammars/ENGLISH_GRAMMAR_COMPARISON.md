@@ -103,9 +103,9 @@ This document compares the US and GB English grammar implementations to the Dani
 | Feature | Danish | US English | GB English | Notes |
 |---------|--------|------------|------------|-------|
 | **Special Characters** | æ, ø, å | None | None | |
-| **Spelling Variants** | N/A | Standard US | 100+ British forms | colour, centre, organise, etc. |
+| **Spelling Variants** | N/A | Standard US | 100+ British forms | -our/-or: colour, favour, honour; -re/-er: centre, theatre, metre; -ise/-ize: organise, realise; -ce/-se: defence, licence; -ogue/-og: programme, catalogue |
 | **Verb Past Forms** | Regular patterns | learned/spelled | learnt/spelt | GB has -t forms |
-| **Participles** | -ende | -ing | -ing (doubled) | GB doubles consonants |
+| **Participles** | -ende | -ing | -ing (doubled) | GB doubles consonants: travelling, modelling |
 
 ### Context-Sensitive Rules
 
@@ -121,10 +121,11 @@ This document compares the US and GB English grammar implementations to the Dani
 
 ### Why Danish has more lines:
 1. **Extensive inline documentation**: Danish grammar has comprehensive comments throughout
-2. **Example sentences**: 200+ lines of example sentences embedded in comments
+2. **Example sentences**: 200+ lines of example sentences embedded as inline comments (vs. separate .txt files for English)
 3. **Dialectal detail**: More dialectal forms for common words (have, be, become verbs)
 4. **V2 word order complexity**: Danish V2 requires more rules for topicalization
 5. **Gender agreement**: Additional rules for gender-based agreement
+6. **Architecture difference**: Danish includes examples inline; English uses separate example files for cleaner separation
 
 ### Why English grammars are comprehensive despite fewer lines:
 1. **More irregular verbs**: 100+ irregular verbs vs. Danish 25+
