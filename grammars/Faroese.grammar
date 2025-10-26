@@ -1,21 +1,36 @@
 /*
- * Faroese Language Grammar (Føroyskt)
+ * Faroese Language Grammar (Føroyskt) - Comprehensive Edition
  * 
- * Comprehensive grammar for the Faroese language spoken in the Faroe Islands.
- * This grammar covers:
- * - Regular and irregular verb conjugations (4 tenses, 3 moods)
- * - Noun declensions (4 cases, 3 genders, 2 numbers)
- * - Complex sentence structures with subordinate clauses
- * - V2 word order (Verb-Second) typical of North Germanic languages
- * - Context-sensitive gender, case, and number agreement
+ * This grammar provides extensive coverage of Faroese language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Full noun declension system (4 cases, 3 genders, 2 numbers)
+ * - Strong and weak adjective declensions
+ * - Context-sensitive agreement rules (gender, number, case, definiteness)
+ * - V2 word order and topicalization
+ * - Relative clauses and complex subordinate structures
+ * - Multiple tenses (present, past, perfect, pluperfect, future)
+ * - Conditional and subjunctive moods
+ * - Regional dialectal variations (3 major dialect regions)
+ * - Preservation of Old Norse grammatical features
  * 
- * Faroese is closely related to Icelandic and Norwegian, preserving many Old Norse features.
+ * Faroese is closely related to Icelandic, preserving many Old Norse features.
  * 
  * Copyright (C) 2024 Minotaur Project
  * Licensed under GNU Affero General Public License v3.0 (AGPL-3.0)
  */
 
-grammar Faroese;
+Grammar: Faroese
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+Keywords: og, ella, men, um, at, sum, er, var, vera, hava, við, tú, hann, hon, tað, vit, tit, teir, tær, tey, ikki, altíð, ofta, sjaldan, nú, tá, her, har, altíð
+
+/* Dialect markers for Faroese regional varieties */
+@DIALECT[northern_islands]    /* Northern Islands (Norðoyggjar) - Borðoy, Viðoy, Kunoy, Kallsoy, Svínoy, Fugloy */
+@DIALECT[southern_islands]    /* Southern Islands (Suðuroyar) - Suðuroy, Lítla Dímun, Stóra Dímun */
+@DIALECT[sandoy]              /* Sandoy dialect - Central Islands */
 
 /* Entry point - complete sentence */
 <start> ::= <sentence> <opt-punctuation>
@@ -27,60 +42,158 @@ grammar Faroese;
 <opt-whitespace> ::= /[ \t\n\r]+/ | ""
 <whitespace> ::= /[ \t\n\r]+/
 
-/* Main sentence types */
-<sentence> ::= <declarative-sentence>
-           | <interrogative-sentence>
-           | <imperative-sentence>
-           | <compound-sentence>
-           | <complex-sentence>
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
 
-/* Declarative sentence - standard V2 word order */
-<declarative-sentence> ::= <topic> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <complement>?
+/* Top-level sentence structure with V2 word order */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
 
-/* Topic can be any major constituent */
-<topic> ::= <subject>
-        | <adverbial>
-        | <object>
+/* Main clause with V2 word order (verb-second) */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
 
-/* Interrogative sentence - question */
-<interrogative-sentence> ::= <yes-no-question>
-                          | <wh-question>
+/* V2 declarative: TopicField + FiniteVerb + MiddleField + MainVerb + FinalField */
+<declarative-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? <punctuation>?
 
-<yes-no-question> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <complement>?
+/* Topic field can contain various constituents */
+<topic-field> ::= <subject>
+               | <adverbial>
+               | <object>
+               | <prepositional-phrase>
 
-<wh-question> ::= <question-word> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <complement>?
+/* Middle field contains subject (if not topicalized), objects, and adverbials */
+<middle-field> ::= <middle-field-element> ( <opt-whitespace> <middle-field-element> )*
 
-<question-word> ::= "hvør" | "hvat" | "hvar" | "nær" | "hví" | "hvussu" | "hvørjum" | "hvørja" | "hvørji"
+<middle-field-element> ::= <subject>
+                        | <negation>
+                        | <sentence-adverb>
+                        | <object>
+                        | <indirect-object>
+                        | <reflexive-pronoun>
 
-/* Imperative sentence - commands */
-<imperative-sentence> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>?
+/* Negation with dialectal variations */
+<negation> ::= <standard-negation> | <dialect-negation>
 
-/* Compound sentence - coordinated clauses */
-<compound-sentence> ::= <declarative-sentence> <opt-whitespace> <coordinator> <opt-whitespace> <declarative-sentence>
+<standard-negation> ::= "ikki" | "ongantíð" | "einki" | "eingina" | "ongin" | "onga" | "onki"
 
-<coordinator> ::= "og" | "men" | "ella" | "tí" | "so" | "orsakað"
+/* Dialectal negation from multiple regions */
+<dialect-negation> ::= @DIALECT[northern_islands] ( "ikki" | "onga" | "inkji" | "eingi" )
+                    | @DIALECT[southern_islands] ( "ikki" | "einki" | "onga" )
+                    | @DIALECT[sandoy] ( "ikki" | "onga" | "eingina" )
 
-/* Complex sentence - with subordinate clauses */
-<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
-                    | <subordinate-clause> <opt-whitespace> <main-clause>
+/* Sentence adverbs with dialectal forms */
+<sentence-adverb> ::= <standard-sentence-adverb> | <dialect-sentence-adverb>
 
-<main-clause> ::= <declarative-sentence>
+<standard-sentence-adverb> ::= "altíð" | "ofta" | "sjaldan" | "kanska" | "víst" | "nok" | "eisini" | "bara" | "líka" | "líklega" | "sjálvandi" | "veruliga" | "tó" | "nú" | "tá" | "enn"
 
-<subordinate-clause> ::= <subordinator> <opt-whitespace> <subordinate-content>
+/* Dialectal sentence adverbs from multiple regions */
+<dialect-sentence-adverb> ::= @DIALECT[northern_islands] ( "æltíð" | "sjitt" | "kanst" | "líkja" | "tó" )
+                           | @DIALECT[southern_islands] ( "ætíð" | "ofta" | "kanska" | "líka" )
+                           | @DIALECT[sandoy] ( "altíð" | "ofta" | "kanska" | "eisini" )
 
-<subordinator> ::= "at" | "um" | "tí" | "eftir" | "áðrenn" | "meðan" | "tá" | "hvussu" | "hvar" | "nær"
+/* Verb complement (infinitive, participle, predicate adjective) */
+<verb-complement> ::= <infinitive-phrase>
+                   | <past-participle>
+                   | <present-participle>
+                   | <predicate-adjective>
 
-<subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase>
+<infinitive-phrase> ::= ( "at" <opt-whitespace> )? <verb-infinitive> ( <opt-whitespace> <object> )?
 
-/* Middle field - sentence adverbs and negation */
-<middle-field> ::= <negation>
-               | <sentence-adverb>
-               | <reflexive-pronoun>
-               | <indirect-object>
+<predicate-adjective> ::= <adjective>
 
-<negation> ::= "ikki" | "ongantíð" | "einki" | "eingina" | "ongin"
+/* Final field for heavy constituents */
+<final-field> ::= <subordinate-clause>
+               | <relative-clause>
+               | <prepositional-phrase>
+               | <embedded-clause-sequence>
 
-<sentence-adverb> ::= "altíð" | "ofta" | "sjaldan" | "kanska" | "víst" | "nok" | "eisini" | "bara" | "líka"
+/* Embedded clause sequence (multiple subordinate clauses) */
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> )+
+
+/* Interrogative clause */
+<interrogative-clause> ::= <yes-no-question>
+                        | <wh-question>
+
+<yes-no-question> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? "?"
+
+/* Imperative clause */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <middle-field>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>? ( "!" | "." )?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? <opt-whitespace> <finite-verb>? <opt-whitespace> <middle-field>? "!"
+
+<exclamative-word> ::= "hvat" | "hvussu" | "hvørjin" | "hvørja" | "hvørji"
+
+/* Subordinate clause (verb-final word order) with nesting support */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+                      | <coordinated-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+/* Nested subordinate clause (sub-sentence within sub-sentence) */
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase-subordinate> <opt-whitespace> <nested-final-field>
+
+<nested-final-field> ::= <subordinate-clause>
+                      | <relative-clause>
+                      | <embedded-clause-sequence>
+                      | <prepositional-phrase>
+
+/* Coordinated subordinate clauses */
+<coordinated-subordinate-clause> ::= <subordinate-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase-subordinate> <opt-whitespace> <subordinate-final-field>?
+
+<subordinate-final-field> ::= <subordinate-clause>
+                           | <relative-clause>
+                           | <prepositional-phrase>
+
+<verb-phrase-subordinate> ::= ( <auxiliary-verb> <opt-whitespace> )* <main-verb>
+
+/* Relative clause with nesting support */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>?
+
+/* Nested relative clause (relative clause containing subordinate clause) */
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>? <opt-whitespace> <subordinate-clause>
+
+/* Compound sentence with multiple coordination */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+/* Multiple coordinated main clauses (3 or more) */
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
+
+/* Complex sentence with various embedding patterns */
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Multi-embedded sentence (multiple levels of embedding) */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated complex sentence (coordination at different levels) */
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+                                | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
 
 /* Subject - noun phrase or pronoun */
 <subject> ::= <noun-phrase>
@@ -227,49 +340,429 @@ grammar Faroese;
 
 <noun-stem> ::= /[a-záðíóúýæø]+/
 
-<proper-noun> ::= /[A-ZÁÐÍÓÚÝÆØ][a-záðíóúýæø]*/
+/* Expanded noun examples with full case paradigms */
+/* Masculine nouns */
+<masculine-noun-examples> ::= <noun-hestur>
+                           | <noun-maður>
+                           | <noun-bátur>
+                           | <noun-hundur>
 
-/* Verb phrase */
-<verb-phrase> ::= <finite-verb> <opt-whitespace> <verb-complement>?
+<noun-hestur> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] "hestur"  // horse
+               | @GENDER[masculine] @NUMBER[singular] @CASE[accusative] "hest"
+               | @GENDER[masculine] @NUMBER[singular] @CASE[dative] "hesti"
+               | @GENDER[masculine] @NUMBER[singular] @CASE[genitive] "hests"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[nominative] "hestar"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[accusative] "hestar"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[dative] "hestum"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[genitive] "hesta"
+
+<noun-maður> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] "maður"  // man
+              | @GENDER[masculine] @NUMBER[singular] @CASE[accusative] "mann"
+              | @GENDER[masculine] @NUMBER[singular] @CASE[dative] "manni"
+              | @GENDER[masculine] @NUMBER[singular] @CASE[genitive] "manns"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[nominative] "menn"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[accusative] "menn"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[dative] "mønnum"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[genitive] "manna"
+
+<noun-bátur> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] "bátur"  // boat
+              | @GENDER[masculine] @NUMBER[singular] @CASE[accusative] "bát"
+              | @GENDER[masculine] @NUMBER[singular] @CASE[dative] "báti"
+              | @GENDER[masculine] @NUMBER[singular] @CASE[genitive] "báts"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[nominative] "bátar"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[accusative] "bátar"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[dative] "bátum"
+              | @GENDER[masculine] @NUMBER[plural] @CASE[genitive] "báta"
+
+<noun-hundur> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] "hundur"  // dog
+               | @GENDER[masculine] @NUMBER[singular] @CASE[accusative] "hund"
+               | @GENDER[masculine] @NUMBER[singular] @CASE[dative] "hundi"
+               | @GENDER[masculine] @NUMBER[singular] @CASE[genitive] "hunds"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[nominative] "hundar"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[accusative] "hundar"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[dative] "hundum"
+               | @GENDER[masculine] @NUMBER[plural] @CASE[genitive] "hunda"
+
+/* Feminine nouns */
+<feminine-noun-examples> ::= <noun-gata>
+                          | <noun-kona>
+                          | <noun-bók>
+
+<noun-gata> ::= @GENDER[feminine] @NUMBER[singular] @CASE[nominative] "gata"  // street
+             | @GENDER[feminine] @NUMBER[singular] @CASE[accusative] "gøtu"
+             | @GENDER[feminine] @NUMBER[singular] @CASE[dative] "gøtu"
+             | @GENDER[feminine] @NUMBER[singular] @CASE[genitive] "gøtu"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[nominative] "gøtur"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[accusative] "gøtur"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[dative] "gøtum"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[genitive] "gatna"
+
+<noun-kona> ::= @GENDER[feminine] @NUMBER[singular] @CASE[nominative] "kona"  // woman
+             | @GENDER[feminine] @NUMBER[singular] @CASE[accusative] "konu"
+             | @GENDER[feminine] @NUMBER[singular] @CASE[dative] "konu"
+             | @GENDER[feminine] @NUMBER[singular] @CASE[genitive] "konu"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[nominative] "konur"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[accusative] "konur"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[dative] "konum"
+             | @GENDER[feminine] @NUMBER[plural] @CASE[genitive] "kvinna"
+
+<noun-bók> ::= @GENDER[feminine] @NUMBER[singular] @CASE[nominative] "bók"  // book
+            | @GENDER[feminine] @NUMBER[singular] @CASE[accusative] "bók"
+            | @GENDER[feminine] @NUMBER[singular] @CASE[dative] "bók"
+            | @GENDER[feminine] @NUMBER[singular] @CASE[genitive] "bókar"
+            | @GENDER[feminine] @NUMBER[plural] @CASE[nominative] "bøkur"
+            | @GENDER[feminine] @NUMBER[plural] @CASE[accusative] "bøkur"
+            | @GENDER[feminine] @NUMBER[plural] @CASE[dative] "bókum"
+            | @GENDER[feminine] @NUMBER[plural] @CASE[genitive] "bóka"
+
+/* Neuter nouns */
+<neuter-noun-examples> ::= <noun-barn>
+                        | <noun-hús>
+                        | <noun-land>
+
+<noun-barn> ::= @GENDER[neuter] @NUMBER[singular] @CASE[nominative] "barn"  // child
+             | @GENDER[neuter] @NUMBER[singular] @CASE[accusative] "barn"
+             | @GENDER[neuter] @NUMBER[singular] @CASE[dative] "barni"
+             | @GENDER[neuter] @NUMBER[singular] @CASE[genitive] "barns"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[nominative] "børn"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[accusative] "børn"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[dative] "børnum"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[genitive] "barna"
+
+<noun-hús> ::= @GENDER[neuter] @NUMBER[singular] @CASE[nominative] "hús"  // house
+            | @GENDER[neuter] @NUMBER[singular] @CASE[accusative] "hús"
+            | @GENDER[neuter] @NUMBER[singular] @CASE[dative] "húsi"
+            | @GENDER[neuter] @NUMBER[singular] @CASE[genitive] "húss"
+            | @GENDER[neuter] @NUMBER[plural] @CASE[nominative] "hús"
+            | @GENDER[neuter] @NUMBER[plural] @CASE[accusative] "hús"
+            | @GENDER[neuter] @NUMBER[plural] @CASE[dative] "húsum"
+            | @GENDER[neuter] @NUMBER[plural] @CASE[genitive] "húsa"
+
+<noun-land> ::= @GENDER[neuter] @NUMBER[singular] @CASE[nominative] "land"  // country
+             | @GENDER[neuter] @NUMBER[singular] @CASE[accusative] "land"
+             | @GENDER[neuter] @NUMBER[singular] @CASE[dative] "landi"
+             | @GENDER[neuter] @NUMBER[singular] @CASE[genitive] "lands"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[nominative] "lønd"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[accusative] "lønd"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[dative] "londum"
+             | @GENDER[neuter] @NUMBER[plural] @CASE[genitive] "landa"
+
+/* Dialectal pronoun variations */
+<dialect-nominative-pronouns> ::= @DIALECT[northern_islands] ( "æ" | "tú" | "hann" | "hón" | "tað" | "vit" | "tit" | "teir" )
+                                | @DIALECT[southern_islands] ( "eg" | "tú" | "hann" | "hon" | "tað" | "vit" | "tit" | "teir" )
+                                | @DIALECT[sandoy] ( "eg" | "tú" | "hann" | "hon" | "tað" | "vit" | "tit" | "teir" )
+
+<dialect-accusative-pronouns> ::= @DIALECT[northern_islands] ( "mæ" | "tæ" | "hann" | "hana" | "tað" | "okkar" | "ykkar" )
+                                | @DIALECT[southern_islands] ( "meg" | "teg" | "hann" | "hana" | "tað" | "okkum" | "tykkum" )
+                                | @DIALECT[sandoy] ( "meg" | "teg" | "hann" | "hana" | "tað" | "okkum" | "tykkum" )
+
+/* Numerals and quantifiers */
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "ein" | "tveir" | "tríggir" | "fýra" | "fimm" | "seks" | "sjey" | "átta" | "níggju" | "tíggju" | "ellivu" | "tólv" | "trettan" | "fjúrtan" | "fimmtan" | "sekstan" | "seytjan" | "átjan" | "nítjan" | "tjúgu" | "tríati" | "fjøruti" | "hálvtrýss" | "trýss" | "hálvfjerds" | "fjerds" | "hálvfems" | "fems" | "hundrað" | "túsund" | /[0-9]+/
+
+<ordinal-number> ::= "fyrsti" | "annar" | "triði" | "fjórði" | "fimmti" | "sætti" | "sjeyndi" | "áttandi" | "níundi" | "tíundi" | /[0-9]+\./
+
+<quantifier> ::= "nógv" | "lítið" | "fleiri" | "færri" | "allir" | "ongin" | "summi" | "nakrir" | "hvør"
+
+// ============================================================================
+// COMPOUND NOUNS AND GENITIVE CONSTRUCTIONS
+// ============================================================================
+
+<compound-noun> ::= <noun-stem> <linking-element>? <noun>
+
+<linking-element> ::= "s" | "a" | "u" | "ar"
+
+/* Genitive constructions (possession) */
+<genitive-construction> ::= <noun-phrase> @CASE[genitive] <opt-whitespace> <noun-phrase>
+
+/* Common compound nouns */
+<common-compound> ::= "sjómaður" | "handilsmaður" | "arbeiðsmaður" | "skúlastova" | "húsfrúgv" | "ferðavegur" | "sjókort" | "flogfar" | "fartelefon"
+
+// ============================================================================
+// TEMPORAL AND CONDITIONAL EXPRESSIONS (expanded)
+// ============================================================================
+
+<temporal-clause> ::= <temporal-conjunction> <opt-whitespace> <subordinate-content>
+
+<temporal-conjunction> ::= "tá" | "nær" | "áðrenn" | "eftir at" | "meðan" | "síðani" | "so leingi sum" | "so skjótt sum" | "tá ið"
+
+<conditional-clause> ::= <conditional-conjunction> <opt-whitespace> <subordinate-content>
+
+<conditional-conjunction> ::= "um" | "so framt sum" | "uttan at" | "nema" | "tó at"
+
+<causal-clause> ::= <causal-conjunction> <opt-whitespace> <subordinate-content>
+
+<causal-conjunction> ::= "tí at" | "av tí at" | "orsakað" | "tí" | "vegna tess at"
+
+/* Purpose clauses */
+<purpose-clause> ::= <purpose-conjunction> <opt-whitespace> <subordinate-content>
+
+<purpose-conjunction> ::= "fyri at" | "til tess at" | "so at"
+
+/* Comparative constructions */
+<comparative-construction> ::= <comparative-word> <opt-whitespace> <noun-phrase>
+
+<comparative-word> ::= "eins og" | "líksum" | "svarandi til" | "meir enn" | "minni enn" | "stærri enn"
+
+// ============================================================================
+// MODAL AND EVIDENTIAL EXPRESSIONS
+// ============================================================================
+
+<modal-expression> ::= <modal-adverb> <opt-whitespace> <verb-phrase>
+
+<modal-adverb> ::= "kanska" | "víst" | "sannlíkt" | "óvisst" | "helst" | "neyvan" | "vart" | "næstum"
+
+<evidential-expression> ::= <evidential-marker> <opt-whitespace> <subordinate-clause>
+
+<evidential-marker> ::= "eg hoyri at" | "eg síggi at" | "tað ber til at" | "tað líkist"
+
+/* Negation patterns (extended) */
+<negation-pattern> ::= <negation> <opt-whitespace> <negation-scope>
+
+<negation-scope> ::= <verb-phrase> | <noun-phrase> | <adjective-phrase>
+
+<double-negation> ::= <negation> <opt-whitespace> ( "nekt" | "ikki nakað" | "onga ferð" )
+
+// ============================================================================
+// FOCUS AND TOPICALIZATION (extended)
+// ============================================================================
+
+<focused-constituent> ::= <focus-particle> <opt-whitespace> <constituent>
+
+<focus-particle> ::= "bert" | "eisini" | "enn" | "ikki einans" | "sjálvur" | "júst"
+
+<constituent> ::= <noun-phrase> | <verb-phrase> | <adjective-phrase> | <adverbial>
+
+/* Topicalization patterns */
+<topicalized-sentence> ::= <fronted-element> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <remainder>
+
+<fronted-element> ::= <object> | <adverbial> | <prepositional-phrase> | <predicate-adjective>
+
+<remainder> ::= <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>?
+
+// ============================================================================
+// DIALECTAL LEXICAL VARIATIONS
+// ============================================================================
+
+/* Dialectal vocabulary differences */
+<dialect-vocabulary> ::= <northern-lexicon>
+                      | <southern-lexicon>
+                      | <sandoy-lexicon>
+
+<northern-lexicon> ::= @DIALECT[northern_islands] ( "æ" | "sjitt" | "kanst" | "likja" | "æltíð" | "tann" | "hessin" )
+
+<southern-lexicon> ::= @DIALECT[southern_islands] ( "eg" | "ofta" | "kanska" | "líka" | "altíð" | "tann" | "hesin" )
+
+<sandoy-lexicon> ::= @DIALECT[sandoy] ( "eg" | "ofta" | "kanska" | "eisini" | "altíð" | "tann" | "hesin" )
+
+/* Dialectal differences in verb forms */
+<dialect-verb-variation> ::= @DIALECT[northern_islands] ( "komi" | "fari" | "havi" | "eri" )
+                          | @DIALECT[southern_islands] ( "komi" | "fari" | "havi" | "eri" )
+                          | @DIALECT[sandoy] ( "komi" | "fari" | "havi" | "eri" )
+
+/* Verb phrase with mood and voice distinctions */
+<verb-phrase> ::= <active-verb-phrase>
+               | <passive-verb-phrase>
+               | <modal-verb-phrase>
+
+<active-verb-phrase> ::= <simple-verb-phrase>
+                      | <compound-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb> ( <opt-whitespace> <adverb> )?
 
 <finite-verb> ::= <verb-present>
               | <verb-past>
               | <verb-future>
+
+<compound-verb-phrase> ::= <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <verb-complement-main>
+
+<verb-complement-main> ::= <past-participle> | <infinitive-phrase>
+
+/* Passive voice (st-passive) */
+<passive-verb-phrase> ::= <st-passive-present>
+                       | <st-passive-past>
+
+<st-passive-present> ::= @VOICE[passive] @TENSE[present] ( "kallast" | "síggst" | "finnst" | "verst" | "sigst" )
+
+<st-passive-past> ::= @VOICE[passive] @TENSE[past] ( "kallaðist" | "sást" | "fannst" | "varst" | "segðist" )
+
+/* Modal verb phrases */
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <adverb>? <opt-whitespace> <infinitive-phrase>
+
+<modal-verb> ::= <modal-present> | <modal-past>
+
+<modal-present> ::= @MOOD[modal] ( "kann" | "skal" | "vil" | "má" | "tør" )
+
+<modal-past> ::= @MOOD[modal] @TENSE[past] ( "kundi" | "skuldi" | "vildi" | "mátti" | "tardi" )
+
+/* Main verb */
+<main-verb> ::= <verb-present>
+             | <verb-past>
+             | <verb-perfect>
+             | <verb-pluperfect>
+             | <verb-future>
+             | <verb-conditional>
+             | <verb-subjunctive>
 
 <verb-complement> ::= <infinitive-phrase>
                   | <participle>
                   | <object>
 
 /* Verb conjugations */
-<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> )
+<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> | <dialect-verb-present> )
 
 <regular-verb-present> ::= <verb-stem> "i" | <verb-stem> "ur"
 
 <verb-stem> ::= /[a-záðíóúýæø]+/
 
 /* Common irregular verbs in present tense */
-<irregular-verb-present> ::= @IRREGULAR "eri" | "havi" | "verði" | "fari" | "kemur" | "síggi" | "tekur" | "gevi" | "veit" | "skal" | "vil" | "kann" | "megi" | "eri"
+<irregular-verb-present> ::= @IRREGULAR ( <irregular-vera> | <irregular-hava> | <irregular-verða> | <irregular-fara> | <irregular-koma> | <irregular-síggja> | <irregular-geva> | <irregular-taka> )
+
+<irregular-vera> ::= "eri" | "ert" | "eru"  // to be
+
+<irregular-hava> ::= "havi" | "hevur" | "hava"  // to have
+
+<irregular-verða> ::= "verði" | "verður" | "verða"  // to become
+
+<irregular-fara> ::= "fari" | "ferð" | "far" | "fara"  // to go
+
+<irregular-koma> ::= "komi" | "kemur" | "koma"  // to come
+
+<irregular-síggja> ::= "sígg" | "sær" | "síggja"  // to see
+
+<irregular-geva> ::= "gevi" | "gevur" | "geva"  // to give
+
+<irregular-taka> ::= "taki" | "tekur" | "taka"  // to take
+
+/* Dialectal verb forms */
+<dialect-verb-present> ::= @DIALECT[northern_islands] ( "i" | "ur" | "a" )
+                        | @DIALECT[southern_islands] ( "i" | "ur" )
+                        | @DIALECT[sandoy] ( "i" | "ur" )
 
 /* Past tense */
-<verb-past> ::= @TENSE[past] ( <regular-verb-past> | <irregular-verb-past> )
+<verb-past> ::= @TENSE[past] ( <regular-verb-past> | <irregular-verb-past> | <dialect-verb-past> )
 
 <regular-verb-past> ::= <verb-stem> "di" | <verb-stem> "ti" | <verb-stem> "aði"
 
 /* Irregular past tense - strong verbs with vowel changes */
-<irregular-verb-past> ::= @IRREGULAR ( "var" | "hevði" | "varð" | "fór" | "kom" | "sá" | "tók" | "gav" | "visti" | "skuldi" | "vildi" | "kundi" | "mátti" )
+<irregular-verb-past> ::= @IRREGULAR ( <irregular-vera-past> | <irregular-hava-past> | <irregular-verða-past> | <irregular-fara-past> | <irregular-koma-past> | <irregular-síggja-past> | <irregular-geva-past> | <irregular-taka-past> )
+
+<irregular-vera-past> ::= "var" | "vart" | "vóru"
+
+<irregular-hava-past> ::= "hevði" | "hevðu"
+
+<irregular-verða-past> ::= "varð" | "vórðu"
+
+<irregular-fara-past> ::= "fór" | "fóru"
+
+<irregular-koma-past> ::= "kom" | "komu"
+
+<irregular-síggja-past> ::= "sá" | "sóu"
+
+<irregular-geva-past> ::= "gav" | "góvu"
+
+<irregular-taka-past> ::= "tók" | "tóku"
+
+/* Dialectal past tense forms */
+<dialect-verb-past> ::= @DIALECT[northern_islands] <verb-stem> ( "aði" | "di" | "ti" )
+                     | @DIALECT[southern_islands] <verb-stem> ( "aði" | "di" | "ti" )
+                     | @DIALECT[sandoy] <verb-stem> ( "aði" | "di" | "ti" )
+
+/* Perfect tense - hava/vera + past participle */
+<verb-perfect> ::= @TENSE[perfect] <perfect-auxiliary> <opt-whitespace> <past-participle>
+
+<perfect-auxiliary> ::= "havi" | "hevur" | "hava" | "eri" | "ert" | "eru"
+
+<past-participle> ::= <verb-stem> ( "að" | "t" | "in" | "ur" )
+
+/* Pluperfect tense - hevði/var + past participle */
+<verb-pluperfect> ::= @TENSE[pluperfect] <pluperfect-auxiliary> <opt-whitespace> <past-participle>
+
+<pluperfect-auxiliary> ::= "hevði" | "hevðu" | "var" | "vóru"
 
 /* Future with modal verbs */
 <verb-future> ::= @TENSE[future] ( "skal" | "vil" | "kann" ) <opt-whitespace> <verb-infinitive>
 
+/* Conditional mood */
+<verb-conditional> ::= @MOOD[conditional] <conditional-auxiliary> <opt-whitespace> <infinitive>
+
+<conditional-auxiliary> ::= "skuldi" | "vildi" | "kundi"
+
+/* Subjunctive mood */
+<verb-subjunctive> ::= @MOOD[subjunctive] ( <subjunctive-present> | <subjunctive-past> )
+
+<subjunctive-present> ::= <verb-stem> ( "i" | "ur" )
+
+<subjunctive-past> ::= <irregular-verb-past>
+
 <verb-infinitive> ::= "at" <opt-whitespace> <verb-stem> ( "a" | "" )
 
+<infinitive> ::= <verb-infinitive>
+
 /* Past participle */
-<participle> ::= <verb-stem> ( "að" | "t" | "in" | "ur" )
+<participle> ::= <past-participle>
 
 /* Imperative form */
 <verb-imperative> ::= <verb-stem> | <irregular-imperative>
 
-<irregular-imperative> ::= "ver" | "hav" | "far" | "kom" | "lat"
+<irregular-imperative> ::= "ver" | "hav" | "far" | "kom" | "lat" | "tak" | "gev"
+
+// ============================================================================
+// ADJECTIVES (strong and weak declensions)
+// ============================================================================
+
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "sera" | "ikki sera" | "ganska" | "fullur" | "heilt" | "lítið"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree with strong/weak declension */
+<adjective-positive> ::= <adjective-strong> | <adjective-weak>
+
+/* Strong adjective declension (indefinite) */
+<adjective-strong> ::= <adjective-strong-masc>
+                    | <adjective-strong-fem>
+                    | <adjective-strong-neut>
+
+<adjective-strong-masc> ::= @GENDER[masculine] @DECLENSION[strong] ( "stórur" | "lítil" | "góður" | "gamal" | "ungur" | "vakur" | "hár" | "lágur" | "langur" | "stuttur" | "rættur" | "rangan" )
+
+<adjective-strong-fem> ::= @GENDER[feminine] @DECLENSION[strong] ( "stór" | "lítil" | "góð" | "gomul" | "ung" | "vøkur" | "há" | "lág" | "long" | "stutt" | "rætt" | "röng" )
+
+<adjective-strong-neut> ::= @GENDER[neuter] @DECLENSION[strong] ( "stórt" | "lítið" | "gott" | "gamalt" | "ungt" | "vakurt" | "hátt" | "lágt" | "langt" | "stuttt" | "rætt" | "rangt" )
+
+/* Weak adjective declension (definite) */
+<adjective-weak> ::= @DECLENSION[weak] ( "stóri" | "stóra" | "litli" | "litla" | "góði" | "góða" | "gamli" | "gamla" | "ungi" | "unga" | "vakra" )
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] ( <regular-comparative> | <irregular-comparative> )
+
+<regular-comparative> ::= "størri" | "minni" | "vakrari" | "hægri" | "lægri" | "longri" | "styttri"
+
+<irregular-comparative> ::= "betri" | "verri" | "eldri" | "yngri" | "meiri"
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] ( <regular-superlative> | <irregular-superlative> )
+
+<regular-superlative> ::= "stærstur" | "minstur" | "vakrastur" | "hæstur" | "lægstur" | "longstur" | "stuttastur"
+
+<irregular-superlative> ::= "bestur" | "verstur" | "elstur" | "yngstur" | "mestur"
+
+// ============================================================================
+// AUXILIARY VERBS
+// ============================================================================
+
+<auxiliary-verb> ::= <modal-verb>
+                  | <temporal-auxiliary>
+
+<temporal-auxiliary> ::= <have-verb> | <be-verb>
+
+<have-verb> ::= "havi" | "hevur" | "hava" | "hevði"
+
+<be-verb> ::= "eri" | "ert" | "eru" | "var"
 
 /* Complement - direct object, infinitive, or clause */
 <complement> ::= <object>
@@ -290,24 +783,100 @@ grammar Faroese;
 /* Infinitive phrase */
 <infinitive-phrase> ::= "at" <opt-whitespace> <verb-stem> <opt-whitespace> <object>?
 
-/* Prepositions */
-<preposition> ::= "í" | "á" | "við" | "úr" | "til" | "frá" | "hjá" | "um" | "av" | "eftir" | "fyri" | "við" | "millum" | "móti" | "hjá" | "undir" | "yvir"
+// ============================================================================
+// PREPOSITIONS (with case government)
+// ============================================================================
+
+<preposition> ::= <preposition-acc>
+               | <preposition-dat>
+               | <preposition-gen>
+
+<preposition-acc> ::= "um" | "gjøgnum" | "fyri" @GOVERNS_CASE[accusative]
+
+<preposition-dat> ::= "í" | "á" | "við" | "úr" | "til" | "frá" | "hjá" | "av" | "eftir" | "fyri" | "millum" | "móti" | "undir" | "yvir" | "nærum" @GOVERNS_CASE[dative]
+
+<preposition-gen> ::= "til" | "frá" | "vegna" | "saman við" | "innan" | "uttan" @GOVERNS_CASE[genitive]
+
+// ============================================================================
+// CONJUNCTIONS
+// ============================================================================
+
+<coordinating-conjunction> ::= "og" | "ella" | "men" | "tí" | "so" | "orsakað" | "samt" | "heldur"
+
+<subordinating-conjunction> ::= "at" | "um" | "tí" | "eftir" | "áðrenn" | "meðan" | "tá" | "hvussu" | "hvar" | "nær"
+                             | "tó at" | "trýtst" | "til tess at" | "av tí at" | "just tí at"
+                             | "nema" | "uttan at" | "so framt sum" | "síðani" | "fyrr enn"
+
+/* Relative pronouns */
+<relative-pronoun> ::= "sum" | "hvør" | "hvat" | "tá" | "har" | "hvussu"
+
+// ============================================================================
+// QUESTION WORDS (expanded)
+// ============================================================================
+
+<question-word> ::= "hvør" | "hvat" | "hvar" | "nær" | "hví" | "hvussu" | "hvørjum" | "hvørja" | "hvørji" | "hvaða" | "hvørgin" | "hvussu nógv"
 
 /* Adverbials */
 <adverbial> ::= <adverb>
             | <prepositional-phrase>
+            | <temporal-expression>
+
+<temporal-expression> ::= <time-adverb>
+                       | <time-noun-phrase>
+                       | <duration-phrase>
+
+<time-noun-phrase> ::= ( "í" | "á" | "um" ) <opt-whitespace> <noun-phrase>
+
+<duration-phrase> ::= ( "í" | "um" ) <opt-whitespace> ( "ein dag" | "tveir dagar" | "ein viku" | "ein mánaða" | "eitt ár" )
 
 <adverb> ::= <time-adverb>
          | <place-adverb>
          | <manner-adverb>
+         | <degree-adverb>
 
 <time-adverb> ::= "nú" | "tá" | "í dag" | "í gjár" | "í morgin" | "altíð" | "ongantíð" | "ofta" | "sjaldan" | "longu" | "enn" | "júst" | "strax" | "aftur"
+               | "tá ið" | "síðan" | "fyrr" | "seinni" | "snemma" | "seint" | "brátt" | "longur" | "tíðliga" | "vanliga"
 
 <place-adverb> ::= "her" | "har" | "hvar" | "heima" | "úti" | "inni" | "uppi" | "niðri" | "burtur" | "heim" | "út" | "inn" | "upp" | "niður"
+                | "norður" | "suður" | "vestur" | "eystur" | "fram" | "aftur" | "niður" | "øðrum" | "longur" | "nær" | "fjarri"
 
 <manner-adverb> ::= "væl" | "illa" | "skjótt" | "spakuliga" | "lættliga" | "hart" | "mjúkt" | "stilliga" | "hátt" | "lágt"
+                 | "so" | "soleiðis" | "einhvussu" | "óvart" | "varnliga" | "rætt" | "skeivt"
+
+<degree-adverb> ::= "sera" | "ganska" | "fullur" | "heilt" | "lítið" | "ógrynningar" | "ótrúliga" | "tæruliga" | "harla" | "ovtan mát"
 
 <prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+// ============================================================================
+// PROPER NOUNS AND NAMES
+// ============================================================================
+
+<proper-noun> ::= <faroese-name>
+               | <place-name>
+               | <foreign-name>
+
+<faroese-name> ::= /[A-ZÁÐÍÓÚÝÆØ][a-záðíóúýæø]+/
+
+<place-name> ::= "Tórshavn" | "Klaksvík" | "Runavík" | "Tvøroyri" | "Fuglafjørður" | "Vágur" | "Vestmanna"
+              | "Føroyar" | "Norðoyggjar" | "Suðuroy" | "Eysturoy" | "Streymoy" | "Vágar" | "Sandoy" | "Mykines"
+
+<foreign-name> ::= /[A-ZÁÐÍÓÚÝÆØ][a-záðíóúýæø]*/
+
+// ============================================================================
+// PRONOUNS AND DETERMINERS (expanded)
+// ============================================================================
+
+/* Demonstrative determiners */
+<demonstrative-determiner> ::= @GENDER[masculine] "hesin" | "tann"
+                            | @GENDER[feminine] "henda" | "ta"
+                            | @GENDER[neuter] "hetta" | "tað"
+                            | @NUMBER[plural] ( "hesir" | "hendir" | "hesi" | "teir" | "tær" | "tey" )
+
+/* Interrogative pronouns */
+<interrogative-pronoun> ::= "hvør" | "hvat" | "hvørjin" | "hvaða"
+
+/* Indefinite pronouns */
+<indefinite-pronoun> ::= "nakar" | "nakað" | "ongin" | "onga" | "onki" | "allir" | "alt" | "hvør" | "nakrir" | "fleiri" | "fáir"
 
 /*
  * EXAMPLE SENTENCES

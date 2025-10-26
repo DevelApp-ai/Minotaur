@@ -1,36 +1,160 @@
-// Norwegian Bokmål Grammar
-// Comprehensive grammar for Norwegian Bokmål (Danish-influenced standard)
-// CEBNF Format with Context-Sensitive Rules
+/*
+ * Norwegian Bokmål Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Norwegian Bokmål language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Full noun system (2 genders: common and neuter, 2 numbers)
+ * - Strong and weak adjective declensions
+ * - Context-sensitive agreement rules (gender, number, definiteness)
+ * - V2 word order and topicalization
+ * - Relative clauses and complex subordinate structures
+ * - Multiple tenses (present, past, perfect, pluperfect, future)
+ * - Conditional and imperative moods
+ * - Variety distinctions (Conservative/Urban vs. Radical/Rural forms)
+ * - Danish-influenced standard with some conservative features
+ * 
+ * Copyright (C) 2024 Minotaur Project
+ * Licensed under GNU Affero General Public License v3.0 (AGPL-3.0)
+ */
 
-GRAMMAR Norwegian_Bokmål
+Grammar: Norwegian_Bokmål
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
 
-// Token splitting configuration for natural language
-TOKEN_SPLIT " "
+Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du, han, hun, vi, dere, de, meg, deg, ham, henne, oss, dere, dem, min, din, hans, hennes, vår, deres, denne, dette, disse, en, et, ikke, kan, vil, skal, må, ha, være, bli, seg, hverandre, nei, ja, kanskje, altså, også, heller, jo, vel, nok, bare, nettopp, akkurat
 
-// ============================================================================
-// SENTENCE STRUCTURES
-// ============================================================================
+/* Variety markers for Norwegian Bokmål forms */
+@VARIETY[conservative]    /* Conservative Bokmål - more formal, Danish-influenced, urban usage */
+@VARIETY[radical]         /* Radical Bokmål - more colloquial, closer to Nynorsk, rural influence */
 
-<sentence> ::= <declarative-sentence>
-            | <interrogative-sentence>
-            | <imperative-sentence>
+/* Optional whitespace */
+<opt-whitespace> ::= /[ \t\n\r]+/ | ""
+<whitespace> ::= /[ \t\n\r]+/
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Top-level sentence structure with V2 word order */
+<sentence> ::= <main-clause>
+            | <subordinate-clause-standalone>
             | <compound-sentence>
             | <complex-sentence>
+            | <multi-embedded-sentence>
 
-<declarative-sentence> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]* "."
+/* Main clause with V2 word order (verb-second) */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
 
-<interrogative-sentence> ::= <question-word> <verb> <subject-np> [ <object-np> ]* "?"
-                          | <verb> <subject-np> [ <object-np> ]* "?"
+/* V2 declarative: TopicField + FiniteVerb + MiddleField + MainVerb + FinalField */
+<declarative-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? <punctuation>?
 
-<imperative-sentence> ::= <imperative-verb> [ <object-np> ]* "!"
+/* Topic field can contain various constituents */
+<topic-field> ::= <subject>
+               | <adverbial>
+               | <object>
+               | <prepositional-phrase>
 
-<compound-sentence> ::= <declarative-sentence> <coordinating-conjunction> <declarative-sentence>
+/* Middle field contains subject (if not topicalized), objects, and adverbials */
+<middle-field> ::= <middle-field-element> ( <opt-whitespace> <middle-field-element> )*
 
-<complex-sentence> ::= <main-clause> <subordinating-conjunction> <subordinate-clause>
+<middle-field-element> ::= <subject>
+                        | <negation>
+                        | <sentence-adverb>
+                        | <object>
+                        | <reflexive-pronoun>
 
-<main-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+/* Negation with variety variations */
+<negation> ::= <standard-negation> | <variety-negation>
 
-<subordinate-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+<standard-negation> ::= "ikke" | "aldri" | "ingenting" | "ingen" | "intet"
+
+<variety-negation> ::= @VARIETY[conservative] ( "ikke" | "aldri" | "ingenting" )
+                    | @VARIETY[radical] ( "ikkje" | "aldri" | "inkje" )
+
+/* Sentence adverbs with variety forms */
+<sentence-adverb> ::= <standard-sentence-adverb> | <variety-sentence-adverb>
+
+<standard-sentence-adverb> ::= "alltid" | "ofte" | "sjelden" | "kanskje" | "nok" | "jo" | "vel" | "da" | "også" | "heller" | "bare" | "nettopp" | "akkurat" | "visst"
+
+<variety-sentence-adverb> ::= @VARIETY[conservative] ( "alltid" | "kanskje" | "også" )
+                           | @VARIETY[radical] ( "alltid" | "kann hende" | "òg" )
+
+/* Verb complement */
+<verb-complement> ::= <infinitive-phrase>
+                   | <past-participle>
+                   | <present-participle>
+                   | <predicate-adjective>
+
+<infinitive-phrase> ::= ( "å" <opt-whitespace> )? <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<predicate-adjective> ::= <adjective>
+
+/* Final field */
+<final-field> ::= <subordinate-clause>
+               | <relative-clause>
+               | <prepositional-phrase>
+
+/* Interrogative clause */
+<interrogative-clause> ::= <yes-no-question>
+                        | <wh-question>
+
+<yes-no-question> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? "?"
+
+/* Imperative clause */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? ( "!" | "." )?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? "!"
+
+<exclamative-word> ::= "hvor" | "så" | "hvilken" | "hvilket"
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<subordinate-clause-standalone> ::= <subordinate-clause>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase>
+
+/* Relative clause */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>?
+
+<relative-pronoun> ::= "som" | "der" | "hvis" | "hvor" | "når"
+
+/* Compound sentence */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+/* Complex sentence */
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Multi-embedded sentence */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+
+/* Subject */
+<subject> ::= <noun-phrase>
+           | <pronoun-subject>
+           | <infinitive-as-subject>
+
+<subject-np> ::= <noun-phrase>
+
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+
+<infinitive-as-subject> ::= "å" <opt-whitespace> <verb-infinitive>
+
+/* Object */
+<object> ::= <noun-phrase>
+          | <pronoun-object>
+
+<object-np> ::= <noun-phrase>
+
+<pronoun-object> ::= <personal-pronoun-accusative>
 
 // ============================================================================
 // NOUN PHRASES (2 genders: common and neuter)
@@ -246,7 +370,425 @@ TOKEN_SPLIT " "
 // ============================================================================
 
 <question-word> ::= "hvem" | "hva" | "når" | "hvor" | "hvordan" | "hvorfor"
-                 | "hvilken" | "hvilket" | "hvilke"
+                 | "hvilken" | "hvilket" | "hvilke" | "hva slags"
+
+// ============================================================================
+// PRONOUNS (complete paradigm)
+// ============================================================================
+
+/* Personal pronouns - nominative case */
+<personal-pronoun-nominative> ::= "jeg" | "du" | "han" | "hun" | "den" | "det" | "vi" | "dere" | "de" | "man"
+
+/* Personal pronouns - accusative/object case */
+<personal-pronoun-accusative> ::= "meg" | "deg" | "ham" | "henne" | "den" | "det" | "oss" | "dere" | "dem"
+
+/* Reflexive pronouns */
+<reflexive-pronoun> ::= "meg" | "deg" | "seg" | "oss" | "dere" | "seg"
+
+/* Possessive pronouns */
+<possessive-pronoun> ::= <possessive-1sg>
+                      | <possessive-2sg>
+                      | <possessive-3sg>
+                      | <possessive-1pl>
+                      | <possessive-2pl>
+                      | <possessive-3pl>
+
+<possessive-1sg> ::= @NUMBER[singular] @PERSON[1] ( "min" | "mi" | "mitt" | "mine" )
+
+<possessive-2sg> ::= @NUMBER[singular] @PERSON[2] ( "din" | "di" | "ditt" | "dine" )
+
+<possessive-3sg> ::= @NUMBER[singular] @PERSON[3] ( "hans" | "hennes" | "dens" | "dets" | "sin" | "si" | "sitt" | "sine" )
+
+<possessive-1pl> ::= @NUMBER[plural] @PERSON[1] ( "vår" | "vårt" | "våre" )
+
+<possessive-2pl> ::= @NUMBER[plural] @PERSON[2] ( "deres" )
+
+<possessive-3pl> ::= @NUMBER[plural] @PERSON[3] ( "deres" | "sin" | "si" | "sitt" | "sine" )
+
+/* Demonstrative pronouns */
+<demonstrative-pronoun> ::= @GENDER[common] @NUMBER[singular] ( "denne" | "den" )
+                         | @GENDER[neuter] @NUMBER[singular] ( "dette" | "det" )
+                         | @NUMBER[plural] ( "disse" | "de" )
+
+/* Indefinite pronouns */
+<indefinite-pronoun> ::= "noen" | "noe" | "ingen" | "intet" | "all" | "alle" | "hver" | "hvert" | "enhver" | "begge" | "annen" | "annet" | "andre"
+
+/* Reciprocal pronoun */
+<reciprocal-pronoun> ::= "hverandre"
+
+// ============================================================================
+// EXPANDED VERB SYSTEM
+// ============================================================================
+
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <modal-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb> ( <opt-whitespace> <adverb> )?
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+
+<compound-verb-phrase> ::= <auxiliary-verb> <opt-whitespace> <verb-complement>
+
+/* Modal verb phrases */
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive-phrase>
+
+<modal-verb> ::= <modal-present> | <modal-past>
+
+<modal-present> ::= "kan" | "vil" | "skal" | "må" | "bør" | "tør"
+
+<modal-past> ::= "kunne" | "ville" | "skulle" | "måtte" | "burde" | "torde"
+
+/* Main verb with tense */
+<main-verb> ::= <verb-present>
+             | <verb-past>
+             | <verb-perfect>
+             | <verb-pluperfect>
+             | <verb-future>
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= <modal-verb>
+                  | <temporal-auxiliary>
+                  | <aspectual-auxiliary>
+
+<temporal-auxiliary> ::= "har" | "hadde" | "er" | "var"
+
+<aspectual-auxiliary> ::= "blir" | "ble"
+
+/* Present tense */
+<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> | <variety-verb-present> )
+
+<regular-verb-present> ::= <verb-stem> "er"
+
+<verb-stem> ::= /[a-zæøå]+/
+
+/* Irregular verbs in present tense */
+<irregular-verb-present> ::= @IRREGULAR ( "er" | "har" | "blir" | "går" | "kommer" | "ser" | "gir" | "sier" | "tar" | "gjør" | "får" | "vet" | "står" | "sitter" | "ligger" )
+
+/* Variety differences in verb forms */
+<variety-verb-present> ::= @VARIETY[conservative] <verb-stem> "er"
+                        | @VARIETY[radical] <verb-stem> "ar"
+
+/* Past tense */
+<verb-past> ::= @TENSE[past] ( <regular-verb-past> | <irregular-verb-past> | <variety-verb-past> )
+
+<regular-verb-past> ::= <verb-stem> ( "et" | "te" | "de" | "dde" )
+
+/* Irregular past tense verbs */
+<irregular-verb-past> ::= @IRREGULAR ( "var" | "hadde" | "ble" | "gikk" | "kom" | "så" | "ga" | "sa" | "tok" | "gjorde" | "fikk" | "visste" | "stod" | "satt" | "lå" )
+
+<variety-verb-past> ::= @VARIETY[conservative] <verb-stem> "et"
+                     | @VARIETY[radical] <verb-stem> "a"
+
+/* Perfect tense - har/er + past participle */
+<verb-perfect> ::= @TENSE[perfect] <perfect-auxiliary> <opt-whitespace> <past-participle>
+
+<perfect-auxiliary> ::= "har" | "er"
+
+<past-participle> ::= <verb-stem> ( "t" | "et" | "dd" | "tt" )
+
+/* Pluperfect tense - hadde/var + past participle */
+<verb-pluperfect> ::= @TENSE[pluperfect] <pluperfect-auxiliary> <opt-whitespace> <past-participle>
+
+<pluperfect-auxiliary> ::= "hadde" | "var"
+
+/* Future tense - skal/vil + infinitive */
+<verb-future> ::= @TENSE[future] <future-auxiliary> <opt-whitespace> <verb-infinitive>
+
+<future-auxiliary> ::= "skal" | "vil"
+
+<verb-infinitive> ::= ( "å" <opt-whitespace> )? <verb-stem>
+
+/* Present participle */
+<present-participle> ::= <verb-stem> "ende"
+
+/* Imperative */
+<verb-imperative> ::= <imperative-verb>
+
+<imperative-verb> ::= <verb-stem> | <irregular-imperative>
+
+<irregular-imperative> ::= "vær" | "ha" | "gå" | "kom" | "la" | "ta" | "gi"
+
+// ============================================================================
+// ADJECTIVES (strong and weak declensions)
+// ============================================================================
+
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "veldig" | "svært" | "ganske" | "litt" | "så" | "for"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree with agreement */
+<adjective-positive> ::= <adjective-common>
+                      | <adjective-neuter>
+                      | <adjective-plural>
+                      | <adjective-definite>
+
+<adjective-common> ::= @AGREEMENT[common] @DEGREE[positive] <adjective-stem>
+
+<adjective-neuter> ::= @AGREEMENT[neuter] @DEGREE[positive] <adjective-stem> "t"?
+
+<adjective-plural> ::= @AGREEMENT[plural] @DEGREE[positive] <adjective-stem> "e"?
+
+<adjective-definite> ::= @AGREEMENT[definite] @DEGREE[positive] <adjective-stem> "e"
+
+<adjective-stem> ::= /[a-zæøå]+/
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] ( <regular-comparative> | <irregular-comparative> )
+
+<regular-comparative> ::= <adjective-stem> "ere"
+
+<irregular-comparative> ::= "bedre" | "verre" | "større" | "mindre" | "eldre" | "yngre" | "mer" <opt-whitespace> <adjective-stem>
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] ( <regular-superlative> | <irregular-superlative> )
+
+<regular-superlative> ::= <adjective-stem> "est" | <adjective-stem> "st"
+
+<irregular-superlative> ::= "best" | "verst" | "størst" | "minst" | "eldst" | "yngst" | "mest" <opt-whitespace> <adjective-stem>
+
+// ============================================================================
+// ADVERBS (expanded)
+// ============================================================================
+
+<adverb> ::= <time-adverb>
+         | <place-adverb>
+         | <manner-adverb>
+         | <degree-adverb>
+
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+             | <adverbial-clause>
+
+<adverbial-clause> ::= <subordinate-clause>
+
+<time-adverb> ::= "nå" | "da" | "før" | "siden" | "alltid" | "aldri" | "ofte" | "sjelden" | "snart" | "straks"
+               | "i dag" | "i går" | "i morgen" | "i kveld" | "i natt" | "i fjor" | "neste år"
+
+<place-adverb> ::= "her" | "der" | "hvor" | "hjemme" | "ute" | "inne" | "oppe" | "nede" | "borte" | "fram" | "tilbake"
+                | "nord" | "sør" | "øst" | "vest" | "hit" | "dit"
+
+<manner-adverb> ::= "godt" | "dårlig" | "fort" | "sakte" | "rett" | "galt" | "pent" | "stygt"
+                 | "sånn" | "slik" | "hvordan"
+
+<degree-adverb> ::= "veldig" | "svært" | "ganske" | "litt" | "for" | "så" | "altfor" | "ekstra"
+
+// ============================================================================
+// PREPOSITIONS (with variety differences)
+// ============================================================================
+
+<preposition> ::= <common-preposition> | <variety-preposition>
+
+<common-preposition> ::= "i" | "på" | "med" | "til" | "fra" | "av" | "for" | "over" | "under" | "ved" | "hos" | "blant" | "mellom" | "mot" | "om" | "rundt" | "uten" | "gjennom"
+
+<variety-preposition> ::= @VARIETY[conservative] ( "i" | "på" | "til" )
+                       | @VARIETY[radical] ( "i" | "på" | "til" )
+
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+// ============================================================================
+// CONJUNCTIONS (coordinating and subordinating)
+// ============================================================================
+
+<coordinating-conjunction> ::= "og" | "eller" | "men" | "for" | "så" | "samt" | "eller også" | "både" <opt-whitespace> "og" | "verken" <opt-whitespace> "eller"
+
+<subordinating-conjunction> ::= "at" | "hvis" | "når" | "fordi" | "siden" | "selv om" | "før" | "etter" | "mens"
+                             | "så" <opt-whitespace> "at" | "til" <opt-whitespace> "tross" <opt-whitespace> "for" <opt-whitespace> "at"
+                             | "enten" | "eller" | "som" <opt-whitespace> "om" | "inntil"
+
+// ============================================================================
+// PROPER NOUNS AND NAMES
+// ============================================================================
+
+<proper-noun> ::= <norwegian-name>
+               | <place-name>
+               | <foreign-name>
+
+<norwegian-name> ::= /[A-ZÆØÅ][a-zæøå]+/
+
+<place-name> ::= "Oslo" | "Bergen" | "Trondheim" | "Stavanger" | "Kristiansand" | "Tromsø" | "Drammen" | "Fredrikstad" | "Sandnes"
+              | "Norge" | "Østlandet" | "Vestlandet" | "Sørlandet" | "Nord-Norge" | "Midt-Norge"
+
+<foreign-name> ::= /[A-ZÆØÅ][a-zæøå]*/
+
+// ============================================================================
+// NUMERALS AND QUANTIFIERS
+// ============================================================================
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "en" | "to" | "tre" | "fire" | "fem" | "seks" | "sju" | "åtte" | "ni" | "ti" | "elleve" | "tolv" | "tretten" | "fjorten" | "femten" | "seksten" | "sytten" | "atten" | "nitten" | "tjue" | "tretti" | "førti" | "femti" | "seksti" | "sytti" | "åtti" | "nitti" | "hundre" | "tusen" | /[0-9]+/
+
+<ordinal-number> ::= "første" | "andre" | "tredje" | "fjerde" | "femte" | "sjette" | "sjuende" | "åttende" | "niende" | "tiende" | /[0-9]+\./
+
+<quantifier> ::= "mange" | "få" | "flere" | "færre" | "mye" | "lite" | "nok" | "alle" | "hver" | "enhver" | "ingen" | "begge"
+
+// ============================================================================
+// EXPANDED NOUN EXAMPLES WITH FULL PARADIGMS
+// ============================================================================
+
+/* Additional common gender noun examples */
+<noun-common-extended> ::= "student" @GENDER[common] @NUMBER[singular]
+                        | "studenten" @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "studenter" @GENDER[common] @NUMBER[plural]
+                        | "studentene" @GENDER[common] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "jente" @GENDER[common] @NUMBER[singular]
+                        | "jenten" | "jenta" @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "jenter" @GENDER[common] @NUMBER[plural]
+                        | "jentene" @GENDER[common] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "venn" @GENDER[common] @NUMBER[singular]
+                        | "vennen" @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "venner" @GENDER[common] @NUMBER[plural]
+                        | "vennene" @GENDER[common] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "time" @GENDER[common] @NUMBER[singular]
+                        | "timen" | "tima" @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "timer" @GENDER[common] @NUMBER[plural]
+                        | "timene" @GENDER[common] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "dag" @GENDER[common] @NUMBER[singular]
+                        | "dagen" @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "dager" @GENDER[common] @NUMBER[plural]
+                        | "dagene" @GENDER[common] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "plass" @GENDER[common] @NUMBER[singular]
+                        | "plassen" @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "plasser" @GENDER[common] @NUMBER[plural]
+                        | "plassene" @GENDER[common] @NUMBER[plural] @DEFINITENESS[definite]
+
+/* Additional neuter gender noun examples */
+<noun-neuter-extended> ::= "vindu" @GENDER[neuter] @NUMBER[singular]
+                        | "vinduet" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "vinduer" @GENDER[neuter] @NUMBER[plural]
+                        | "vinduene" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "bord" @GENDER[neuter] @NUMBER[singular]
+                        | "bordet" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "bord" @GENDER[neuter] @NUMBER[plural]
+                        | "bordene" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "rom" @GENDER[neuter] @NUMBER[singular]
+                        | "rommet" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "rom" @GENDER[neuter] @NUMBER[plural]
+                        | "rommene" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "tre" @GENDER[neuter] @NUMBER[singular]
+                        | "treet" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "trær" @GENDER[neuter] @NUMBER[plural]
+                        | "trærne" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+                        | "eple" @GENDER[neuter] @NUMBER[singular]
+                        | "eplet" @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite]
+                        | "epler" @GENDER[neuter] @NUMBER[plural]
+                        | "eplene" @GENDER[neuter] @NUMBER[plural] @DEFINITENESS[definite]
+
+// ============================================================================
+// VARIETY-SPECIFIC FORMS AND EXPRESSIONS
+// ============================================================================
+
+/* Conservative Bokmål forms (more formal, Danish-influenced) */
+<conservative-forms> ::= @VARIETY[conservative] ( <conservative-verb> | <conservative-noun> | <conservative-pronoun> )
+
+<conservative-verb> ::= @VARIETY[conservative] ( <verb-stem> "er" | <verb-stem> "et" )
+
+<conservative-noun> ::= @VARIETY[conservative] @GENDER[common] @DEFINITENESS[definite] ( <noun-stem> "en" )
+
+<conservative-pronoun> ::= @VARIETY[conservative] ( "jeg" | "vi" | "de" | "dem" )
+
+/* Radical Bokmål forms (more colloquial, closer to Nynorsk) */
+<radical-forms> ::= @VARIETY[radical] ( <radical-verb> | <radical-noun> | <radical-pronoun> )
+
+<radical-verb> ::= @VARIETY[radical] ( <verb-stem> "ar" | <verb-stem> "a" )
+
+<radical-noun> ::= @VARIETY[radical] @GENDER[common] @DEFINITENESS[definite] ( <noun-stem> "a" )
+
+<radical-pronoun> ::= @VARIETY[radical] ( "jeg" | "vi" | "dei" | "deim" )
+
+// ============================================================================
+// COMPOUND NOUNS AND GENITIVE CONSTRUCTIONS
+// ============================================================================
+
+<compound-noun> ::= <noun-stem> <linking-element>? <noun>
+
+<linking-element> ::= "s" | "e"
+
+/* Common compound nouns */
+<common-compound> ::= "barnehage" | "kjøkkenbenk" | "soverom" | "arbeidsplass" | "ferieuke" | "skoledag" | "togstasjon" | "bilnøkkel" | "matpakke"
+
+/* Genitive constructions */
+<genitive-construction> ::= <noun-phrase> "s" <opt-whitespace> <noun-phrase>
+
+// ============================================================================
+// TEMPORAL AND CONDITIONAL EXPRESSIONS
+// ============================================================================
+
+<temporal-clause> ::= <temporal-conjunction> <opt-whitespace> <subordinate-content>
+
+<temporal-conjunction> ::= "når" | "før" | "etter" | "mens" | "inntil" | "så lenge som" | "så snart"
+
+<conditional-clause> ::= <conditional-conjunction> <opt-whitespace> <subordinate-content>
+
+<conditional-conjunction> ::= "hvis" | "dersom" | "om" | "så fremt" | "med mindre"
+
+<causal-clause> ::= <causal-conjunction> <opt-whitespace> <subordinate-content>
+
+<causal-conjunction> ::= "fordi" | "siden" | "ettersom" | "da"
+
+/* Purpose clauses */
+<purpose-clause> ::= <purpose-conjunction> <opt-whitespace> <subordinate-content>
+
+<purpose-conjunction> ::= "for å" | "så" <opt-whitespace> "at" | "til" <opt-whitespace> "å"
+
+/* Comparative constructions */
+<comparative-construction> ::= <comparative-word> <opt-whitespace> <noun-phrase>
+
+<comparative-word> ::= "som" | "enn" | "mer enn" | "mindre enn" | "like" <opt-whitespace> "som"
+
+// ============================================================================
+// MODAL AND EVIDENTIAL EXPRESSIONS
+// ============================================================================
+
+<modal-expression> ::= <modal-adverb> <opt-whitespace> <verb-phrase>
+
+<modal-adverb> ::= "kanskje" | "sikkert" | "sannsynligvis" | "visstnok" | "helst" | "neppe" | "knapt"
+
+<evidential-expression> ::= <evidential-marker> <opt-whitespace> <subordinate-clause>
+
+<evidential-marker> ::= "jeg hører at" | "jeg ser at" | "det sies at" | "det ser ut til at"
+
+/* Negation patterns */
+<negation-pattern> ::= <negation> <opt-whitespace> <negation-scope>
+
+<negation-scope> ::= <verb-phrase> | <noun-phrase> | <adjective-phrase>
+
+<double-negation> ::= <negation> <opt-whitespace> ( "noe" | "noen" | "noensinne" )
+
+// ============================================================================
+// FOCUS AND TOPICALIZATION
+// ============================================================================
+
+<focused-constituent> ::= <focus-particle> <opt-whitespace> <constituent>
+
+<focus-particle> ::= "bare" | "også" | "til og med" | "ikke engang" | "selv" | "nettopp" | "akkurat"
+
+<constituent> ::= <noun-phrase> | <verb-phrase> | <adjective-phrase> | <adverbial>
+
+/* Topicalization patterns */
+<topicalized-sentence> ::= <fronted-element> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <remainder>
+
+<fronted-element> ::= <object> | <adverbial> | <prepositional-phrase> | <predicate-adjective>
+
+<remainder> ::= <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>?
+
+// ============================================================================
+// VARIETY-SPECIFIC LEXICAL DIFFERENCES
+// ============================================================================
+
+/* Conservative vs. Radical lexical choices */
+<variety-vocabulary> ::= <conservative-lexicon>
+                      | <radical-lexicon>
+
+<conservative-lexicon> ::= @VARIETY[conservative] ( "jeg" | "de" | "ikke" | "også" | "bare" | "mange" )
+
+<radical-lexicon> ::= @VARIETY[radical] ( "jeg" | "dei" | "ikkje" | "òg" | "berre" | "mange" )
 
 // ============================================================================
 // WHITESPACE AND PUNCTUATION

@@ -1,37 +1,32 @@
-// Old Norse (Norrœnt mál) Grammar
-// Comprehensive grammar for Old Norse (Viking Age, 800-1350 AD)
-// Ancestor of all modern North Germanic languages
-// CEBNF Format with Context-Sensitive Rules
+/*
+ * Old Norse (Norrœnt mál) Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Old Norse language structures including:
+ * - Regular and irregular verb conjugations (all tenses, moods, voices)
+ * - Full noun declension system (4 cases, 3 genders, 3 numbers including dual)
+ * - Strong and weak verb classes (all ablaut patterns)
+ * - Strong and weak adjective declensions
+ * - Context-sensitive agreement rules (gender, number, case, definiteness)
+ * - Complex sentence structures with subordination
+ * - Multiple tenses (present, past, perfect, pluperfect)
+ * - Branch distinctions (West Norse vs. East Norse)
+ * - Ancestor of all modern North Germanic languages (Viking Age, 800-1350 AD)
+ * 
+ * Copyright (C) 2024 Minotaur Project
+ * Licensed under GNU Affero General Public License v3.0 (AGPL-3.0)
+ */
 
-GRAMMAR Old_Norse
+Grammar: Old_Norse
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
 
-// Token splitting configuration for natural language
-TOKEN_SPLIT " "
+Keywords: ok, eða, en, ef, at, er, var, vera, hafa, með, þú, hann, hon, þat, ek, vér, þér, þeir, þær, þau, minn, þinn, hans, hennar, várr, yðvarr, þeirra, eigi, aldregi, mjök, svá, hér, þar, nú, þá, jafnan, opt, sjaldan
 
-// ============================================================================
-// SENTENCE STRUCTURES
-// ============================================================================
-
-<sentence> ::= <declarative-sentence>
-            | <interrogative-sentence>
-            | <imperative-sentence>
-            | <compound-sentence>
-            | <complex-sentence>
-
-<declarative-sentence> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]* "."
-
-<interrogative-sentence> ::= <question-word> <verb> <subject-np> [ <object-np> ]* "?"
-                          | <verb> <subject-np> [ <object-np> ]* "?"
-
-<imperative-sentence> ::= <imperative-verb> [ <object-np> ]* "!"
-
-<compound-sentence> ::= <declarative-sentence> <coordinating-conjunction> <declarative-sentence>
-
-<complex-sentence> ::= <main-clause> <subordinating-conjunction> <subordinate-clause>
-
-<main-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
-
-<subordinate-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+/* Branch markers for Old Norse linguistic variations */
+@BRANCH[west_norse]    /* West Norse - Iceland, Norway, Faroe Islands, Greenland, Shetland, Orkney */
+@BRANCH[east_norse]    /* East Norse - Denmark, Sweden, Eastern settlements */
 
 // ============================================================================
 // NOUN PHRASES (4 cases, 3 genders, 3 numbers including dual)
@@ -276,13 +271,422 @@ ei"
 // QUESTION WORDS
 // ============================================================================
 
-<question-word> ::= "hverr" | "hvat" | "hvar" | "hvenær"
+<question-word> ::= "hverr" | "hvat" | "hvar" | "hvenær" | "hví" | "hvadan" | "hversu"
 
 // ============================================================================
-// WHITESPACE
+// EXPANDED SENTENCE STRUCTURES
 // ============================================================================
 
+/* Optional whitespace */
+<opt-whitespace> ::= /[ \t\n\r]+/ | ""
 <whitespace> ::= /[ \t\n\r]+/
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Enhanced sentence structures */
+<sentence> ::= <main-clause>
+            | <subordinate-clause-standalone>
+            | <compound-sentence>
+            | <complex-sentence>
+
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+
+<declarative-clause> ::= <subject> <opt-whitespace> <finite-verb> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <punctuation>?
+
+<subject> ::= <noun-phrase>
+           | <pronoun-nominative>
+
+<middle-field> ::= <negation>? <opt-whitespace> <adverb>? <opt-whitespace> <object>?
+
+<negation> ::= <standard-negation> | <branch-negation>
+
+<standard-negation> ::= "eigi" | "ekki" | "aldregi"
+
+<branch-negation> ::= @BRANCH[west_norse] ( "eigi" | "ekki" )
+                   | @BRANCH[east_norse] ( "ęngi" | "ękki" )
+
+<interrogative-clause> ::= <yes-no-question>
+                        | <wh-question>
+
+<yes-no-question> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? "?"
+
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? ( "!" | "." )?
+
+<subordinate-clause-standalone> ::= <subordinate-clause>
+
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase>
+
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+// ============================================================================
+// PRONOUNS (complete paradigm with 4 cases)
+// ============================================================================
+
+/* Personal pronouns - nominative case */
+<pronoun-nominative> ::= <personal-pronoun-nominative>
+                      | <demonstrative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( <standard-nominative> | <branch-nominative> )
+
+<standard-nominative> ::= "ek" | "þú" | "hann" | "hon" | "þat" | "vér" | "þér" | "þeir" | "þær" | "þau"
+
+<branch-nominative> ::= @BRANCH[west_norse] ( "ek" | "þú" | "hann" | "hon" | "þat" | "vér" | "þér" | "þeir" | "þær" | "þau" )
+                     | @BRANCH[east_norse] ( "iak" | "þu" | "han" | "hon" | "þat" | "vir" | "þer" | "þeir" | "þær" | "þau" )
+
+/* Personal pronouns - accusative case */
+<personal-pronoun-accusative> ::= @CASE[accusative] ( "mik" | "þik" | "hann" | "hana" | "þat" | "okkr" | "ykkr" | "þá" | "þær" | "þau" )
+
+/* Personal pronouns - dative case */
+<personal-pronoun-dative> ::= @CASE[dative] ( "mér" | "þér" | "honum" | "henni" | "því" | "okkr" | "ykkr" | "þeim" )
+
+/* Personal pronouns - genitive case */
+<personal-pronoun-genitive> ::= @CASE[genitive] ( "mín" | "þín" | "hans" | "hennar" | "þess" | "okkar" | "ykkar" | "þeirra" )
+
+/* Demonstrative pronouns */
+<demonstrative-pronoun> ::= @GENDER[masculine] @NUMBER[singular] ( "þessi" | "sá" | "hinn" )
+                         | @GENDER[feminine] @NUMBER[singular] ( "þessi" | "sú" | "hin" )
+                         | @GENDER[neuter] @NUMBER[singular] ( "þetta" | "þat" | "hit" )
+                         | @NUMBER[plural] ( "þessir" | "þessar" | "þessi" | "þeir" | "þær" | "þau" )
+
+/* Reflexive pronouns */
+<reflexive-pronoun> ::= "sik" | "sér" | "sín"
+
+/* Possessive pronouns */
+<possessive-pronoun> ::= "minn" | "þinn" | "sinn" | "várr" | "yðvarr" | "hans" | "hennar" | "þeirra"
+
+// ============================================================================
+// EXPANDED VERB SYSTEM (Strong and Weak Classes)
+// ============================================================================
+
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb> ( <opt-whitespace> <adverb> )?
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+
+<compound-verb-phrase> ::= <auxiliary-verb> <opt-whitespace> <verb-complement>
+
+<verb-complement> ::= <infinitive-phrase>
+                   | <past-participle>
+
+<infinitive-phrase> ::= ( "at" <opt-whitespace> )? <verb-infinitive>
+
+/* Main verb with tense */
+<main-verb> ::= <verb-present>
+             | <verb-past>
+             | <verb-perfect>
+
+/* Present tense */
+<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> | <branch-verb-present> )
+
+<regular-verb-present> ::= <verb-stem> "r" | <verb-stem> "ir" | <verb-stem> "ar"
+
+<verb-stem> ::= /[a-záðéíóúýþæö]+/
+
+/* Irregular verbs in present tense */
+<irregular-verb-present> ::= @IRREGULAR ( <irregular-vera> | <irregular-hafa> | <irregular-verða> | <irregular-fara> | <irregular-koma> )
+
+<irregular-vera> ::= "em" | "est" | "er" | "erum" | "eruð" | "eru"  // to be
+
+<irregular-hafa> ::= "hefi" | "hefir" | "hefir" | "höfum" | "hafið" | "hafa"  // to have
+
+<irregular-verða> ::= "verð" | "verðr" | "verðr" | "verðum" | "verðið" | "verða"  // to become
+
+<irregular-fara> ::= "fer" | "ferr" | "ferr" | "förum" | "farið" | "fara"  // to go
+
+<irregular-koma> ::= "kem" | "kemr" | "kemr" | "komum" | "komið" | "koma"  // to come
+
+/* Branch-specific verb forms */
+<branch-verb-present> ::= @BRANCH[west_norse] <verb-stem> "r"
+                       | @BRANCH[east_norse] <verb-stem> "r"
+
+/* Past tense - strong and weak verbs */
+<verb-past> ::= @TENSE[past] ( <strong-verb-past> | <weak-verb-past> | <irregular-verb-past> )
+
+/* Strong verb classes (ablaut patterns) */
+<strong-verb-past> ::= <strong-class-1>
+                    | <strong-class-2>
+                    | <strong-class-3>
+                    | <strong-class-4>
+                    | <strong-class-5>
+                    | <strong-class-6>
+                    | <strong-class-7>
+
+<strong-class-1> ::= @VERB_CLASS[1] <verb-stem> // í → ei → i (bíta → beit → bitu)
+
+<strong-class-2> ::= @VERB_CLASS[2] <verb-stem> // jú → au → u (bjóða → bauð → buðu)
+
+<strong-class-3> ::= @VERB_CLASS[3] <verb-stem> // e → a → u (binda → batt → bundu)
+
+<strong-class-4> ::= @VERB_CLASS[4] <verb-stem> // e → a → á (bera → bar → báru)
+
+<strong-class-5> ::= @VERB_CLASS[5] <verb-stem> // e → a → á (gefa → gaf → gáfu)
+
+<strong-class-6> ::= @VERB_CLASS[6] <verb-stem> // a → ó → ó (fara → fór → fóru)
+
+<strong-class-7> ::= @VERB_CLASS[7] <verb-stem> // reduplicating (halda → helt → helt)
+
+/* Weak verb classes */
+<weak-verb-past> ::= <weak-class-1>
+                  | <weak-class-2>
+                  | <weak-class-3>
+
+<weak-class-1> ::= @VERB_CLASS[weak-1] <verb-stem> ( "ða" | "da" | "ta" )
+
+<weak-class-2> ::= @VERB_CLASS[weak-2] <verb-stem> "aða"
+
+<weak-class-3> ::= @VERB_CLASS[weak-3] <verb-stem> "ði"
+
+/* Irregular past tense verbs */
+<irregular-verb-past> ::= @IRREGULAR ( <irregular-vera-past> | <irregular-hafa-past> | <irregular-verða-past> | <irregular-fara-past> | <irregular-koma-past> )
+
+<irregular-vera-past> ::= "var" | "vast" | "var" | "várum" | "váruð" | "váru"
+
+<irregular-hafa-past> ::= "hafða" | "hafðir" | "hafði" | "höfðum" | "höfðuð" | "höfðu"
+
+<irregular-verða-past> ::= "varð" | "varðst" | "varð" | "urðum" | "urðuð" | "urðu"
+
+<irregular-fara-past> ::= "fór" | "fórst" | "fór" | "fórum" | "fóruð" | "fóru"
+
+<irregular-koma-past> ::= "kom" | "komst" | "kom" | "komum" | "komuð" | "komu"
+
+/* Perfect tense - hafa/vera + past participle */
+<verb-perfect> ::= @TENSE[perfect] <perfect-auxiliary> <opt-whitespace> <past-participle>
+
+<perfect-auxiliary> ::= "hefi" | "hefir" | "er" | "eru"
+
+<past-participle> ::= <verb-stem> ( "inn" | "it" | "ið" | "t" )
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= "hefi" | "hefir" | "er" | "munu" | "skulu"
+
+<verb-infinitive> ::= <verb-stem> "a"
+
+/* Imperative */
+<verb-imperative> ::= <imperative-verb>
+
+<imperative-verb> ::= <verb-stem> | <irregular-imperative>
+
+<irregular-imperative> ::= "ver" | "haf" | "far" | "kom" | "tak" | "gef"
+
+// ============================================================================
+// ADJECTIVES (strong and weak declensions)
+// ============================================================================
+
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "mjök" | "harla" | "svá"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree with strong/weak declension */
+<adjective-positive> ::= <adjective-strong> | <adjective-weak>
+
+<adjective-strong> ::= @DECLENSION[strong] ( "góðr" | "mikill" | "lítill" | "stórr" | "langr" | "ungr" | "gamall" )
+
+<adjective-weak> ::= @DECLENSION[weak] ( "góði" | "góða" | "mikli" | "mikla" | "litli" | "litla" )
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] ( "betri" | "verri" | "meiri" | "minni" | "stœrri" | "lengri" | "eldri" | "yngri" )
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] ( "beztr" | "verstr" | "mestr" | "minstr" | "stœrstr" | "lengstr" | "elztr" | "yngstr" )
+
+// ============================================================================
+// ADVERBS
+// ============================================================================
+
+<adverb> ::= <time-adverb>
+         | <place-adverb>
+         | <manner-adverb>
+         | <degree-adverb>
+
+<time-adverb> ::= "nú" | "þá" | "áðr" | "síðan" | "jafnan" | "aldregi" | "opt" | "sjaldan" | "brátt" | "lengi"
+
+<place-adverb> ::= "hér" | "þar" | "hvar" | "heima" | "úti" | "inni" | "uppi" | "niðri" | "fram" | "aptr" | "norðr" | "suðr" | "austr" | "vestr"
+
+<manner-adverb> ::= "vel" | "illa" | "skjótt" | "hægt" | "rétt" | "rangt"
+
+<degree-adverb> ::= "mjök" | "svá" | "þvílíkt" | "harla" | "afar"
+
+// ============================================================================
+// PREPOSITIONS (with case government)
+// ============================================================================
+
+<preposition> ::= <preposition-acc>
+               | <preposition-dat>
+               | <preposition-gen>
+
+<preposition-acc> ::= "um" | "gegnum" | "fyrir" @GOVERNS_CASE[accusative]
+
+<preposition-dat> ::= "á" | "í" | "frá" | "með" | "at" | "af" | "til" | "hjá" | "úr" | "við" | "undir" | "yfir" @GOVERNS_CASE[dative]
+
+<preposition-gen> ::= "til" | "frá" | "án" | "vegna" | "innan" | "utan" @GOVERNS_CASE[genitive]
+
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+// ============================================================================
+// CONJUNCTIONS
+// ============================================================================
+
+<coordinating-conjunction> ::= "ok" | "eða" | "en" | "né" | "þó"
+
+<subordinating-conjunction> ::= "at" | "ef" | "þá er" | "þar er" | "vegna þess at" | "þó at" | "áðr en" | "eptir at" | "meðan"
+
+// ============================================================================
+// BRANCH-SPECIFIC VARIATIONS
+// ============================================================================
+
+<branch-vocabulary> ::= <west-norse-forms>
+                     | <east-norse-forms>
+
+<west-norse-forms> ::= @BRANCH[west_norse] ( <west-pronouns> | <west-verbs> | <west-nouns> )
+
+<west-pronouns> ::= @BRANCH[west_norse] ( "ek" | "þú" | "vér" | "þér" | "þeir" )
+
+<west-verbs> ::= @BRANCH[west_norse] ( "em" | "hefir" | "verðr" | "ferr" )
+
+<west-nouns> ::= @BRANCH[west_norse] ( "maðr" | "konungr" | "dróttinn" )
+
+<east-norse-forms> ::= @BRANCH[east_norse] ( <east-pronouns> | <east-verbs> | <east-nouns> )
+
+<east-pronouns> ::= @BRANCH[east_norse] ( "iak" | "þu" | "vir" | "þer" | "þeir" )
+
+<east-verbs> ::= @BRANCH[east_norse] ( "ęm" | "hęvir" | "vęrþr" | "fęrr" )
+
+<east-nouns> ::= @BRANCH[east_norse] ( "maþr" | "konungr" | "drottin" )
+
+// ============================================================================
+// PROPER NOUNS
+// ============================================================================
+
+<proper-noun> ::= <norse-name>
+               | <place-name>
+
+<norse-name> ::= /[A-ZÁÐÉÍÓÚÝÞÆÖ][a-záðéíóúýþæö]+/
+
+<place-name> ::= "Norðrvegr" | "Ísland" | "Danmörk" | "Svíþjóð" | "Grœnland" | "Færeyjar" | "Orkneyjar" | "Hjaltland"
+
+// ============================================================================
+// NUMERALS
+// ============================================================================
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "einn" | "tveir" | "þrír" | "fjórir" | "fimm" | "sex" | "sjau" | "átta" | "níu" | "tíu" | "ellifu" | "tólf" | "þrettán"
+
+<ordinal-number> ::= "fyrstr" | "annarr" | "þriði" | "fjórði" | "fimmti" | "sétti" | "sjöundi" | "áttundi" | "níundi" | "tíundi"
+
+<object> ::= <noun-phrase>
+          | <personal-pronoun-accusative>
+
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+// ============================================================================
+// DUAL NUMBER FORMS (special to Old Norse)
+// ============================================================================
+
+/* Dual number pronouns (for "we two", "you two", "they two") */
+<dual-pronoun-nominative> ::= @NUMBER[dual] ( "vit" | "þit" )
+
+<dual-pronoun-accusative> ::= @NUMBER[dual] ( "okkr" | "ykkr" )
+
+<dual-pronoun-dative> ::= @NUMBER[dual] ( "okkr" | "ykkr" )
+
+<dual-pronoun-genitive> ::= @NUMBER[dual] ( "okkar" | "ykkar" )
+
+/* Dual number verb forms */
+<dual-verb-present> ::= @NUMBER[dual] ( <verb-stem> "um" ) // for "we two", "you two"
+
+<dual-verb-past> ::= @NUMBER[dual] ( <verb-stem> "um" ) // for "we two", "you two"
+
+// ============================================================================
+// ADDITIONAL STRONG VERB EXAMPLES
+// ============================================================================
+
+/* Strong verb class 1 (í → ei → i) */
+<strong-class-1-examples> ::= @VERB_CLASS[1] ( "bíta" | "beit" | "bitu" | "bitinn" )  // bite
+                           | @VERB_CLASS[1] ( "ríða" | "reiðr" | "riðu" | "riðinn" )  // ride
+                           | @VERB_CLASS[1] ( "skína" | "skein" | "skinu" | "skininn" )  // shine
+
+/* Strong verb class 2 (jú → au → u) */
+<strong-class-2-examples> ::= @VERB_CLASS[2] ( "bjóða" | "bauð" | "buðu" | "boðinn" )  // offer
+                           | @VERB_CLASS[2] ( "ljúka" | "lauk" | "luku" | "lokinn" )  // close
+                           | @VERB_CLASS[2] ( "brjóta" | "braut" | "brutu" | "brotinn" )  // break
+
+/* Strong verb class 3 (e → a → u) */
+<strong-class-3-examples> ::= @VERB_CLASS[3] ( "binda" | "batt" | "bundu" | "bundinn" )  // bind
+                           | @VERB_CLASS[3] ( "finna" | "fann" | "funnu" | "fundinn" )  // find
+                           | @VERB_CLASS[3] ( "vinna" | "vann" | "unnu" | "unninn" )  // win
+
+/* Strong verb class 4 (e → a → á) */
+<strong-class-4-examples> ::= @VERB_CLASS[4] ( "bera" | "bar" | "báru" | "borinn" )  // bear/carry
+                           | @VERB_CLASS[4] ( "stela" | "stal" | "stálu" | "stolinn" )  // steal
+                           | @VERB_CLASS[4] ( "koma" | "kom" | "kómu" | "kominn" )  // come
+
+/* Strong verb class 5 (e → a → á) */
+<strong-class-5-examples> ::= @VERB_CLASS[5] ( "gefa" | "gaf" | "gáfu" | "gefinn" )  // give
+                           | @VERB_CLASS[5] ( "eta" | "át" | "átu" | "etinn" )  // eat
+                           | @VERB_CLASS[5] ( "sjá" | "sá" | "sáu" | "sénn" )  // see
+
+/* Strong verb class 6 (a → ó → ó) */
+<strong-class-6-examples> ::= @VERB_CLASS[6] ( "fara" | "fór" | "fóru" | "farinn" )  // go
+                           | @VERB_CLASS[6] ( "taka" | "tók" | "tóku" | "tekinn" )  // take
+                           | @VERB_CLASS[6] ( "draga" | "dró" | "drógu" | "dreginn" )  // draw/pull
+
+/* Strong verb class 7 (reduplicating) */
+<strong-class-7-examples> ::= @VERB_CLASS[7] ( "halda" | "helt" | "heldu" | "haldinn" )  // hold
+                           | @VERB_CLASS[7] ( "ganga" | "gekk" | "gengu" | "genginn" )  // walk
+                           | @VERB_CLASS[7] ( "falla" | "fell" | "fellu" | "fallinn" )  // fall
+
+// ============================================================================
+// WEAK NOUN DECLENSIONS
+// ============================================================================
+
+/* Weak masculine nouns (like "goði" - chieftain) */
+<noun-masc-weak-nom-sg> ::= "goði" @GENDER[masculine] @NUMBER[singular] @CASE[nominative] @DECLENSION[weak]
+<noun-masc-weak-acc-sg> ::= "goða" @GENDER[masculine] @NUMBER[singular] @CASE[accusative] @DECLENSION[weak]
+<noun-masc-weak-dat-sg> ::= "goða" @GENDER[masculine] @NUMBER[singular] @CASE[dative] @DECLENSION[weak]
+<noun-masc-weak-gen-sg> ::= "goða" @GENDER[masculine] @NUMBER[singular] @CASE[genitive] @DECLENSION[weak]
+<noun-masc-weak-nom-pl> ::= "goðar" @GENDER[masculine] @NUMBER[plural] @CASE[nominative] @DECLENSION[weak]
+<noun-masc-weak-acc-pl> ::= "goða" @GENDER[masculine] @NUMBER[plural] @CASE[accusative] @DECLENSION[weak]
+<noun-masc-weak-dat-pl> ::= "goðum" @GENDER[masculine] @NUMBER[plural] @CASE[dative] @DECLENSION[weak]
+<noun-masc-weak-gen-pl> ::= "goða" @GENDER[masculine] @NUMBER[plural] @CASE[genitive] @DECLENSION[weak]
+
+/* Weak feminine nouns (like "tunga" - tongue/language) */
+<noun-fem-weak-nom-sg> ::= "tunga" @GENDER[feminine] @NUMBER[singular] @CASE[nominative] @DECLENSION[weak]
+<noun-fem-weak-acc-sg> ::= "tungu" @GENDER[feminine] @NUMBER[singular] @CASE[accusative] @DECLENSION[weak]
+<noun-fem-weak-dat-sg> ::= "tungu" @GENDER[feminine] @NUMBER[singular] @CASE[dative] @DECLENSION[weak]
+<noun-fem-weak-gen-sg> ::= "tungu" @GENDER[feminine] @NUMBER[singular] @CASE[genitive] @DECLENSION[weak]
+<noun-fem-weak-nom-pl> ::= "tungur" @GENDER[feminine] @NUMBER[plural] @CASE[nominative] @DECLENSION[weak]
+<noun-fem-weak-acc-pl> ::= "tungur" @GENDER[feminine] @NUMBER[plural] @CASE[accusative] @DECLENSION[weak]
+<noun-fem-weak-dat-pl> ::= "tungum" @GENDER[feminine] @NUMBER[plural] @CASE[dative] @DECLENSION[weak]
+<noun-fem-weak-gen-pl> ::= "tungna" @GENDER[feminine] @NUMBER[plural] @CASE[genitive] @DECLENSION[weak]
+
+/* Weak neuter nouns (like "hjarta" - heart) */
+<noun-neut-weak-nom-sg> ::= "hjarta" @GENDER[neuter] @NUMBER[singular] @CASE[nominative] @DECLENSION[weak]
+<noun-neut-weak-acc-sg> ::= "hjarta" @GENDER[neuter] @NUMBER[singular] @CASE[accusative] @DECLENSION[weak]
+<noun-neut-weak-dat-sg> ::= "hjarta" @GENDER[neuter] @NUMBER[singular] @CASE[dative] @DECLENSION[weak]
+<noun-neut-weak-gen-sg> ::= "hjarta" @GENDER[neuter] @NUMBER[singular] @CASE[genitive] @DECLENSION[weak]
+<noun-neut-weak-nom-pl> ::= "hjörtu" @GENDER[neuter] @NUMBER[plural] @CASE[nominative] @DECLENSION[weak]
+<noun-neut-weak-acc-pl> ::= "hjörtu" @GENDER[neuter] @NUMBER[plural] @CASE[accusative] @DECLENSION[weak]
+<noun-neut-weak-dat-pl> ::= "hjörtum" @GENDER[neuter] @NUMBER[plural] @CASE[dative] @DECLENSION[weak]
+<noun-neut-weak-gen-pl> ::= "hjartna" @GENDER[neuter] @NUMBER[plural] @CASE[genitive] @DECLENSION[weak]
 
 // V2 WORD ORDER RULE (Verb-Second)
 // Old Norse follows V2 word order in main clauses
