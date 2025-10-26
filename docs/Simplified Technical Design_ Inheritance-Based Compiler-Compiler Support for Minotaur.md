@@ -1,59 +1,59 @@
-# Simplified Technical Design: Inheritance-Based Compiler-Compiler Support for GrammarForge
+# Simplified Technical Design: Inheritance-Based Compiler-Compiler Support for Minotaur
 
 **Document Version**: 1.0  
 **Author**: Manus AI  
 **Date**: July 20, 2025  
-**Project**: GrammarForge Simplified Compiler-Compiler Integration
+**Project**: Minotaur Simplified Compiler-Compiler Integration
 
 ## Executive Summary
 
-This simplified technical design specification leverages GrammarForge's existing GLR (Generalized LR) parsing capabilities to provide compiler-compiler support through inheritance-based .grammar files. Unlike traditional parser generators that suffer from LL(*) and LR ambiguity conflicts, GrammarForge's GLR variation uses multi-path parsing to handle ambiguities gracefully, eliminating the need for complex multi-engine architectures.
+This simplified technical design specification leverages Minotaur's existing GLR (Generalized LR) parsing capabilities to provide compiler-compiler support through inheritance-based .grammar files. Unlike traditional parser generators that suffer from LL(*) and LR ambiguity conflicts, Minotaur's GLR variation uses multi-path parsing to handle ambiguities gracefully, eliminating the need for complex multi-engine architectures.
 
-The proposed solution creates base .grammar files that define the fundamental parsing patterns for ANTLR v4, Bison/Flex, and Yacc/Lex formats. User grammars can then inherit from these base definitions, allowing GrammarForge's existing parser to handle the imported grammar constructs directly without requiring separate parsing engines or complex translation layers.
+The proposed solution creates base .grammar files that define the fundamental parsing patterns for ANTLR v4, Bison/Flex, and Yacc/Lex formats. User grammars can then inherit from these base definitions, allowing Minotaur's existing parser to handle the imported grammar constructs directly without requiring separate parsing engines or complex translation layers.
 
-This approach dramatically simplifies the implementation while maintaining full compatibility with existing GrammarForge features including visual editing, real-time debugging, rule activation callbacks, and cross-platform support. The inheritance mechanism provides clean extensibility for additional parser generator formats while preserving the semantic richness of the original grammar definitions.
+This approach dramatically simplifies the implementation while maintaining full compatibility with existing Minotaur features including visual editing, real-time debugging, rule activation callbacks, and cross-platform support. The inheritance mechanism provides clean extensibility for additional parser generator formats while preserving the semantic richness of the original grammar definitions.
 
 ## 1. GLR Parsing Advantage Analysis
 
-### 1.1 Understanding GrammarForge's GLR Implementation
+### 1.1 Understanding Minotaur's GLR Implementation
 
-GrammarForge's GLR (Generalized LR) parsing implementation represents a significant advancement over traditional parsing algorithms by eliminating the fundamental limitations that plague LL(*) and LR parsers. Traditional LL parsers suffer from left recursion issues and require extensive grammar restructuring to handle common programming language constructs like expression parsing. LR parsers, while capable of handling left recursion, encounter shift/reduce and reduce/reduce conflicts that require careful grammar design and precedence declarations to resolve.
+Minotaur's GLR (Generalized LR) parsing implementation represents a significant advancement over traditional parsing algorithms by eliminating the fundamental limitations that plague LL(*) and LR parsers. Traditional LL parsers suffer from left recursion issues and require extensive grammar restructuring to handle common programming language constructs like expression parsing. LR parsers, while capable of handling left recursion, encounter shift/reduce and reduce/reduce conflicts that require careful grammar design and precedence declarations to resolve.
 
-The GLR approach implemented in GrammarForge transcends these limitations through its multi-path parsing strategy. When the parser encounters an ambiguous situation where multiple parsing paths are possible, rather than forcing a single choice (as traditional parsers do), the GLR implementation maintains all viable paths simultaneously. This parallel processing of potential parse trees continues until the ambiguity resolves naturally through subsequent input tokens, at which point invalid paths are pruned and valid paths are merged.
+The GLR approach implemented in Minotaur transcends these limitations through its multi-path parsing strategy. When the parser encounters an ambiguous situation where multiple parsing paths are possible, rather than forcing a single choice (as traditional parsers do), the GLR implementation maintains all viable paths simultaneously. This parallel processing of potential parse trees continues until the ambiguity resolves naturally through subsequent input tokens, at which point invalid paths are pruned and valid paths are merged.
 
-This multi-path capability is particularly powerful for compiler-compiler integration because it means that GrammarForge can directly parse grammar constructs that would be problematic for traditional parsers. ANTLR v4 grammars often contain constructs that would create conflicts in LR parsers, while Bison grammars may include patterns that would require significant restructuring for LL parsers. GrammarForge's GLR implementation can handle both types of constructs without modification, making inheritance-based integration feasible.
+This multi-path capability is particularly powerful for compiler-compiler integration because it means that Minotaur can directly parse grammar constructs that would be problematic for traditional parsers. ANTLR v4 grammars often contain constructs that would create conflicts in LR parsers, while Bison grammars may include patterns that would require significant restructuring for LL parsers. Minotaur's GLR implementation can handle both types of constructs without modification, making inheritance-based integration feasible.
 
 The step-by-step parsing architecture described in the technical specification supports this GLR approach by maintaining active productions for each lexer path and allowing parser paths to split and merge dynamically. This architecture provides the foundation for handling diverse grammar formats without requiring separate parsing engines or complex conflict resolution mechanisms.
 
 ### 1.2 Ambiguity Resolution Through Multi-Path Processing
 
-The key insight that enables simplified compiler-compiler support is understanding how GrammarForge's multi-path processing eliminates traditional parsing conflicts. In conventional parser generators, ambiguities are treated as errors that must be resolved through grammar modification, precedence declarations, or algorithm-specific techniques. GrammarForge's approach treats ambiguities as natural occurrences that can be resolved through continued parsing.
+The key insight that enables simplified compiler-compiler support is understanding how Minotaur's multi-path processing eliminates traditional parsing conflicts. In conventional parser generators, ambiguities are treated as errors that must be resolved through grammar modification, precedence declarations, or algorithm-specific techniques. Minotaur's approach treats ambiguities as natural occurrences that can be resolved through continued parsing.
 
-Consider a typical example where both ANTLR v4 and Bison might handle expression parsing differently. ANTLR v4 might use left-recursive rules that would cause problems for traditional LL parsers, while Bison might use precedence declarations that assume LR parsing behavior. GrammarForge's GLR implementation can handle both approaches simultaneously, allowing the parser to explore multiple interpretations until the correct one becomes clear from context.
+Consider a typical example where both ANTLR v4 and Bison might handle expression parsing differently. ANTLR v4 might use left-recursive rules that would cause problems for traditional LL parsers, while Bison might use precedence declarations that assume LR parsing behavior. Minotaur's GLR implementation can handle both approaches simultaneously, allowing the parser to explore multiple interpretations until the correct one becomes clear from context.
 
-This capability is crucial for inheritance-based compiler-compiler support because it means that base .grammar files can define parsing patterns that accommodate multiple interpretation strategies. When a user grammar inherits from an ANTLR v4 base grammar, the inherited rules can coexist with GrammarForge's native parsing strategies without creating conflicts or requiring special handling.
+This capability is crucial for inheritance-based compiler-compiler support because it means that base .grammar files can define parsing patterns that accommodate multiple interpretation strategies. When a user grammar inherits from an ANTLR v4 base grammar, the inherited rules can coexist with Minotaur's native parsing strategies without creating conflicts or requiring special handling.
 
 The multi-path processing also provides natural error recovery capabilities that enhance the robustness of imported grammars. When parsing encounters an error in one path, other paths may continue successfully, providing better error reporting and recovery than traditional single-path parsers. This resilience is particularly valuable when working with complex grammars that may contain edge cases or unusual constructs.
 
 ### 1.3 Semantic Preservation Through Inheritance
 
-The inheritance-based approach preserves the semantic intent of original grammars while adapting them to GrammarForge's parsing model. Rather than translating grammar constructs to different formats (which can introduce semantic changes), inheritance allows the original constructs to be extended and specialized within GrammarForge's framework.
+The inheritance-based approach preserves the semantic intent of original grammars while adapting them to Minotaur's parsing model. Rather than translating grammar constructs to different formats (which can introduce semantic changes), inheritance allows the original constructs to be extended and specialized within Minotaur's framework.
 
-This preservation is achieved through careful design of base .grammar files that capture the essential parsing patterns of each target format while remaining compatible with GrammarForge's GLR implementation. The base grammars serve as semantic templates that define how constructs like precedence relationships, associativity rules, and error recovery should be interpreted within GrammarForge's parsing model.
+This preservation is achieved through careful design of base .grammar files that capture the essential parsing patterns of each target format while remaining compatible with Minotaur's GLR implementation. The base grammars serve as semantic templates that define how constructs like precedence relationships, associativity rules, and error recovery should be interpreted within Minotaur's parsing model.
 
-When user grammars inherit from these base definitions, they gain access to format-specific parsing behaviors while benefiting from GrammarForge's advanced features like visual debugging and real-time grammar modification. The inheritance mechanism ensures that semantic actions, precedence relationships, and other format-specific features are preserved and interpreted correctly within the GLR parsing framework.
+When user grammars inherit from these base definitions, they gain access to format-specific parsing behaviors while benefiting from Minotaur's advanced features like visual debugging and real-time grammar modification. The inheritance mechanism ensures that semantic actions, precedence relationships, and other format-specific features are preserved and interpreted correctly within the GLR parsing framework.
 
 ## 2. Inheritance-Based Architecture Design
 
 ### 2.1 Base Grammar File Structure
 
-The foundation of the simplified compiler-compiler support lies in creating comprehensive base .grammar files that define the fundamental parsing patterns for each supported parser generator format. These base files serve as semantic templates that capture the essential characteristics of ANTLR v4, Bison/Flex, and Yacc/Lex grammars while remaining fully compatible with GrammarForge's GLR parsing implementation.
+The foundation of the simplified compiler-compiler support lies in creating comprehensive base .grammar files that define the fundamental parsing patterns for each supported parser generator format. These base files serve as semantic templates that capture the essential characteristics of ANTLR v4, Bison/Flex, and Yacc/Lex grammars while remaining fully compatible with Minotaur's GLR parsing implementation.
 
-The base grammar files are designed using GrammarForge's existing CEBNF (Core Extended Backus-Naur Form) syntax, extended with inheritance mechanisms that allow user grammars to specialize and extend the base definitions. This approach leverages GrammarForge's existing grammar loading and interpretation infrastructure while adding the semantic richness necessary for compiler-compiler support.
+The base grammar files are designed using Minotaur's existing CEBNF (Core Extended Backus-Naur Form) syntax, extended with inheritance mechanisms that allow user grammars to specialize and extend the base definitions. This approach leverages Minotaur's existing grammar loading and interpretation infrastructure while adding the semantic richness necessary for compiler-compiler support.
 
 Each base grammar file includes several key components: fundamental rule patterns that define how grammar constructs should be parsed, semantic action templates that provide framework for executing format-specific behaviors, precedence and associativity definitions that capture the default behaviors of each parser generator, error recovery patterns that define how parsing errors should be handled, and extension points that allow user grammars to add format-specific features.
 
-The base grammar structure follows GrammarForge's established format while incorporating inheritance-specific extensions:
+The base grammar structure follows Minotaur's established format while incorporating inheritance-specific extensions:
 
 ```
 Grammar: <BaseGrammarName>
@@ -69,29 +69,29 @@ FormatType: <ANTLR4|BisonFlex|YaccLex>
 
 ### 2.2 ANTLR v4 Base Grammar Design
 
-The ANTLR v4 base grammar file (antlr4_base.grammar) captures the essential parsing patterns and semantic behaviors of ANTLR v4 grammars while adapting them to GrammarForge's GLR parsing model. This base grammar addresses the unique characteristics of ANTLR v4, including its integrated lexer/parser model, sophisticated precedence handling, and embedded action execution.
+The ANTLR v4 base grammar file (antlr4_base.grammar) captures the essential parsing patterns and semantic behaviors of ANTLR v4 grammars while adapting them to Minotaur's GLR parsing model. This base grammar addresses the unique characteristics of ANTLR v4, including its integrated lexer/parser model, sophisticated precedence handling, and embedded action execution.
 
-The lexer rule patterns in the base grammar define how ANTLR v4's uppercase-named lexer rules should be interpreted within GrammarForge's tokenization framework. These patterns accommodate ANTLR v4's regular expression syntax, fragment rule handling, and lexer mode capabilities. The base grammar provides templates for converting ANTLR v4 lexer constructs to equivalent CEBNF terminal definitions while preserving their semantic behavior.
+The lexer rule patterns in the base grammar define how ANTLR v4's uppercase-named lexer rules should be interpreted within Minotaur's tokenization framework. These patterns accommodate ANTLR v4's regular expression syntax, fragment rule handling, and lexer mode capabilities. The base grammar provides templates for converting ANTLR v4 lexer constructs to equivalent CEBNF terminal definitions while preserving their semantic behavior.
 
-Parser rule patterns address ANTLR v4's lowercase-named parser rules and their integration with the lexer component. The base grammar defines how ANTLR v4's rule alternatives, labeled elements, and embedded actions should be interpreted within GrammarForge's multi-path parsing framework. Special attention is given to handling ANTLR v4's approach to left recursion, which can be processed directly by GrammarForge's GLR implementation without requiring the transformation typically needed for LL parsers.
+Parser rule patterns address ANTLR v4's lowercase-named parser rules and their integration with the lexer component. The base grammar defines how ANTLR v4's rule alternatives, labeled elements, and embedded actions should be interpreted within Minotaur's multi-path parsing framework. Special attention is given to handling ANTLR v4's approach to left recursion, which can be processed directly by Minotaur's GLR implementation without requiring the transformation typically needed for LL parsers.
 
-Precedence and associativity handling in the ANTLR v4 base grammar addresses both explicit precedence declarations and ANTLR v4's implicit precedence based on rule ordering. The base grammar provides mechanisms for capturing these precedence relationships and translating them to GrammarForge's precedence model, ensuring that expression parsing and operator handling maintain their original semantic behavior.
+Precedence and associativity handling in the ANTLR v4 base grammar addresses both explicit precedence declarations and ANTLR v4's implicit precedence based on rule ordering. The base grammar provides mechanisms for capturing these precedence relationships and translating them to Minotaur's precedence model, ensuring that expression parsing and operator handling maintain their original semantic behavior.
 
-The semantic action framework in the base grammar provides templates for handling ANTLR v4's embedded actions while adapting them to GrammarForge's callback mechanism. This framework preserves the execution context and parameter passing conventions that ANTLR v4 actions expect while integrating them with GrammarForge's rule activation callback system.
+The semantic action framework in the base grammar provides templates for handling ANTLR v4's embedded actions while adapting them to Minotaur's callback mechanism. This framework preserves the execution context and parameter passing conventions that ANTLR v4 actions expect while integrating them with Minotaur's rule activation callback system.
 
 ### 2.3 Bison/Flex Base Grammar Design
 
-The Bison/Flex base grammar combination (bison_base.grammar and flex_base.grammar) addresses the unique challenges of supporting a two-file parser generator system within GrammarForge's single-file grammar model. This design maintains the semantic separation between lexical and syntactic analysis while providing unified inheritance mechanisms for both components.
+The Bison/Flex base grammar combination (bison_base.grammar and flex_base.grammar) addresses the unique challenges of supporting a two-file parser generator system within Minotaur's single-file grammar model. This design maintains the semantic separation between lexical and syntactic analysis while providing unified inheritance mechanisms for both components.
 
-The Flex base grammar (flex_base.grammar) defines patterns for handling Flex lexer specifications, including regular expression syntax, start conditions (lexical states), and token definition mechanisms. The base grammar provides templates for converting Flex's three-section file format to GrammarForge's rule-based structure while preserving the semantic behavior of lexical state management and token generation.
+The Flex base grammar (flex_base.grammar) defines patterns for handling Flex lexer specifications, including regular expression syntax, start conditions (lexical states), and token definition mechanisms. The base grammar provides templates for converting Flex's three-section file format to Minotaur's rule-based structure while preserving the semantic behavior of lexical state management and token generation.
 
-Start condition handling represents a particular challenge because Flex's lexical states have no direct equivalent in GrammarForge's standard grammar model. The base grammar addresses this through context-sensitive rule definitions that use GrammarForge's context modifier syntax to simulate lexical state behavior. This approach allows inherited grammars to maintain the state-dependent tokenization behavior that Flex provides while working within GrammarForge's unified parsing framework.
+Start condition handling represents a particular challenge because Flex's lexical states have no direct equivalent in Minotaur's standard grammar model. The base grammar addresses this through context-sensitive rule definitions that use Minotaur's context modifier syntax to simulate lexical state behavior. This approach allows inherited grammars to maintain the state-dependent tokenization behavior that Flex provides while working within Minotaur's unified parsing framework.
 
-The Bison base grammar (bison_base.grammar) focuses on parser rule definitions, precedence declarations, and semantic action handling. The base grammar provides patterns for converting Bison's three-section format to GrammarForge's rule structure while preserving the bottom-up parsing semantics that Bison users expect. Special attention is given to handling Bison's approach to shift/reduce conflict resolution and error recovery through explicit error productions.
+The Bison base grammar (bison_base.grammar) focuses on parser rule definitions, precedence declarations, and semantic action handling. The base grammar provides patterns for converting Bison's three-section format to Minotaur's rule structure while preserving the bottom-up parsing semantics that Bison users expect. Special attention is given to handling Bison's approach to shift/reduce conflict resolution and error recovery through explicit error productions.
 
 Token coordination between the Flex and Bison base grammars ensures that token definitions remain consistent across both components. The base grammars include mechanisms for sharing token definitions and maintaining the interface contracts that allow Flex lexers to integrate properly with Bison parsers. This coordination is achieved through shared token definition templates and consistent naming conventions.
 
-Semantic action handling in the Bison base grammar addresses the unique characteristics of Bison's action execution model, including access to the parser stack through $$ and $n syntax, type management for semantic values, and integration with external C code. The base grammar provides templates that adapt these conventions to GrammarForge's callback mechanism while preserving the essential semantic behavior.
+Semantic action handling in the Bison base grammar addresses the unique characteristics of Bison's action execution model, including access to the parser stack through $$ and $n syntax, type management for semantic values, and integration with external C code. The base grammar provides templates that adapt these conventions to Minotaur's callback mechanism while preserving the essential semantic behavior.
 
 ### 2.4 Yacc/Lex Base Grammar Design
 
@@ -99,9 +99,9 @@ The Yacc/Lex base grammar combination (yacc_base.grammar and lex_base.grammar) p
 
 The Lex base grammar (lex_base.grammar) defines patterns for handling the simpler regular expression syntax and more limited feature set of the original Lex tool. The base grammar provides conservative templates that work across different Lex implementations while capturing the essential tokenization behavior. Special consideration is given to handling the differences between various Lex variants and providing appropriate fallback mechanisms for features that may not be universally supported.
 
-The Yacc base grammar (yacc_base.grammar) focuses on the core parser generation capabilities of the original Yacc tool, emphasizing compatibility with the LALR(1) parsing algorithm and basic precedence handling. The base grammar provides templates that capture Yacc's fundamental parsing patterns while adapting them to GrammarForge's more sophisticated GLR implementation.
+The Yacc base grammar (yacc_base.grammar) focuses on the core parser generation capabilities of the original Yacc tool, emphasizing compatibility with the LALR(1) parsing algorithm and basic precedence handling. The base grammar provides templates that capture Yacc's fundamental parsing patterns while adapting them to Minotaur's more sophisticated GLR implementation.
 
-Error recovery in the Yacc/Lex base grammars addresses the simpler error handling mechanisms available in the original tools while providing enhanced capabilities through GrammarForge's multi-path parsing. The base grammars include templates for handling Yacc's error token mechanism while extending it with GrammarForge's more sophisticated error recovery and reporting capabilities.
+Error recovery in the Yacc/Lex base grammars addresses the simpler error handling mechanisms available in the original tools while providing enhanced capabilities through Minotaur's multi-path parsing. The base grammars include templates for handling Yacc's error token mechanism while extending it with Minotaur's more sophisticated error recovery and reporting capabilities.
 
 Legacy compatibility considerations are embedded throughout the Yacc/Lex base grammars, including handling of older syntax conventions, accommodation of implementation-specific behaviors, and provision of migration guidance for moving from legacy tools to more modern alternatives. The base grammars serve as a bridge between historical parser generator usage and contemporary grammar development practices.
 
@@ -110,7 +110,7 @@ Legacy compatibility considerations are embedded throughout the Yacc/Lex base gr
 
 ### 3.1 Grammar Inheritance Syntax
 
-The inheritance mechanism extends GrammarForge's existing grammar syntax to support base grammar specification and rule inheritance. This extension maintains compatibility with existing GrammarForge features while providing the semantic richness necessary for compiler-compiler support.
+The inheritance mechanism extends Minotaur's existing grammar syntax to support base grammar specification and rule inheritance. This extension maintains compatibility with existing Minotaur features while providing the semantic richness necessary for compiler-compiler support.
 
 The inheritance syntax introduces new grammar file headers that specify inheritance relationships:
 
@@ -149,7 +149,7 @@ Specialization syntax allows inheriting grammars to add constraints or context m
 
 ### 3.2 Semantic Action Inheritance
 
-Semantic action inheritance provides mechanisms for preserving and extending the behavioral aspects of base grammars while adapting them to specific use cases. This inheritance system addresses the challenge of maintaining semantic consistency across different parser generator paradigms while leveraging GrammarForge's rule activation callback system.
+Semantic action inheritance provides mechanisms for preserving and extending the behavioral aspects of base grammars while adapting them to specific use cases. This inheritance system addresses the challenge of maintaining semantic consistency across different parser generator paradigms while leveraging Minotaur's rule activation callback system.
 
 The semantic action inheritance framework operates on multiple levels: template inheritance, where base grammars provide action templates that inheriting grammars can customize; callback inheritance, where rule activation callbacks from base grammars are automatically available to inheriting grammars; context inheritance, where semantic context and state management patterns are preserved across inheritance relationships; and parameter inheritance, where action parameter passing conventions are maintained and extended.
 
@@ -178,7 +178,7 @@ Precedence and associativity inheritance addresses one of the most critical aspe
 
 The precedence inheritance system operates through precedence template definitions in base grammars that capture the default precedence relationships for each parser generator format. These templates define not only the relative precedence levels but also the associativity rules and conflict resolution strategies that are characteristic of each format.
 
-ANTLR v4 precedence inheritance handles both explicit precedence declarations and implicit precedence based on rule ordering. The base grammar provides templates that capture ANTLR v4's precedence climbing approach while adapting it to GrammarForge's multi-path parsing framework. Inheriting grammars can extend these precedence relationships or override them for specific use cases.
+ANTLR v4 precedence inheritance handles both explicit precedence declarations and implicit precedence based on rule ordering. The base grammar provides templates that capture ANTLR v4's precedence climbing approach while adapting it to Minotaur's multi-path parsing framework. Inheriting grammars can extend these precedence relationships or override them for specific use cases.
 
 ```
 // ANTLR v4 base precedence template
@@ -196,7 +196,7 @@ Precedence: {
 }
 ```
 
-Bison/Yacc precedence inheritance focuses on the explicit precedence declarations that are characteristic of LR-based parser generators. The base grammars provide templates that capture the %left, %right, and %nonassoc declarations while adapting them to GrammarForge's precedence model. This adaptation ensures that shift/reduce conflict resolution behaves consistently with the original Bison/Yacc semantics.
+Bison/Yacc precedence inheritance focuses on the explicit precedence declarations that are characteristic of LR-based parser generators. The base grammars provide templates that capture the %left, %right, and %nonassoc declarations while adapting them to Minotaur's precedence model. This adaptation ensures that shift/reduce conflict resolution behaves consistently with the original Bison/Yacc semantics.
 
 Associativity inheritance preserves the associativity rules that are critical for correct expression parsing. The inheritance mechanism ensures that left-associative, right-associative, and non-associative operators maintain their semantic behavior across inheritance relationships while allowing inheriting grammars to add new operators or modify existing associativity rules.
 
@@ -206,7 +206,7 @@ Error recovery inheritance provides mechanisms for preserving and extending the 
 
 The error recovery inheritance framework operates through recovery strategy templates that capture the error handling patterns of each parser generator format. These templates define not only the specific error recovery mechanisms but also the error reporting and synchronization strategies that users expect from each format.
 
-ANTLR v4 error recovery inheritance captures the sophisticated automatic error recovery mechanisms that ANTLR v4 provides, including token insertion, deletion, and synchronization strategies. The base grammar provides templates that adapt these mechanisms to GrammarForge's multi-path parsing framework while preserving the user experience that ANTLR v4 users expect.
+ANTLR v4 error recovery inheritance captures the sophisticated automatic error recovery mechanisms that ANTLR v4 provides, including token insertion, deletion, and synchronization strategies. The base grammar provides templates that adapt these mechanisms to Minotaur's multi-path parsing framework while preserving the user experience that ANTLR v4 users expect.
 
 ```
 // ANTLR v4 error recovery template
@@ -219,15 +219,15 @@ ErrorRecovery: {
 }
 ```
 
-Bison/Yacc error recovery inheritance focuses on the explicit error productions and programmer-defined recovery strategies that are characteristic of LR-based parser generators. The base grammars provide templates that capture the error token mechanism while extending it with GrammarForge's more sophisticated error recovery capabilities.
+Bison/Yacc error recovery inheritance focuses on the explicit error productions and programmer-defined recovery strategies that are characteristic of LR-based parser generators. The base grammars provide templates that capture the error token mechanism while extending it with Minotaur's more sophisticated error recovery capabilities.
 
-Error reporting inheritance ensures that error messages and diagnostic information maintain consistency with the original parser generator's conventions while benefiting from GrammarForge's enhanced debugging and visualization capabilities. This inheritance includes both the format and content of error messages as well as the mechanisms for providing contextual information about parsing failures.
+Error reporting inheritance ensures that error messages and diagnostic information maintain consistency with the original parser generator's conventions while benefiting from Minotaur's enhanced debugging and visualization capabilities. This inheritance includes both the format and content of error messages as well as the mechanisms for providing contextual information about parsing failures.
 
 ## 4. Implementation Strategy
 
 ### 4.1 Base Grammar Development Process
 
-The development of base grammar files represents the most critical aspect of the inheritance-based compiler-compiler support implementation. These base files must capture the essential semantic and syntactic characteristics of each target parser generator format while remaining fully compatible with GrammarForge's GLR parsing implementation and existing feature set.
+The development of base grammar files represents the most critical aspect of the inheritance-based compiler-compiler support implementation. These base files must capture the essential semantic and syntactic characteristics of each target parser generator format while remaining fully compatible with Minotaur's GLR parsing implementation and existing feature set.
 
 The base grammar development process begins with comprehensive analysis of each target parser generator format to identify the fundamental parsing patterns, semantic behaviors, and feature sets that must be preserved. This analysis includes examination of official documentation, study of real-world grammar examples, and testing with representative use cases to ensure complete coverage of format-specific requirements.
 
@@ -237,9 +237,9 @@ Template design focuses on creating reusable patterns that can be inherited and 
 
 Validation and testing of base grammars involves comprehensive testing with representative grammars from each target format to ensure that the inheritance mechanism preserves semantic behavior while providing the expected functionality. This testing includes both positive tests (successful parsing and semantic processing) and negative tests (appropriate error handling and recovery).
 
-### 4.2 Integration with Existing GrammarForge Infrastructure
+### 4.2 Integration with Existing Minotaur Infrastructure
 
-The inheritance-based compiler-compiler support must integrate seamlessly with GrammarForge's existing infrastructure while preserving all current functionality and maintaining backward compatibility with existing grammars. This integration requires careful consideration of how inheritance mechanisms interact with existing features like visual editing, real-time debugging, and rule activation callbacks.
+The inheritance-based compiler-compiler support must integrate seamlessly with Minotaur's existing infrastructure while preserving all current functionality and maintaining backward compatibility with existing grammars. This integration requires careful consideration of how inheritance mechanisms interact with existing features like visual editing, real-time debugging, and rule activation callbacks.
 
 Grammar loading infrastructure requires extension to support inheritance relationships and base grammar resolution. The existing GrammarContainer and GrammarLoader components must be enhanced to handle inheritance directives, resolve base grammar dependencies, and merge inherited rules with specialized definitions. This enhancement includes support for circular dependency detection, version compatibility checking, and graceful handling of missing base grammars.
 
@@ -247,29 +247,29 @@ The grammar interpretation process must be extended to handle inherited rules an
 
 Parser integration involves extending the existing StepParser component to handle inherited parsing patterns while maintaining the multi-path parsing capabilities that enable GLR functionality. This integration includes support for inherited precedence relationships, error recovery strategies, and semantic action execution within the context of inherited grammars.
 
-Visual editing integration ensures that GrammarForge's visual grammar editing capabilities work seamlessly with inherited grammars. This includes support for visualizing inheritance relationships, editing inherited rules, and providing appropriate feedback about rule overrides and extensions. The visual editor must also support navigation between base and derived grammars and provide clear indication of which rules are inherited versus locally defined.
+Visual editing integration ensures that Minotaur's visual grammar editing capabilities work seamlessly with inherited grammars. This includes support for visualizing inheritance relationships, editing inherited rules, and providing appropriate feedback about rule overrides and extensions. The visual editor must also support navigation between base and derived grammars and provide clear indication of which rules are inherited versus locally defined.
 
-Debugging integration extends GrammarForge's real-time debugging capabilities to work with inherited grammars while providing clear visibility into the inheritance relationships and rule resolution process. This includes support for stepping through inherited rules, visualizing the inheritance hierarchy, and providing appropriate context information during debugging sessions.
+Debugging integration extends Minotaur's real-time debugging capabilities to work with inherited grammars while providing clear visibility into the inheritance relationships and rule resolution process. This includes support for stepping through inherited rules, visualizing the inheritance hierarchy, and providing appropriate context information during debugging sessions.
 
 ### 4.3 Testing and Validation Framework
 
-The testing and validation framework for inheritance-based compiler-compiler support must ensure that the implementation correctly preserves the semantic behavior of original grammars while providing the enhanced capabilities that GrammarForge offers. This framework operates on multiple levels to provide comprehensive coverage of both functional correctness and performance characteristics.
+The testing and validation framework for inheritance-based compiler-compiler support must ensure that the implementation correctly preserves the semantic behavior of original grammars while providing the enhanced capabilities that Minotaur offers. This framework operates on multiple levels to provide comprehensive coverage of both functional correctness and performance characteristics.
 
 Unit testing focuses on individual components of the inheritance mechanism, including base grammar loading, rule resolution, semantic action inheritance, and precedence handling. These tests use synthetic grammars designed to exercise specific aspects of the inheritance system while providing clear pass/fail criteria for each component.
 
-Integration testing validates the interaction between inheritance mechanisms and existing GrammarForge features, including visual editing, debugging, and callback execution. These tests use representative real-world grammars to ensure that the inheritance system works correctly in practical scenarios while maintaining the performance and reliability characteristics that users expect.
+Integration testing validates the interaction between inheritance mechanisms and existing Minotaur features, including visual editing, debugging, and callback execution. These tests use representative real-world grammars to ensure that the inheritance system works correctly in practical scenarios while maintaining the performance and reliability characteristics that users expect.
 
-Compatibility testing ensures that inherited grammars produce parsing behavior that is semantically equivalent to the original parser generator format. This testing involves creating test suites that exercise the same grammar constructs using both the original parser generator and the GrammarForge inheritance-based implementation, then comparing the results to ensure semantic equivalence.
+Compatibility testing ensures that inherited grammars produce parsing behavior that is semantically equivalent to the original parser generator format. This testing involves creating test suites that exercise the same grammar constructs using both the original parser generator and the Minotaur inheritance-based implementation, then comparing the results to ensure semantic equivalence.
 
-Performance testing validates that the inheritance mechanism does not introduce significant performance overhead compared to native GrammarForge grammars. This testing includes benchmarking of grammar loading times, parsing performance, and memory usage for both inherited and native grammars across a range of grammar sizes and complexity levels.
+Performance testing validates that the inheritance mechanism does not introduce significant performance overhead compared to native Minotaur grammars. This testing includes benchmarking of grammar loading times, parsing performance, and memory usage for both inherited and native grammars across a range of grammar sizes and complexity levels.
 
 Regression testing ensures that enhancements to the inheritance system do not break existing functionality or introduce new issues. This testing includes automated execution of comprehensive test suites whenever changes are made to the inheritance implementation, with clear reporting of any performance or functional regressions.
 
 ### 4.4 Documentation and User Experience
 
-The documentation and user experience for inheritance-based compiler-compiler support must provide clear guidance for users migrating from traditional parser generators while highlighting the enhanced capabilities that GrammarForge provides. This documentation addresses multiple user personas, from experienced parser generator users to newcomers to grammar development.
+The documentation and user experience for inheritance-based compiler-compiler support must provide clear guidance for users migrating from traditional parser generators while highlighting the enhanced capabilities that Minotaur provides. This documentation addresses multiple user personas, from experienced parser generator users to newcomers to grammar development.
 
-Migration guides provide step-by-step instructions for converting existing grammars from ANTLR v4, Bison/Flex, and Yacc/Lex to GrammarForge's inheritance-based format. These guides include practical examples, common pitfalls and their solutions, and best practices for taking advantage of GrammarForge's enhanced capabilities while maintaining compatibility with existing tools and workflows.
+Migration guides provide step-by-step instructions for converting existing grammars from ANTLR v4, Bison/Flex, and Yacc/Lex to Minotaur's inheritance-based format. These guides include practical examples, common pitfalls and their solutions, and best practices for taking advantage of Minotaur's enhanced capabilities while maintaining compatibility with existing tools and workflows.
 
 Reference documentation provides comprehensive coverage of the inheritance syntax, semantic action framework, and integration mechanisms. This documentation includes detailed examples, API references, and troubleshooting guides that enable users to effectively utilize the inheritance system for their specific requirements.
 
@@ -277,7 +277,7 @@ Tutorial content provides hands-on learning experiences that guide users through
 
 Best practices documentation provides guidance on effective use of the inheritance system, including recommendations for base grammar selection, rule customization strategies, and performance optimization techniques. This documentation draws on experience with real-world usage scenarios to provide practical advice for achieving optimal results with the inheritance-based approach.
 
-User interface enhancements ensure that GrammarForge's visual editing and debugging interfaces provide appropriate support for inheritance relationships while maintaining the intuitive user experience that makes GrammarForge accessible to users with varying levels of parser generator experience. These enhancements include visual indicators for inherited rules, navigation support for inheritance hierarchies, and contextual help for inheritance-specific features.
+User interface enhancements ensure that Minotaur's visual editing and debugging interfaces provide appropriate support for inheritance relationships while maintaining the intuitive user experience that makes Minotaur accessible to users with varying levels of parser generator experience. These enhancements include visual indicators for inherited rules, navigation support for inheritance hierarchies, and contextual help for inheritance-specific features.
 
 
 ## 5. Practical Implementation Examples
@@ -303,7 +303,7 @@ expr : expr ('*'|'/') expr
      ;
 ```
 
-Using GrammarForge's inheritance-based approach, this grammar would be converted to:
+Using Minotaur's inheritance-based approach, this grammar would be converted to:
 
 ```
 Grammar: SimpleExprGrammar
@@ -331,9 +331,9 @@ Precedence: {
 }
 ```
 
-The key advantages of this approach become apparent in the implementation. The `antlr4_base` grammar provides templates for handling ANTLR v4's left-recursive rules, which GrammarForge's GLR parser can process directly without the transformation typically required for LL parsers. The precedence inheritance ensures that operator precedence behaves exactly as it would in the original ANTLR v4 grammar, while the semantic action templates provide appropriate callback mechanisms that preserve the original grammar's intent.
+The key advantages of this approach become apparent in the implementation. The `antlr4_base` grammar provides templates for handling ANTLR v4's left-recursive rules, which Minotaur's GLR parser can process directly without the transformation typically required for LL parsers. The precedence inheritance ensures that operator precedence behaves exactly as it would in the original ANTLR v4 grammar, while the semantic action templates provide appropriate callback mechanisms that preserve the original grammar's intent.
 
-The inheritance mechanism also handles more complex ANTLR v4 features automatically. If the original grammar included lexer modes for handling string literals or embedded languages, the base grammar would provide templates for managing these modes within GrammarForge's parsing framework. Fragment rules would be handled through the base grammar's fragment resolution templates, and embedded actions would be preserved through the semantic action inheritance system.
+The inheritance mechanism also handles more complex ANTLR v4 features automatically. If the original grammar included lexer modes for handling string literals or embedded languages, the base grammar would provide templates for managing these modes within Minotaur's parsing framework. Fragment rules would be handled through the base grammar's fragment resolution templates, and embedded actions would be preserved through the semantic action inheritance system.
 
 ### 5.2 Bison/Flex Grammar Inheritance Example
 
@@ -381,7 +381,7 @@ expr: expr PLUS expr     { $$ = $1 + $3; }
 %%
 ```
 
-Using GrammarForge's inheritance-based approach, this would become a single coordinated grammar:
+Using Minotaur's inheritance-based approach, this would become a single coordinated grammar:
 
 ```
 Grammar: CalculatorGrammar
@@ -437,7 +437,7 @@ Precedence: {
 }
 ```
 
-The `CoordinateTokens: true` directive ensures that token definitions are properly shared between the lexer and parser components, maintaining the interface contract that Bison and Flex establish. The semantic action templates preserve the stack-based value management that Bison users expect while adapting it to GrammarForge's callback mechanism.
+The `CoordinateTokens: true` directive ensures that token definitions are properly shared between the lexer and parser components, maintaining the interface contract that Bison and Flex establish. The semantic action templates preserve the stack-based value management that Bison users expect while adapting it to Minotaur's callback mechanism.
 
 ### 5.3 Complex Grammar Migration Example
 
@@ -497,7 +497,7 @@ TokenSplitter: Space
 ImportSemantics: true
 EnableModes: true
 
-// Context-sensitive tokenization using GrammarForge contexts
+// Context-sensitive tokenization using Minotaur contexts
 <FUNCTION (default-context)> ::= "function" => { return("FUNCTION"); }
 <IF (default-context)> ::= "if" => { return("IF"); }
 <WHILE (default-context)> ::= "while" => { return("WHILE"); }
@@ -555,19 +555,19 @@ Precedence: {
 }
 ```
 
-This example demonstrates several key advantages of the inheritance-based approach. The complex lexer mode handling is managed through GrammarForge's context system, which provides equivalent functionality while being more transparent and debuggable. The multi-level precedence relationships are preserved through the inheritance mechanism while being clearly documented and easily modifiable. The embedded SQL handling leverages both the base ANTLR v4 patterns and specialized SQL extension patterns, demonstrating the composability of the inheritance system.
+This example demonstrates several key advantages of the inheritance-based approach. The complex lexer mode handling is managed through Minotaur's context system, which provides equivalent functionality while being more transparent and debuggable. The multi-level precedence relationships are preserved through the inheritance mechanism while being clearly documented and easily modifiable. The embedded SQL handling leverages both the base ANTLR v4 patterns and specialized SQL extension patterns, demonstrating the composability of the inheritance system.
 
 ## 6. Performance and Scalability Considerations
 
 ### 6.1 Inheritance Resolution Performance
 
-The inheritance-based approach must maintain GrammarForge's existing performance characteristics while adding the overhead of inheritance resolution and base grammar processing. The implementation strategy addresses these performance considerations through several optimization techniques that minimize the impact of inheritance on parsing performance.
+The inheritance-based approach must maintain Minotaur's existing performance characteristics while adding the overhead of inheritance resolution and base grammar processing. The implementation strategy addresses these performance considerations through several optimization techniques that minimize the impact of inheritance on parsing performance.
 
 Inheritance resolution occurs primarily during grammar loading rather than during parsing execution, ensuring that the runtime performance impact is minimal. The grammar loading process resolves all inheritance relationships, merges inherited rules with specialized definitions, and creates optimized internal representations that eliminate inheritance overhead during parsing.
 
 Caching strategies ensure that base grammars are loaded and processed only once, even when multiple derived grammars inherit from the same base. The grammar container maintains a cache of processed base grammars and their resolved rule sets, allowing subsequent inheritance operations to reuse previously computed results.
 
-Rule resolution optimization involves creating flattened rule hierarchies during grammar loading that eliminate the need for inheritance lookups during parsing. This optimization ensures that inherited grammars perform identically to equivalent native GrammarForge grammars during parsing execution.
+Rule resolution optimization involves creating flattened rule hierarchies during grammar loading that eliminate the need for inheritance lookups during parsing. This optimization ensures that inherited grammars perform identically to equivalent native Minotaur grammars during parsing execution.
 
 Memory usage optimization addresses the potential for increased memory consumption due to inheritance relationships and cached base grammars. The implementation uses shared data structures for common rule patterns and employs copy-on-write semantics for specialized rule definitions to minimize memory overhead.
 
@@ -585,7 +585,7 @@ Version compatibility management ensures that grammar hierarchies remain stable 
 
 ### 6.3 Integration Performance Impact
 
-The integration of inheritance-based compiler-compiler support with existing GrammarForge features must maintain the performance characteristics that users expect from the platform. This integration performance is achieved through careful design decisions that minimize the impact on existing functionality while providing the enhanced capabilities of inheritance support.
+The integration of inheritance-based compiler-compiler support with existing Minotaur features must maintain the performance characteristics that users expect from the platform. This integration performance is achieved through careful design decisions that minimize the impact on existing functionality while providing the enhanced capabilities of inheritance support.
 
 Visual editing performance remains responsive even with inherited grammars by employing efficient data structures and update strategies that minimize the overhead of inheritance relationship management. The visual editor uses incremental update techniques that process only the portions of the grammar hierarchy that are affected by user modifications.
 
@@ -593,19 +593,19 @@ Real-time debugging performance is maintained through optimized callback resolut
 
 Callback execution performance is preserved through efficient callback resolution and parameter passing mechanisms that eliminate inheritance lookup overhead during rule activation. The implementation pre-compiles callback execution paths during grammar loading to ensure optimal runtime performance.
 
-Memory usage optimization ensures that inheritance support does not significantly increase the memory footprint of GrammarForge applications. The implementation uses shared data structures, efficient caching strategies, and garbage collection optimization to minimize memory overhead while providing full inheritance functionality.
+Memory usage optimization ensures that inheritance support does not significantly increase the memory footprint of Minotaur applications. The implementation uses shared data structures, efficient caching strategies, and garbage collection optimization to minimize memory overhead while providing full inheritance functionality.
 
 ## 7. Conclusion and Strategic Benefits
 
 ### 7.1 Architectural Advantages
 
-The inheritance-based approach to compiler-compiler support represents a significant architectural advancement that leverages GrammarForge's unique GLR parsing capabilities to provide seamless integration with existing parser generator formats. This approach offers several key advantages over traditional multi-engine architectures while maintaining full compatibility with GrammarForge's existing feature set.
+The inheritance-based approach to compiler-compiler support represents a significant architectural advancement that leverages Minotaur's unique GLR parsing capabilities to provide seamless integration with existing parser generator formats. This approach offers several key advantages over traditional multi-engine architectures while maintaining full compatibility with Minotaur's existing feature set.
 
-The elimination of parsing algorithm conflicts through GLR multi-path processing provides the foundation for this simplified approach. Unlike traditional parser generators that must choose between LL or LR algorithms and deal with their respective limitations, GrammarForge's GLR implementation can handle both paradigms simultaneously without requiring separate engines or complex conflict resolution mechanisms.
+The elimination of parsing algorithm conflicts through GLR multi-path processing provides the foundation for this simplified approach. Unlike traditional parser generators that must choose between LL or LR algorithms and deal with their respective limitations, Minotaur's GLR implementation can handle both paradigms simultaneously without requiring separate engines or complex conflict resolution mechanisms.
 
-The inheritance mechanism provides a clean abstraction layer that preserves the semantic intent of original grammars while adapting them to GrammarForge's enhanced capabilities. This abstraction eliminates the need for complex translation layers or semantic mapping systems while ensuring that users can leverage their existing grammar investments without modification.
+The inheritance mechanism provides a clean abstraction layer that preserves the semantic intent of original grammars while adapting them to Minotaur's enhanced capabilities. This abstraction eliminates the need for complex translation layers or semantic mapping systems while ensuring that users can leverage their existing grammar investments without modification.
 
-The unified development experience enables users to work with grammars from different parser generator formats using the same tools, debugging capabilities, and visualization features that GrammarForge provides. This unification reduces the learning curve for users migrating from traditional parser generators while providing access to advanced features that are not available in the original tools.
+The unified development experience enables users to work with grammars from different parser generator formats using the same tools, debugging capabilities, and visualization features that Minotaur provides. This unification reduces the learning curve for users migrating from traditional parser generators while providing access to advanced features that are not available in the original tools.
 
 ### 7.2 Implementation Simplicity
 
@@ -615,11 +615,11 @@ The single-parser architecture eliminates the complexity of managing multiple pa
 
 The base grammar approach provides a clear extension mechanism for adding support for additional parser generator formats without requiring architectural changes or complex integration work. New formats can be supported by creating appropriate base grammar files and testing them with the existing inheritance infrastructure.
 
-The preservation of existing functionality ensures that current GrammarForge users experience no disruption or performance degradation while gaining access to enhanced compiler-compiler capabilities. This preservation eliminates the need for migration or compatibility layers while providing immediate value to existing users.
+The preservation of existing functionality ensures that current Minotaur users experience no disruption or performance degradation while gaining access to enhanced compiler-compiler capabilities. This preservation eliminates the need for migration or compatibility layers while providing immediate value to existing users.
 
 ### 7.3 Strategic Positioning
 
-The inheritance-based compiler-compiler support positions GrammarForge as a universal grammar development platform that can serve as a bridge between different parser generator ecosystems while providing enhanced capabilities that are not available in traditional tools. This positioning creates significant strategic advantages for both individual developers and organizations working with parser technologies.
+The inheritance-based compiler-compiler support positions Minotaur as a universal grammar development platform that can serve as a bridge between different parser generator ecosystems while providing enhanced capabilities that are not available in traditional tools. This positioning creates significant strategic advantages for both individual developers and organizations working with parser technologies.
 
 The migration facilitation capabilities enable organizations to consolidate their grammar development efforts around a single platform while maintaining compatibility with existing tools and workflows. This consolidation reduces training requirements, tool licensing costs, and maintenance overhead while providing access to advanced debugging and visualization capabilities.
 
@@ -633,11 +633,11 @@ The inheritance-based architecture provides a solid foundation for future enhanc
 
 The modular base grammar design enables support for new parser generator formats to be added incrementally without requiring changes to the core inheritance infrastructure. This modularity reduces the risk and complexity of adding new format support while ensuring that existing functionality remains stable and reliable.
 
-The semantic preservation framework provides mechanisms for handling advanced features and format-specific extensions as they emerge in the parser generator ecosystem. This framework ensures that GrammarForge can adapt to evolving requirements while maintaining compatibility with existing grammars and workflows.
+The semantic preservation framework provides mechanisms for handling advanced features and format-specific extensions as they emerge in the parser generator ecosystem. This framework ensures that Minotaur can adapt to evolving requirements while maintaining compatibility with existing grammars and workflows.
 
-The performance optimization opportunities provided by the GLR architecture and inheritance system create potential for significant performance improvements as the system matures and optimization techniques are refined. These opportunities ensure that GrammarForge can continue to provide competitive performance characteristics while offering enhanced functionality.
+The performance optimization opportunities provided by the GLR architecture and inheritance system create potential for significant performance improvements as the system matures and optimization techniques are refined. These opportunities ensure that Minotaur can continue to provide competitive performance characteristics while offering enhanced functionality.
 
-The inheritance-based approach to compiler-compiler support represents a strategic architectural decision that leverages GrammarForge's unique capabilities to provide a simplified yet powerful solution for parser generator integration. This approach offers significant advantages in terms of implementation complexity, user experience, and future extensibility while maintaining full compatibility with existing functionality and performance characteristics. The result is a system that can serve as a universal grammar development platform while providing the enhanced capabilities that modern parser development requires.
+The inheritance-based approach to compiler-compiler support represents a strategic architectural decision that leverages Minotaur's unique capabilities to provide a simplified yet powerful solution for parser generator integration. This approach offers significant advantages in terms of implementation complexity, user experience, and future extensibility while maintaining full compatibility with existing functionality and performance characteristics. The result is a system that can serve as a universal grammar development platform while providing the enhanced capabilities that modern parser development requires.
 
 
 ## 8. Plugin System for Embedded Script Testing
@@ -646,13 +646,13 @@ The inheritance-based approach to compiler-compiler support represents a strateg
 
 The inheritance-based compiler-compiler support can be enhanced with a plugin system specifically designed to handle embedded scripts within grammar definitions. This plugin system addresses the challenge of testing and validating semantic actions, embedded code blocks, and format-specific scripts that are preserved during the inheritance process.
 
-The plugin architecture operates through a modular framework that allows platform-specific script execution engines to be integrated with GrammarForge's core parsing and testing infrastructure. This approach recognizes that embedded scripts often require specific runtime environments, libraries, and system integrations that may vary significantly between different operating systems and deployment scenarios.
+The plugin architecture operates through a modular framework that allows platform-specific script execution engines to be integrated with Minotaur's core parsing and testing infrastructure. This approach recognizes that embedded scripts often require specific runtime environments, libraries, and system integrations that may vary significantly between different operating systems and deployment scenarios.
 
-The plugin system is designed around the principle of sandboxed execution environments that provide secure, isolated contexts for running embedded scripts while maintaining appropriate integration with GrammarForge's debugging and visualization capabilities. Each plugin represents a specific script execution environment (such as Java for ANTLR v4 actions, C for Bison/Yacc actions, or JavaScript for web-based grammar applications) and provides standardized interfaces for script execution, result collection, and error reporting.
+The plugin system is designed around the principle of sandboxed execution environments that provide secure, isolated contexts for running embedded scripts while maintaining appropriate integration with Minotaur's debugging and visualization capabilities. Each plugin represents a specific script execution environment (such as Java for ANTLR v4 actions, C for Bison/Yacc actions, or JavaScript for web-based grammar applications) and provides standardized interfaces for script execution, result collection, and error reporting.
 
 ### 8.2 Platform Integration Considerations
 
-The plugin system acknowledges that embedded script testing requires platform-specific capabilities that may necessitate integration with operating system services, development tools, and runtime environments. This integration is particularly relevant for Electron-based deployments of GrammarForge, where the application has access to both web technologies and native operating system capabilities.
+The plugin system acknowledges that embedded script testing requires platform-specific capabilities that may necessitate integration with operating system services, development tools, and runtime environments. This integration is particularly relevant for Electron-based deployments of Minotaur, where the application has access to both web technologies and native operating system capabilities.
 
 For Electron applications, the plugin system can leverage Node.js capabilities to spawn child processes, execute system commands, and integrate with development tools that are installed on the host system. This integration enables plugins to invoke compilers, interpreters, and other development tools that are necessary for testing embedded scripts in their native environments.
 
@@ -662,9 +662,9 @@ Cross-platform compatibility is achieved through plugin abstraction layers that 
 
 ### 8.3 Plugin Interface Design
 
-The plugin interface follows a standardized contract that enables consistent integration between GrammarForge's core systems and diverse script execution environments. This interface is designed to be delivered through NuGet packages on the tool side, with local NuGet repositories serving as the delivery mechanism for plugin distribution and updates.
+The plugin interface follows a standardized contract that enables consistent integration between Minotaur's core systems and diverse script execution environments. This interface is designed to be delivered through NuGet packages on the tool side, with local NuGet repositories serving as the delivery mechanism for plugin distribution and updates.
 
-The core plugin interface defines several key components: script execution methods that provide standardized ways to run embedded scripts with appropriate parameters and context, result collection mechanisms that capture script output, return values, and side effects for analysis and testing, error handling frameworks that provide consistent error reporting and debugging information across different script execution environments, and integration hooks that allow plugins to interact with GrammarForge's debugging and visualization systems.
+The core plugin interface defines several key components: script execution methods that provide standardized ways to run embedded scripts with appropriate parameters and context, result collection mechanisms that capture script output, return values, and side effects for analysis and testing, error handling frameworks that provide consistent error reporting and debugging information across different script execution environments, and integration hooks that allow plugins to interact with Minotaur's debugging and visualization systems.
 
 ```csharp
 public interface IEmbeddedScriptPlugin
@@ -689,7 +689,7 @@ public interface IEmbeddedScriptPlugin
 }
 ```
 
-The plugin interface includes support for asynchronous execution to prevent blocking of the main GrammarForge interface during script testing, comprehensive error handling and reporting mechanisms, configuration management for plugin-specific settings and environment requirements, and event-driven communication for real-time feedback during script execution.
+The plugin interface includes support for asynchronous execution to prevent blocking of the main Minotaur interface during script testing, comprehensive error handling and reporting mechanisms, configuration management for plugin-specific settings and environment requirements, and event-driven communication for real-time feedback during script execution.
 
 ### 8.4 Security and Sandboxing Framework
 
@@ -703,13 +703,13 @@ The security framework also includes mechanisms for validating plugin authentici
 
 ### 8.5 Testing Integration Framework
 
-The plugin system integrates seamlessly with GrammarForge's existing testing and validation infrastructure to provide comprehensive testing capabilities for grammars that include embedded scripts. This integration enables automated testing of semantic actions, validation of script behavior across different contexts, and regression testing for grammar modifications that affect embedded scripts.
+The plugin system integrates seamlessly with Minotaur's existing testing and validation infrastructure to provide comprehensive testing capabilities for grammars that include embedded scripts. This integration enables automated testing of semantic actions, validation of script behavior across different contexts, and regression testing for grammar modifications that affect embedded scripts.
 
 The testing integration framework includes several key components: automated test case generation that creates appropriate test scenarios for embedded scripts based on grammar structure and script content, result validation mechanisms that compare script execution results against expected outcomes, performance monitoring that tracks script execution time and resource usage, and regression testing capabilities that detect changes in script behavior over time.
 
 The framework supports both unit testing of individual embedded scripts and integration testing of complete grammar workflows that include script execution. This comprehensive testing approach ensures that embedded scripts function correctly within the context of the overall grammar while maintaining appropriate performance and reliability characteristics.
 
-Test result reporting integrates with GrammarForge's existing debugging and visualization capabilities to provide clear feedback about script execution results, error conditions, and performance characteristics. This integration includes visual indicators for script execution status, detailed error reporting with source code context, and performance metrics that help identify optimization opportunities.
+Test result reporting integrates with Minotaur's existing debugging and visualization capabilities to provide clear feedback about script execution results, error conditions, and performance characteristics. This integration includes visual indicators for script execution status, detailed error reporting with source code context, and performance metrics that help identify optimization opportunities.
 
 ### 8.6 Plugin Development and Distribution
 
@@ -719,13 +719,13 @@ Plugin development templates provide starting points for common plugin scenarios
 
 The plugin distribution system leverages NuGet package management to provide secure, versioned distribution of plugins with appropriate dependency management. This system includes automated package building and signing processes, version compatibility checking and dependency resolution, secure distribution through trusted package repositories, and automated update mechanisms for plugin maintenance.
 
-Plugin testing and validation frameworks ensure that plugins meet quality and security standards before distribution. This includes automated testing of plugin functionality across different platforms and configurations, security scanning and validation of plugin code and dependencies, performance benchmarking to ensure plugins meet performance requirements, and compatibility testing with different versions of GrammarForge.
+Plugin testing and validation frameworks ensure that plugins meet quality and security standards before distribution. This includes automated testing of plugin functionality across different platforms and configurations, security scanning and validation of plugin code and dependencies, performance benchmarking to ensure plugins meet performance requirements, and compatibility testing with different versions of Minotaur.
 
 ### 8.7 Future Enhancement Opportunities
 
-The plugin system architecture provides a foundation for future enhancements that can extend GrammarForge's capabilities beyond embedded script testing. These enhancements include support for custom grammar analysis tools, integration with external development environments, and specialized testing frameworks for domain-specific applications.
+The plugin system architecture provides a foundation for future enhancements that can extend Minotaur's capabilities beyond embedded script testing. These enhancements include support for custom grammar analysis tools, integration with external development environments, and specialized testing frameworks for domain-specific applications.
 
 Potential future enhancements include integration with cloud-based execution environments for scalable script testing, support for distributed testing across multiple platforms and configurations, integration with continuous integration and deployment pipelines, and development of specialized plugins for emerging programming languages and development frameworks.
 
-The plugin architecture also provides opportunities for community-driven development of specialized plugins that address specific use cases or integration requirements. This community development model can accelerate the expansion of GrammarForge's capabilities while maintaining the quality and security standards that users expect from the platform.
+The plugin architecture also provides opportunities for community-driven development of specialized plugins that address specific use cases or integration requirements. This community development model can accelerate the expansion of Minotaur's capabilities while maintaining the quality and security standards that users expect from the platform.
 

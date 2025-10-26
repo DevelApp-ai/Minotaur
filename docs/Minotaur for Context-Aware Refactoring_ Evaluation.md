@@ -1,9 +1,9 @@
-# GrammarForge for Context-Aware Refactoring: Evaluation
+# Minotaur for Context-Aware Refactoring: Evaluation
 
 ## Context Management Capabilities
 
 ### 1. Grammar-Level Context Control
-GrammarForge provides superior context management compared to traditional AST-based approaches:
+Minotaur provides superior context management compared to traditional AST-based approaches:
 
 **Context Modifiers:**
 ```typescript
@@ -25,7 +25,7 @@ Context(class-scope, off)     // Exit class context
 ```
 
 ### 2. Multi-Path Context Preservation
-Unlike refakts' single-path approach, GrammarForge maintains multiple parsing contexts simultaneously:
+Unlike refakts' single-path approach, Minotaur maintains multiple parsing contexts simultaneously:
 
 - **Parallel Context Tracking**: Multiple interpretations of ambiguous code
 - **Context Merging**: Combining contexts when ambiguities resolve
@@ -33,7 +33,7 @@ Unlike refakts' single-path approach, GrammarForge maintains multiple parsing co
 - **Context History**: Maintaining parsing history for rollback operations
 
 ### 3. Hierarchical Context Management
-GrammarForge supports nested contexts that refakts cannot easily handle:
+Minotaur supports nested contexts that refakts cannot easily handle:
 
 ```typescript
 // Nested context example
@@ -53,7 +53,7 @@ GrammarForge supports nested contexts that refakts cannot easily handle:
 ## Refactoring Operation Precision
 
 ### 1. Grammar-Guided Surgical Operations
-GrammarForge enables more precise refactoring than refakts through grammar awareness:
+Minotaur enables more precise refactoring than refakts through grammar awareness:
 
 **Variable Extraction with Grammar Context:**
 ```typescript
@@ -91,7 +91,7 @@ function renameInScope(identifier: string, newName: string, scope: string) {
 ```
 
 ### 2. Language-Specific Refactoring Rules
-GrammarForge can define refactoring rules specific to language constructs:
+Minotaur can define refactoring rules specific to language constructs:
 
 ```typescript
 // TypeScript-specific refactoring
@@ -114,7 +114,7 @@ GrammarForge can define refactoring rules specific to language constructs:
 ```
 
 ### 3. Multi-Language Refactoring Support
-GrammarForge's grammar switching enables refactoring across language boundaries:
+Minotaur's grammar switching enables refactoring across language boundaries:
 
 ```typescript
 // HTML with embedded CSS and JavaScript
@@ -136,7 +136,7 @@ GrammarForge's grammar switching enables refactoring across language boundaries:
 ## Advantages Over RefakTS Approach
 
 ### 1. Language Agnostic Operations
-| Capability | RefakTS | GrammarForge |
+| Capability | RefakTS | Minotaur |
 |------------|---------|--------------|
 | Language Support | TypeScript only | Any language with grammar |
 | Multi-language Files | Limited | Native support |
@@ -144,7 +144,7 @@ GrammarForge's grammar switching enables refactoring across language boundaries:
 | Language Extensions | Not supported | Dynamic extensions |
 
 ### 2. Context Granularity
-| Context Level | RefakTS | GrammarForge |
+| Context Level | RefakTS | Minotaur |
 |---------------|---------|--------------|
 | Function Scope | ✓ | ✓ |
 | Class Scope | ✓ | ✓ |
@@ -154,7 +154,7 @@ GrammarForge's grammar switching enables refactoring across language boundaries:
 | Context History | No | Yes |
 
 ### 3. Refactoring Precision
-| Operation Type | RefakTS | GrammarForge |
+| Operation Type | RefakTS | Minotaur |
 |----------------|---------|--------------|
 | Variable Operations | ✓ | ✓ |
 | Function Operations | ✓ | ✓ |
@@ -245,7 +245,7 @@ interface RefactoringOperation {
 
 ## Conclusion
 
-GrammarForge provides superior context-aware refactoring capabilities compared to refakts by:
+Minotaur provides superior context-aware refactoring capabilities compared to refakts by:
 
 1. **Grammar-Level Context Control**: More precise and flexible than AST-based approaches
 2. **Multi-Language Support**: Native handling of embedded and mixed languages
