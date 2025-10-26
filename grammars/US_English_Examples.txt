@@ -1,0 +1,502 @@
+# US English Language Example Sentences
+# Demonstrating Regular and Irregular Verbs with Context-Sensitive Rules
+
+## Regular Verbs - Present Tense
+
+I work.
+You work.
+He works in New York.
+She studies English.
+We read books.
+They write letters.
+It works well.
+The dog barks loudly.
+The children play outside.
+She teaches mathematics.
+
+## Regular Verbs - Past Tense
+
+I worked yesterday.
+You studied all night.
+He played football.
+She called me.
+We lived in Boston.
+They visited the museum.
+It rained heavily.
+The dog barked at strangers.
+The children played in the park.
+She taught well.
+
+## Regular Verbs - Present Perfect
+
+I have worked all day.
+You have studied English for two years.
+He has played very well.
+She has called three times.
+We have lived here for a long time.
+They have visited many places.
+It has rained all week.
+The dog has barked all night.
+The children have played nicely.
+She has taught for ten years.
+
+## Irregular Verb: be (to be)
+
+# Present
+I am a teacher.
+You are a student.
+He is American.
+She is happy.
+It is cold.
+We are friends.
+They are at school.
+
+# Past
+I was tired.
+You were here yesterday.
+He was in the city.
+She was sick.
+It was warm.
+We were together.
+They were on vacation.
+
+# Present Perfect
+I have been to Paris.
+You have been sick.
+He has been here before.
+She has been very helpful.
+It has been raining.
+We have been at the museum.
+They have been in America for a month.
+
+## Irregular Verb: have (to have)
+
+# Present
+I have a dog.
+You have a cat.
+He has a car.
+She has a bicycle.
+It has a tail.
+We have time.
+They have children.
+
+# Past
+I had a dream.
+You had the answer.
+He had an idea.
+She had a fever.
+It had a problem.
+We had visitors.
+They had a party.
+
+# Present Perfect
+I have had a good time.
+You have had the chance.
+He has had a hard day.
+She has had the flu.
+It has had problems.
+We have had many experiences.
+They have had issues.
+
+## Irregular Verb: do (to do)
+
+# Present
+I do my homework.
+You do well.
+He does his job.
+She does exercises.
+It does nothing.
+We do our best.
+They do their work.
+
+# Past
+I did my homework.
+You did well on the test.
+He did his job yesterday.
+She did the exercises.
+It did nothing.
+We did our best.
+They did their work.
+
+# Present Perfect
+I have done my homework.
+You have done well.
+He has done his job.
+She has done the exercises.
+It has done nothing.
+We have done our best.
+They have done their work.
+
+## Irregular Verb: go (to go)
+
+# Present
+I go to school.
+You go home.
+He goes to work.
+She goes shopping.
+It goes fast.
+We go together.
+They go early.
+
+# Past
+I went to the store.
+You went home.
+He went to the doctor.
+She went past.
+It went quickly.
+We went together.
+They went by car.
+
+# Present Perfect
+I have gone far.
+You have gone wrong.
+He has gone to school.
+She has gone away.
+It has gone missing.
+We have gone home.
+They have gone already.
+
+## Modal Verbs
+
+I can swim.
+You can speak English.
+He can drive.
+She can sing.
+We can help.
+They can come tomorrow.
+
+I could swim when I was young.
+You could see it clearly.
+He could have helped.
+She could dance well.
+We could go now.
+They could arrive late.
+
+I will go tomorrow.
+You will see.
+He will come.
+She will help.
+We will try.
+They will understand.
+
+I would go if I could.
+You would like it.
+He would come if invited.
+She would help if asked.
+We would appreciate it.
+They would understand.
+
+I should study more.
+You should rest.
+He should call.
+She should know.
+We should leave.
+They should wait.
+
+I must leave now.
+You must try.
+He must work.
+She must study.
+We must go.
+They must understand.
+
+I may come tomorrow.
+You may be right.
+He may know.
+She may help.
+We may stay.
+They may arrive soon.
+
+I might go.
+You might see.
+He might come.
+She might help.
+We might try.
+They might understand.
+
+## Progressive (Continuous) Aspect
+
+I am working now.
+You are studying.
+He is sleeping.
+She is cooking.
+We are waiting.
+They are coming.
+
+I was working when you called.
+You were studying all night.
+He was sleeping.
+She was cooking dinner.
+We were waiting for hours.
+They were coming when it started raining.
+
+I have been working all day.
+You have been studying hard.
+He has been sleeping for hours.
+She has been cooking since morning.
+We have been waiting for you.
+They have been coming here for years.
+
+## Passive Voice
+
+The letter is written by John.
+The house was built in 1990.
+The book has been read by millions.
+The car will be repaired tomorrow.
+The problem is being solved.
+The homework was being done.
+
+## Questions - Yes/No
+
+Are you coming?
+Is he here?
+Was she there?
+Will they arrive?
+Can you help?
+Do you understand?
+Did he call?
+Have you finished?
+Has she left?
+Were they happy?
+
+## Questions - Wh-
+
+Where are you going?
+What is your name?
+When did he arrive?
+Why are they late?
+How do you know?
+Who is that?
+Which one do you want?
+Whose book is this?
+What time is it?
+How much does it cost?
+
+## Tag Questions
+
+You're coming, aren't you?
+She isn't late, is she?
+They can swim, can't they?
+He doesn't know, does he?
+We should go, shouldn't we?
+You will help, won't you?
+She has finished, hasn't she?
+They weren't there, were they?
+
+## Subordinate Clauses
+
+I know that she is coming.
+He said that he was tired.
+We believe that it is true.
+She thinks that they are right.
+They hope that we can help.
+
+## Conditional Sentences
+
+If it rains, we will stay inside.
+If you come, I will be happy.
+If he studies, he will pass.
+If she calls, tell her I'm out.
+If we leave now, we'll be on time.
+
+## Relative Clauses
+
+The man who lives here is a doctor.
+The book that I read was interesting.
+The house which was built yesterday is big.
+The woman whose car was stolen called the police.
+The place where we met was beautiful.
+
+## Compound Sentences
+
+I work and she studies.
+He goes home but she stays.
+We eat now or we eat later.
+You can come and I can help.
+She is happy for it went well.
+
+## Complex Sentences
+
+I know that he said that she is coming.
+When you work and I study, we get tired.
+If we go now, we can arrive on time.
+He said that she thinks that they are home.
+We hope that you can come when we have the party.
+
+## Comparatives and Superlatives
+
+He is taller than me.
+She is smarter than him.
+This is bigger than that.
+You are faster than us.
+We are better than them.
+
+He is the tallest.
+She is the smartest.
+This is the biggest.
+You are the fastest.
+We are the best.
+
+This is more interesting than that.
+She is more beautiful than her sister.
+This is the most interesting book.
+She is the most beautiful woman.
+
+## Genitive (Possessive)
+
+John's book is on the table.
+The cat's tail is long.
+The students' books are new.
+The children's toys are everywhere.
+My mother's car is red.
+
+## Negation
+
+I do not know.
+She doesn't like coffee.
+They have never been there.
+We cannot come.
+He will not go.
+You should not do that.
+I am not ready.
+She was not here.
+They have not finished.
+
+## Imperative
+
+Come here!
+Go away!
+Look at me!
+Listen carefully!
+Read the book!
+Write your name!
+Eat your food!
+Be quiet!
+Have a good day!
+Stop talking!
+
+## Exclamatives
+
+What a beautiful day!
+How wonderful!
+What a great idea!
+How amazing!
+Such a lovely place!
+What a surprise!
+
+## Southern US Dialect
+
+Y'all are coming to the barbecue, right?
+All y'all need to listen to this.
+You'uns better hurry up.
+Y'all want some sweet tea?
+Where are y'all going?
+
+## African American Vernacular English (AAVE)
+
+She be working at the store.
+They done finished already.
+He been knowing that for a long time.
+We going to the store.
+She been working all day.
+
+## Reported Speech
+
+He said that he was tired.
+She told me that she would come.
+They asked where I was going.
+He wanted to know what I was doing.
+She wondered if I could help.
+
+## Cleft Sentences
+
+It is John who did it.
+It was yesterday that I saw him.
+What I want is peace.
+What she needs is rest.
+It is here that we met.
+
+## Complex Multi-Embedded Sentences
+
+I think that he said that she is coming tomorrow.
+If you believe that he knows where she lives, you should call him.
+The man who I met yesterday told me that his son will come home next week.
+When she comes home, she will discover that her cat has been missing for days.
+I heard that he told her that they should come because the weather was good.
+
+## Future Tenses
+
+I will go tomorrow.
+You will see him soon.
+He will be here at five.
+She will have finished by then.
+We will be waiting for you.
+They will have left by the time you arrive.
+
+## Past Perfect
+
+I had finished before you arrived.
+She had left when I got there.
+They had already eaten when we came.
+He had never seen such a thing.
+We had been waiting for hours.
+
+## Present Perfect vs Simple Past
+
+I have lived here for five years. (still living here)
+I lived there for five years. (no longer living there)
+
+She has worked here since 2010. (still working)
+She worked there for ten years. (no longer working)
+
+They have visited Paris three times. (experience up to now)
+They visited Paris last year. (specific past time)
+
+## Infinitives and Gerunds
+
+I want to go home.
+She likes to read books.
+We need to finish this.
+They decided to leave.
+He forgot to call.
+
+I enjoy reading books.
+She loves swimming.
+We keep trying.
+They started laughing.
+He stopped smoking.
+
+## Prepositions
+
+I live in New York.
+The book is on the table.
+We arrived at the station.
+She walked to school.
+He came from Boston.
+They work with computers.
+The cat is under the bed.
+The picture is above the fireplace.
+We met during the summer.
+I'll see you after lunch.
+
+## Time Expressions
+
+I go to work every day.
+She visited us yesterday.
+We will meet tomorrow.
+They arrived last week.
+He left two hours ago.
+I have been here since Monday.
+She has worked there for five years.
+We will finish by Friday.
+
+## Adverbs
+
+She speaks English well.
+He drives carefully.
+They work hard.
+I completely agree.
+She almost fell.
+He barely passed.
+We definitely should go.
+They probably won't come.

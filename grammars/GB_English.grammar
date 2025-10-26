@@ -1,0 +1,824 @@
+Grammar: GB_English
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * GB English (British English) Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of British English language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Passive voice and modal constructions
+ * - Context-sensitive agreement rules (number, person, case)
+ * - Full regular expression support for morphological patterns
+ * - Articles (definite and indefinite)
+ * - Multiple tenses (present, past, future, perfect, pluperfect, progressive)
+ * - Conditional and subjunctive moods
+ * - SVO word order and various transformations
+ * - Relative clauses and subordinate structures
+ * - Comparative and superlative adjectives
+ * - Genitive case and compound nouns
+ * - Negation patterns
+ * - Quantifiers and determiners
+ * - Reflexive and reciprocal pronouns
+ * - Complex temporal expressions
+ * - British-specific spelling and usage patterns
+ */
+
+Keywords: and, or, but, if, when, because, that, which, who, whom, whose, the, a, an, this, these, that, those, I, you, he, she, it, we, they, me, him, her, us, them, my, your, his, her, its, our, their, mine, yours, hers, ours, theirs, not, can, will, shall, may, must, might, could, would, should, have, has, had, is, am, are, was, were, be, been, being, do, does, did, no, yes, perhaps, so, also, too, either, neither, very, quite, rather, some, any, all, each, every, both, few, many, much, more, most, less, least, whilst, amongst
+
+/* Regional markers for GB English varieties */
+@DIALECT[received_pronunciation]  /* Standard British English (RP) */
+@DIALECT[cockney]                 /* London East End */
+@DIALECT[geordie]                 /* Newcastle/Tyneside */
+@DIALECT[scouse]                  /* Liverpool */
+@DIALECT[brummie]                 /* Birmingham */
+@DIALECT[scottish]                /* Scottish English */
+
+/* Top-level sentence structure with SVO word order */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
+
+/* Main clause with SVO word order (Subject-Verb-Object) */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+               | <parenthetical-clause>
+
+/* SVO declarative: Subject + Verb + Object + Adverbials */
+<declarative-clause> ::= <subject> <opt-whitespace> <predicate> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <punctuation>?
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+           | <infinitive-as-subject>
+           | <gerund-as-subject>
+           | <clause-as-subject>
+
+<infinitive-as-subject> ::= "to" <opt-whitespace> <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<gerund-as-subject> ::= <verb-stem> "ing" ( <opt-whitespace> <object> )?
+
+<clause-as-subject> ::= "that" <opt-whitespace> <subordinate-content>
+
+/* Pronouns with case distinctions */
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+                   | <indefinite-pronoun>
+                   | <interrogative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( <standard-nominative> | <dialect-nominative> )
+
+<standard-nominative> ::= "I" | "you" | "he" | "she" | "it" | "we" | "they" | "one"
+
+/* Dialectal pronouns from multiple GB regions */
+<dialect-nominative> ::= <cockney-nominative>
+                      | <geordie-nominative>
+                      | <scouse-nominative>
+                      | <brummie-nominative>
+                      | <scottish-nominative>
+
+<cockney-nominative> ::= @DIALECT[cockney] ( "meself" | "yerself" | "hisself" | "theirselves" )
+
+<geordie-nominative> ::= @DIALECT[geordie] ( "wor" | "yous" | "we" | "us" | "them" )
+
+<scouse-nominative> ::= @DIALECT[scouse] ( "yous" | "youse" | "la" )
+
+<brummie-nominative> ::= @DIALECT[brummie] ( "yow" | "thee" )
+
+<scottish-nominative> ::= @DIALECT[scottish] ( "ye" | "youse" )
+
+<personal-pronoun-accusative> ::= @CASE[accusative] ( <standard-accusative> | <dialect-accusative> )
+
+<standard-accusative> ::= "me" | "you" | "him" | "her" | "it" | "us" | "them"
+
+/* Dialectal accusative pronouns */
+<dialect-accusative> ::= <cockney-accusative>
+                      | <geordie-accusative>
+                      | <scouse-accusative>
+
+<cockney-accusative> ::= @DIALECT[cockney] ( "me" | "yer" )
+
+<geordie-accusative> ::= @DIALECT[geordie] ( "us" | "wor" | "yous" )
+
+<scouse-accusative> ::= @DIALECT[scouse] ( "yous" | "youse" | "us" )
+
+/* Reflexive pronouns */
+<reflexive-pronoun> ::= @REFLEXIVE "myself" | "yourself" | "himself" | "herself" | "itself" | "ourselves" | "yourselves" | "themselves" | "oneself"
+
+/* Reciprocal pronouns */
+<reciprocal-pronoun> ::= "each other" | "one another"
+
+<pronoun> ::= <personal-pronoun-nominative>
+           | <personal-pronoun-accusative>
+           | <possessive-pronoun>
+           | <demonstrative-pronoun>
+           | <relative-pronoun>
+           | <reflexive-pronoun>
+           | <reciprocal-pronoun>
+           | <indefinite-pronoun>
+           | <interrogative-pronoun>
+
+<possessive-pronoun> ::= <possessive-determiner-form>
+                      | <possessive-independent-form>
+
+/* Possessive determiners (used before nouns) */
+<possessive-determiner-form> ::= "my" | "your" | "his" | "her" | "its" | "our" | "their" | "one's"
+
+/* Independent possessive forms (used without nouns) */
+<possessive-independent-form> ::= "mine" | "yours" | "his" | "hers" | "ours" | "theirs"
+
+<demonstrative-pronoun> ::= @NUMBER[singular] ( "this" | "that" )
+                         | @NUMBER[plural] ( "these" | "those" )
+
+<relative-pronoun> ::= "who" | "whom" | "whose" | "which" | "that" | "where" | "when" | "why" | "whence" | "whereby"
+
+/* Indefinite pronouns */
+<indefinite-pronoun> ::= "someone" | "somebody" | "something" | "anyone" | "anybody" | "anything" | "everyone" | "everybody" | "everything" | "no one" | "nobody" | "nothing" | "one" | "some" | "any" | "all" | "each" | "every" | "both" | "few" | "many" | "several" | "none" | "another" | "other" | "others"
+
+/* Interrogative pronouns */
+<interrogative-pronoun> ::= "who" | "whom" | "whose" | "what" | "which"
+
+/* Noun Phrase */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <article>
+              | <demonstrative-determiner>
+              | <possessive-determiner>
+              | <quantifying-determiner>
+
+<article> ::= <indefinite-article> | <definite-article>
+
+/* Indefinite articles */
+<indefinite-article> ::= "a" | "an"
+
+/* Definite article */
+<definite-article> ::= "the"
+
+<demonstrative-determiner> ::= @NUMBER[singular] ( "this" | "that" )
+                            | @NUMBER[plural] ( "these" | "those" )
+
+<possessive-determiner> ::= <possessive-determiner-form>
+
+/* Quantifiers */
+<quantifier> ::= <numeral>
+              | <indefinite-quantifier>
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "one" | "two" | "three" | "four" | "five" | "six" | "seven" | "eight" | "nine" | "ten" | "eleven" | "twelve" | "thirteen" | "fourteen" | "fifteen" | "sixteen" | "seventeen" | "eighteen" | "nineteen" | "twenty" | "thirty" | "forty" | "fifty" | "sixty" | "seventy" | "eighty" | "ninety" | "hundred" | "thousand" | "million" | "billion" | /[0-9]+/
+
+<ordinal-number> ::= "first" | "second" | "third" | "fourth" | "fifth" | "sixth" | "seventh" | "eighth" | "ninth" | "tenth" | "eleventh" | "twelfth" | /[0-9]+(st|nd|rd|th)/
+
+<indefinite-quantifier> ::= "many" | "few" | "several" | "some" | "any" | "much" | "little" | "enough" | "all" | "most" | "each" | "every" | "either" | "neither" | "both" | "no"
+
+<quantifying-determiner> ::= "all" | "both" | "half" | "each" | "every" | "either" | "neither" | "no"
+
+/* Nouns with British spelling patterns */
+<noun> ::= <simple-noun>
+        | <compound-noun>
+        | <noun-with-genitive>
+
+<simple-noun> ::= <noun-singular>
+               | <noun-plural>
+
+<noun-singular> ::= @NUMBER[singular] <noun-stem>
+
+<noun-plural> ::= @NUMBER[plural] <noun-stem> <plural-suffix>
+
+<plural-suffix> ::= "s" | "es" | "ies" | "ves" | "en" | ""
+
+/* Compound nouns (common in British English) */
+<compound-noun> ::= <noun-stem> <opt-whitespace>? <noun>
+                 | <noun-stem> "-" <noun>
+
+/* Genitive case (possession) */
+<noun-with-genitive> ::= <simple-noun> "'s"
+                      | <noun-plural> "'"
+
+/* British spelling patterns for common words */
+<noun-stem> ::= /[a-z]+/
+             | <british-spelling-noun>
+
+<british-spelling-noun> ::= "colour" | "favour" | "honour" | "labour" | "neighbour" | "rumour" | "humour" | "behaviour" | "flavour" | "centre" | "theatre" | "metre" | "litre" | "fibre" | "calibre" | "sombre" | "lustre" | "defence" | "offence" | "licence" | "pretence" | "programme" | "catalogue" | "dialogue" | "analogue" | "monologue" | "epilogue" | "travelogue" | "apologise" | "organise" | "realise" | "recognise" | "analyse" | "paralyse" | "grey" | "cheque" | "lorry" | "boot" | "bonnet" | "windscreen" | "petrol" | "pavement" | "lift" | "flat" | "torch" | "biscuit" | "holiday" | "autumn" | "queue" | "queueing"
+
+<proper-noun> ::= /[A-Z][a-z]*/
+                | <multi-word-proper-noun>
+
+<multi-word-proper-noun> ::= /[A-Z][a-z]*/ ( <opt-whitespace> /[A-Z][a-z]*/ )+
+
+/* Adjective phrases */
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "very" | "quite" | "rather" | "extremely" | "awfully" | "jolly" | "fairly" | "really" | "somewhat" | "too" | "so" | "pretty"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree */
+<adjective-positive> ::= @DEGREE[positive] <adjective-stem>
+
+<adjective-stem> ::= /[a-z]+/
+                  | <british-spelling-adjective>
+
+<british-spelling-adjective> ::= "colourful" | "favourite" | "honourable" | "laborious" | "neighbourly" | "humorous" | "flavourful" | "grey"
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] ( <regular-comparative> | <irregular-comparative> )
+
+<regular-comparative> ::= <adjective-stem> "er"
+                       | "more" <opt-whitespace> <adjective-stem>
+
+<irregular-comparative> ::= "better" | "worse" | "more" | "less" | "further" | "farther" | "elder"
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] ( <regular-superlative> | <irregular-superlative> )
+
+<regular-superlative> ::= "the" <opt-whitespace> <adjective-stem> "est"
+                       | "the" <opt-whitespace> "most" <opt-whitespace> <adjective-stem>
+
+<irregular-superlative> ::= "the" <opt-whitespace> ( "best" | "worst" | "most" | "least" | "furthest" | "farthest" | "eldest" )
+
+/* Predicate */
+<predicate> ::= <verb-phrase>
+
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <passive-verb-phrase>
+               | <modal-verb-phrase>
+               | <progressive-verb-phrase>
+               | <perfect-verb-phrase>
+
+/* Simple verb phrases */
+<simple-verb-phrase> ::= <finite-verb> ( <opt-whitespace> <adverb> )?
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+
+/* Present tense */
+<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> )
+
+<regular-verb-present> ::= @PERSON[third] @NUMBER[singular] <verb-stem> "s"
+                        | @PERSON[first|second] <verb-stem>
+                        | @NUMBER[plural] <verb-stem>
+
+<verb-stem> ::= /[a-z]+/
+             | <british-spelling-verb-stem>
+
+<british-spelling-verb-stem> ::= "colour" | "favour" | "honour" | "labour" | "neighbour" | "rumour" | "humour" | "flavour" | "organise" | "realise" | "recognise" | "analyse" | "paralyse" | "apologise" | "standardise" | "specialise" | "emphasise" | "summarise" | "prioritise" | "finalise" | "utilise" | "mobilise" | "minimise" | "maximise" | "criticise" | "characterise" | "categorise" | "centralise" | "modernise" | "privatise" | "nationalise" | "civilise" | "memorise" | "authorise" | "capitalise" | "equalise" | "generalise" | "legalise" | "localise" | "naturalise" | "normalise" | "personalise" | "popularise" | "rationalise" | "sensitise" | "socialise" | "stabilise" | "symbolise" | "sympathise" | "synchronise" | "theorise" | "visualise"
+
+/* Irregular verbs in present tense */
+<irregular-verb-present> ::= @IRREGULAR ( "am" | "is" | "are" | "has" | "have" | "does" | "do" | "goes" | "go" | "says" | "say" | "gets" | "get" | "makes" | "make" | "knows" | "know" | "thinks" | "think" | "takes" | "take" | "sees" | "see" | "comes" | "come" | "wants" | "want" | "looks" | "look" | "uses" | "use" | "finds" | "find" | "gives" | "give" | "tells" | "tell" | "works" | "work" | "calls" | "call" | "tries" | "try" | "asks" | "ask" | "needs" | "need" | "feels" | "feel" | "becomes" | "become" | "leaves" | "leave" | "puts" | "put" )
+
+/* Past tense with British spelling patterns */
+<verb-past> ::= @TENSE[past] ( <regular-verb-past> | <irregular-verb-past> | <british-irregular-past> )
+
+<regular-verb-past> ::= <verb-stem> "ed"
+                     | <verb-stem> "d"
+
+/* British-specific past tense forms */
+<british-irregular-past> ::= "learnt" | "spelt" | "burnt" | "dreamt" | "leant" | "leapt" | "spilt" | "spoilt" | "dwelt" | "smelt" | "spelt"
+
+/* Irregular verbs in past tense */
+<irregular-verb-past> ::= @IRREGULAR ( "was" | "were" | "had" | "did" | "went" | "said" | "got" | "made" | "knew" | "thought" | "took" | "saw" | "came" | "wanted" | "looked" | "used" | "found" | "gave" | "told" | "worked" | "called" | "tried" | "asked" | "needed" | "felt" | "became" | "left" | "put" | "meant" | "kept" | "let" | "began" | "seemed" | "helped" | "talked" | "turned" | "started" | "showed" | "heard" | "played" | "ran" | "moved" | "lived" | "believed" | "held" | "brought" | "happened" | "wrote" | "provided" | "sat" | "stood" | "lost" | "paid" | "met" | "included" | "continued" | "set" | "learned" | "learnt" | "changed" | "led" | "understood" | "watched" | "followed" | "stopped" | "created" | "spoke" | "read" | "spent" | "grew" | "opened" | "walked" | "won" | "offered" | "remembered" | "loved" | "considered" | "appeared" | "bought" | "waited" | "served" | "died" | "sent" | "built" | "stayed" | "fell" | "cut" | "reached" | "killed" | "remained" | "suggested" | "raised" | "passed" | "sold" | "decided" | "returned" | "explained" | "hoped" | "developed" | "carried" | "broke" | "received" | "agreed" | "supported" | "hit" | "produced" | "ate" | "covered" | "caught" | "drew" )
+
+/* Compound verb phrases */
+<compound-verb-phrase> ::= <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <verb-complement>
+
+<verb-complement> ::= <verb-infinitive>
+                   | <past-participle>
+                   | <present-participle>
+                   | <predicate-adjective>
+
+<verb-infinitive> ::= ( "to" <opt-whitespace> )? <verb-stem>
+
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle> | <british-irregular-participle>
+
+<regular-past-participle> ::= <verb-stem> "ed"
+
+/* British-specific past participle forms */
+<british-irregular-participle> ::= "learnt" | "spelt" | "burnt" | "dreamt" | "leant" | "leapt" | "spilt" | "spoilt" | "dwelt" | "smelt"
+
+<irregular-past-participle> ::= @IRREGULAR ( "been" | "had" | "done" | "gone" | "said" | "got" | "gotten" | "made" | "known" | "thought" | "taken" | "seen" | "come" | "wanted" | "looked" | "used" | "found" | "given" | "told" | "worked" | "called" | "tried" | "asked" | "needed" | "felt" | "become" | "left" | "put" | "meant" | "kept" | "let" | "begun" | "seemed" | "helped" | "talked" | "turned" | "started" | "shown" | "heard" | "played" | "run" | "moved" | "lived" | "believed" | "held" | "brought" | "happened" | "written" | "provided" | "sat" | "stood" | "lost" | "paid" | "met" | "included" | "continued" | "set" | "learned" | "learnt" | "changed" | "led" | "understood" | "watched" | "followed" | "stopped" | "created" | "spoken" | "read" | "spent" | "grown" | "opened" | "walked" | "won" | "offered" | "remembered" | "loved" | "considered" | "appeared" | "bought" | "waited" | "served" | "died" | "sent" | "built" | "stayed" | "fallen" | "cut" | "reached" | "killed" | "remained" | "suggested" | "raised" | "passed" | "sold" | "decided" | "returned" | "explained" | "hoped" | "developed" | "carried" | "broken" | "received" | "agreed" | "supported" | "hit" | "produced" | "eaten" | "covered" | "caught" | "drawn" )
+
+<present-participle> ::= <verb-stem> "ing"
+                      | <british-participle-doubling>
+
+/* British spelling: double consonant before -ing in some cases */
+<british-participle-doubling> ::= "travelling" | "cancelling" | "signalling" | "modelling" | "labelling" | "levelling" | "quarrelling" | "marvelling" | "panelling" | "channelling" | "counselling" | "equalling" | "rivalling" | "totalling" | "spiralling"
+
+<predicate-adjective> ::= <adjective>
+
+/* Passive voice */
+<passive-verb-phrase> ::= @VOICE[passive] <be-verb> <opt-whitespace> <past-participle> ( <opt-whitespace> "by" <opt-whitespace> <noun-phrase> )?
+
+/* Modal verb phrases with British usage */
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <adverb>? <opt-whitespace> <verb-infinitive-base>
+
+<modal-verb> ::= @MOOD[modal] ( "can" | "could" | "may" | "might" | "will" | "would" | "shall" | "should" | "must" | "ought" <opt-whitespace> "to" | "needn't" | "mayn't" | "shan't" )
+
+<verb-infinitive-base> ::= <verb-stem>
+
+/* Progressive (continuous) aspect */
+<progressive-verb-phrase> ::= @ASPECT[progressive] <be-verb> <opt-whitespace> <present-participle>
+
+/* Perfect aspect */
+<perfect-verb-phrase> ::= @ASPECT[perfect] ( <present-perfect> | <past-perfect> | <future-perfect> )
+
+<present-perfect> ::= @TENSE[present-perfect] "have" <opt-whitespace> <past-participle>
+                   | @TENSE[present-perfect] "has" <opt-whitespace> <past-participle>
+
+<past-perfect> ::= @TENSE[past-perfect] "had" <opt-whitespace> <past-participle>
+
+<future-perfect> ::= @TENSE[future-perfect] "will" <opt-whitespace> "have" <opt-whitespace> <past-participle>
+                  | @TENSE[future-perfect] "shall" <opt-whitespace> "have" <opt-whitespace> <past-participle>
+
+/* Future tense with British shall/will distinction */
+<future-tense> ::= @TENSE[future] ( "will" | "shall" ) <opt-whitespace> <verb-infinitive-base>
+
+/* Conditional mood */
+<conditional-mood> ::= @MOOD[conditional] "would" <opt-whitespace> <verb-infinitive-base>
+                    | @MOOD[conditional] "should" <opt-whitespace> <verb-infinitive-base>
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= <modal-verb>
+                  | <be-verb>
+                  | <have-verb>
+                  | <do-verb>
+
+<be-verb> ::= <be-present> | <be-past> | <be-infinitive>
+
+<be-present> ::= @TENSE[present] ( "am" | "is" | "are" )
+
+<be-past> ::= @TENSE[past] ( "was" | "were" )
+
+<be-infinitive> ::= "be" | "being" | "been"
+
+<have-verb> ::= <have-present> | <have-past> | <have-infinitive>
+
+<have-present> ::= @TENSE[present] ( "have" | "has" )
+
+<have-past> ::= @TENSE[past] "had"
+
+<have-infinitive> ::= "have" | "having" | "had"
+
+<do-verb> ::= <do-present> | <do-past> | <do-infinitive>
+
+<do-present> ::= @TENSE[present] ( "do" | "does" )
+
+<do-past> ::= @TENSE[past] "did"
+
+<do-infinitive> ::= "do" | "doing" | "done"
+
+/* Object */
+<object> ::= <direct-object>
+          | <indirect-object> <opt-whitespace> <direct-object>
+
+<direct-object> ::= <noun-phrase>
+                 | <pronoun-object>
+                 | <clause-object>
+                 | <infinitive-phrase>
+                 | <gerund-phrase>
+
+<pronoun-object> ::= <personal-pronoun-accusative>
+                  | <demonstrative-pronoun>
+                  | <reflexive-pronoun>
+                  | <reciprocal-pronoun>
+
+<clause-object> ::= <that-clause>
+                 | <wh-clause>
+                 | <if-whether-clause>
+
+<that-clause> ::= "that" <opt-whitespace> <subordinate-content>
+
+<wh-clause> ::= <interrogative-clause-embedded>
+
+<if-whether-clause> ::= ( "if" | "whether" ) <opt-whitespace> <subordinate-content>
+
+<infinitive-phrase> ::= "to" <opt-whitespace> <verb-infinitive-base> ( <opt-whitespace> <object> )?
+
+<gerund-phrase> ::= <present-participle> ( <opt-whitespace> <object> )?
+
+<indirect-object> ::= "to" <opt-whitespace> <noun-phrase>
+                   | "for" <opt-whitespace> <noun-phrase>
+                   | <pronoun-object>
+
+/* Adverbials with British usage */
+<adverbial> ::= <adverb>
+             | <adverb-phrase>
+             | <prepositional-phrase>
+             | <adverb-clause>
+
+<adverb-phrase> ::= <degree-adverb-modifier>? <opt-whitespace> <adverb>
+
+<degree-adverb-modifier> ::= "very" | "extremely" | "quite" | "rather" | "awfully" | "jolly" | "fairly" | "pretty"
+
+<adverb> ::= <time-adverb>
+          | <place-adverb>
+          | <manner-adverb>
+          | <degree-adverb>
+          | <frequency-adverb>
+          | <sentence-adverb>
+
+<time-adverb> ::= "now" | "then" | "today" | "yesterday" | "tomorrow" | "tonight" | "already" | "still" | "yet" | "soon" | "later" | "earlier" | "before" | "after" | "always" | "never" | "recently" | "lately" | "formerly" | "previously" | "presently"
+
+<place-adverb> ::= "here" | "there" | "everywhere" | "anywhere" | "somewhere" | "nowhere" | "home" | "away" | "abroad" | "upstairs" | "downstairs" | "inside" | "outside" | "above" | "below" | "near" | "far"
+
+<manner-adverb> ::= <adjective-stem> "ly"
+                 | "well" | "badly" | "fast" | "hard" | "late" | "early" | "together" | "alone" | "otherwise"
+
+<degree-adverb> ::= "very" | "quite" | "rather" | "extremely" | "awfully" | "jolly" | "fairly" | "really" | "too" | "so" | "enough" | "almost" | "nearly" | "hardly" | "scarcely" | "barely" | "just" | "only" | "even"
+
+<frequency-adverb> ::= "always" | "usually" | "normally" | "generally" | "often" | "frequently" | "sometimes" | "occasionally" | "seldom" | "rarely" | "never" | "daily" | "weekly" | "monthly" | "yearly"
+
+<sentence-adverb> ::= "however" | "therefore" | "moreover" | "furthermore" | "nevertheless" | "nonetheless" | "otherwise" | "thus" | "hence" | "consequently" | "accordingly" | "indeed" | "certainly" | "surely" | "obviously" | "clearly" | "fortunately" | "unfortunately" | "apparently" | "evidently" | "perhaps" | "maybe" | "possibly" | "probably"
+
+/* Prepositional phrases with British usage */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+                        | <complex-preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "in" | "on" | "at" | "to" | "from" | "with" | "without" | "by" | "about" | "for" | "of" | "over" | "under" | "above" | "below" | "between" | "among" | "amongst" | "through" | "during" | "before" | "after" | "since" | "until" | "till" | "into" | "onto" | "upon" | "within" | "throughout" | "against" | "across" | "along" | "around" | "behind" | "beside" | "beyond" | "near" | "off" | "past" | "toward" | "towards" | "underneath" | "up" | "down" | "out" | "inside" | "outside" | "whilst"
+
+<complex-preposition> ::= "in" <opt-whitespace> "front" <opt-whitespace> "of"
+                        | "in" <opt-whitespace> "back" <opt-whitespace> "of"
+                        | "on" <opt-whitespace> "top" <opt-whitespace> "of"
+                        | "at" <opt-whitespace> "the" <opt-whitespace> "bottom" <opt-whitespace> "of"
+                        | "in" <opt-whitespace> "spite" <opt-whitespace> "of"
+                        | "because" <opt-whitespace> "of"
+                        | "instead" <opt-whitespace> "of"
+                        | "in" <opt-whitespace> "case" <opt-whitespace> "of"
+                        | "by" <opt-whitespace> "means" <opt-whitespace> "of"
+                        | "with" <opt-whitespace> "regard" <opt-whitespace> "to"
+                        | "according" <opt-whitespace> "to"
+                        | "due" <opt-whitespace> "to"
+                        | "as" <opt-whitespace> "for"
+                        | "as" <opt-whitespace> "to"
+                        | "out" <opt-whitespace> "of"
+
+/* Interrogative clause with British forms */
+<interrogative-clause> ::= <yes-no-question>
+                        | <wh-question>
+                        | <tag-question>
+
+<yes-no-question> ::= <auxiliary-verb> <opt-whitespace> <subject> <opt-whitespace> <verb-complement>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* "?"
+                   | <do-verb> <opt-whitespace> <subject> <opt-whitespace> <verb-infinitive-base> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <auxiliary-verb>? <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* "?"
+
+<tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <question-tag> "?"
+
+/* British tag questions (more common than in US) */
+<question-tag> ::= <auxiliary-verb> "n't" <opt-whitespace> <subject>
+                | <auxiliary-verb> <opt-whitespace> "not" <opt-whitespace> <subject>
+                | "shan't" <opt-whitespace> <subject>
+                | "mayn't" <opt-whitespace> <subject>
+
+<question-word> ::= <interrogative-pronoun>
+                 | <interrogative-adverb>
+                 | <interrogative-determiner>
+
+<interrogative-adverb> ::= "where" | "when" | "why" | "how" | "how" <opt-whitespace> "much" | "how" <opt-whitespace> "many" | "how" <opt-whitespace> "long" | "how" <opt-whitespace> "often" | "whence" | "whereby"
+
+<interrogative-determiner> ::= "which" | "what" | "whose"
+
+<interrogative-clause-embedded> ::= <question-word> <opt-whitespace> <subordinate-content>
+
+/* Imperative clause */
+<imperative-clause> ::= <verb-infinitive-base> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* ( "!" | "." )?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? "!"
+                      | "What" <opt-whitespace> <noun-phrase> "!"
+                      | "How" <opt-whitespace> <adjective> "!"
+
+<exclamative-word> ::= "What" | "How" | "Such"
+
+/* Subordinate clause */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+                      | <coordinated-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <nested-final-field>
+
+<nested-final-field> ::= <subordinate-clause>
+                      | <relative-clause>
+                      | <prepositional-phrase>
+
+<coordinated-subordinate-clause> ::= <subordinate-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>*
+
+/* Relative clause */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>*
+
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <subordinate-clause>
+
+/* Compound sentence */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
+
+<coordinating-conjunction> ::= "and" | "or" | "but" | "nor" | "for" | "yet" | "so"
+
+/* Complex sentence */
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Multi-embedded sentence */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated complex sentence */
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+                                | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
+
+/* Parenthetical clause */
+<parenthetical-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <punctuation>?
+
+<parenthetical-insertion> ::= <subordinate-clause>
+                           | <main-clause>
+                           | <comment-phrase>
+
+<comment-phrase> ::= <sentence-adverb> ( <opt-whitespace> <sentence-adverb> )*
+
+/* Subordinating conjunctions with British usage */
+<subordinating-conjunction> ::= <temporal-conjunction>
+                             | <causal-conjunction>
+                             | <conditional-conjunction>
+                             | <concessive-conjunction>
+                             | <purpose-conjunction>
+                             | <result-conjunction>
+                             | <comparative-conjunction>
+                             | "that"
+
+<temporal-conjunction> ::= "when" | "while" | "whilst" | "as" | "after" | "before" | "since" | "until" | "till" | "once" | "whenever" | "as" <opt-whitespace> "soon" <opt-whitespace> "as" | "as" <opt-whitespace> "long" <opt-whitespace> "as"
+
+<causal-conjunction> ::= "because" | "since" | "as" | "now" <opt-whitespace> "that" | "inasmuch" <opt-whitespace> "as"
+
+<conditional-conjunction> ::= "if" | "unless" | "provided" <opt-whitespace> "that" | "provided" | "providing" <opt-whitespace> "that" | "in" <opt-whitespace> "case"
+
+<concessive-conjunction> ::= "although" | "though" | "even" <opt-whitespace> "though" | "even" <opt-whitespace> "if" | "while" | "whilst" | "whereas"
+
+<purpose-conjunction> ::= "so" <opt-whitespace> "that" | "in" <opt-whitespace> "order" <opt-whitespace> "that" | "in" <opt-whitespace> "order" <opt-whitespace> "to"
+
+<result-conjunction> ::= "so" <opt-whitespace> "that" | "such" <opt-whitespace> "that"
+
+<comparative-conjunction> ::= "as" | "than" | "as" <opt-whitespace> "if" | "as" <opt-whitespace> "though"
+
+/* Negation with British contractions */
+<negation> ::= "not" | "n't" | "never" | "no" | "none" | "nothing" | "nobody" | "no" <opt-whitespace> "one" | "neither" | "nor" | "shan't" | "mayn't" | "needn't"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":" | "..." | "-" | "–" | "—" | "(" | ")" | "[" | "]" | "{" | "}" | "\"" | "'" | "'"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Cleft sentences */
+<cleft-sentence> ::= <it-cleft>
+                  | <wh-cleft>
+
+<it-cleft> ::= "It" <opt-whitespace> <be-verb> <opt-whitespace> <focused-constituent> <opt-whitespace> <relative-clause>
+
+<wh-cleft> ::= <wh-clause> <opt-whitespace> <be-verb> <opt-whitespace> <focused-constituent>
+
+<focused-constituent> ::= <noun-phrase>
+                       | <prepositional-phrase>
+                       | <adverb>
+
+/* Reported speech */
+<reported-speech> ::= <reporting-verb> <opt-whitespace> <reported-clause>
+
+<reporting-verb> ::= "say" | "says" | "said" | "tell" | "tells" | "told" | "ask" | "asks" | "asked" | "report" | "reports" | "reported" | "claim" | "claims" | "claimed" | "state" | "states" | "stated" | "mention" | "mentions" | "mentioned"
+
+<reported-clause> ::= "that" <opt-whitespace> <subordinate-content>
+                   | <interrogative-clause-embedded>
+
+/* Elliptical structures */
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+
+<elliptical-response> ::= <sentence-adverb>
+                       | <verb-phrase>
+                       | <noun-phrase>
+
+<elliptical-coordination> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <elliptical-clause>
+
+/* Context-sensitive agreement rules */
+
+/* Subject-verb agreement (number and person) */
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@NUMBER == <verb>.@NUMBER AND <subject>.@PERSON == <verb>.@PERSON
+    THEN VALID
+    ELSE ERROR "Subject and verb must agree in number and person"
+
+/* Pronoun case agreement */
+@CONTEXT_RULE[pronoun-case]:
+    IF <pronoun> IN <subject-position> REQUIRES @CASE[nominative]
+    THEN VALID
+    ELSE ERROR "Nominative case required for subject position"
+
+@CONTEXT_RULE[pronoun-object-case]:
+    IF <pronoun> IN <object-position> REQUIRES @CASE[accusative]
+    THEN VALID
+    ELSE ERROR "Accusative case required for object position"
+
+/* Article-noun compatibility */
+@CONTEXT_RULE[article-noun]:
+    IF <indefinite-article> == "a" AND <noun> STARTS_WITH_VOWEL_SOUND
+    THEN WARNING "Consider using 'an' before vowel sounds"
+
+/* Reflexive pronoun agreement */
+@CONTEXT_RULE[reflexive-agreement]:
+    IF <reflexive-pronoun>.@PERSON == <subject>.@PERSON AND <reflexive-pronoun>.@NUMBER == <subject>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Reflexive pronoun must agree with subject"
+
+/* Tense consistency */
+@CONTEXT_RULE[tense-consistency]:
+    IF <sentence> HAS_CONSISTENT_TENSE_SEQUENCE
+    THEN VALID
+    ELSE WARNING "Consider maintaining consistent tense usage"
+
+/* British spelling consistency */
+@CONTEXT_RULE[british-spelling]:
+    IF <text> USES_BRITISH_SPELLING_CONSISTENTLY
+    THEN VALID
+    ELSE WARNING "Consider using consistent British spelling patterns"
+
+/* Passive voice identification */
+@CONTEXT_RULE[passive-voice]:
+    IF <passive-verb-phrase> HAS_PROPER_STRUCTURE
+    THEN VALID
+    ELSE ERROR "Passive voice requires 'be' + past participle"
+
+/* Modal verb + infinitive */
+@CONTEXT_RULE[modal-infinitive]:
+    IF <modal-verb> FOLLOWED_BY <verb-infinitive-base>
+    THEN VALID
+    ELSE ERROR "Modal verbs must be followed by base form infinitive"
+
+/* Comparative context */
+@CONTEXT_RULE[comparative-than]:
+    IF <adjective-comparative> REQUIRES "than"
+    THEN VALID
+    ELSE WARNING "Comparative adjectives typically require 'than'"
+
+/* Nested clause depth */
+@CONTEXT_RULE[nested-clause-depth]:
+    IF <nested-subordinate-clause> DEPTH <= 3
+    THEN VALID
+    ELSE WARNING "Deep nesting (>3 levels) may reduce readability"
+
+/* Example sentences demonstrating comprehensive GB English grammar:
+ *
+ * REGULAR VERBS:
+ * - "I work in London" (present tense)
+ * - "She worked yesterday" (past tense)
+ * - "We have worked all day" (present perfect)
+ *
+ * IRREGULAR VERBS:
+ * - "He is a teacher" (present - be)
+ * - "They were home" (past - be)
+ * - "I have been to Paris" (present perfect - be)
+ * - "She goes to school" (present - go)
+ * - "He went home" (past - go)
+ * - "We have gone far" (present perfect - go)
+ *
+ * BRITISH SPELLING:
+ * - "I favour the colour grey"
+ * - "The theatre is in the centre"
+ * - "We apologise for the programme"
+ * - "I learnt to organise the catalogue"
+ *
+ * BRITISH PAST FORMS:
+ * - "I learnt French at school"
+ * - "The house burnt down"
+ * - "She dreamt of flying"
+ * - "He spelt the word correctly"
+ *
+ * SUBJECT-VERB AGREEMENT:
+ * - "The dog runs fast" (3rd person singular)
+ * - "The dogs run fast" (plural)
+ * - "I am happy" (1st person singular)
+ * - "We are happy" (1st person plural)
+ *
+ * PASSIVE VOICE:
+ * - "The letter is written by John"
+ * - "The house was built in 1990"
+ * - "The book has been read by millions"
+ *
+ * MODAL VERBS WITH BRITISH USAGE:
+ * - "I can speak English"
+ * - "She might come tomorrow"
+ * - "You should study more"
+ * - "They must leave now"
+ * - "I shan't be long"
+ * - "You needn't worry"
+ *
+ * PROGRESSIVE ASPECT:
+ * - "I am working now"
+ * - "She was studying all night"
+ * - "We have been waiting for hours"
+ *
+ * PERFECT ASPECT:
+ * - "I have finished my homework"
+ * - "She had left before I arrived"
+ * - "We shall have completed it by Friday"
+ *
+ * SUBORDINATE CLAUSES:
+ * - "I know that she is coming"
+ * - "When it rains, we stay inside"
+ * - "Whilst he is tired, he continues working"
+ *
+ * RELATIVE CLAUSES:
+ * - "The man who lives here is a doctor"
+ * - "The book that I read was interesting"
+ * - "The house which was built yesterday is big"
+ *
+ * COMPARATIVES/SUPERLATIVES:
+ * - "He is taller than me"
+ * - "She is the best teacher"
+ * - "This is the most interesting book"
+ *
+ * QUESTION FORMS WITH TAG QUESTIONS:
+ * - "Are you coming?"
+ * - "Where is he?"
+ * - "What did you do?"
+ * - "You're coming, aren't you?" (tag question)
+ * - "She won't be late, will she?"
+ * - "They shan't forget, shall they?"
+ *
+ * REPORTED SPEECH:
+ * - "He said that he was tired"
+ * - "She asked where he lived"
+ * - "They told us that they would come"
+ *
+ * CLEFT SENTENCES:
+ * - "It is John who did it"
+ * - "What I want is peace"
+ *
+ * NEGATION WITH BRITISH FORMS:
+ * - "I do not know"
+ * - "She doesn't like coffee"
+ * - "They have never been there"
+ * - "I shan't go"
+ * - "You needn't bother"
+ *
+ * COCKNEY DIALECT:
+ * - "I done it meself"
+ * - "Yerself better hurry"
+ * - "They was going down the boozer"
+ *
+ * GEORDIE DIALECT:
+ * - "Wor lass is canny"
+ * - "Yous are coming, aren't yous?"
+ * - "Us are going to the match"
+ *
+ * SCOUSE DIALECT:
+ * - "Youse are sound, la"
+ * - "That's boss, that is"
+ *
+ * SCOTTISH ENGLISH:
+ * - "Ye cannae do that"
+ * - "Where are youse going?"
+ *
+ * NESTED SUBORDINATE CLAUSES:
+ * - "I think that he said that she is coming"
+ * - "If you believe that he knows where she lives, ring him"
+ * - "The man whom I met told me that his son will come home"
+ *
+ * COMPLEX SENTENCES:
+ * - "When she comes home, she will discover that her cat is missing"
+ * - "I heard that he told her that they should come because the weather was favourable"
+ *
+ * BRITISH VOCABULARY:
+ * - "I took the lift to my flat"
+ * - "The lorry drove on the pavement"
+ * - "We queued for the bus in the autumn"
+ * - "He wrote a cheque at the theatre"
+ */
