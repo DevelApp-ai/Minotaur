@@ -24,9 +24,13 @@ SymbolTableSharing: hierarchical
  * - Quantifiers and determiners
  * - Reflexive and reciprocal pronouns
  * - Complex temporal expressions
+ * - Dialectal variations (Southern Jutland/Sønderjysk)
  */
 
 Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du, han, hun, vi, I, de, mig, dig, ham, hende, os, jer, dem, min, din, hans, hendes, vores, jeres, deres, denne, dette, disse, en, et, ikke, kan, vil, skal, må, have, være, blive, sig, hinanden, selv, nej, ja, måske, altså, dog, endda, også, heller, jo, vel, nok, bare, lige, godt, nå, så
+
+/* Dialect marker for Southern Jutland (Sønderjysk) */
+@DIALECT[southern_jutland]
 
 /* Top-level sentence structure with V2 word order */
 <sentence> ::= <main-clause>
@@ -62,11 +66,21 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
                         | <indirect-object>
                         | <reflexive-pronoun>
 
-/* Negation */
-<negation> ::= "ikke" | "aldrig" | "ingenting" | "ingen" | "intet"
+/* Negation with dialectal variations */
+<negation> ::= <standard-negation> | <dialect-negation>
 
-/* Sentence adverbs */
-<sentence-adverb> ::= "altid" | "ofte" | "sjældent" | "måske" | "nok" | "jo" | "vel" | "da" | "dog" | "også" | "heller" | "endda" | "bare" | "lige" | "godt" | "vist" | "nødvendigvis"
+<standard-negation> ::= "ikke" | "aldrig" | "ingenting" | "ingen" | "intet"
+
+/* Southern Jutland dialectal negation */
+<dialect-negation> ::= @DIALECT[southern_jutland] ( "it" | "ä" | "int" | "alde" | "näjs" | "inj" )
+
+/* Sentence adverbs with dialectal forms */
+<sentence-adverb> ::= <standard-sentence-adverb> | <dialect-sentence-adverb>
+
+<standard-sentence-adverb> ::= "altid" | "ofte" | "sjældent" | "måske" | "nok" | "jo" | "vel" | "da" | "dog" | "også" | "heller" | "endda" | "bare" | "lige" | "godt" | "vist" | "nødvendigvis"
+
+/* Southern Jutland dialectal sentence adverbs and modal particles */
+<dialect-sentence-adverb> ::= @DIALECT[southern_jutland] ( "aalti" | "mâske" | "nok" | "jo" | "wel" | "dâ" | "dû" | "âsse" | "blot" | "sâen" )
 
 /* Verb complement (infinitive, participle, predicate adjective) */
 <verb-complement> ::= <infinitive-phrase>
@@ -204,9 +218,19 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
                    | <indefinite-pronoun>
                    | <interrogative-pronoun>
 
-<personal-pronoun-nominative> ::= @CASE[nominative] ( "jeg" | "du" | "han" | "hun" | "den" | "det" | "vi" | "I" | "de" | "man" )
+<personal-pronoun-nominative> ::= @CASE[nominative] ( <standard-nominative> | <dialect-nominative> )
 
-<personal-pronoun-accusative> ::= @CASE[accusative] ( "mig" | "dig" | "ham" | "hende" | "den" | "det" | "os" | "jer" | "dem" )
+<standard-nominative> ::= "jeg" | "du" | "han" | "hun" | "den" | "det" | "vi" | "I" | "de" | "man"
+
+/* Southern Jutland dialectal pronouns */
+<dialect-nominative> ::= @DIALECT[southern_jutland] ( "æ" | "a" | "dæ" | "han" | "ho" | "den" | "det" | "vi" | "I" | "di" | "man" )
+
+<personal-pronoun-accusative> ::= @CASE[accusative] ( <standard-accusative> | <dialect-accusative> )
+
+<standard-accusative> ::= "mig" | "dig" | "ham" | "hende" | "den" | "det" | "os" | "jer" | "dem"
+
+/* Southern Jutland dialectal accusative pronouns */
+<dialect-accusative> ::= @DIALECT[southern_jutland] ( "mæ" | "dæ" | "ham" | "hendes" | "æn" | "æt" | "os" | "jer" | "dem" | "juw" )
 
 /* Reflexive pronouns */
 <reflexive-pronoun> ::= @REFLEXIVE "mig" | "dig" | "sig" | "os" | "jer" | "sig" | "sig selv" | "mig selv" | "dig selv" | "os selv" | "jer selv"
@@ -228,16 +252,25 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
                       | <possessive-second-person>
                       | <possessive-third-person>
 
-/* Possessive pronouns with gender agreement */
-<possessive-first-person> ::= @GENDER[common] @NUMBER[singular] "min"
-                           | @GENDER[neuter] @NUMBER[singular] "mit"
-                           | @NUMBER[plural] "mine"
-                           | @NUMBER[plural] "vores"
+/* Possessive pronouns with gender agreement and dialectal forms */
+<possessive-first-person> ::= @GENDER[common] @NUMBER[singular] ( "min" | <dialect-poss-1sg-common> )
+                           | @GENDER[neuter] @NUMBER[singular] ( "mit" | <dialect-poss-1sg-neuter> )
+                           | @NUMBER[plural] ( "mine" | <dialect-poss-1pl> )
+                           | @NUMBER[plural] ( "vores" | <dialect-poss-1pl-collective> )
 
-<possessive-second-person> ::= @GENDER[common] @NUMBER[singular] "din"
-                            | @GENDER[neuter] @NUMBER[singular] "dit"
-                            | @NUMBER[plural] "dine"
+<dialect-poss-1sg-common> ::= @DIALECT[southern_jutland] "mæn"
+<dialect-poss-1sg-neuter> ::= @DIALECT[southern_jutland] "mæt"
+<dialect-poss-1pl> ::= @DIALECT[southern_jutland] "voes"
+<dialect-poss-1pl-collective> ::= @DIALECT[southern_jutland] "voes"
+
+<possessive-second-person> ::= @GENDER[common] @NUMBER[singular] ( "din" | <dialect-poss-2sg-common> )
+                            | @GENDER[neuter] @NUMBER[singular] ( "dit" | <dialect-poss-2sg-neuter> )
+                            | @NUMBER[plural] ( "dine" | <dialect-poss-2pl> )
                             | @NUMBER[plural] "jeres"
+
+<dialect-poss-2sg-common> ::= @DIALECT[southern_jutland] "dæn"
+<dialect-poss-2sg-neuter> ::= @DIALECT[southern_jutland] "dæt"
+<dialect-poss-2pl> ::= @DIALECT[southern_jutland] "dan" | "juwes"
 
 <possessive-third-person> ::= @GENDER[common] "hans" | "hendes" | "dens" | "deres"
                            | @GENDER[neuter] "hans" | "hendes" | "dets" | "deres"
@@ -502,32 +535,50 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
 /* Irregular past participles - context sensitive */
 <irregular-past-participle> ::= @IRREGULAR "været" | "haft" | "blevet" | "gået" | "kommet" | "vidst" | "gjort" | "fået" | "set" | "givet" | "sagt" | "taget" | "fundet" | "stået" | "siddet" | "ligget" | "slået" | "holdt" | "faldet" | "døet" | "født" | "båret" | "spist" | "drukket" | "sovet" | "løbet"
 
-/* Common 'have' verb conjugations */
+/* Common 'have' verb conjugations with dialectal variations */
 <have-verb> ::= <have-present> | <have-past> | <have-perfect>
 
-<have-present> ::= @TENSE[present] "har"
+<have-present> ::= @TENSE[present] ( "har" | <dialect-have-present> )
 
-<have-past> ::= @TENSE[past] "havde"
+<dialect-have-present> ::= @DIALECT[southern_jutland] "hâ" | "ha"
 
-<have-perfect> ::= @TENSE[perfect] "har" <opt-whitespace> "haft"
+<have-past> ::= @TENSE[past] ( "havde" | <dialect-have-past> )
 
-/* Common 'be' verb conjugations */
+<dialect-have-past> ::= @DIALECT[southern_jutland] "ha" | "haaj"
+
+<have-perfect> ::= @TENSE[perfect] ( "har" <opt-whitespace> "haft" | <dialect-have-perfect> )
+
+<dialect-have-perfect> ::= @DIALECT[southern_jutland] "hâ" <opt-whitespace> "hat"
+
+/* Common 'be' verb conjugations with dialectal variations */
 <be-verb> ::= <be-present> | <be-past> | <be-perfect>
 
-<be-present> ::= @TENSE[present] "er"
+<be-present> ::= @TENSE[present] ( "er" | <dialect-be-present> )
 
-<be-past> ::= @TENSE[past] "var"
+<dialect-be-present> ::= @DIALECT[southern_jutland] "æ" | "ä"
 
-<be-perfect> ::= @TENSE[perfect] "har" <opt-whitespace> "været"
+<be-past> ::= @TENSE[past] ( "var" | <dialect-be-past> )
 
-/* Common 'become' verb conjugations */
+<dialect-be-past> ::= @DIALECT[southern_jutland] "wa" | "wier"
+
+<be-perfect> ::= @TENSE[perfect] ( "har" <opt-whitespace> "været" | <dialect-be-perfect> )
+
+<dialect-be-perfect> ::= @DIALECT[southern_jutland] "hâ" <opt-whitespace> "wet"
+
+/* Common 'become' verb conjugations with dialectal variations */
 <become-verb> ::= <become-present> | <become-past> | <become-perfect>
 
-<become-present> ::= @TENSE[present] "bliver"
+<become-present> ::= @TENSE[present] ( "bliver" | <dialect-become-present> )
 
-<become-past> ::= @TENSE[past] "blev"
+<dialect-become-present> ::= @DIALECT[southern_jutland] "bli" | "bliw"
 
-<become-perfect> ::= @TENSE[perfect] "er" <opt-whitespace> "blevet"
+<become-past> ::= @TENSE[past] ( "blev" | <dialect-become-past> )
+
+<dialect-become-past> ::= @DIALECT[southern_jutland] "blyw"
+
+<become-perfect> ::= @TENSE[perfect] ( "er" <opt-whitespace> "blevet" | <dialect-become-perfect> )
+
+<dialect-become-perfect> ::= @DIALECT[southern_jutland] "æ" <opt-whitespace> "blywt"
 
 /* Imperative form - base verb stem */
 <verb-imperative> ::= <verb-stem> | <irregular-imperative>
@@ -590,22 +641,48 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
                | <time-duration>
                | <time-relation>
 
-<time-point> ::= "nu" | "da" | "dengang" | "i dag" | "i går" | "i morgen" | "i forgårs" | "i overmorgen" | "i aften" | "i nat" | "om morgenen" | "om eftermiddagen" | "om aftenen" | "om natten"
+<time-point> ::= <standard-time-point> | <dialect-time-point>
 
-<time-duration> ::= "altid" | "aldrig" | "længe" | "kort" | "hele" <opt-whitespace> "tiden" | "hele" <opt-whitespace> "dagen"
+<standard-time-point> ::= "nu" | "da" | "dengang" | "i dag" | "i går" | "i morgen" | "i forgårs" | "i overmorgen" | "i aften" | "i nat" | "om morgenen" | "om eftermiddagen" | "om aftenen" | "om natten"
 
-<time-relation> ::= "tidligere" | "senere" | "før" | "efter" | "straks" | "med" <opt-whitespace> "det" <opt-whitespace> "samme" | "samtidig" | "allerede" | "stadig" | "endnu" | "endnu" <opt-whitespace> "ikke"
+/* Southern Jutland dialectal time expressions */
+<dialect-time-point> ::= @DIALECT[southern_jutland] ( "nâ" | "nü" | "i daw" | "i gâ" | "i moin" | "i aften" | "i naat" )
+
+<time-duration> ::= <standard-time-duration> | <dialect-time-duration>
+
+<standard-time-duration> ::= "altid" | "aldrig" | "længe" | "kort" | "hele" <opt-whitespace> "tiden" | "hele" <opt-whitespace> "dagen"
+
+<dialect-time-duration> ::= @DIALECT[southern_jutland] ( "aalti" | "aldi" | "länj" )
+
+<time-relation> ::= <standard-time-relation> | <dialect-time-relation>
+
+<standard-time-relation> ::= "tidligere" | "senere" | "før" | "efter" | "straks" | "med" <opt-whitespace> "det" <opt-whitespace> "samme" | "samtidig" | "allerede" | "stadig" | "endnu" | "endnu" <opt-whitespace> "ikke"
+
+<dialect-time-relation> ::= @DIALECT[southern_jutland] ( "tidiær" | "sinær" | "för" | "äder" )
 
 <frequency-adverb> ::= "altid" | "aldrig" | "ofte" | "sjældent" | "nogle" <opt-whitespace> "gange" | "undertiden" | "af" <opt-whitespace> "og" <opt-whitespace> "til" | "sommetider" | "normalt" | "sædvanligvis" | "plejede" | "dagligt" | "ugentligt" | "månedligt" | "årligt"
 
 <place-adverb> ::= <place-location>
                 | <place-direction>
 
-<place-location> ::= "her" | "der" | "hvor" | "alle" <opt-whitespace> "vegne" | "ingen" <opt-whitespace> "steder" | "et" <opt-whitespace> "sted" | "nogen" <opt-whitespace> "steder" | "hjemme" | "ude" | "inde" | "oppe" | "nede" | "borte"
+<place-location> ::= <standard-place-location> | <dialect-place-location>
 
-<place-direction> ::= "hjem" | "hen" | "bort" | "frem" | "tilbage" | "ud" | "ind" | "op" | "ned" | "over" | "under" | "omkring" | "væk" | "til" | "fra"
+<standard-place-location> ::= "her" | "der" | "hvor" | "alle" <opt-whitespace> "vegne" | "ingen" <opt-whitespace> "steder" | "et" <opt-whitespace> "sted" | "nogen" <opt-whitespace> "steder" | "hjemme" | "ude" | "inde" | "oppe" | "nede" | "borte"
 
-<manner-adverb> ::= "godt" | "dårligt" | "hurtigt" | "langsomt" | "let" | "svært" | "nem" | "sammen" | "alene" | "sådan" | "således" | "ligesom" | "anderledes" | "rigtigt" | "forkert" | "pænt" | "grimt" | "stille" | "højt"
+/* Southern Jutland dialectal place adverbs */
+<dialect-place-location> ::= @DIALECT[southern_jutland] ( "hiær" | "diær" | "hâm" | "üj" | "inj" )
+
+<place-direction> ::= <standard-place-direction> | <dialect-place-direction>
+
+<standard-place-direction> ::= "hjem" | "hen" | "bort" | "frem" | "tilbage" | "ud" | "ind" | "op" | "ned" | "over" | "under" | "omkring" | "væk" | "til" | "fra"
+
+<dialect-place-direction> ::= @DIALECT[southern_jutland] ( "häm" | "hen" | "bot" | "üj" | "inj" | "op" | "neer" )
+
+<manner-adverb> ::= <standard-manner-adverb> | <dialect-manner-adverb>
+
+<standard-manner-adverb> ::= "godt" | "dårligt" | "hurtigt" | "langsomt" | "let" | "svært" | "nem" | "sammen" | "alene" | "sådan" | "således" | "ligesom" | "anderledes" | "rigtigt" | "forkert" | "pænt" | "grimt" | "stille" | "højt"
+
+<dialect-manner-adverb> ::= @DIALECT[southern_jutland] ( "got" | "dâli" | "flot" | "swat" | "sâen" )
 
 <degree-adverb> ::= "meget" | "lidt" | "for" | "så" | "ret" | "ganske" | "helt" | "næsten" | "delvis" | "fuldstændig" | "totalt" | "absolut" | "overhovedet" | "slet" <opt-whitespace> "ikke" | "rimelig" | "temmelig" | "virkelig" | "rigtig"
 
@@ -1038,4 +1115,49 @@ Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du
  * - "Først kom han, derefter gik hun" (First he came, then she went)
  * - "Han er syg, derfor kommer han ikke" (He is sick, therefore he is not coming)
  * - "Hun er intelligent, desuden er hun venlig" (She is intelligent, moreover she is kind)
+ *
+ * SOUTHERN JUTLAND DIALECT (SØNDERJYSK) EXAMPLES:
+ * 
+ * DIALECTAL PRONOUNS:
+ * - "Æ vil it" (Jeg vil ikke - I don't want to)
+ * - "Dæ ka it" (Du kan ikke - You cannot)
+ * - "Ho æ hiær" (Hun er her - She is here)
+ * - "Di wa diær" (De var der - They were there)
+ * - "Mæn hus" (Mit hus - My house)
+ * - "Dæn bil" (Din bil - Your car)
+ *
+ * DIALECTAL VERBS:
+ * - "Æ hâ en hund" (Jeg har en hund - I have a dog)
+ * - "Han wa hiær" (Han var her - He was here)
+ * - "Wi bli hjemme" (Vi bliver hjemme - We stay home)
+ * - "A ha set æt" (Jeg har set det - I have seen it)
+ *
+ * DIALECTAL NEGATION:
+ * - "Æ ka it komme" (Jeg kan ikke komme - I cannot come)
+ * - "Han vil ä" (Han vil ikke - He doesn't want to)
+ * - "Inj hâ noget" (Ingen har noget - Nobody has anything)
+ *
+ * DIALECTAL TIME EXPRESSIONS:
+ * - "Nâ komme æ" (Nu kommer jeg - Now I'm coming)
+ * - "I daw æ han hiær" (I dag er han her - Today he is here)
+ * - "I gâ wa wi diær" (I går var vi der - Yesterday we were there)
+ *
+ * DIALECTAL PLACE EXPRESSIONS:
+ * - "Hiær æ æ" (Her er jeg - Here I am)
+ * - "Han æ hâm" (Han er hjemme - He is at home)
+ * - "Wi gå häm" (Vi går hjem - We go home)
+ *
+ * DIALECTAL MANNER AND DEGREE:
+ * - "Æt æ got" (Det er godt - That is good)
+ * - "Ho æ flot" (Hun er smuk - She is beautiful)
+ * - "Sâen gör wi æt" (Sådan gør vi det - That's how we do it)
+ *
+ * MIXED STANDARD AND DIALECT:
+ * - "Jeg tror, at æ vil komme i daw" (I think that I will come today - mixing standard and dialect)
+ * - "Han sagde, at ho wa hiær i gâ" (He said that she was here yesterday)
+ *
+ * DIALECTAL MODAL PARTICLES:
+ * - "Æt æ jo sâen" (Det er jo sådan - That's just how it is)
+ * - "Dâ gör wi æt" (Så gør vi det - Then we'll do it)
+ * - "Mâske komme æ" (Måske kommer jeg - Maybe I'll come)
  */

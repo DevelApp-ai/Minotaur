@@ -1,13 +1,14 @@
-# Comprehensive Danish Language Grammar with Sub-Sentences
+# Comprehensive Danish Language Grammar with Sub-Sentences and Dialectal Variations
 
-This grammar provides extensive coverage of the Danish language, from basic sentence structures to complex multi-level nested sub-sentences and discourse structures.
+This grammar provides extensive coverage of the Danish language, from basic sentence structures to complex multi-level nested sub-sentences, discourse structures, and dialectal variations including Southern Jutland (Sønderjysk).
 
 ## Grammar Size & Scope
 
-- **1,041 lines** of comprehensive grammar rules (expanded from 774 lines)
-- **35% larger than Python** (775 lines), **comparable to C#** (932 lines)
+- **1,163 lines** of comprehensive grammar rules (expanded from 1,041 lines)
+- **50% larger than Python** (775 lines), **25% larger than C#** (932 lines)
 - **Production-ready** for advanced natural language processing applications
 - **Supports nested sub-sentences** up to 3+ levels of embedding
+- **Dialectal support**: Southern Jutland (Sønderjysk) dialect variations
 
 ## Core Features
 
@@ -291,6 +292,88 @@ Postponed subordinate clauses with correlate pronoun:
 14. **Reported speech tense** (NEW): Tense consistency in indirect discourse
 15. **Extraposition validation** (NEW): Proper correlate pronoun usage
 
+### 15. Dialectal Variations - Southern Jutland (Sønderjysk) (NEW)
+
+The grammar includes comprehensive support for the Southern Jutland dialect (Sønderjysk), one of Denmark's most distinctive regional varieties spoken in Southern Jutland.
+
+#### Dialectal Pronouns
+- **Personal pronouns**: 
+  - Standard: jeg, du, han, hun → Dialect: æ/a, dæ, han, ho
+  - Standard: de → Dialect: di
+- **Accusative pronouns**:
+  - Standard: mig, dig → Dialect: mæ, dæ
+  - Standard: jer → Dialect: juw
+- **Possessive pronouns**:
+  - Standard: min/mit → Dialect: mæn/mæt
+  - Standard: din/dit → Dialect: dæn/dæt
+  - Standard: vores → Dialect: voes
+
+#### Dialectal Verb Forms
+- **"være" (to be)**:
+  - Present: er → æ/ä
+  - Past: var → wa/wier
+  - Perfect: har været → hâ wet
+- **"have" (to have)**:
+  - Present: har → hâ/ha
+  - Past: havde → ha/haaj
+  - Perfect: har haft → hâ hat
+- **"blive" (to become)**:
+  - Present: bliver → bli/bliw
+  - Past: blev → blyw
+  - Perfect: er blevet → æ blywt
+
+#### Dialectal Negation
+- Standard: ikke → Dialect: it/ä/int
+- Standard: aldrig → Dialect: alde
+- Standard: ingen → Dialect: inj/näjs
+
+#### Dialectal Adverbs
+- **Time**: 
+  - nu → nâ/nü
+  - i dag → i daw
+  - i går → i gâ
+  - i morgen → i moin
+  - altid → aalti
+- **Place**:
+  - her → hiær
+  - der → diær
+  - hjemme → hâm
+  - ude → üj
+  - inde → inj
+  - hjem → häm
+- **Manner**:
+  - godt → got
+  - dårligt → dâli
+  - sådan → sâen
+
+#### Dialectal Modal Particles
+- måske → mâske
+- vel → wel
+- da → dâ/dû
+- også → âsse
+
+#### Usage Examples
+```
+Standard: Jeg kan ikke komme i dag
+Dialect:  Æ ka it komme i daw
+(I cannot come today)
+
+Standard: Hun var hjemme i går
+Dialect:  Ho wa hâm i gâ
+(She was home yesterday)
+
+Standard: De har set det
+Dialect:  Di hâ set æt
+(They have seen it)
+
+Standard: Min bil er stor
+Dialect:  Mæn bil æ stot
+(My car is big)
+```
+
+#### Dialect Marker
+All dialectal forms are marked with `@DIALECT[southern_jutland]` for proper identification and processing.
+
 ## Advanced Linguistic Features
 
 ### Word Order Variations
@@ -376,25 +459,26 @@ This comprehensive grammar with sub-sentence support enables:
 
 ## Coverage Comparison
 
-| Feature | Basic Grammar | Comprehensive Grammar | With Sub-Sentences |
-|---------|---------------|----------------------|--------------------|
-| Lines of code | 303 | 774 | 1,041 |
-| Verb tenses | 3 | 6 | 6 |
-| Subordinate clause types | 4 | 7 | 9 |
-| Nesting levels | 1 | 2 | 3+ |
-| Clause coordination | Basic | Advanced | Full |
-| Discourse structures | 0 | 0 | 7 types |
-| Elliptical structures | 0 | 0 | Supported |
-| Cleft sentences | 0 | 0 | Supported |
-| Tag questions | 0 | 0 | Supported |
-| Reported speech | 0 | 0 | Full support |
-| Context rules | 4 | 9 | 15 |
-| Irregular verbs | 9 | 25+ | 25+ |
-| Voice types | 1 | 3 | 3 |
-| Pronoun types | 4 | 7 | 7 |
-| Adverb categories | 4 | 6 | 6 |
-| Prepositions | 20 | 45+ | 45+ |
-| Quantifiers | 0 | 20+ | 20+ |
+| Feature | Basic Grammar | Comprehensive Grammar | With Sub-Sentences | With Dialects |
+|---------|---------------|----------------------|--------------------|--------------| 
+| Lines of code | 303 | 774 | 1,041 | 1,163 |
+| Verb tenses | 3 | 6 | 6 | 6 |
+| Subordinate clause types | 4 | 7 | 9 | 9 |
+| Nesting levels | 1 | 2 | 3+ | 3+ |
+| Clause coordination | Basic | Advanced | Full | Full |
+| Discourse structures | 0 | 0 | 7 types | 7 types |
+| Elliptical structures | 0 | 0 | Supported | Supported |
+| Cleft sentences | 0 | 0 | Supported | Supported |
+| Tag questions | 0 | 0 | Supported | Supported |
+| Reported speech | 0 | 0 | Full support | Full support |
+| Context rules | 4 | 9 | 15 | 15 |
+| Irregular verbs | 9 | 25+ | 25+ | 25+ |
+| Voice types | 1 | 3 | 3 | 3 |
+| Pronoun types | 4 | 7 | 7 | 7 |
+| Adverb categories | 4 | 6 | 6 | 6 |
+| Prepositions | 20 | 45+ | 45+ | 45+ |
+| Quantifiers | 0 | 20+ | 20+ | 20+ |
+| Dialectal variations | 0 | 0 | 0 | Southern Jutland |
 
 ## Example Sentences
 
@@ -415,6 +499,7 @@ See `Danish_Examples.txt` for 300+ validated sentences demonstrating:
 - **Reported speech and indirect discourse**
 - **Elliptical structures and tag questions**
 - **Discourse markers and connectives**
+- **Southern Jutland dialectal forms** (NEW)
 
 ## References
 
@@ -423,6 +508,7 @@ Based on standard Danish grammar references:
 - Dansk Grammatik (Danish Grammar)
 - Modern Danish orthographic conventions
 - Spoken and written Danish patterns
+- Southern Jutland dialect documentation (Sønderjysk)
 
 ## License
 
