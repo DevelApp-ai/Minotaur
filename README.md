@@ -143,7 +143,7 @@ Contributions are welcome! Please feel free to open issues or submit pull reques
 
 ## 🏷️ Releases
 
-- **v1.0.0**: Initial release with complete GrammarForge implementation
+- **v1.0.0**: Initial release with complete Minotaur implementation
 - **v1.0.0-preview**: Pre-release versions for testing
 
 ## 📈 Roadmap

@@ -1,8 +1,8 @@
-# GrammarForge for Real-Time Code Generation and Refactoring: Analysis and Recommendations
+# Minotaur for Real-Time Code Generation and Refactoring: Analysis and Recommendations
 
 ## Executive Summary
 
-**YES, GrammarForge can be effectively used for real-time code generation and refactoring with clear path and small context management, similar to the refakts approach for TypeScript.** In fact, GrammarForge offers several advantages over refakts while maintaining the same core principles of surgical operations and context preservation.
+**YES, Minotaur can be effectively used for real-time code generation and refactoring with clear path and small context management, similar to the refakts approach for TypeScript.** In fact, Minotaur offers several advantages over refakts while maintaining the same core principles of surgical operations and context preservation.
 
 ## Key Findings
 
@@ -14,10 +14,10 @@ RefakTS demonstrates a successful model for AI-assisted code refactoring through
 - **Cognitive Load Reduction**: AI agents focus on logic rather than syntax management
 - **Token Efficiency**: Only change what needs to be changed
 
-### GrammarForge Capabilities Mapping
-GrammarForge provides equivalent and enhanced capabilities:
+### Minotaur Capabilities Mapping
+Minotaur provides equivalent and enhanced capabilities:
 
-| RefakTS Feature | GrammarForge Equivalent | Enhancement |
+| RefakTS Feature | Minotaur Equivalent | Enhancement |
 |----------------|------------------------|-------------|
 | Location-based targeting | Position tracking in rule callbacks | Grammar-aware precision |
 | Surgical operations | Rule activation callbacks | Language-agnostic operations |
@@ -25,7 +25,7 @@ GrammarForge provides equivalent and enhanced capabilities:
 | AST manipulation | Grammar-driven parsing | Real-time incremental parsing |
 | TypeScript-specific | Language-agnostic grammar | Support for any language |
 
-## Core Advantages of GrammarForge Approach
+## Core Advantages of Minotaur Approach
 
 ### 1. Language Agnostic Operations
 - **Universal Application**: Works with any language that has a defined grammar
@@ -285,7 +285,7 @@ class MultiLanguageCoordinator {
 
 #### 1. Command-Line Interface (Similar to RefakTS)
 ```bash
-# GrammarForge CLI commands
+# Minotaur CLI commands
 grammarforge select src/example.ts --regex "tempResult" --grammar "TypeScript"
 grammarforge extract-variable "[src/example.ts 5:8-5:18]" --name "result"
 grammarforge rename "[src/example.ts 3:5-3:15]" --to "newVariableName"
@@ -298,7 +298,7 @@ grammarforge optimize-query "[src/page.html 15:20-15:45]"
 
 #### 2. API Integration
 ```typescript
-interface GrammarForgeAPI {
+interface MinotaurAPI {
   // Location-based operations
   select(file: string, criteria: SelectionCriteria): CodeLocation[];
   extractVariable(location: CodeLocation, name: string): RefactoringResult;
@@ -360,9 +360,9 @@ interface RealTimeFeedback {
 
 ## Comparison with RefakTS
 
-### Advantages of GrammarForge Approach
+### Advantages of Minotaur Approach
 
-| Aspect | RefakTS | GrammarForge | Advantage |
+| Aspect | RefakTS | Minotaur | Advantage |
 |--------|---------|--------------|-----------|
 | **Language Support** | TypeScript only | Any language | Universal applicability |
 | **Multi-Language Files** | Limited | Native support | Better for modern development |
@@ -474,7 +474,7 @@ grammarforge extract-plot-function "[analysis.R 45:10-65:20]" --name "create_sca
 
 ## Conclusion
 
-GrammarForge provides a superior foundation for real-time code generation and refactoring compared to refakts by offering:
+Minotaur provides a superior foundation for real-time code generation and refactoring compared to refakts by offering:
 
 1. **Universal Language Support**: Works with any language that has a defined grammar
 2. **Enhanced Context Management**: Grammar-level context control with hierarchical scoping
@@ -483,7 +483,7 @@ GrammarForge provides a superior foundation for real-time code generation and re
 5. **Multi-Language Capabilities**: Native support for embedded and mixed languages
 6. **Extensible Framework**: Custom refactoring rules for any domain
 
-The grammar-based approach maintains all the benefits of refakts' surgical operations while extending capabilities to support specialized languages, multi-language files, and domain-specific refactoring needs. This makes GrammarForge an ideal foundation for AI-assisted code generation and refactoring systems that need to work across diverse programming environments.
+The grammar-based approach maintains all the benefits of refakts' surgical operations while extending capabilities to support specialized languages, multi-language files, and domain-specific refactoring needs. This makes Minotaur an ideal foundation for AI-assisted code generation and refactoring systems that need to work across diverse programming environments.
 
-**Recommendation**: Proceed with GrammarForge implementation using the phased approach outlined above, starting with core infrastructure and gradually adding advanced features. The investment in grammar-based refactoring will provide long-term benefits for AI code generation systems working with specialized languages and complex multi-language codebases.
+**Recommendation**: Proceed with Minotaur implementation using the phased approach outlined above, starting with core infrastructure and gradually adding advanced features. The investment in grammar-based refactoring will provide long-term benefits for AI code generation systems working with specialized languages and complex multi-language codebases.
 

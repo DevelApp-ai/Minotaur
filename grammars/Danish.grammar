@@ -1,0 +1,1393 @@
+Grammar: Danish
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Danish Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Danish language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Passive voice and reflexive verbs
+ * - Context-sensitive agreement rules (gender, number, case, definiteness)
+ * - Full regular expression support for morphological patterns
+ * - Common and neuter gender agreement
+ * - Definite and indefinite forms
+ * - Multiple tenses (present, past, future, perfect, pluperfect)
+ * - Conditional and subjunctive moods
+ * - V2 word order and topicalization
+ * - Relative clauses and subordinate structures
+ * - Comparative and superlative adjectives
+ * - Genitive case and compound nouns
+ * - Negation patterns
+ * - Quantifiers and determiners
+ * - Reflexive and reciprocal pronouns
+ * - Complex temporal expressions
+ * - Dialectal variations (multiple regional dialects)
+ */
+
+Keywords: og, eller, men, hvis, når, fordi, at, som, der, det, den, de, jeg, du, han, hun, vi, I, de, mig, dig, ham, hende, os, jer, dem, min, din, hans, hendes, vores, jeres, deres, denne, dette, disse, en, et, ikke, kan, vil, skal, må, have, være, blive, sig, hinanden, selv, nej, ja, måske, altså, dog, endda, også, heller, jo, vel, nok, bare, lige, godt, nå, så
+
+/* Dialect markers for Danish regional varieties */
+@DIALECT[southern_jutland]     /* Sønderjysk */
+@DIALECT[northwestern_jutland] /* Thybomål/Thisted area */
+@DIALECT[funen]                /* Fynsk */
+@DIALECT[lolland]              /* Lollandsk */
+@DIALECT[eastern_jutland]      /* Østjysk */
+@DIALECT[bornholm]             /* Bornholmsk */
+
+/* Top-level sentence structure with V2 word order */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
+
+/* Main clause with V2 word order (verb-second) */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+               | <parenthetical-clause>
+
+/* V2 declarative: TopicField + FiniteVerb + MiddleField + MainVerb + FinalField */
+<declarative-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? <punctuation>?
+
+/* Topic field can contain various constituents */
+<topic-field> ::= <subject>
+               | <adverbial>
+               | <object>
+               | <prepositional-phrase>
+
+/* Middle field contains subject (if not topicalized), objects, and adverbials */
+<middle-field> ::= <middle-field-element> ( <opt-whitespace> <middle-field-element> )*
+
+<middle-field-element> ::= <subject>
+                        | <negation>
+                        | <sentence-adverb>
+                        | <object>
+                        | <indirect-object>
+                        | <reflexive-pronoun>
+
+/* Negation with dialectal variations */
+<negation> ::= <standard-negation> | <dialect-negation>
+
+<standard-negation> ::= "ikke" | "aldrig" | "ingenting" | "ingen" | "intet"
+
+/* Dialectal negation from multiple regions */
+<dialect-negation> ::= @DIALECT[southern_jutland] ( "it" | "ä" | "int" | "alde" | "näjs" | "inj" )
+                    | @DIALECT[northwestern_jutland] ( "it" | "int" | "aldi" | "inj" )
+                    | @DIALECT[funen] ( "it" | "int" | "aldi" | "inj" )
+                    | @DIALECT[lolland] ( "it" | "int" | "aldi" | "inj" )
+                    | @DIALECT[eastern_jutland] ( "it" | "int" | "aldi" | "inj" )
+                    | @DIALECT[bornholm] ( "itt" | "âldre" | "injenting" | "injen" )
+
+/* Sentence adverbs with dialectal forms */
+<sentence-adverb> ::= <standard-sentence-adverb> | <dialect-sentence-adverb>
+
+<standard-sentence-adverb> ::= "altid" | "ofte" | "sjældent" | "måske" | "nok" | "jo" | "vel" | "da" | "dog" | "også" | "heller" | "endda" | "bare" | "lige" | "godt" | "vist" | "nødvendigvis"
+
+/* Dialectal sentence adverbs and modal particles from multiple regions */
+<dialect-sentence-adverb> ::= @DIALECT[southern_jutland] ( "aalti" | "mâske" | "nok" | "jo" | "wel" | "dâ" | "dû" | "âsse" | "blot" | "sâen" )
+                           | @DIALECT[northwestern_jutland] ( "aalti" | "mâske" | "nok" | "jo" | "vel" | "dâ" | "âsse" | "sâen" )
+                           | @DIALECT[funen] ( "aalti" | "mâske" | "nok" | "jo" | "vel" | "dâ" | "âsse" | "sân" )
+                           | @DIALECT[lolland] ( "aalti" | "mâske" | "nok" | "jo" | "vel" | "dâ" | "âsse" | "sân" )
+                           | @DIALECT[eastern_jutland] ( "aalti" | "mâske" | "nok" | "jo" | "vel" | "dâ" | "âsse" | "sâen" )
+                           | @DIALECT[bornholm] ( "åltid" | "måske" | "nok" | "jo" | "vel" | "då" | "åsse" | "såen" )
+
+/* Verb complement (infinitive, participle, predicate adjective) */
+<verb-complement> ::= <infinitive-phrase>
+                   | <past-participle>
+                   | <present-participle>
+                   | <predicate-adjective>
+
+<infinitive-phrase> ::= ( "at" <opt-whitespace> )? <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<predicate-adjective> ::= <adjective>
+
+/* Final field for heavy constituents */
+<final-field> ::= <subordinate-clause>
+               | <relative-clause>
+               | <prepositional-phrase>
+               | <embedded-clause-sequence>
+               | <extraposed-clause>
+
+/* Embedded clause sequence (multiple subordinate clauses) */
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> )+
+
+/* Extraposed clause (postponed subordinate clause with correlate) */
+<extraposed-clause> ::= <correlate-pronoun> <opt-whitespace> <subordinate-clause>
+
+<correlate-pronoun> ::= "det"
+
+/* Interrogative clause */
+<interrogative-clause> ::= <yes-no-question>
+                        | <wh-question>
+
+<yes-no-question> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? "?"
+
+/* Imperative clause */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <middle-field>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>? ( "!" | "." )?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? <opt-whitespace> <finite-verb>? <opt-whitespace> <middle-field>? "!"
+
+<exclamative-word> ::= "hvor" | "sikke" | "så" | "hvilket" | "hvilken"
+
+/* Subordinate clause (verb-final word order) with nesting support */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+                      | <coordinated-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+/* Nested subordinate clause (sub-sentence within sub-sentence) */
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase-subordinate> <opt-whitespace> <nested-final-field>
+
+<nested-final-field> ::= <subordinate-clause>
+                      | <relative-clause>
+                      | <embedded-clause-sequence>
+                      | <prepositional-phrase>
+
+/* Coordinated subordinate clauses */
+<coordinated-subordinate-clause> ::= <subordinate-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase-subordinate> <opt-whitespace> <subordinate-final-field>?
+
+<subordinate-final-field> ::= <subordinate-clause>
+                           | <relative-clause>
+                           | <prepositional-phrase>
+                           | <adverb-clause>
+
+<verb-phrase-subordinate> ::= ( <auxiliary-verb> <opt-whitespace> )* <main-verb>
+
+/* Relative clause with nesting support */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>?
+
+/* Nested relative clause (relative clause containing subordinate clause) */
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>? <opt-whitespace> <subordinate-clause>
+
+/* Compound sentence with multiple coordination */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+/* Multiple coordinated main clauses (3 or more) */
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
+
+<coordinating-conjunction> ::= "og" | "eller" | "men" | "for" | "så" | "samt" | "eller også" | "men også" | "både" <opt-whitespace> "og" | "hverken" <opt-whitespace> "eller"
+
+/* Complex sentence with various embedding patterns */
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+                    | <split-complex-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Split complex sentence (subordinate clause split by main clause) */
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+/* Multi-embedded sentence (multiple levels of embedding) */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated complex sentence (coordination at different levels) */
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+                                | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
+
+/* Parenthetical clause (inserted remark within main clause) */
+<parenthetical-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <punctuation>?
+
+<parenthetical-insertion> ::= <subordinate-clause>
+                           | <main-clause>
+                           | <comment-phrase>
+
+<comment-phrase> ::= <sentence-adverb> ( <opt-whitespace> <sentence-adverb> )*
+
+/* Subject with case marking */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+           | <infinitive-as-subject>
+           | <clause-as-subject>
+
+<infinitive-as-subject> ::= "at" <opt-whitespace> <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<clause-as-subject> ::= "at" <opt-whitespace> <subordinate-content>
+
+/* Pronouns with case distinctions */
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+                   | <indefinite-pronoun>
+                   | <interrogative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( <standard-nominative> | <dialect-nominative> )
+
+<standard-nominative> ::= "jeg" | "du" | "han" | "hun" | "den" | "det" | "vi" | "I" | "de" | "man"
+
+/* Dialectal pronouns from multiple regions */
+<dialect-nominative> ::= <southern-jutland-nominative>
+                      | <northwestern-jutland-nominative>
+                      | <funen-nominative>
+                      | <lolland-nominative>
+                      | <eastern-jutland-nominative>
+                      | <bornholm-nominative>
+
+<southern-jutland-nominative> ::= @DIALECT[southern_jutland] ( "æ" | "a" | "dæ" | "han" | "ho" | "den" | "det" | "vi" | "I" | "di" | "man" )
+
+<northwestern-jutland-nominative> ::= @DIALECT[northwestern_jutland] ( "a" | "æ" | "dyw" | "han" | "hun" | "den" | "det" | "vyw" | "I" | "dem" | "man" )
+
+<funen-nominative> ::= @DIALECT[funen] ( "jæ" | "dyw" | "han" | "hun" | "dæn" | "dæt" | "vi" | "I" | "di" | "man" )
+
+<lolland-nominative> ::= @DIALECT[lolland] ( "jaj" | "dow" | "han" | "hun" | "den" | "det" | "vi" | "I" | "di" | "man" )
+
+<eastern-jutland-nominative> ::= @DIALECT[eastern_jutland] ( "jeg" | "dyw" | "han" | "hun" | "den" | "det" | "vyw" | "I" | "di" | "man" )
+
+<bornholm-nominative> ::= @DIALECT[bornholm] ( "ja" | "dø" | "han" | "hun" | "den" | "det" | "ve" | "I" | "di" | "man" )
+
+<personal-pronoun-accusative> ::= @CASE[accusative] ( <standard-accusative> | <dialect-accusative> )
+
+<standard-accusative> ::= "mig" | "dig" | "ham" | "hende" | "den" | "det" | "os" | "jer" | "dem"
+
+/* Dialectal accusative pronouns from multiple regions */
+<dialect-accusative> ::= <southern-jutland-accusative>
+                      | <northwestern-jutland-accusative>
+                      | <funen-accusative>
+                      | <lolland-accusative>
+                      | <eastern-jutland-accusative>
+                      | <bornholm-accusative>
+
+<southern-jutland-accusative> ::= @DIALECT[southern_jutland] ( "mæ" | "dæ" | "ham" | "hendes" | "æn" | "æt" | "os" | "jer" | "dem" | "juw" )
+
+<northwestern-jutland-accusative> ::= @DIALECT[northwestern_jutland] ( "mæ" | "dæ" | "ham" | "hende" | "den" | "det" | "os" | "jer" | "dem" )
+
+<funen-accusative> ::= @DIALECT[funen] ( "maj" | "daj" | "ham" | "hende" | "dæn" | "dæt" | "os" | "jer" | "dem" )
+
+<lolland-accusative> ::= @DIALECT[lolland] ( "maj" | "daj" | "ham" | "hende" | "den" | "det" | "os" | "jer" | "dem" )
+
+<eastern-jutland-accusative> ::= @DIALECT[eastern_jutland] ( "mæ" | "dæ" | "ham" | "hende" | "den" | "det" | "os" | "jer" | "dem" )
+
+<bornholm-accusative> ::= @DIALECT[bornholm] ( "mæ" | "dæ" | "ham" | "hende" | "den" | "det" | "os" | "jær" | "dem" )
+
+/* Reflexive pronouns */
+<reflexive-pronoun> ::= @REFLEXIVE "mig" | "dig" | "sig" | "os" | "jer" | "sig" | "sig selv" | "mig selv" | "dig selv" | "os selv" | "jer selv"
+
+/* Reciprocal pronouns */
+<reciprocal-pronoun> ::= "hinanden" | "hverandre"
+
+<pronoun> ::= <personal-pronoun-nominative>
+           | <personal-pronoun-accusative>
+           | <possessive-pronoun>
+           | <demonstrative-pronoun>
+           | <relative-pronoun>
+           | <reflexive-pronoun>
+           | <reciprocal-pronoun>
+           | <indefinite-pronoun>
+           | <interrogative-pronoun>
+
+<possessive-pronoun> ::= <possessive-first-person>
+                      | <possessive-second-person>
+                      | <possessive-third-person>
+
+/* Possessive pronouns with gender agreement and dialectal forms */
+<possessive-first-person> ::= @GENDER[common] @NUMBER[singular] ( "min" | <dialect-poss-1sg-common> )
+                           | @GENDER[neuter] @NUMBER[singular] ( "mit" | <dialect-poss-1sg-neuter> )
+                           | @NUMBER[plural] ( "mine" | <dialect-poss-1pl> )
+                           | @NUMBER[plural] ( "vores" | <dialect-poss-1pl-collective> )
+
+<dialect-poss-1sg-common> ::= @DIALECT[southern_jutland] "mæn"
+                           | @DIALECT[northwestern_jutland] "mæn"
+                           | @DIALECT[funen] "mæn"
+                           | @DIALECT[lolland] "min"
+                           | @DIALECT[eastern_jutland] "mæn"
+                           | @DIALECT[bornholm] "mæn"
+
+<dialect-poss-1sg-neuter> ::= @DIALECT[southern_jutland] "mæt"
+                           | @DIALECT[northwestern_jutland] "mæt"
+                           | @DIALECT[funen] "mæt"
+                           | @DIALECT[lolland] "mit"
+                           | @DIALECT[eastern_jutland] "mæt"
+                           | @DIALECT[bornholm] "mæt"
+
+<dialect-poss-1pl> ::= @DIALECT[southern_jutland] "voes"
+                    | @DIALECT[northwestern_jutland] "voes"
+                    | @DIALECT[funen] "voes"
+                    | @DIALECT[lolland] "voes"
+                    | @DIALECT[eastern_jutland] "voes"
+                    | @DIALECT[bornholm] "våes"
+
+<dialect-poss-1pl-collective> ::= @DIALECT[southern_jutland] "voes"
+                               | @DIALECT[northwestern_jutland] "voes"
+                               | @DIALECT[funen] "voes"
+                               | @DIALECT[lolland] "voes"
+                               | @DIALECT[eastern_jutland] "voes"
+                               | @DIALECT[bornholm] "våes"
+
+<possessive-second-person> ::= @GENDER[common] @NUMBER[singular] ( "din" | <dialect-poss-2sg-common> )
+                            | @GENDER[neuter] @NUMBER[singular] ( "dit" | <dialect-poss-2sg-neuter> )
+                            | @NUMBER[plural] ( "dine" | <dialect-poss-2pl> )
+                            | @NUMBER[plural] "jeres"
+
+<dialect-poss-2sg-common> ::= @DIALECT[southern_jutland] "dæn"
+                           | @DIALECT[northwestern_jutland] "dæn"
+                           | @DIALECT[funen] "dæn"
+                           | @DIALECT[lolland] "din"
+                           | @DIALECT[eastern_jutland] "dæn"
+                           | @DIALECT[bornholm] "dæn"
+
+<dialect-poss-2sg-neuter> ::= @DIALECT[southern_jutland] "dæt"
+                           | @DIALECT[northwestern_jutland] "dæt"
+                           | @DIALECT[funen] "dæt"
+                           | @DIALECT[lolland] "dit"
+                           | @DIALECT[eastern_jutland] "dæt"
+                           | @DIALECT[bornholm] "dæt"
+
+<dialect-poss-2pl> ::= @DIALECT[southern_jutland] ( "dan" | "juwes" )
+                    | @DIALECT[northwestern_jutland] "dæres"
+                    | @DIALECT[funen] "jeres"
+                    | @DIALECT[lolland] "jeres"
+                    | @DIALECT[eastern_jutland] "jeres"
+                    | @DIALECT[bornholm] "jæres"
+
+<possessive-third-person> ::= @GENDER[common] "hans" | "hendes" | "dens" | "deres"
+                           | @GENDER[neuter] "hans" | "hendes" | "dets" | "deres"
+
+<demonstrative-pronoun> ::= @GENDER[common] @NUMBER[singular] "denne" | "den"
+                         | @GENDER[neuter] @NUMBER[singular] "dette" | "det"
+                         | @NUMBER[plural] "disse" | "de"
+
+<relative-pronoun> ::= "som" | "der" | "hvis" | "hvem" | "hvad" | "hvor" | "hvordan" | "hvorfor" | "hvornår"
+
+/* Indefinite pronouns */
+<indefinite-pronoun> ::= "man" | "nogen" | "noget" | "nogle" | "ingen" | "intet" | "en" | "et" | "enhver" | "alt" | "alle" | "hver" | "begge" | "samme" | "anden" | "andet" | "andre"
+
+/* Interrogative pronouns */
+<interrogative-pronoun> ::= "hvem" | "hvad" | "hvis" | "hvilken" | "hvilket" | "hvilke"
+
+/* Noun Phrase with gender agreement and quantifiers */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <article>
+              | <demonstrative-determiner>
+              | <possessive-determiner>
+              | <quantifying-determiner>
+
+<article> ::= <indefinite-article> | <definite-article-standalone>
+
+/* Indefinite articles with gender marking */
+<indefinite-article> ::= @GENDER[common] "en"
+                      | @GENDER[neuter] "et"
+
+/* Standalone definite article (pre-posed) */
+<definite-article-standalone> ::= @GENDER[common] @NUMBER[singular] "den"
+                               | @GENDER[neuter] @NUMBER[singular] "det"
+                               | @NUMBER[plural] "de"
+
+<demonstrative-determiner> ::= @GENDER[common] @NUMBER[singular] ( "denne" | "den" | "hin" )
+                            | @GENDER[neuter] @NUMBER[singular] ( "dette" | "det" | "hint" )
+                            | @NUMBER[plural] ( "disse" | "de" | "hine" )
+
+<possessive-determiner> ::= <possessive-pronoun>
+
+/* Quantifiers */
+<quantifier> ::= <numeral>
+              | <indefinite-quantifier>
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "en" | "to" | "tre" | "fire" | "fem" | "seks" | "syv" | "otte" | "ni" | "ti" | "elleve" | "tolv" | "tretten" | "fjorten" | "femten" | "seksten" | "sytten" | "atten" | "nitten" | "tyve" | "tredive" | "fyrre" | "halvtreds" | "tres" | "halvfjerds" | "firs" | "halvfems" | "hundrede" | "tusind" | "million" | /[0-9]+/
+
+<ordinal-number> ::= "første" | "anden" | "tredje" | "fjerde" | "femte" | "sjette" | "syvende" | "ottende" | "niende" | "tiende" | /[0-9]+\./ "."
+
+<indefinite-quantifier> ::= "mange" | "få" | "flere" | "færre" | "meget" | "lidt" | "nok" | "alle" | "hver" | "enhver" | "ingen" | "begge" | "halvdelen" | "størstedelen" | "flertallet"
+
+<quantifying-determiner> ::= "alle" | "hver" | "enhver" | "ingen" | "begge" | "samme" | "sådan"
+
+/* Nouns with definite/indefinite, plural forms, and genitive */
+<noun> ::= <simple-noun>
+        | <compound-noun>
+        | <noun-with-genitive>
+
+<simple-noun> ::= <noun-common-indef>
+               | <noun-neuter-indef>
+               | <noun-common-def>
+               | <noun-neuter-def>
+               | <noun-plural-indef>
+               | <noun-plural-def>
+
+/* Regular common gender nouns (en-words) */
+<noun-common-indef> ::= @GENDER[common] @NUMBER[singular] @DEFINITENESS[indefinite] <common-noun-stem>
+
+<noun-common-def> ::= @GENDER[common] @NUMBER[singular] @DEFINITENESS[definite] <common-noun-stem> "en"
+
+/* Regular neuter gender nouns (et-words) */
+<noun-neuter-indef> ::= @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[indefinite] <neuter-noun-stem>
+
+<noun-neuter-def> ::= @GENDER[neuter] @NUMBER[singular] @DEFINITENESS[definite] <neuter-noun-stem> "et"
+
+/* Plural forms */
+<noun-plural-indef> ::= @NUMBER[plural] @DEFINITENESS[indefinite] ( <common-noun-stem> | <neuter-noun-stem> ) <plural-suffix>
+
+<noun-plural-def> ::= @NUMBER[plural] @DEFINITENESS[definite] ( <common-noun-stem> | <neuter-noun-stem> ) <plural-suffix> "ne"?
+
+<plural-suffix> ::= "er" | "e" | "r" | ""
+
+/* Compound nouns (very common in Danish) */
+<compound-noun> ::= <noun-stem> <linking-element>? <noun>
+
+<linking-element> ::= "s" | "e" | "n"
+
+/* Genitive case (possession) */
+<noun-with-genitive> ::= <simple-noun> "s"
+
+<genitive-modifier> ::= <noun-phrase> "s"
+
+/* Common noun stems - using regex for pattern matching */
+<common-noun-stem> ::= /[a-zæøå]+/
+
+<neuter-noun-stem> ::= /[a-zæøå]+/
+
+<noun-stem> ::= /[a-zæøå]+/
+
+<proper-noun> ::= /[A-ZÆØÅ][a-zæøå]*/
+                | <multi-word-proper-noun>
+
+<multi-word-proper-noun> ::= /[A-ZÆØÅ][a-zæøå]*/ ( <opt-whitespace> /[A-ZÆØÅ][a-zæøå]*/ )+
+
+/* Adjective phrases with agreement and comparison */
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "meget" | "rigtig" | "vældig" | "ekstremt" | "ret" | "temmelig" | "ganske" | "lidt" | "for" | "så"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree with agreement */
+<adjective-positive> ::= <adjective-common>
+                      | <adjective-neuter>
+                      | <adjective-plural>
+                      | <adjective-definite>
+
+<adjective-common> ::= @AGREEMENT[common] @DEGREE[positive] <adjective-stem>
+
+<adjective-neuter> ::= @AGREEMENT[neuter] @DEGREE[positive] <adjective-stem> "t"?
+
+<adjective-plural> ::= @AGREEMENT[plural] @DEGREE[positive] <adjective-stem> "e"?
+
+<adjective-definite> ::= @AGREEMENT[definite] @DEGREE[positive] <adjective-stem> "e"
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] ( <regular-comparative> | <irregular-comparative> )
+
+<regular-comparative> ::= <adjective-stem> "ere"
+
+<irregular-comparative> ::= "bedre" | "værre" | "større" | "mindre" | "ældre" | "yngre" | "mere" <opt-whitespace> <adjective-stem>
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] ( <regular-superlative> | <irregular-superlative> )
+
+<regular-superlative> ::= <adjective-stem> "est" | <adjective-stem> "st"
+
+<irregular-superlative> ::= "bedst" | "værst" | "størst" | "mindst" | "ældst" | "yngst" | "mest" <opt-whitespace> <adjective-stem>
+
+<adjective-stem> ::= /[a-zæøå]+/
+
+/* Predicate with voice and mood */
+<predicate> ::= <verb-phrase>
+
+<verb-phrase> ::= <active-verb-phrase>
+               | <passive-verb-phrase>
+               | <modal-verb-phrase>
+
+/* Active voice verb phrases */
+<active-verb-phrase> ::= <simple-verb-phrase>
+                      | <compound-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb> ( <opt-whitespace> <adverb> )?
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+
+<compound-verb-phrase> ::= <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <verb-complement>
+
+/* Passive voice (s-passive and blive-passive) */
+<passive-verb-phrase> ::= <s-passive>
+                       | <blive-passive>
+
+<s-passive> ::= @VOICE[passive] <verb-stem> "s"
+
+<blive-passive> ::= @VOICE[passive] <blive-verb> <opt-whitespace> <past-participle>
+
+/* Modal verb phrases */
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <adverb>? <opt-whitespace> <infinitive-phrase>
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= <modal-verb>
+                  | <temporal-auxiliary>
+                  | <aspectual-auxiliary>
+
+<temporal-auxiliary> ::= <have-verb> | <be-verb>
+
+<aspectual-auxiliary> ::= <become-verb> | <continue-verb> | <begin-verb>
+
+<modal-verb> ::= <modal-present> | <modal-past>
+
+<modal-present> ::= @MOOD[modal] ( "kan" | "vil" | "skal" | "må" | "bør" | "tør" )
+
+<modal-past> ::= @MOOD[modal] @TENSE[past] ( "kunne" | "ville" | "skulle" | "måtte" | "burde" | "turde" )
+
+<continue-verb> ::= "fortsætter" <opt-whitespace> "med" <opt-whitespace> "at"
+                 | "bliver" <opt-whitespace> "ved" <opt-whitespace> "med" <opt-whitespace> "at"
+
+<begin-verb> ::= "begynder" <opt-whitespace> "at"
+              | "starter" <opt-whitespace> "med" <opt-whitespace> "at"
+
+/* Main verb with tense and mood marking */
+<main-verb> ::= <verb-present>
+             | <verb-past>
+             | <verb-perfect>
+             | <verb-pluperfect>
+             | <verb-future>
+             | <verb-conditional>
+             | <verb-infinitive>
+
+/* Regular verb conjugations using regex patterns */
+<verb-infinitive> ::= ( "at" <opt-whitespace> )? <verb-stem>
+
+/* Present tense - regular verbs add -r or -er */
+<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> )
+
+<regular-verb-present> ::= <verb-stem> ( "er" | "r" )
+
+/* Common regular verb stems */
+<verb-stem> ::= /[a-zæøå]+/
+
+/* Irregular verbs in present tense - context sensitive */
+<irregular-verb-present> ::= @IRREGULAR "er" | "har" | "bliver" | "går" | "kommer" | "ved" | "gør" | "får" | "ser" | "giver" | "siger" | "tager" | "finder" | "står" | "sidder" | "ligger" | "slår" | "holder" | "falder" | "dør" | "fødes" | "bærer" | "spiser" | "drikker" | "sover" | "løber"
+
+/* Past tense - regular verbs add -(e)de or -(e)te */
+<verb-past> ::= @TENSE[past] ( <regular-verb-past> | <irregular-verb-past> )
+
+/* Regular past tense patterns */
+<regular-verb-past> ::= <verb-stem> <regular-past-suffix>
+
+<regular-past-suffix> ::= "ede" | "de" | "te"
+
+/* Irregular verbs in past tense - context sensitive with stem changes */
+<irregular-verb-past> ::= @IRREGULAR ( <irregular-past-strong> | <irregular-past-weak> )
+
+/* Strong irregular verbs (vowel change) */
+<irregular-past-strong> ::= "var" | "havde" | "blev" | "gik" | "kom" | "vidste" | "gjorde" | "fik" | "så" | "gav" | "sagde" | "tog" | "fandt" | "stod" | "sad" | "lå" | "slog" | "holdt" | "faldt" | "døde" | "fødtes" | "bar" | "spiste" | "drak" | "sov" | "løb"
+
+/* Weak irregular verbs */
+<irregular-past-weak> ::= "kunne" | "ville" | "skulle" | "måtte" | "burde" | "turde"
+
+/* Perfect tense - har/er + past participle */
+<verb-perfect> ::= @TENSE[perfect] <perfect-auxiliary> <opt-whitespace> <past-participle>
+
+<perfect-auxiliary> ::= "har" | "er"
+
+/* Pluperfect tense - havde/var + past participle */
+<verb-pluperfect> ::= @TENSE[pluperfect] <pluperfect-auxiliary> <opt-whitespace> <past-participle>
+
+<pluperfect-auxiliary> ::= "havde" | "var"
+
+/* Future tense - vil/skal + infinitive */
+<verb-future> ::= @TENSE[future] <future-auxiliary> <opt-whitespace> <verb-infinitive>
+
+<future-auxiliary> ::= "vil" | "skal" | "kommer" <opt-whitespace> "til" <opt-whitespace> "at"
+
+/* Conditional mood - ville + infinitive */
+<verb-conditional> ::= @MOOD[conditional] "ville" <opt-whitespace> <verb-infinitive>
+
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle>
+
+/* Regular past participles */
+<regular-past-participle> ::= <verb-stem> ( "et" | "t" )
+
+/* Present participle (used attributively or in continuous aspect) */
+<present-participle> ::= <verb-stem> "ende"
+
+/* Irregular past participles - context sensitive */
+<irregular-past-participle> ::= @IRREGULAR "været" | "haft" | "blevet" | "gået" | "kommet" | "vidst" | "gjort" | "fået" | "set" | "givet" | "sagt" | "taget" | "fundet" | "stået" | "siddet" | "ligget" | "slået" | "holdt" | "faldet" | "døet" | "født" | "båret" | "spist" | "drukket" | "sovet" | "løbet"
+
+/* Common 'have' verb conjugations with dialectal variations */
+<have-verb> ::= <have-present> | <have-past> | <have-perfect>
+
+<have-present> ::= @TENSE[present] ( "har" | <dialect-have-present> )
+
+<dialect-have-present> ::= @DIALECT[southern_jutland] ( "hâ" | "ha" )
+                       | @DIALECT[northwestern_jutland] ( "hâ" | "ha" )
+                       | @DIALECT[funen] "ha"
+                       | @DIALECT[lolland] "ha"
+                       | @DIALECT[eastern_jutland] "hâ"
+                       | @DIALECT[bornholm] "hâr"
+
+<have-past> ::= @TENSE[past] ( "havde" | <dialect-have-past> )
+
+<dialect-have-past> ::= @DIALECT[southern_jutland] ( "ha" | "haaj" )
+                     | @DIALECT[northwestern_jutland] "ha"
+                     | @DIALECT[funen] "ha"
+                     | @DIALECT[lolland] "ha"
+                     | @DIALECT[eastern_jutland] "ha"
+                     | @DIALECT[bornholm] "havd"
+
+<have-perfect> ::= @TENSE[perfect] ( "har" <opt-whitespace> "haft" | <dialect-have-perfect> )
+
+<dialect-have-perfect> ::= @DIALECT[southern_jutland] "hâ" <opt-whitespace> "hat"
+                       | @DIALECT[northwestern_jutland] "hâ" <opt-whitespace> "hat"
+                       | @DIALECT[funen] "ha" <opt-whitespace> "hat"
+                       | @DIALECT[lolland] "ha" <opt-whitespace> "hat"
+                       | @DIALECT[eastern_jutland] "hâ" <opt-whitespace> "hat"
+                       | @DIALECT[bornholm] "hâr" <opt-whitespace> "hat"
+
+/* Common 'be' verb conjugations with dialectal variations */
+<be-verb> ::= <be-present> | <be-past> | <be-perfect>
+
+<be-present> ::= @TENSE[present] ( "er" | <dialect-be-present> )
+
+<dialect-be-present> ::= @DIALECT[southern_jutland] ( "æ" | "ä" )
+                      | @DIALECT[northwestern_jutland] "æ"
+                      | @DIALECT[funen] "æ"
+                      | @DIALECT[lolland] "æ"
+                      | @DIALECT[eastern_jutland] "æ"
+                      | @DIALECT[bornholm] "er"
+
+<be-past> ::= @TENSE[past] ( "var" | <dialect-be-past> )
+
+<dialect-be-past> ::= @DIALECT[southern_jutland] ( "wa" | "wier" )
+                   | @DIALECT[northwestern_jutland] "wa"
+                   | @DIALECT[funen] "wa"
+                   | @DIALECT[lolland] "wa"
+                   | @DIALECT[eastern_jutland] "wa"
+                   | @DIALECT[bornholm] "war"
+
+<be-perfect> ::= @TENSE[perfect] ( "har" <opt-whitespace> "været" | <dialect-be-perfect> )
+
+<dialect-be-perfect> ::= @DIALECT[southern_jutland] "hâ" <opt-whitespace> "wet"
+                      | @DIALECT[northwestern_jutland] "hâ" <opt-whitespace> "wet"
+                      | @DIALECT[funen] "ha" <opt-whitespace> "wet"
+                      | @DIALECT[lolland] "ha" <opt-whitespace> "wet"
+                      | @DIALECT[eastern_jutland] "hâ" <opt-whitespace> "wet"
+                      | @DIALECT[bornholm] "hâr" <opt-whitespace> "vært"
+
+/* Common 'become' verb conjugations with dialectal variations */
+<become-verb> ::= <become-present> | <become-past> | <become-perfect>
+
+<become-present> ::= @TENSE[present] ( "bliver" | <dialect-become-present> )
+
+<dialect-become-present> ::= @DIALECT[southern_jutland] ( "bli" | "bliw" )
+                          | @DIALECT[northwestern_jutland] "bli"
+                          | @DIALECT[funen] "bli"
+                          | @DIALECT[lolland] "bli"
+                          | @DIALECT[eastern_jutland] "bli"
+                          | @DIALECT[bornholm] "blywer"
+
+<become-past> ::= @TENSE[past] ( "blev" | <dialect-become-past> )
+
+<dialect-become-past> ::= @DIALECT[southern_jutland] "blyw"
+                       | @DIALECT[northwestern_jutland] "blyw"
+                       | @DIALECT[funen] "blyw"
+                       | @DIALECT[lolland] "blyw"
+                       | @DIALECT[eastern_jutland] "blyw"
+                       | @DIALECT[bornholm] "blyw"
+
+<become-perfect> ::= @TENSE[perfect] ( "er" <opt-whitespace> "blevet" | <dialect-become-perfect> )
+
+<dialect-become-perfect> ::= @DIALECT[southern_jutland] "æ" <opt-whitespace> "blywt"
+                          | @DIALECT[northwestern_jutland] "æ" <opt-whitespace> "blywt"
+                          | @DIALECT[funen] "æ" <opt-whitespace> "blywt"
+                          | @DIALECT[lolland] "æ" <opt-whitespace> "blywt"
+                          | @DIALECT[eastern_jutland] "æ" <opt-whitespace> "blywt"
+                          | @DIALECT[bornholm] "er" <opt-whitespace> "blywt"
+
+/* Imperative form - base verb stem */
+<verb-imperative> ::= <verb-stem> | <irregular-imperative>
+
+<irregular-imperative> ::= "vær" | "hav" | "bliv" | "lad"
+
+/* Object (direct and indirect) with clause complements */
+<object> ::= <direct-object>
+
+<direct-object> ::= <noun-phrase>
+                 | <pronoun-object>
+                 | <clause-object>
+                 | <infinitive-phrase>
+
+/* Clause as object (complement clause) */
+<clause-object> ::= <that-clause>
+                 | <wh-clause>
+                 | <if-whether-clause>
+                 | <infinitival-clause>
+
+<that-clause> ::= "at" <opt-whitespace> <subordinate-content>
+
+<wh-clause> ::= <interrogative-clause-embedded>
+
+<if-whether-clause> ::= ( "om" | "hvis" ) <opt-whitespace> <subordinate-content>
+
+<infinitival-clause> ::= "at" <opt-whitespace> <verb-infinitive> ( <opt-whitespace> <object> )? ( <opt-whitespace> <adverbial> )?
+
+<clause> ::= <clause-object>
+
+<interrogative-clause-embedded> ::= <question-word> <opt-whitespace> <subordinate-content>
+
+<indirect-object> ::= "til" <opt-whitespace> <noun-phrase>
+                   | "til" <opt-whitespace> <pronoun-object>
+                   | <pronoun-object>
+
+<pronoun-object> ::= <personal-pronoun-accusative>
+                  | <demonstrative-pronoun>
+                  | <reflexive-pronoun>
+                  | <reciprocal-pronoun>
+
+/* Adverbials with detailed categorization */
+<adverbial> ::= <adverb>
+             | <adverb-phrase>
+             | <prepositional-phrase>
+             | <adverb-clause>
+
+<adverb-phrase> ::= <degree-adverb-modifier>? <opt-whitespace> <adverb>
+
+<degree-adverb-modifier> ::= "meget" | "virkelig" | "rigtig" | "ekstremt" | "ganske" | "temmelig"
+
+<adverb> ::= <time-adverb>
+          | <place-adverb>
+          | <manner-adverb>
+          | <degree-adverb>
+          | <frequency-adverb>
+          | <modal-adverb>
+
+<time-adverb> ::= <time-point>
+               | <time-duration>
+               | <time-relation>
+
+<time-point> ::= <standard-time-point> | <dialect-time-point>
+
+<standard-time-point> ::= "nu" | "da" | "dengang" | "i dag" | "i går" | "i morgen" | "i forgårs" | "i overmorgen" | "i aften" | "i nat" | "om morgenen" | "om eftermiddagen" | "om aftenen" | "om natten"
+
+/* Dialectal time expressions from multiple regions */
+<dialect-time-point> ::= @DIALECT[southern_jutland] ( "nâ" | "nü" | "i daw" | "i gâ" | "i moin" | "i aften" | "i naat" )
+                      | @DIALECT[northwestern_jutland] ( "nâ" | "i daw" | "i gârs" | "i moen" )
+                      | @DIALECT[funen] ( "nu" | "i daw" | "i gâr" | "i morn" )
+                      | @DIALECT[lolland] ( "nu" | "i daw" | "i gâr" | "i morn" )
+                      | @DIALECT[eastern_jutland] ( "nâ" | "i daw" | "i gârs" | "i moen" )
+                      | @DIALECT[bornholm] ( "nå" | "i dâ" | "i går" | "i mårn" )
+
+<time-duration> ::= <standard-time-duration> | <dialect-time-duration>
+
+<standard-time-duration> ::= "altid" | "aldrig" | "længe" | "kort" | "hele" <opt-whitespace> "tiden" | "hele" <opt-whitespace> "dagen"
+
+<dialect-time-duration> ::= @DIALECT[southern_jutland] ( "aalti" | "aldi" | "länj" )
+                         | @DIALECT[northwestern_jutland] ( "aalti" | "aldi" )
+                         | @DIALECT[funen] ( "aalti" | "aldi" )
+                         | @DIALECT[lolland] ( "aalti" | "aldi" )
+                         | @DIALECT[eastern_jutland] ( "aalti" | "aldi" )
+                         | @DIALECT[bornholm] ( "åltid" | "âldre" )
+
+<time-relation> ::= <standard-time-relation> | <dialect-time-relation>
+
+<standard-time-relation> ::= "tidligere" | "senere" | "før" | "efter" | "straks" | "med" <opt-whitespace> "det" <opt-whitespace> "samme" | "samtidig" | "allerede" | "stadig" | "endnu" | "endnu" <opt-whitespace> "ikke"
+
+<dialect-time-relation> ::= @DIALECT[southern_jutland] ( "tidiær" | "sinær" | "för" | "äder" )
+
+<frequency-adverb> ::= "altid" | "aldrig" | "ofte" | "sjældent" | "nogle" <opt-whitespace> "gange" | "undertiden" | "af" <opt-whitespace> "og" <opt-whitespace> "til" | "sommetider" | "normalt" | "sædvanligvis" | "plejede" | "dagligt" | "ugentligt" | "månedligt" | "årligt"
+
+<place-adverb> ::= <place-location>
+                | <place-direction>
+
+<place-location> ::= <standard-place-location> | <dialect-place-location>
+
+<standard-place-location> ::= "her" | "der" | "hvor" | "alle" <opt-whitespace> "vegne" | "ingen" <opt-whitespace> "steder" | "et" <opt-whitespace> "sted" | "nogen" <opt-whitespace> "steder" | "hjemme" | "ude" | "inde" | "oppe" | "nede" | "borte"
+
+/* Dialectal place adverbs from multiple regions */
+<dialect-place-location> ::= @DIALECT[southern_jutland] ( "hiær" | "diær" | "hâm" | "üj" | "inj" )
+                          | @DIALECT[northwestern_jutland] ( "hiær" | "diær" | "hæm" | "üjj" | "inj" )
+                          | @DIALECT[funen] ( "hær" | "dær" | "hæm" | "uj" | "inj" )
+                          | @DIALECT[lolland] ( "hær" | "dær" | "hæm" | "uj" | "inj" )
+                          | @DIALECT[eastern_jutland] ( "hiær" | "diær" | "hæm" | "üjj" | "inj" )
+                          | @DIALECT[bornholm] ( "her" | "der" | "hæm" | "üte" | "inne" )
+
+<place-direction> ::= <standard-place-direction> | <dialect-place-direction>
+
+<standard-place-direction> ::= "hjem" | "hen" | "bort" | "frem" | "tilbage" | "ud" | "ind" | "op" | "ned" | "over" | "under" | "omkring" | "væk" | "til" | "fra"
+
+<dialect-place-direction> ::= @DIALECT[southern_jutland] ( "häm" | "hen" | "bot" | "üj" | "inj" | "op" | "neer" )
+                           | @DIALECT[northwestern_jutland] ( "hæm" | "hen" | "bot" | "üjj" | "inj" | "op" | "ner" )
+                           | @DIALECT[funen] ( "hæm" | "hen" | "bot" | "uj" | "inj" | "op" | "ner" )
+                           | @DIALECT[lolland] ( "hæm" | "hen" | "bot" | "uj" | "inj" | "op" | "ner" )
+                           | @DIALECT[eastern_jutland] ( "hæm" | "hen" | "bot" | "üjj" | "inj" | "op" | "ner" )
+                           | @DIALECT[bornholm] ( "hem" | "hen" | "bårt" | "üte" | "inne" | "op" | "ner" )
+
+<manner-adverb> ::= <standard-manner-adverb> | <dialect-manner-adverb>
+
+<standard-manner-adverb> ::= "godt" | "dårligt" | "hurtigt" | "langsomt" | "let" | "svært" | "nem" | "sammen" | "alene" | "sådan" | "således" | "ligesom" | "anderledes" | "rigtigt" | "forkert" | "pænt" | "grimt" | "stille" | "højt"
+
+<dialect-manner-adverb> ::= @DIALECT[southern_jutland] ( "got" | "dâli" | "flot" | "swat" | "sâen" )
+                         | @DIALECT[northwestern_jutland] ( "got" | "dârli" | "sâen" )
+                         | @DIALECT[funen] ( "got" | "dârli" | "sâen" )
+                         | @DIALECT[lolland] ( "got" | "dârli" | "sân" )
+                         | @DIALECT[eastern_jutland] ( "got" | "dârli" | "sâen" )
+                         | @DIALECT[bornholm] ( "gott" | "dårlit" | "såen" )
+
+<degree-adverb> ::= "meget" | "lidt" | "for" | "så" | "ret" | "ganske" | "helt" | "næsten" | "delvis" | "fuldstændig" | "totalt" | "absolut" | "overhovedet" | "slet" <opt-whitespace> "ikke" | "rimelig" | "temmelig" | "virkelig" | "rigtig"
+
+<modal-adverb> ::= "måske" | "nok" | "sikkert" | "sandsynligvis" | "formentlig" | "vist" | "åbenbart" | "naturligvis" | "selvfølgelig" | "desværre" | "heldigvis" | "forhåbentlig" | "faktisk" | "virkelig" | "egentlig"
+
+/* Prepositional phrases with complex prepositions */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+                        | <complex-preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= <simple-preposition>
+               | <compound-preposition>
+
+<simple-preposition> ::= "i" | "på" | "til" | "fra" | "med" | "uden" | "om" | "over" | "under" | "ved" | "efter" | "før" | "mellem" | "gennem" | "hos" | "af" | "for" | "mod" | "bag" | "foran" | "langs" | "trods" | "ud" | "ind" | "op" | "ned" | "oven" | "neden"
+
+<compound-preposition> ::= "bag" <opt-whitespace> "ved"
+                        | "foran" <opt-whitespace> "for"
+                        | "i" <opt-whitespace> "forhold" <opt-whitespace> "til"
+                        | "i" <opt-whitespace> "løbet" <opt-whitespace> "af"
+                        | "i" <opt-whitespace> "stedet" <opt-whitespace> "for"
+                        | "på" <opt-whitespace> "grund" <opt-whitespace> "af"
+                        | "ved" <opt-whitespace> "siden" <opt-whitespace> "af"
+                        | "i" <opt-whitespace> "kraft" <opt-whitespace> "af"
+                        | "på" <opt-whitespace> "trods" <opt-whitespace> "af"
+                        | "til" <opt-whitespace> "forskel" <opt-whitespace> "fra"
+                        | "sammen" <opt-whitespace> "med"
+                        | "ud" <opt-whitespace> "over"
+                        | "hen" <opt-whitespace> "over"
+                        | "rundt" <opt-whitespace> "om"
+
+<complex-preposition> ::= <compound-preposition>
+
+/* Adverb clauses with various conjunctions and nesting */
+<adverb-clause> ::= <simple-adverb-clause>
+                 | <nested-adverb-clause>
+                 | <coordinated-adverb-clause>
+
+<simple-adverb-clause> ::= <temporal-clause>
+                        | <causal-clause>
+                        | <conditional-clause>
+                        | <concessive-clause>
+                        | <purpose-clause>
+                        | <result-clause>
+                        | <comparative-clause>
+                        | <manner-clause>
+                        | <extent-clause>
+
+/* Nested adverb clause (contains another subordinate clause) */
+<nested-adverb-clause> ::= <temporal-clause> <opt-whitespace> <subordinate-clause>
+                        | <conditional-clause> <opt-whitespace> <subordinate-clause>
+                        | <causal-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated adverb clauses */
+<coordinated-adverb-clause> ::= <adverb-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <adverb-clause>
+
+/* Manner clause (how something is done) */
+<manner-clause> ::= <manner-conjunction> <opt-whitespace> <subordinate-content>
+
+<manner-conjunction> ::= "som" | "ligesom" | "som" <opt-whitespace> "om" | "således" <opt-whitespace> "som" | "på" <opt-whitespace> "samme" <opt-whitespace> "måde" <opt-whitespace> "som"
+
+/* Extent clause (degree/measure) */
+<extent-clause> ::= <extent-conjunction> <opt-whitespace> <subordinate-content>
+
+<extent-conjunction> ::= "så" <opt-whitespace> "at" | "i" <opt-whitespace> "en" <opt-whitespace> "sådan" <opt-whitespace> "grad" <opt-whitespace> "at"
+
+<temporal-clause> ::= <temporal-conjunction> <opt-whitespace> <subordinate-content>
+
+<temporal-conjunction> ::= "når" | "da" | "mens" | "inden" | "før" | "efter" | "så" <opt-whitespace> "snart" <opt-whitespace> "som" | "lige" <opt-whitespace> "så" <opt-whitespace> "snart" | "hver" <opt-whitespace> "gang" | "altid" <opt-whitespace> "når" | "så" <opt-whitespace> "længe" <opt-whitespace> "som" | "indtil" | "siden"
+
+<causal-clause> ::= <causal-conjunction> <opt-whitespace> <subordinate-content>
+
+<causal-conjunction> ::= "fordi" | "da" | "eftersom" | "idet" | "når" | "nu" <opt-whitespace> "da" | "nu" <opt-whitespace> "når"
+
+<conditional-clause> ::= <conditional-conjunction> <opt-whitespace> <subordinate-content>
+
+<conditional-conjunction> ::= "hvis" | "såfremt" | "i" <opt-whitespace> "fald" | "i" <opt-whitespace> "tilfælde" <opt-whitespace> "af" | "medmindre" | "med" <opt-whitespace> "mindre"
+
+<concessive-clause> ::= <concessive-conjunction> <opt-whitespace> <subordinate-content>
+
+<concessive-conjunction> ::= "selvom" | "skønt" | "omend" | "selv" <opt-whitespace> "hvis" | "på" <opt-whitespace> "trods" <opt-whitespace> "af" <opt-whitespace> "at" | "trods" <opt-whitespace> "at"
+
+<purpose-clause> ::= <purpose-conjunction> <opt-whitespace> <subordinate-content>
+
+<purpose-conjunction> ::= "for" <opt-whitespace> "at" | "så" | "således" <opt-whitespace> "at" | "for" <opt-whitespace> "at" | "med" <opt-whitespace> "henblik" <opt-whitespace> "på" <opt-whitespace> "at"
+
+<result-clause> ::= <result-conjunction> <opt-whitespace> <subordinate-content>
+
+<result-conjunction> ::= "så" | "således" | "derfor" | "så" <opt-whitespace> "at"
+
+<comparative-clause> ::= <comparative-conjunction> <opt-whitespace> <subordinate-content>
+
+<comparative-conjunction> ::= "som" | "end" | "ligesom" | "lige" <opt-whitespace> "så" | "jo" | "desto" | "som" <opt-whitespace> "om"
+
+<subordinating-conjunction> ::= <temporal-conjunction>
+                             | <causal-conjunction>
+                             | <conditional-conjunction>
+                             | <concessive-conjunction>
+                             | <purpose-conjunction>
+                             | <result-conjunction>
+                             | <comparative-conjunction>
+                             | "at"
+
+/* Question words with detailed types */
+<question-word> ::= <interrogative-pronoun-question>
+                 | <interrogative-adverb>
+                 | <interrogative-determiner>
+
+<interrogative-pronoun-question> ::= "hvem" | "hvad" | "hvis"
+
+<interrogative-adverb> ::= "hvor" | "hvordan" | "hvorledes" | "hvorfor" | "hvornår" | "hvorhen" | "hvorfra"
+
+<interrogative-determiner> ::= "hvilken" | "hvilket" | "hvilke" | "hvor" <opt-whitespace> "mange" | "hvor" <opt-whitespace> "meget"
+
+/* Conjunctions expanded */
+<conjunction> ::= <coordinating-conjunction>
+
+/* Punctuation expanded */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":" | "..." | "-" | "–" | "—"
+
+/* Whitespace handling */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Correlative constructions (paired conjunctions) */
+<correlative-construction> ::= <correlative-pair> <opt-whitespace> <clause-sequence>
+
+<correlative-pair> ::= "både" <opt-whitespace> "og"
+                    | "hverken" <opt-whitespace> "eller"
+                    | "enten" <opt-whitespace> "eller"
+                    | "ikke" <opt-whitespace> "bare" <opt-whitespace> "men" <opt-whitespace> "også"
+                    | "dels" <opt-whitespace> "dels"
+                    | "jo" <opt-whitespace> "desto"
+
+<clause-sequence> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Discourse markers and connectives */
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+
+<temporal-discourse> ::= "først" | "derefter" | "så" | "til" <opt-whitespace> "sidst" | "endelig" | "samtidig" | "i" <opt-whitespace> "mellemtiden"
+
+<causal-discourse> ::= "derfor" | "således" | "følgelig" | "som" <opt-whitespace> "følge" <opt-whitespace> "heraf" | "af" <opt-whitespace> "den" <opt-whitespace> "grund"
+
+<contrastive-discourse> ::= "derimod" | "til" <opt-whitespace> "gengæld" | "på" <opt-whitespace> "den" <opt-whitespace> "anden" <opt-whitespace> "side" | "ikke" <opt-whitespace> "desto" <opt-whitespace> "mindre" | "alligevel" | "dog" | "imidlertid"
+
+<additive-discourse> ::= "desuden" | "endvidere" | "ydermere" | "ligeledes" | "tillige" | "samt" | "også" | "i" <opt-whitespace> "øvrigt"
+
+<conclusive-discourse> ::= "altså" | "kort" <opt-whitespace> "sagt" | "med" <opt-whitespace> "andre" <opt-whitespace> "ord" | "sammenfattende"
+
+/* Cleft sentences (focusing construction) */
+<cleft-sentence> ::= <it-cleft>
+                  | <pseudo-cleft>
+
+<it-cleft> ::= "det" <opt-whitespace> "er" <opt-whitespace> <focused-constituent> <opt-whitespace> <relative-clause>
+
+<pseudo-cleft> ::= <wh-clause> <opt-whitespace> "er" <opt-whitespace> <focused-constituent>
+
+<focused-constituent> ::= <noun-phrase>
+                       | <prepositional-phrase>
+                       | <adverb>
+
+/* Question tags and follow-up questions */
+<question-tag> ::= "ikke" <opt-whitespace> "sandt"
+                | "vel"
+                | "ikke"
+                | "er" <opt-whitespace> "det" <opt-whitespace> "ikke"
+                | "gør" <opt-whitespace> "du" <opt-whitespace> "ikke"
+
+<tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <question-tag> "?"
+
+/* Elliptical structures (reduced clauses) */
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+
+<elliptical-response> ::= <sentence-adverb>
+                       | <verb-phrase>
+                       | <noun-phrase>
+
+<elliptical-coordination> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <elliptical-clause>
+
+/* Reported speech and indirect discourse */
+<reported-speech> ::= <reporting-verb> <opt-whitespace> <reported-clause>
+
+<reporting-verb> ::= "siger" | "sagde" | "mener" | "mente" | "tror" | "troede" | "spørger" | "spurgte" | "fortæller" | "fortalte" | "hævder" | "hævdede"
+
+<reported-clause> ::= "at" <opt-whitespace> <subordinate-content>
+                   | <interrogative-clause-embedded>
+
+/* Free indirect speech */
+<free-indirect-speech> ::= <main-clause> ( <opt-whitespace> <main-clause> )+ /* Multiple main clauses representing internal thoughts */
+
+/* Context-sensitive agreement rules */
+
+/* Gender agreement between article and noun */
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER
+    THEN VALID
+    ELSE ERROR "Article and noun gender must agree"
+
+/* Number agreement between subject and verb */
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@NUMBER == <verb>.@NUMBER OR <subject> == <pronoun>
+    THEN VALID
+    ELSE WARNING "Consider subject-verb number agreement"
+
+/* Adjective-noun agreement (gender, number, definiteness) */
+@CONTEXT_RULE[adjective-noun-agreement]:
+    IF <adjective>.@AGREEMENT == <noun>.@GENDER OR <noun>.@DEFINITENESS == "definite"
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun gender/definiteness"
+
+/* Auxiliary verb tense compatibility */
+@CONTEXT_RULE[auxiliary-tense-agreement]:
+    IF <auxiliary-verb>.@TENSE IS_COMPATIBLE_WITH <main-verb>.@TENSE
+    THEN VALID
+    ELSE ERROR "Auxiliary and main verb tenses incompatible"
+
+/* V2 word order validation */
+@CONTEXT_RULE[v2-word-order]:
+    IF <main-clause> CONTAINS <finite-verb> AT_POSITION 2
+    THEN VALID
+    ELSE WARNING "Main clause should have verb in second position (V2)"
+
+/* Reflexive pronoun agreement with subject */
+@CONTEXT_RULE[reflexive-agreement]:
+    IF <reflexive-pronoun>.@PERSON == <subject>.@PERSON AND <reflexive-pronoun>.@NUMBER == <subject>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Reflexive pronoun must agree with subject in person and number"
+
+/* Possessive pronoun agreement */
+@CONTEXT_RULE[possessive-agreement]:
+    IF <possessive-pronoun>.@GENDER == <noun>.@GENDER AND <possessive-pronoun>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Possessive pronoun must agree with possessed noun"
+
+/* Passive voice formation validation */
+@CONTEXT_RULE[passive-voice-formation]:
+    IF <passive-verb-phrase> REQUIRES <past-participle> OR <s-passive>
+    THEN VALID
+    ELSE ERROR "Passive voice requires proper formation (blive + participle or s-passive)"
+
+/* Comparative/superlative context */
+@CONTEXT_RULE[comparison-context]:
+    IF <adjective-comparative> REQUIRES "end" OR <adjective-superlative> REQUIRES "definite"
+    THEN VALID
+    ELSE WARNING "Comparative usually takes 'end', superlative requires definite form"
+
+/* Nested subordinate clause validation */
+@CONTEXT_RULE[nested-clause-depth]:
+    IF <nested-subordinate-clause> DEPTH <= 3
+    THEN VALID
+    ELSE WARNING "Deep nesting (>3 levels) may reduce readability"
+
+/* Subordinate clause word order */
+@CONTEXT_RULE[subordinate-word-order]:
+    IF <subordinate-clause> HAS_VERB_FINAL_ORDER
+    THEN VALID
+    ELSE ERROR "Subordinate clause must have verb-final word order"
+
+/* Correlative pair matching */
+@CONTEXT_RULE[correlative-matching]:
+    IF <correlative-construction> HAS_MATCHING_PAIR
+    THEN VALID
+    ELSE ERROR "Correlative conjunction pairs must match (både...og, enten...eller, etc.)"
+
+/* Clause sequence coherence */
+@CONTEXT_RULE[clause-coherence]:
+    IF <multi-embedded-sentence> HAS_COHERENT_REFERENCE_CHAIN
+    THEN VALID
+    ELSE WARNING "Complex sentences should maintain clear reference chains"
+
+/* Reported speech tense consistency */
+@CONTEXT_RULE[reported-speech-tense]:
+    IF <reported-clause> TENSE_CONSISTENT_WITH <reporting-verb>
+    THEN VALID
+    ELSE WARNING "Tense in reported clause should be consistent with reporting verb"
+
+/* Example sentences demonstrating comprehensive Danish grammar:
+ *
+ * REGULAR VERBS:
+ * - "Jeg arbejder i København" (I work in Copenhagen) - present regular
+ * - "Han arbejdede i går" (He worked yesterday) - past regular
+ * - "Vi har arbejdet hele dagen" (We have worked all day) - perfect regular
+ *
+ * IRREGULAR VERBS:
+ * - "Hun er lærer" (She is a teacher) - present irregular 'være'
+ * - "De var hjemme" (They were home) - past irregular 'være'
+ * - "Jeg har været i Paris" (I have been in Paris) - perfect irregular 'være'
+ * - "Han går til skole" (He goes to school) - present irregular 'gå'
+ * - "Hun gik hjem" (She went home) - past irregular 'gå'
+ * - "Vi har gået meget" (We have walked a lot) - perfect irregular 'gå'
+ *
+ * GENDER AGREEMENT:
+ * - "En stor hund" (A big dog - common gender agreement)
+ * - "Et stort hus" (A big house - neuter gender agreement)
+ * - "Den store hund" (The big dog - definite form)
+ * - "Det store hus" (The big house - definite form)
+ *
+ * V2 WORD ORDER:
+ * - "I dag arbejder jeg" (Today I work - topicalized adverb)
+ * - "Bogen læser han" (The book he reads - topicalized object)
+ * - "I København bor vi" (In Copenhagen we live - topicalized PP)
+ *
+ * PASSIVE VOICE:
+ * - "Brevet skrives" (The letter is being written - s-passive)
+ * - "Brevet bliver skrevet" (The letter is being written - blive-passive)
+ * - "Brevet blev skrevet i går" (The letter was written yesterday)
+ *
+ * REFLEXIVE VERBS:
+ * - "Jeg vasker mig" (I wash myself)
+ * - "Hun glæder sig" (She is happy/pleased - reflexive)
+ * - "De ser sig om" (They look around - reflexive)
+ *
+ * RELATIVE CLAUSES:
+ * - "Manden, som bor her, er læge" (The man who lives here is a doctor)
+ * - "Huset, der blev bygget i går, er stort" (The house that was built yesterday is big)
+ *
+ * SUBORDINATE CLAUSES:
+ * - "Jeg ved, at han kommer" (I know that he is coming)
+ * - "Hvis det regner, bliver vi hjemme" (If it rains, we stay home)
+ * - "Selvom hun er træt, arbejder hun" (Although she is tired, she works)
+ *
+ * COMPARATIVES/SUPERLATIVES:
+ * - "Han er større end mig" (He is taller than me)
+ * - "Hun er den bedste lærer" (She is the best teacher)
+ * - "Dette hus er det største" (This house is the biggest)
+ *
+ * COMPOUND NOUNS:
+ * - "Børnehavelærer" (Kindergarten teacher - compound)
+ * - "Solskinsvejr" (Sunshine weather - compound)
+ *
+ * GENITIVE CASE:
+ * - "Mandens bil" (The man's car)
+ * - "Kongens slot" (The king's castle)
+ * - "Barnets legetøj" (The child's toy)
+ *
+ * NEGATION:
+ * - "Jeg kommer ikke" (I am not coming)
+ * - "Han har aldrig været der" (He has never been there)
+ * - "De kan ikke se noget" (They cannot see anything)
+ *
+ * FUTURE TENSE:
+ * - "Jeg vil rejse i morgen" (I will travel tomorrow)
+ * - "Hun skal komme senere" (She shall come later)
+ * - "Vi kommer til at vente" (We are going to wait)
+ *
+ * PLUPERFECT TENSE:
+ * - "Han havde været der før" (He had been there before)
+ * - "De havde spist, da jeg kom" (They had eaten when I came)
+ *
+ * CONDITIONAL MOOD:
+ * - "Jeg ville komme, hvis jeg kunne" (I would come if I could)
+ * - "Han ville have gjort det" (He would have done it)
+ *
+ * MODAL VERBS:
+ * - "Jeg kan tale dansk" (I can speak Danish)
+ * - "Hun vil læse bogen" (She wants to read the book)
+ * - "Vi skal arbejde i morgen" (We must work tomorrow)
+ * - "De kunne ikke komme" (They could not come)
+ *
+ * COMPLEX SENTENCES:
+ * - "Manden, som jeg mødte i går, sagde at han ville komme, hvis vejret var godt" 
+ *   (The man whom I met yesterday said that he would come if the weather was good)
+ *
+ * RECIPROCAL PRONOUNS:
+ * - "De elsker hinanden" (They love each other)
+ * - "Vi hjælper hinanden" (We help each other)
+ *
+ * INDEFINITE PRONOUNS:
+ * - "Nogen kom" (Someone came)
+ * - "Ingen ved det" (Nobody knows it)
+ * - "Alt er godt" (Everything is good)
+ *
+ * NESTED SUBORDINATE CLAUSES (SUB-SENTENCES):
+ * - "Jeg tror, at han sagde, at hun kommer" 
+ *   (I think that he said that she is coming - 2-level nesting)
+ * - "Manden, som jeg mødte, fortalte mig, at hans søn, som bor i Paris, vil komme hjem"
+ *   (The man whom I met told me that his son, who lives in Paris, will come home - multiple embeddings)
+ * - "Hvis du siger, at han ved, hvor hun bor, skal jeg ringe til ham"
+ *   (If you say that he knows where she lives, I will call him - conditional with nested clauses)
+ * - "Når hun kommer hjem, vil hun opdage, at hendes kat, som plejede at sove på sofaen, er væk"
+ *   (When she comes home, she will discover that her cat, which used to sleep on the sofa, is gone)
+ *
+ * COORDINATED SUBORDINATE CLAUSES:
+ * - "Han sagde, at han vil komme, og at han vil hjælpe os"
+ *   (He said that he will come and that he will help us)
+ * - "Jeg ved ikke, om han kommer, eller om hun går"
+ *   (I don't know whether he is coming or whether she is going)
+ *
+ * CLEFT SENTENCES:
+ * - "Det er Peter, som kom i går" (It is Peter who came yesterday - it-cleft)
+ * - "Hvad jeg vil have, er fred" (What I want is peace - pseudo-cleft)
+ *
+ * CORRELATIVE CONSTRUCTIONS:
+ * - "Både du og jeg ved det" (Both you and I know it)
+ * - "Enten kommer han, eller går hun" (Either he comes or she goes)
+ * - "Ikke bare løb han, men også sprang han" (Not only did he run, but he also jumped)
+ *
+ * REPORTED SPEECH:
+ * - "Han sagde, at han var træt" (He said that he was tired - indirect speech)
+ * - "Hun spurgte, hvor han boede" (She asked where he lived - indirect question)
+ * - "De fortalte os, at de havde været der før" (They told us that they had been there before)
+ *
+ * ELLIPTICAL STRUCTURES:
+ * - "Han kommer i dag, og hun i morgen" (He comes today, and she tomorrow - elliptical coordination)
+ * - "Vil du have kaffe? - Ja, gerne" (Will you have coffee? - Yes, gladly - elliptical response)
+ *
+ * TAG QUESTIONS:
+ * - "Du kommer, ikke sandt?" (You're coming, aren't you?)
+ * - "Han er læge, vel?" (He is a doctor, right?)
+ *
+ * MULTIPLE EMBEDDING (3+ LEVELS):
+ * - "Peter sagde, at Maria tror, at hendes bror, som bor i London, ved, hvor deres mor er"
+ *   (Peter said that Maria thinks that her brother, who lives in London, knows where their mother is - 4-level nesting)
+ * - "Jeg hørte, at han fortalte, at hun mente, at de skulle komme, fordi vejret var godt"
+ *   (I heard that he told that she thought that they should come because the weather was good)
+ *
+ * SPLIT COMPLEX SENTENCES:
+ * - "Når det regner, går jeg hjem, fordi jeg ikke har paraply"
+ *   (When it rains, I go home because I don't have an umbrella - split subordination)
+ *
+ * PARENTHETICAL CLAUSES:
+ * - "Han kommer, tror jeg, i morgen" (He comes, I think, tomorrow - parenthetical insertion)
+ * - "Bogen, som du nævnte, er meget god" (The book, which you mentioned, is very good)
+ *
+ * DISCOURSE MARKERS:
+ * - "Først kom han, derefter gik hun" (First he came, then she went)
+ * - "Han er syg, derfor kommer han ikke" (He is sick, therefore he is not coming)
+ * - "Hun er intelligent, desuden er hun venlig" (She is intelligent, moreover she is kind)
+ *
+ * SOUTHERN JUTLAND DIALECT (SØNDERJYSK) EXAMPLES:
+ * 
+ * DIALECTAL PRONOUNS:
+ * - "Æ vil it" (Jeg vil ikke - I don't want to)
+ * - "Dæ ka it" (Du kan ikke - You cannot)
+ * - "Ho æ hiær" (Hun er her - She is here)
+ * - "Di wa diær" (De var der - They were there)
+ * - "Mæn hus" (Mit hus - My house)
+ * - "Dæn bil" (Din bil - Your car)
+ *
+ * DIALECTAL VERBS:
+ * - "Æ hâ en hund" (Jeg har en hund - I have a dog)
+ * - "Han wa hiær" (Han var her - He was here)
+ * - "Wi bli hjemme" (Vi bliver hjemme - We stay home)
+ * - "A ha set æt" (Jeg har set det - I have seen it)
+ *
+ * DIALECTAL NEGATION:
+ * - "Æ ka it komme" (Jeg kan ikke komme - I cannot come)
+ * - "Han vil ä" (Han vil ikke - He doesn't want to)
+ * - "Inj hâ noget" (Ingen har noget - Nobody has anything)
+ *
+ * DIALECTAL TIME EXPRESSIONS:
+ * - "Nâ komme æ" (Nu kommer jeg - Now I'm coming)
+ * - "I daw æ han hiær" (I dag er han her - Today he is here)
+ * - "I gâ wa wi diær" (I går var vi der - Yesterday we were there)
+ *
+ * DIALECTAL PLACE EXPRESSIONS:
+ * - "Hiær æ æ" (Her er jeg - Here I am)
+ * - "Han æ hâm" (Han er hjemme - He is at home)
+ * - "Wi gå häm" (Vi går hjem - We go home)
+ *
+ * DIALECTAL MANNER AND DEGREE:
+ * - "Æt æ got" (Det er godt - That is good)
+ * - "Ho æ flot" (Hun er smuk - She is beautiful)
+ * - "Sâen gör wi æt" (Sådan gør vi det - That's how we do it)
+ *
+ * MIXED STANDARD AND DIALECT:
+ * - "Jeg tror, at æ vil komme i daw" (I think that I will come today - mixing standard and dialect)
+ * - "Han sagde, at ho wa hiær i gâ" (He said that she was here yesterday)
+ *
+ * DIALECTAL MODAL PARTICLES:
+ * - "Æt æ jo sâen" (Det er jo sådan - That's just how it is)
+ * - "Dâ gör wi æt" (Så gør vi det - Then we'll do it)
+ * - "Mâske komme æ" (Måske kommer jeg - Maybe I'll come)
+ *
+ * NORTHWESTERN JUTLAND DIALECT (THISTED AREA - THYBOMÅL) EXAMPLES:
+ *
+ * PRONOUNS AND VERBS:
+ * - "A hâ en hund" (Jeg har en hund - I have a dog)
+ * - "Dyw æ lærer" (Du er lærer - You are a teacher)
+ * - "Vyw wa diær i gârs" (Vi var der i går - We were there yesterday)
+ * - "Mæn bil æ stor" (Min bil er stor - My car is big)
+ *
+ * NEGATION AND ADVERBS:
+ * - "A ka it komme" (Jeg kan ikke komme - I cannot come)
+ * - "Hiær æ a" (Her er jeg - Here I am)
+ * - "I daw hâ a tid" (I dag har jeg tid - Today I have time)
+ *
+ * FUNEN DIALECT (FYNSK) EXAMPLES:
+ *
+ * PRONOUNS AND VERBS:
+ * - "Jæ ha en kat" (Jeg har en kat - I have a cat)
+ * - "Dyw æ her" (Du er her - You are here)
+ * - "Di wa hæm" (De var hjemme - They were home)
+ * - "Mæn hus" (Mit hus - My house)
+ *
+ * NEGATION AND PLACE:
+ * - "Jæ ka it se æt" (Jeg kan ikke se det - I cannot see it)
+ * - "Hær æ vi" (Her er vi - Here we are)
+ * - "I daw bli vi hæm" (I dag bliver vi hjemme - Today we stay home)
+ *
+ * LOLLAND DIALECT (LOLLANDSK) EXAMPLES:
+ *
+ * PRONOUNS AND VERBS:
+ * - "Jaj ha tid" (Jeg har tid - I have time)
+ * - "Dow æ færdi" (Du er færdig - You are done)
+ * - "Di wa hær i daw" (De var her i dag - They were here today)
+ *
+ * NEGATION AND MANNER:
+ * - "Jaj ka it" (Jeg kan ikke - I cannot)
+ * - "Æt æ got" (Det er godt - That is good)
+ * - "Hæm gå vi" (Hjem går vi - Home we go)
+ *
+ * EASTERN JUTLAND DIALECT (ØSTJYSK) EXAMPLES:
+ *
+ * PRONOUNS AND VERBS:
+ * - "Jeg hâ en gård" (Jeg har en gård - I have a farm)
+ * - "Dyw æ klâr" (Du er klar - You are ready)
+ * - "Vyw bli hiær" (Vi bliver her - We stay here)
+ * - "Mæn far" (Min far - My father)
+ *
+ * NEGATION AND PLACE:
+ * - "Jeg ka it finde æt" (Jeg kan ikke finde det - I cannot find it)
+ * - "Diær æ han" (Der er han - There he is)
+ * - "I moen komme vyw" (I morgen kommer vi - Tomorrow we come)
+ *
+ * BORNHOLM DIALECT (BORNHOLMSK) EXAMPLES:
+ *
+ * PRONOUNS AND VERBS:
+ * - "Ja hâr en båt" (Jeg har en båd - I have a boat)
+ * - "Dø er her" (Du er her - You are here)
+ * - "Ve war der i går" (Vi var der i går - We were there yesterday)
+ * - "Mæn mår" (Min mor - My mother)
+ *
+ * NEGATION AND UNIQUE FEATURES:
+ * - "Ja kan itt komme" (Jeg kan ikke komme - I cannot come)
+ * - "Âldre" (Aldrig - Never)
+ * - "I dâ blywer ve hæm" (I dag bliver vi hjemme - Today we stay home)
+ * - "Såen gör ve æt" (Sådan gør vi det - That's how we do it)
+ * - "Hem till båten" (Hjem til båden - Home to the boat)
+ *
+ * MIXED DIALECTS IN COMPLEX SENTENCES:
+ * - "Jæ tror, at han sagde, at ho wa i Fyen i gâr" (Funen + Standard - I think he said she was in Funen yesterday)
+ * - "A hâ hørt, at di komme i moen" (Northwestern Jutland - I have heard that they come tomorrow)
+ * - "Ja ved, att dø var der, når ve kom" (Bornholm - I know that you were there when we came)
+ */

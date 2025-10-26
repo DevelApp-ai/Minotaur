@@ -1,0 +1,293 @@
+// Old Norse (Norrœnt mál) Grammar
+// Comprehensive grammar for Old Norse (Viking Age, 800-1350 AD)
+// Ancestor of all modern North Germanic languages
+// CEBNF Format with Context-Sensitive Rules
+
+GRAMMAR Old_Norse
+
+// Token splitting configuration for natural language
+TOKEN_SPLIT " "
+
+// ============================================================================
+// SENTENCE STRUCTURES
+// ============================================================================
+
+<sentence> ::= <declarative-sentence>
+            | <interrogative-sentence>
+            | <imperative-sentence>
+            | <compound-sentence>
+            | <complex-sentence>
+
+<declarative-sentence> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]* "."
+
+<interrogative-sentence> ::= <question-word> <verb> <subject-np> [ <object-np> ]* "?"
+                          | <verb> <subject-np> [ <object-np> ]* "?"
+
+<imperative-sentence> ::= <imperative-verb> [ <object-np> ]* "!"
+
+<compound-sentence> ::= <declarative-sentence> <coordinating-conjunction> <declarative-sentence>
+
+<complex-sentence> ::= <main-clause> <subordinating-conjunction> <subordinate-clause>
+
+<main-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+
+<subordinate-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+
+// ============================================================================
+// NOUN PHRASES (4 cases, 3 genders, 3 numbers including dual)
+// ============================================================================
+
+<subject-np> ::= <noun-phrase> @CASE[nominative]
+
+<object-np> ::= <noun-phrase> @CASE[accusative]
+
+<indirect-object-np> ::= <noun-phrase> @CASE[dative]
+
+<genitive-np> ::= <noun-phrase> @CASE[genitive]
+
+<noun-phrase> ::= [ <article> ] [ <adjective> ] <noun>
+               | <pronoun>
+               | <proper-noun>
+
+// ============================================================================
+// NOUNS (Strong and Weak Declensions)
+// ============================================================================
+
+// Strong Masculine (hestr - horse)
+<noun-masc-strong-nom-sg> ::= "hestr" @GENDER[masculine] @NUMBER[singular] @CASE[nominative] @DECLENSION[strong]
+<noun-masc-strong-acc-sg> ::= "hest" @GENDER[masculine] @NUMBER[singular] @CASE[accusative] @DECLENSION[strong]
+<noun-masc-strong-dat-sg> ::= "hesti" @GENDER[masculine] @NUMBER[singular] @CASE[dative] @DECLENSION[strong]
+<noun-masc-strong-gen-sg> ::= "hests" @GENDER[masculine] @NUMBER[singular] @CASE[genitive] @DECLENSION[strong]
+<noun-masc-strong-nom-pl> ::= "hestar" @GENDER[masculine] @NUMBER[plural] @CASE[nominative] @DECLENSION[strong]
+<noun-masc-strong-acc-pl> ::= "hesta" @GENDER[masculine] @NUMBER[plural] @CASE[accusative] @DECLENSION[strong]
+<noun-masc-strong-dat-pl> ::= "hestum" @GENDER[masculine] @NUMBER[plural] @CASE[dative] @DECLENSION[strong]
+<noun-masc-strong-gen-pl> ::= "hesta" @GENDER[masculine] @NUMBER[plural] @CASE[genitive] @DECLENSION[strong]
+
+// Strong Masculine (maðr - man)
+<noun-masc-maðr-nom-sg> ::= "maðr" @GENDER[masculine] @NUMBER[singular] @CASE[nominative]
+<noun-masc-maðr-acc-sg> ::= "mann" @GENDER[masculine] @NUMBER[singular] @CASE[accusative]
+<noun-masc-maðr-dat-sg> ::= "manni" @GENDER[masculine] @NUMBER[singular] @CASE[dative]
+<noun-masc-maðr-gen-sg> ::= "manns" @GENDER[masculine] @NUMBER[singular] @CASE[genitive]
+<noun-masc-maðr-nom-pl> ::= "menn" @GENDER[masculine] @NUMBER[plural] @CASE[nominative]
+<noun-masc-maðr-acc-pl> ::= "menn" @GENDER[masculine] @NUMBER[plural] @CASE[accusative]
+<noun-masc-maðr-dat-pl> ::= "mönnum" @GENDER[masculine] @NUMBER[plural] @CASE[dative]
+<noun-masc-maðr-gen-pl> ::= "manna" @GENDER[masculine] @NUMBER[plural] @CASE[genitive]
+
+// Strong Feminine (gata - street)
+<noun-fem-strong-nom-sg> ::= "gata" @GENDER[feminine] @NUMBER[singular] @CASE[nominative] @DECLENSION[strong]
+<noun-fem-strong-acc-sg> ::= "götu" @GENDER[feminine] @NUMBER[singular] @CASE[accusative] @DECLENSION[strong]
+<noun-fem-strong-dat-sg> ::= "götu" @GENDER[feminine] @NUMBER[singular] @CASE[dative] @DECLENSION[strong]
+<noun-fem-strong-gen-sg> ::= "götu" @GENDER[feminine] @NUMBER[singular] @CASE[genitive] @DECLENSION[strong]
+<noun-fem-strong-nom-pl> ::= "götur" @GENDER[feminine] @NUMBER[plural] @CASE[nominative] @DECLENSION[strong]
+<noun-fem-strong-acc-pl> ::= "götur" @GENDER[feminine] @NUMBER[plural] @CASE[accusative] @DECLENSION[strong]
+<noun-fem-strong-dat-pl> ::= "götum" @GENDER[feminine] @NUMBER[plural] @CASE[dative] @DECLENSION[strong]
+<noun-fem-strong-gen-pl> ::= "gatna" @GENDER[feminine] @NUMBER[plural] @CASE[genitive] @DECLENSION[strong]
+
+// Strong Neuter (barn - child)
+<noun-neut-strong-nom-sg> ::= "barn" @GENDER[neuter] @NUMBER[singular] @CASE[nominative] @DECLENSION[strong]
+<noun-neut-strong-acc-sg> ::= "barn" @GENDER[neuter] @NUMBER[singular] @CASE[accusative] @DECLENSION[strong]
+<noun-neut-strong-dat-sg> ::= "barni" @GENDER[neuter] @NUMBER[singular] @CASE[dative] @DECLENSION[strong]
+<noun-neut-strong-gen-sg> ::= "barns" @GENDER[neuter] @NUMBER[singular] @CASE[genitive] @DECLENSION[strong]
+<noun-neut-strong-nom-pl> ::= "börn" @GENDER[neuter] @NUMBER[plural] @CASE[nominative] @DECLENSION[strong]
+<noun-neut-strong-acc-pl> ::= "börn" @GENDER[neuter] @NUMBER[plural] @CASE[accusative] @DECLENSION[strong]
+<noun-neut-strong-dat-pl> ::= "börnum" @GENDER[neuter] @NUMBER[plural] @CASE[dative] @DECLENSION[strong]
+<noun-neut-strong-gen-pl> ::= "barna" @GENDER[neuter] @NUMBER[plural] @CASE[genitive] @DECLENSION[strong]
+
+// Strong Neuter (hús - house)
+<noun-neut-hús-nom-sg> ::= "hús" @GENDER[neuter] @NUMBER[singular] @CASE[nominative]
+<noun-neut-hús-acc-sg> ::= "hús" @GENDER[neuter] @NUMBER[singular] @CASE[accusative]
+<noun-neut-hús-dat-sg> ::= "húsi" @GENDER[neuter] @NUMBER[singular] @CASE[dative]
+<noun-neut-hús-gen-sg> ::= "húss" @GENDER[neuter] @NUMBER[singular] @CASE[genitive]
+
+<noun> ::= <noun-masc-strong-nom-sg> | <noun-masc-strong-acc-sg> | <noun-masc-strong-dat-sg> | <noun-masc-strong-gen-sg>
+        | <noun-masc-strong-nom-pl> | <noun-masc-strong-acc-pl> | <noun-masc-strong-dat-pl> | <noun-masc-strong-gen-pl>
+        | <noun-masc-maðr-nom-sg> | <noun-masc-maðr-acc-sg> | <noun-masc-maðr-dat-sg> | <noun-masc-maðr-gen-sg>
+        | <noun-masc-maðr-nom-pl> | <noun-masc-maðr-acc-pl> | <noun-masc-maðr-dat-pl> | <noun-masc-maðr-gen-pl>
+        | <noun-fem-strong-nom-sg> | <noun-fem-strong-acc-sg> | <noun-fem-strong-dat-sg> | <noun-fem-strong-gen-sg>
+        | <noun-fem-strong-nom-pl> | <noun-fem-strong-acc-pl> | <noun-fem-strong-dat-pl> | <noun-fem-strong-gen-pl>
+        | <noun-neut-strong-nom-sg> | <noun-neut-strong-acc-sg> | <noun-neut-strong-dat-sg> | <noun-neut-strong-gen-sg>
+        | <noun-neut-strong-nom-pl> | <noun-neut-strong-acc-pl> | <noun-neut-strong-dat-pl> | <noun-neut-strong-gen-pl>
+        | <noun-neut-hús-nom-sg> | <noun-neut-hús-acc-sg> | <noun-neut-hús-dat-sg> | <noun-neut-hús-gen-sg>
+
+<proper-noun> ::= /[A-ZÁÐÉÍÓÚÝÞÆÖ][a-záðéíóúýþæö]*/
+
+// ============================================================================
+// PRONOUNS (including DUAL number!)
+// ============================================================================
+
+// Personal pronouns - 1st person singular
+<pronoun-1sg-nom> ::= "ek" @NUMBER[singular] @PERSON[1] @CASE[nominative]
+<pronoun-1sg-acc> ::= "mik" @NUMBER[singular] @PERSON[1] @CASE[accusative]
+<pronoun-1sg-dat> ::= "mér" @NUMBER[singular] @PERSON[1] @CASE[dative]
+<pronoun-1sg-gen> ::= "mín" @NUMBER[singular] @PERSON[1] @CASE[genitive]
+
+// 2nd person singular
+<pronoun-2sg-nom> ::= "þú" @NUMBER[singular] @PERSON[2] @CASE[nominative]
+<pronoun-2sg-acc> ::= "þik" @NUMBER[singular] @PERSON[2] @CASE[accusative]
+<pronoun-2sg-dat> ::= "þér" @NUMBER[singular] @PERSON[2] @CASE[dative]
+<pronoun-2sg-gen> ::= "þín" @NUMBER[singular] @PERSON[2] @CASE[genitive]
+
+// 1st person DUAL (we two)
+<pronoun-1dual-nom> ::= "vit" @NUMBER[dual] @PERSON[1] @CASE[nominative]
+<pronoun-1dual-acc> ::= "okkr" @NUMBER[dual] @PERSON[1] @CASE[accusative]
+<pronoun-1dual-dat> ::= "okkr" @NUMBER[dual] @PERSON[1] @CASE[dative]
+<pronoun-1dual-gen> ::= "okkar" @NUMBER[dual] @PERSON[1] @CASE[genitive]
+
+// 2nd person DUAL (you two)
+<pronoun-2dual-nom> ::= "þit" @NUMBER[dual] @PERSON[2] @CASE[nominative]
+<pronoun-2dual-acc> ::= "ykkr" @NUMBER[dual] @PERSON[2] @CASE[accusative]
+<pronoun-2dual-dat> ::= "ykkr" @NUMBER[dual] @PERSON[2] @CASE[dative]
+<pronoun-2dual-gen> ::= "ykkar" @NUMBER[dual] @PERSON[2] @CASE[genitive]
+
+// 1st person plural
+<pronoun-1pl-nom> ::= "vér" @NUMBER[plural] @PERSON[1] @CASE[nominative]
+<pronoun-1pl-acc> ::= "oss" @NUMBER[plural] @PERSON[1] @CASE[accusative]
+<pronoun-1pl-dat> ::= "oss" @NUMBER[plural] @PERSON[1] @CASE[dative]
+<pronoun-1pl-gen> ::= "vár" @NUMBER[plural] @PERSON[1] @CASE[genitive]
+
+// 2nd person plural
+<pronoun-2pl-nom> ::= "þér" @NUMBER[plural] @PERSON[2] @CASE[nominative]
+<pronoun-2pl-acc> ::= "yðr" @NUMBER[plural] @PERSON[2] @CASE[accusative]
+<pronoun-2pl-dat> ::= "yðr" @NUMBER[plural] @PERSON[2] @CASE[dative]
+<pronoun-2pl-gen> ::= "yðar" @NUMBER[plural] @PERSON[2] @CASE[genitive]
+
+// 3rd person masculine singular
+<pronoun-3sg-masc-nom> ::= "hann" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[nominative]
+<pronoun-3sg-masc-acc> ::= "hann" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[accusative]
+<pronoun-3sg-masc-dat> ::= "honum" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[dative]
+<pronoun-3sg-masc-gen> ::= "hans" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[genitive]
+
+// 3rd person feminine singular
+<pronoun-3sg-fem-nom> ::= "hon" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[nominative]
+<pronoun-3sg-fem-acc> ::= "hana" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[accusative]
+<pronoun-3sg-fem-dat> ::= "henni" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[dative]
+<pronoun-3sg-fem-gen> ::= "hennar" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[genitive]
+
+// 3rd person neuter singular
+<pronoun-3sg-neut-nom> ::= "þat" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[nominative]
+<pronoun-3sg-neut-acc> ::= "þat" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[accusative]
+<pronoun-3sg-neut-dat> ::= "því" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[dative]
+<pronoun-3sg-neut-gen> ::= "þess" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[genitive]
+
+<pronoun> ::= <pronoun-1sg-nom> | <pronoun-1sg-acc> | <pronoun-1sg-dat> | <pronoun-1sg-gen>
+           | <pronoun-2sg-nom> | <pronoun-2sg-acc> | <pronoun-2sg-dat> | <pronoun-2sg-gen>
+           | <pronoun-1dual-nom> | <pronoun-1dual-acc> | <pronoun-1dual-dat> | <pronoun-1dual-gen>
+           | <pronoun-2dual-nom> | <pronoun-2dual-acc> | <pronoun-2dual-dat> | <pronoun-2dual-gen>
+           | <pronoun-1pl-nom> | <pronoun-1pl-acc> | <pronoun-1pl-dat> | <pronoun-1pl-gen>
+           | <pronoun-2pl-nom> | <pronoun-2pl-acc> | <pronoun-2pl-dat> | <pronoun-2pl-gen>
+           | <pronoun-3sg-masc-nom> | <pronoun-3sg-masc-acc> | <pronoun-3sg-masc-dat> | <pronoun-3sg-masc-gen>
+           | <pronoun-3sg-fem-nom> | <pronoun-3sg-fem-acc> | <pronoun-3sg-fem-dat> | <pronoun-3sg-fem-gen>
+           | <pronoun-3sg-neut-nom> | <pronoun-3sg-neut-acc> | <pronoun-3sg-neut-dat> | <pronoun-3sg-neut-gen>
+
+// ============================================================================
+// ADJECTIVES
+// ============================================================================
+
+<adjective> ::= "stórr" | "stórt" | "stór"  // big
+             | "lítill" | "lítit" | "lítil"  // small
+             | "góðr" | "gott" | "góð"  // good
+
+// ============================================================================
+// VERB SYSTEM (Strong and Weak Verbs, Seven Ablaut Classes)
+// ============================================================================
+
+<verb-phrase> ::= <verb> [ <adverb> ]*
+               | <auxiliary-verb> <past-participle>
+
+// Strong Verb Class I - bíta (to bite)
+// Present sg: bít, bítr, bítr
+// Present pl: bítum, bítið, bíta
+// Past sg: beit, beitt, beit
+// Past pl: bitum, bituð, bitu
+// Past participle: bitinn
+
+<strong-verb-1-present> ::= "bít" | "bítr" | "bítum" | "bítið" | "bíta" @TENSE[present] @VERB_CLASS[strong1]
+<strong-verb-1-past-sg> ::= "beit" | "beitt" @TENSE[past] @VERB_CLASS[strong1]
+<strong-verb-1-past-pl> ::= "bitum" | "bituð" | "bitu" @TENSE[past] @VERB_CLASS[strong1]
+<strong-verb-1-participle> ::= "bitinn" @VERB_CLASS[strong1]
+
+// Strong Verb Class II - bjóða (to offer)
+<strong-verb-2-present> ::= "býð" | "býðr" | "bjóðum" | "bjóðið" | "bjóða" @TENSE[present] @VERB_CLASS[strong2]
+<strong-verb-2-past-sg> ::= "bauð" | "bautt" @TENSE[past] @VERB_CLASS[strong2]
+<strong-verb-2-past-pl> ::= "buðum" | "buðuð" | "buðu" @TENSE[past] @VERB_CLASS[strong2]
+
+// Weak Verb Class I - kalla (to call)
+<weak-verb-1-present> ::= "kalla" | "kallar" | "kallum" | "kallið" @TENSE[present] @VERB_CLASS[weak1]
+<weak-verb-1-past> ::= "kallaða" | "kallaðir" | "kölluðum" @TENSE[past] @VERB_CLASS[weak1]
+
+// Irregular: vera (to be)
+<irregular-verb-vera-present-sg> ::= "em" | "est" | "es" | "er" @TENSE[present]
+<irregular-verb-vera-present-pl> ::= "erum" | "eruð" | "eru" @TENSE[present]
+<irregular-verb-vera-past-sg> ::= "var" | "vast" @TENSE[past]
+<irregular-verb-vera-past-pl> ::= "vórum" | "vóruð" | "váru" @TENSE[past]
+
+// Irregular: hafa (to have)
+<irregular-verb-hafa-present> ::= "hefi" | "hefir" | "höfum" | "hafið" | "hafa" @TENSE[present]
+<irregular-verb-hafa-past> ::= "hafða" | "hafðir" | "höfðum" | "höfðuð" | "höfðu" @TENSE[past]
+
+<verb> ::= <strong-verb-1-present> | <strong-verb-1-past-sg> | <strong-verb-1-past-pl>
+        | <strong-verb-2-present> | <strong-verb-2-past-sg> | <strong-verb-2-past-pl>
+        | <weak-verb-1-present> | <weak-verb-1-past>
+        | <irregular-verb-vera-present-sg> | <irregular-verb-vera-present-pl>
+        | <irregular-verb-vera-past-sg> | <irregular-verb-vera-past-pl>
+        | <irregular-verb-hafa-present> | <irregular-verb-hafa-past>
+
+<auxiliary-verb> ::= "hefi" | "höfum"  // have (auxiliary)
+
+<past-participle> ::= <verb-stem> "inn" | <verb-stem> "it"
+
+<infinitive> ::= "at" <verb-stem> "a"
+
+<imperative-verb> ::= <verb-stem> | <verb-stem> "ið"
+
+<verb-stem> ::= /[a-záðéíóúýþæö]+/
+
+// ============================================================================
+// ADVERBS
+// ============================================================================
+
+<adverb> ::= <time-adverb> | <place-adverb>
+
+<time-adverb> ::= "nú" | "þá" | "áðr" | "síðan" | "aldr
+
+ei"
+               | "í dag" | "í gær"
+
+<place-adverb> ::= "hér" | "þar" | "heima" | "úti" | "inni"
+
+// ============================================================================
+// PREPOSITIONS
+// ============================================================================
+
+<preposition> ::= "í" | "á" | "til" | "frá" | "með" | "af" | "fyrir"
+               | "um" | "yfir" | "undir" | "við" | "hjá" | "eftir"
+
+<prepositional-phrase> ::= <preposition> <noun-phrase>
+
+// ============================================================================
+// CONJUNCTIONS
+// ============================================================================
+
+<coordinating-conjunction> ::= "ok" | "en" | "eða" | "né"
+
+<subordinating-conjunction> ::= "at" | "ef" | "þá er" | "þar sem"
+
+// ============================================================================
+// QUESTION WORDS
+// ============================================================================
+
+<question-word> ::= "hverr" | "hvat" | "hvar" | "hvenær"
+
+// ============================================================================
+// WHITESPACE
+// ============================================================================
+
+<whitespace> ::= /[ \t\n\r]+/
+
+// V2 WORD ORDER RULE (Verb-Second)
+// Old Norse follows V2 word order in main clauses
+
+// DUAL NUMBER preserved in Old Norse
+// Special grammatical number for "two of something"
+
+// END OF GRAMMAR

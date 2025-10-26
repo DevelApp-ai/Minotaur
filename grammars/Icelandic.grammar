@@ -1,0 +1,338 @@
+// Icelandic (Íslenska) Grammar
+// Comprehensive grammar for Modern Icelandic with full morphological system
+// CEBNF Format with Context-Sensitive Rules
+
+GRAMMAR Icelandic
+
+// Token splitting configuration for natural language
+TOKEN_SPLIT " "
+
+// ============================================================================
+// SENTENCE STRUCTURES
+// ============================================================================
+
+<sentence> ::= <declarative-sentence>
+            | <interrogative-sentence>
+            | <imperative-sentence>
+            | <compound-sentence>
+            | <complex-sentence>
+
+<declarative-sentence> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]* "."
+
+<interrogative-sentence> ::= <question-word> <verb> <subject-np> [ <object-np> | <prepositional-phrase> ]* "?"
+                          | <verb> <subject-np> [ <object-np> | <prepositional-phrase> ]* "?"
+
+<imperative-sentence> ::= <imperative-verb> [ <object-np> | <prepositional-phrase> ]* "!"
+
+<compound-sentence> ::= <declarative-sentence> <coordinating-conjunction> <declarative-sentence>
+
+<complex-sentence> ::= <main-clause> <subordinating-conjunction> <subordinate-clause>
+
+<main-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+
+<subordinate-clause> ::= <subject-np> <verb-phrase> [ <object-np> | <prepositional-phrase> ]*
+
+// ============================================================================
+// NOUN PHRASES (with 4 cases, 3 genders, 2 numbers)
+// ============================================================================
+
+<subject-np> ::= <noun-phrase> @CASE[nominative]
+
+<object-np> ::= <noun-phrase> @CASE[accusative]
+
+<indirect-object-np> ::= <noun-phrase> @CASE[dative]
+
+<genitive-np> ::= <noun-phrase> @CASE[genitive]
+
+<noun-phrase> ::= [ <article> ] [ <adjective> ] <noun>
+               | <pronoun>
+               | <proper-noun>
+               | <compound-noun>
+
+// ============================================================================
+// ARTICLES (definite suffix paradigm)
+// ============================================================================
+
+// Icelandic uses suffixed definite articles
+<definite-suffix-masc-nom-sg> ::= "inn" @GENDER[masculine] @NUMBER[singular] @CASE[nominative] @DEFINITENESS[definite]
+<definite-suffix-masc-acc-sg> ::= "inn" @GENDER[masculine] @NUMBER[singular] @CASE[accusative] @DEFINITENESS[definite]
+<definite-suffix-masc-dat-sg> ::= "num" @GENDER[masculine] @NUMBER[singular] @CASE[dative] @DEFINITENESS[definite]
+<definite-suffix-masc-gen-sg> ::= "sins" @GENDER[masculine] @NUMBER[singular] @CASE[genitive] @DEFINITENESS[definite]
+
+<definite-suffix-fem-nom-sg> ::= "in" @GENDER[feminine] @NUMBER[singular] @CASE[nominative] @DEFINITENESS[definite]
+<definite-suffix-fem-acc-sg> ::= "ina" @GENDER[feminine] @NUMBER[singular] @CASE[accusative] @DEFINITENESS[definite]
+<definite-suffix-fem-dat-sg> ::= "inni" @GENDER[feminine] @NUMBER[singular] @CASE[dative] @DEFINITENESS[definite]
+<definite-suffix-fem-gen-sg> ::= "innar" @GENDER[feminine] @NUMBER[singular] @CASE[genitive] @DEFINITENESS[definite]
+
+<definite-suffix-neut-nom-sg> ::= "ið" @GENDER[neuter] @NUMBER[singular] @CASE[nominative] @DEFINITENESS[definite]
+<definite-suffix-neut-acc-sg> ::= "ið" @GENDER[neuter] @NUMBER[singular] @CASE[accusative] @DEFINITENESS[definite]
+<definite-suffix-neut-dat-sg> ::= "inu" @GENDER[neuter] @NUMBER[singular] @CASE[dative] @DEFINITENESS[definite]
+<definite-suffix-neut-gen-sg> ::= "sins" @GENDER[neuter] @NUMBER[singular] @CASE[genitive] @DEFINITENESS[definite]
+
+// Demonstratives as articles
+<article> ::= "hinn" | "hin" | "hið"  // the (demonstrative)
+           | "þessi" | "þetta" | "þessir"  // this/these
+           | "sá" | "sú" | "það"  // that
+
+// ============================================================================
+// NOUNS (4 cases × 2 numbers × 3 genders)
+// ============================================================================
+
+// Masculine nouns
+<noun-masc> ::= "hestur" @GENDER[masculine] @NUMBER[singular] @CASE[nominative]  // horse
+             | "hest" @GENDER[masculine] @NUMBER[singular] @CASE[accusative]
+             | "hesti" @GENDER[masculine] @NUMBER[singular] @CASE[dative]
+             | "hests" @GENDER[masculine] @NUMBER[singular] @CASE[genitive]
+             | "maður" @GENDER[masculine] @NUMBER[singular] @CASE[nominative]  // man
+             | "mann" @GENDER[masculine] @NUMBER[singular] @CASE[accusative]
+             | "manni" @GENDER[masculine] @NUMBER[singular] @CASE[dative]
+             | "manns" @GENDER[masculine] @NUMBER[singular] @CASE[genitive]
+             | "hundur" @GENDER[masculine] @NUMBER[singular] @CASE[nominative]  // dog
+             | "hund" @GENDER[masculine] @NUMBER[singular] @CASE[accusative]
+             | "hundi" @GENDER[masculine] @NUMBER[singular] @CASE[dative]
+             | "hunds" @GENDER[masculine] @NUMBER[singular] @CASE[genitive]
+             | "bíll" @GENDER[masculine] @NUMBER[singular] @CASE[nominative]  // car
+             | "bíl" @GENDER[masculine] @NUMBER[singular] @CASE[accusative]
+             | "bíl" @GENDER[masculine] @NUMBER[singular] @CASE[dative]
+             | "bíls" @GENDER[masculine] @NUMBER[singular] @CASE[genitive]
+
+// Feminine nouns
+<noun-fem> ::= "kona" @GENDER[feminine] @NUMBER[singular] @CASE[nominative]  // woman
+            | "konu" @GENDER[feminine] @NUMBER[singular] @CASE[accusative]
+            | "konu" @GENDER[feminine] @NUMBER[singular] @CASE[dative]
+            | "konu" @GENDER[feminine] @NUMBER[singular] @CASE[genitive]
+            | "gata" @GENDER[feminine] @NUMBER[singular] @CASE[nominative]  // street
+            | "götu" @GENDER[feminine] @NUMBER[singular] @CASE[accusative]
+            | "götu" @GENDER[feminine] @NUMBER[singular] @CASE[dative]
+            | "götu" @GENDER[feminine] @NUMBER[singular] @CASE[genitive]
+            | "köttur" @GENDER[feminine] @NUMBER[singular] @CASE[nominative]  // cat
+            | "kött" @GENDER[feminine] @NUMBER[singular] @CASE[accusative]
+            | "ketti" @GENDER[feminine] @NUMBER[singular] @CASE[dative]
+            | "kattar" @GENDER[feminine] @NUMBER[singular] @CASE[genitive]
+            | "borg" @GENDER[feminine] @NUMBER[singular] @CASE[nominative]  // city
+            | "borg" @GENDER[feminine] @NUMBER[singular] @CASE[accusative]
+            | "borg" @GENDER[feminine] @NUMBER[singular] @CASE[dative]
+            | "borgar" @GENDER[feminine] @NUMBER[singular] @CASE[genitive]
+
+// Neuter nouns
+<noun-neut> ::= "barn" @GENDER[neuter] @NUMBER[singular] @CASE[nominative]  // child
+             | "barn" @GENDER[neuter] @NUMBER[singular] @CASE[accusative]
+             | "barni" @GENDER[neuter] @NUMBER[singular] @CASE[dative]
+             | "barns" @GENDER[neuter] @NUMBER[singular] @CASE[genitive]
+             | "hús" @GENDER[neuter] @NUMBER[singular] @CASE[nominative]  // house
+             | "hús" @GENDER[neuter] @NUMBER[singular] @CASE[accusative]
+             | "húsi" @GENDER[neuter] @NUMBER[singular] @CASE[dative]
+             | "húss" @GENDER[neuter] @NUMBER[singular] @CASE[genitive]
+             | "land" @GENDER[neuter] @NUMBER[singular] @CASE[nominative]  // country
+             | "land" @GENDER[neuter] @NUMBER[singular] @CASE[accusative]
+             | "landi" @GENDER[neuter] @NUMBER[singular] @CASE[dative]
+             | "lands" @GENDER[neuter] @NUMBER[singular] @CASE[genitive]
+
+<noun> ::= <noun-masc> | <noun-fem> | <noun-neut>
+
+<compound-noun> ::= <noun> <noun>
+
+<proper-noun> ::= /[A-ZÁÐÉÍÓÚÝÞÆÖ][a-záðéíóúýþæö]*/
+
+// ============================================================================
+// PRONOUNS (full case declension)
+// ============================================================================
+
+// Personal pronouns - 1st person singular
+<pronoun-1sg-nom> ::= "ég" @NUMBER[singular] @PERSON[1] @CASE[nominative]
+<pronoun-1sg-acc> ::= "mig" @NUMBER[singular] @PERSON[1] @CASE[accusative]
+<pronoun-1sg-dat> ::= "mér" @NUMBER[singular] @PERSON[1] @CASE[dative]
+<pronoun-1sg-gen> ::= "mín" @NUMBER[singular] @PERSON[1] @CASE[genitive]
+
+// 2nd person singular
+<pronoun-2sg-nom> ::= "þú" @NUMBER[singular] @PERSON[2] @CASE[nominative]
+<pronoun-2sg-acc> ::= "þig" @NUMBER[singular] @PERSON[2] @CASE[accusative]
+<pronoun-2sg-dat> ::= "þér" @NUMBER[singular] @PERSON[2] @CASE[dative]
+<pronoun-2sg-gen> ::= "þín" @NUMBER[singular] @PERSON[2] @CASE[genitive]
+
+// 3rd person singular masculine
+<pronoun-3sg-masc-nom> ::= "hann" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[nominative]
+<pronoun-3sg-masc-acc> ::= "hann" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[accusative]
+<pronoun-3sg-masc-dat> ::= "honum" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[dative]
+<pronoun-3sg-masc-gen> ::= "hans" @NUMBER[singular] @PERSON[3] @GENDER[masculine] @CASE[genitive]
+
+// 3rd person singular feminine
+<pronoun-3sg-fem-nom> ::= "hún" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[nominative]
+<pronoun-3sg-fem-acc> ::= "hana" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[accusative]
+<pronoun-3sg-fem-dat> ::= "henni" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[dative]
+<pronoun-3sg-fem-gen> ::= "hennar" @NUMBER[singular] @PERSON[3] @GENDER[feminine] @CASE[genitive]
+
+// 3rd person singular neuter
+<pronoun-3sg-neut-nom> ::= "það" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[nominative]
+<pronoun-3sg-neut-acc> ::= "það" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[accusative]
+<pronoun-3sg-neut-dat> ::= "því" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[dative]
+<pronoun-3sg-neut-gen> ::= "þess" @NUMBER[singular] @PERSON[3] @GENDER[neuter] @CASE[genitive]
+
+// 1st person plural
+<pronoun-1pl-nom> ::= "við" @NUMBER[plural] @PERSON[1] @CASE[nominative]
+<pronoun-1pl-acc> ::= "okkur" @NUMBER[plural] @PERSON[1] @CASE[accusative]
+<pronoun-1pl-dat> ::= "okkur" @NUMBER[plural] @PERSON[1] @CASE[dative]
+<pronoun-1pl-gen> ::= "okkar" @NUMBER[plural] @PERSON[1] @CASE[genitive]
+
+// 2nd person plural
+<pronoun-2pl-nom> ::= "þið" @NUMBER[plural] @PERSON[2] @CASE[nominative]
+<pronoun-2pl-acc> ::= "ykkur" @NUMBER[plural] @PERSON[2] @CASE[accusative]
+<pronoun-2pl-dat> ::= "ykkur" @NUMBER[plural] @PERSON[2] @CASE[dative]
+<pronoun-2pl-gen> ::= "ykkar" @NUMBER[plural] @PERSON[2] @CASE[genitive]
+
+// 3rd person plural
+<pronoun-3pl-nom> ::= "þeir" | "þær" | "þau" @NUMBER[plural] @PERSON[3] @CASE[nominative]
+<pronoun-3pl-acc> ::= "þá" | "þær" | "þau" @NUMBER[plural] @PERSON[3] @CASE[accusative]
+<pronoun-3pl-dat> ::= "þeim" @NUMBER[plural] @PERSON[3] @CASE[dative]
+<pronoun-3pl-gen> ::= "þeirra" @NUMBER[plural] @PERSON[3] @CASE[genitive]
+
+<pronoun> ::= <pronoun-1sg-nom> | <pronoun-1sg-acc> | <pronoun-1sg-dat> | <pronoun-1sg-gen>
+           | <pronoun-2sg-nom> | <pronoun-2sg-acc> | <pronoun-2sg-dat> | <pronoun-2sg-gen>
+           | <pronoun-3sg-masc-nom> | <pronoun-3sg-masc-acc> | <pronoun-3sg-masc-dat> | <pronoun-3sg-masc-gen>
+           | <pronoun-3sg-fem-nom> | <pronoun-3sg-fem-acc> | <pronoun-3sg-fem-dat> | <pronoun-3sg-fem-gen>
+           | <pronoun-3sg-neut-nom> | <pronoun-3sg-neut-acc> | <pronoun-3sg-neut-dat> | <pronoun-3sg-neut-gen>
+           | <pronoun-1pl-nom> | <pronoun-1pl-acc> | <pronoun-1pl-dat> | <pronoun-1pl-gen>
+           | <pronoun-2pl-nom> | <pronoun-2pl-acc> | <pronoun-2pl-dat> | <pronoun-2pl-gen>
+           | <pronoun-3pl-nom> | <pronoun-3pl-acc> | <pronoun-3pl-dat> | <pronoun-3pl-gen>
+
+// Reflexive pronouns
+<reflexive-pronoun> ::= "sig" | "sér" | "sín"
+
+// ============================================================================
+// ADJECTIVES (agree with noun in case, gender, number)
+// ============================================================================
+
+<adjective> ::= "stór" | "stórt" | "stórir" | "stórar" // big
+             | "lítill" | "lítil" | "lítið" // small
+             | "góður" | "góð" | "gott" // good
+             | "gamall" | "gömul" | "gamalt" // old
+             | "ungur" | "ung" | "ungt" // young
+             | "fallegur" | "falleg" | "fallegt" // beautiful
+
+// Comparative and superlative
+<adjective-comparative> ::= "stærri" | "minni" | "betri" | "verri"
+<adjective-superlative> ::= "stærstur" | "minstur" | "bestur" | "verstur"
+
+// ============================================================================
+// VERB SYSTEM
+// ============================================================================
+
+<verb-phrase> ::= <verb> [ <adverb> ]*
+               | <auxiliary-verb> <past-participle>
+               | <auxiliary-verb> <infinitive>
+
+// Present tense - strong and weak verbs
+<verb-present> ::= <strong-verb-present> | <weak-verb-present>
+
+<strong-verb-present> ::= "er" @TENSE[present] // to be
+                       | "ert" @TENSE[present]
+                       | "erum" @TENSE[present]
+                       | "eruð" @TENSE[present]
+                       | "eru" @TENSE[present]
+
+<weak-verb-present> ::= <verb-stem> "i" @TENSE[present]
+                     | <verb-stem> "ir" @TENSE[present]
+                     | <verb-stem> "um" @TENSE[present]
+                     | <verb-stem> "ið" @TENSE[present]
+                     | <verb-stem> "a" @TENSE[present]
+
+// Past tense - strong verbs (ablaut) and weak verbs
+<verb-past> ::= "var" @TENSE[past] // was
+             | "varst" @TENSE[past]
+             | "vorum" @TENSE[past]
+             | "voruð" @TENSE[past]
+             | "voru" @TENSE[past]
+             | <verb-stem> "aði" @TENSE[past]
+             | <verb-stem> "ði" @TENSE[past]
+
+// Irregular verbs preserving Old Norse ablaut patterns
+<irregular-verb-vera> ::= "er" | "ert" | "eru" | "erum" | "eruð"  // to be (present)
+                       | "var" | "varst" | "vorum" | "voruð" | "voru"  // to be (past)
+
+<irregular-verb-hafa> ::= "hef" | "hefur" | "höfum" | "hafið" | "hafa"  // to have (present)
+                       | "hafði" | "hafðir" | "höfðum" | "höfðuð" | "höfðu"  // to have (past)
+
+<irregular-verb-verða> ::= "verð" | "verður" | "verðum" | "verðið" | "verða"  // to become (present)
+                        | "varð" | "varðst" | "urðum" | "urðuð" | "urðu"  // to become (past)
+
+<irregular-verb-fara> ::= "fer" | "ferð" | "förum" | "farið" | "fara"  // to go (present)
+                       | "fór" | "fórst" | "fórum" | "fóruð" | "fóru"  // to go (past)
+
+<irregular-verb-koma> ::= "kem" | "kemur" | "komum" | "komið" | "koma"  // to come (present)
+                       | "kom" | "komst" | "komum" | "komuð" | "komu"  // to come (past)
+
+<irregular-verb-sjá> ::= "sé" | "sérð" | "sjáum" | "sjáið" | "sjá"  // to see (present)
+                      | "sá" | "sást" | "sáum" | "sáuð" | "sáu"  // to see (past)
+
+<verb> ::= <verb-present> | <verb-past>
+        | <irregular-verb-vera> | <irregular-verb-hafa> | <irregular-verb-verða>
+        | <irregular-verb-fara> | <irregular-verb-koma> | <irregular-verb-sjá>
+
+<verb-stem> ::= /[a-záðéíóúýþæö]+/
+
+<auxiliary-verb> ::= "hef" | "hefur" | "höfum"  // have (auxiliary)
+                  | "mun" | "munt" | "munum"  // will (future)
+                  | "skal" | "skalt" | "skulum"  // shall
+                  | "má" | "mátt" | "megum"  // may
+                  | "vil" | "vilt" | "viljum"  // want
+
+<past-participle> ::= <verb-stem> "að" | <verb-stem> "ið"
+
+<infinitive> ::= "að" <verb-stem> "a"
+
+<imperative-verb> ::= <verb-stem> | <verb-stem> "ið"
+
+// ============================================================================
+// ADVERBS
+// ============================================================================
+
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb>
+
+<time-adverb> ::= "nú" | "þá" | "áður" | "síðan" | "alltaf" | "aldrei"
+               | "í dag" | "í gær" | "á morgun" | "í kvöld"
+
+<place-adverb> ::= "hér" | "þar" | "hérna" | "þarna" | "heima" | "úti" | "inni"
+                | "niður" | "upp" | "fram" | "aftur"
+
+<manner-adverb> ::= "vel" | "illa" | "hratt" | "hægt" | "rétt" | "rangt"
+
+<degree-adverb> ::= "mjög" | "svo" | "of" | "nokkuð" | "frekar"
+
+// ============================================================================
+// PREPOSITIONS (govern specific cases)
+// ============================================================================
+
+<preposition-acc> ::= "um" | "gegnum" | "fyrir" @GOVERNS_CASE[accusative]
+
+<preposition-dat> ::= "á" | "í" | "frá" | "með" | "að" | "af" | "til" | "hjá" @GOVERNS_CASE[dative]
+
+<preposition-gen> ::= "til" | "frá" | "án" | "vegna" @GOVERNS_CASE[genitive]
+
+<preposition> ::= <preposition-acc> | <preposition-dat> | <preposition-gen>
+
+<prepositional-phrase> ::= <preposition-acc> <object-np>
+                        | <preposition-dat> <indirect-object-np>
+                        | <preposition-gen> <genitive-np>
+
+// ============================================================================
+// CONJUNCTIONS
+// ============================================================================
+
+<coordinating-conjunction> ::= "og" | "eða" | "en" | "né"
+
+<subordinating-conjunction> ::= "að" | "ef" | "þegar" | "þar sem" | "vegna þess að"
+                             | "þó að" | "áður en" | "eftir að" | "þangað til"
+
+// ============================================================================
+// QUESTION WORDS
+// ============================================================================
+
+<question-word> ::= "hver" | "hvað" | "hvenær" | "hvar" | "hvernig" | "hvers vegna"
+
+// ============================================================================
+// WHITESPACE AND PUNCTUATION
+// ============================================================================
+
+<whitespace> ::= /[ \t\n\r]+/
+
+// END OF GRAMMAR
