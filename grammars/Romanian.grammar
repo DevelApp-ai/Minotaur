@@ -1,0 +1,364 @@
+Grammar: Romanian
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Romanian Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Romanian language structures including:
+ * - Regular and irregular verb conjugations (4 conjugation groups)
+ * - Five grammatical cases (nominative, genitive, dative, accusative, vocative)
+ * - Three genders (masculine, feminine, neuter)
+ * - Definite article suffixes (enclitic articles - unique to Romanian)
+ * - Context-sensitive agreement rules (gender, number, case)
+ * - Multiple tenses and moods (indicative, subjunctive, conditional)
+ * - Relative and subordinate clauses with nesting
+ * - Comparative and superlative adjectives
+ * - Clitic pronouns and doubling
+ */
+
+Keywords: și, sau, dar, însă, ci, ori, că, de, dacă, când, unde, cum, care, ce, cine, căruia, cui, al, a, ai, ale, acest, această, acești, aceste, acel, acea, acei, acele, eu, tu, el, ea, noi, voi, ei, ele, mine, tine, lui, ei, nouă, vouă, lor, meu, mea, mei, mele, tău, ta, tăi, tale, său, sa, săi, sale, nostru, noastră, noștri, noastre, vostru, voastră, voștri, voastre, în, la, pe, cu, din, pentru, fără, până, spre, prin, după, înaintea, înainte, înapoi, între, sub, peste, lângă, despre, fi, a, avea, face, vrea, putea, trebui, ști, da, lua, vedea, merge, veni, spune, nu, nimic, nimeni, niciodată
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+
+<declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( "eu" | "tu" | "el" | "ea" | "noi" | "voi" | "ei" | "ele" )
+
+/* Noun phrase - with definite article suffixes */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <demonstrative-determiner>
+              | <possessive-adjective>
+              | <indefinite-article>
+
+/* Demonstrative determiners with gender/number agreement */
+<demonstrative-determiner> ::= @GENDER[masculine] @NUMBER[singular] ( "acest" | "acel" )
+                            | @GENDER[feminine] @NUMBER[singular] ( "această" | "acea" )
+                            | @GENDER[masculine] @NUMBER[plural] ( "acești" | "acei" )
+                            | @GENDER[feminine] @NUMBER[plural] ( "aceste" | "acele" )
+
+/* Indefinite articles */
+<indefinite-article> ::= @GENDER[masculine] @NUMBER[singular] "un"
+                      | @GENDER[feminine] @NUMBER[singular] "o"
+                      | @GENDER[masculine] @NUMBER[plural] "niște"
+                      | @GENDER[feminine] @NUMBER[plural] "niște"
+
+/* Possessive adjectives with gender/number agreement */
+<possessive-adjective> ::= @GENDER[masculine] @NUMBER[singular] ( "meu" | "tău" | "său" | "nostru" | "vostru" )
+                        | @GENDER[feminine] @NUMBER[singular] ( "mea" | "ta" | "sa" | "noastră" | "voastră" )
+                        | @GENDER[masculine] @NUMBER[plural] ( "mei" | "tăi" | "săi" | "noștri" | "voștri" )
+                        | @GENDER[feminine] @NUMBER[plural] ( "mele" | "tale" | "sale" | "noastre" | "voastre" )
+
+/* Nouns with definite article suffixes (enclitic articles) */
+<noun> ::= <noun-indefinite> | <noun-definite>
+
+<noun-indefinite> ::= <noun-stem>
+
+<noun-definite> ::= <noun-with-definite-suffix>
+
+/* Definite article suffixes - unique Romanian feature */
+<noun-with-definite-suffix> ::= @GENDER[masculine] @NUMBER[singular] <noun-stem> ( "l" | "le" | "ul" )
+                             | @GENDER[feminine] @NUMBER[singular] <noun-stem> "a"
+                             | @GENDER[neuter] @NUMBER[singular] <noun-stem> ( "l" | "ul" )
+                             | @GENDER[masculine] @NUMBER[plural] <noun-stem> "i"
+                             | @GENDER[feminine] @NUMBER[plural] <noun-stem> "le"
+                             | @GENDER[neuter] @NUMBER[plural] <noun-stem> "le"
+
+<noun-stem> ::= /[a-zăâîșț]+/
+
+/* Genitive-Dative forms (Romanian merges these cases) */
+<noun-genitive-dative> ::= @CASE[genitive-dative] <noun-with-definite-suffix> <genitive-dative-marker>?
+
+<genitive-dative-marker> ::= "lui" | "ei" | "lor"
+
+<proper-noun> ::= /[A-ZĂÂÎȘȚ][a-zăâîșț]*/
+
+/* Adjectives with case/gender/number agreement */
+<adjective-phrase> ::= <adjective>
+
+<adjective> ::= <adjective-positive> | <adjective-comparative> | <adjective-superlative>
+
+<adjective-positive> ::= @DEGREE[positive] <adjective-with-agreement>
+
+<adjective-with-agreement> ::= @GENDER[masculine] @NUMBER[singular] <adjective-stem>
+                            | @GENDER[feminine] @NUMBER[singular] <adjective-stem> "ă"
+                            | @GENDER[masculine] @NUMBER[plural] <adjective-stem> "i"
+                            | @GENDER[feminine] @NUMBER[plural] <adjective-stem> "e"
+                            | @GENDER[neuter] @NUMBER[singular] <adjective-stem>
+                            | @GENDER[neuter] @NUMBER[plural] <adjective-stem> "e"
+
+<adjective-comparative> ::= @DEGREE[comparative] ( "mai" <opt-whitespace> <adjective-stem> )
+
+<adjective-superlative> ::= @DEGREE[superlative] ( "cel" <opt-whitespace> "mai" <opt-whitespace> <adjective-stem> )
+
+<adjective-stem> ::= /[a-zăâîșț]+/
+
+/* Verb phrases */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <modal-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb>
+
+<finite-verb> ::= <verb-present>
+               | <verb-perfect-compus>
+               | <verb-imperfect>
+               | <verb-simple-perfect>
+               | <verb-pluperfect>
+               | <verb-future>
+               | <verb-conditional>
+               | <verb-subjunctive>
+
+/* Present tense - 4 conjugation groups */
+<verb-present> ::= @TENSE[present] @MOOD[indicative] <present-conjugation>
+
+<present-conjugation> ::= <conj1-present> | <conj2-present> | <conj3-present> | <conj4-present> | <irregular-present>
+
+/* Conjugation I (-a verbs) */
+<conj1-present> ::= <verb-stem> ( "ez" | "ezi" | "ează" | "ăm" | "ați" | "ează" )
+
+/* Conjugation II (-ea verbs) */
+<conj2-present> ::= <verb-stem> ( "eau" | "ei" | "e" | "em" | "eți" | "eau" )
+
+/* Conjugation III (-e verbs) */
+<conj3-present> ::= <verb-stem> ( "" | "i" | "e" | "em" | "eți" | "" )
+
+/* Conjugation IV (-i/-î verbs) */
+<conj4-present> ::= <verb-stem> ( "esc" | "ești" | "ește" | "im" | "iți" | "esc" )
+
+/* Irregular verbs */
+<irregular-present> ::= "sunt" | "ești" | "este" | "suntem" | "sunteți" | "sunt" /* a fi */
+                     | "am" | "ai" | "are" | "avem" | "aveți" | "au" /* a avea */
+                     | "fac" | "faci" | "face" | "facem" | "faceți" | "fac" /* a face */
+                     | "vreau" | "vrei" | "vrea" | "vrem" | "vreți" | "vor" /* a vrea */
+                     | "pot" | "poți" | "poate" | "putem" | "puteți" | "pot" /* a putea */
+                     | "știu" | "știi" | "știe" | "știm" | "știți" | "știu" /* a ști */
+                     | "dau" | "dai" | "dă" | "dăm" | "dați" | "dau" /* a da */
+                     | "iau" | "iei" | "ia" | "luăm" | "luați" | "iau" /* a lua */
+                     | "văd" | "vezi" | "vede" | "vedem" | "vedeți" | "văd" /* a vedea */
+                     | "merg" | "mergi" | "merge" | "mergem" | "mergeți" | "merg" /* a merge */
+
+/* Perfect compus (compound past) - most common past tense */
+<verb-perfect-compus> ::= @TENSE[perfect-compus] <aux-avoir> <opt-whitespace> <past-participle>
+
+<aux-avoir> ::= "am" | "ai" | "a" | "am" | "ați" | "au"
+
+<past-participle> ::= <verb-stem> ( "at" | "ut" | "it" | "ât" | "ânt" )
+
+/* Imperfect */
+<verb-imperfect> ::= @TENSE[imperfect] <imperfect-conjugation>
+
+<imperfect-conjugation> ::= <verb-stem> ( "am" | "ai" | "a" | "am" | "ați" | "au" )
+                         | "eram" | "erai" | "era" | "eram" | "erați" | "erau" /* a fi */
+
+/* Simple perfect (literary) */
+<verb-simple-perfect> ::= @TENSE[simple-perfect] <simple-perfect-conjugation>
+
+<simple-perfect-conjugation> ::= <verb-stem> ( "ai" | "ași" | "ă" | "arăm" | "arăți" | "ară" )
+
+/* Pluperfect */
+<verb-pluperfect> ::= @TENSE[pluperfect] <aux-imperfect> <opt-whitespace> <past-participle>
+
+<aux-imperfect> ::= "am" | "ai" | "a" | "am" | "ați" | "au"
+
+/* Future */
+<verb-future> ::= @TENSE[future] <future-construction>
+
+<future-construction> ::= "voi" <opt-whitespace> <infinitive>
+                       | "vei" <opt-whitespace> <infinitive>
+                       | "va" <opt-whitespace> <infinitive>
+                       | "vom" <opt-whitespace> <infinitive>
+                       | "veți" <opt-whitespace> <infinitive>
+                       | "vor" <opt-whitespace> <infinitive>
+                       | "o" <opt-whitespace> "să" <opt-whitespace> <verb-subjunctive>
+
+<infinitive> ::= <verb-stem> ( "a" | "ea" | "e" | "i" | "î" )
+
+/* Conditional */
+<verb-conditional> ::= @MOOD[conditional] <conditional-conjugation>
+
+<conditional-conjugation> ::= "aș" <opt-whitespace> <infinitive>
+                           | "ai" <opt-whitespace> <infinitive>
+                           | "ar" <opt-whitespace> <infinitive>
+                           | "am" <opt-whitespace> <infinitive>
+                           | "ați" <opt-whitespace> <infinitive>
+                           | "ar" <opt-whitespace> <infinitive>
+
+/* Subjunctive mood */
+<verb-subjunctive> ::= @MOOD[subjunctive] "să" <opt-whitespace> <subjunctive-conjugation>
+
+<subjunctive-conjugation> ::= <verb-stem> ( "ez" | "ezi" | "eze" | "ăm" | "ați" | "eze" )
+                           | <irregular-subjunctive>
+
+<irregular-subjunctive> ::= "fiu" | "fii" | "fie" | "fim" | "fiți" | "fie" /* a fi */
+                         | "am" | "ai" | "aibă" | "avem" | "aveți" | "aibă" /* a avea */
+
+/* Compound verb phrases */
+<compound-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+                        | <modal-verb> <opt-whitespace> "să" <opt-whitespace> <subjunctive-conjugation>
+
+<modal-verb> ::= "pot" | "poți" | "poate" | "putem" | "puteți" | "pot"
+              | "vreau" | "vrei" | "vrea" | "vrem" | "vreți" | "vor"
+              | "trebuie" <opt-whitespace> "să"
+              | "pot" <opt-whitespace> "să"
+
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+
+<verb-stem> ::= /[a-zăâîșț]+/
+
+/* Object with clitic pronouns */
+<object> ::= <direct-object> | <indirect-object> | <clitic-doubled-object>
+
+<direct-object> ::= <noun-phrase-accusative>
+                 | <clitic-pronoun-accusative>
+
+<indirect-object> ::= <noun-phrase-dative>
+                   | <clitic-pronoun-dative>
+
+/* Clitic doubling - Romanian specific feature */
+<clitic-doubled-object> ::= <clitic-pronoun-dative> <opt-whitespace> <noun-phrase-dative>
+
+<noun-phrase-accusative> ::= @CASE[accusative] ( "pe" <opt-whitespace> )? <noun-phrase>
+
+<noun-phrase-dative> ::= @CASE[dative] <noun-phrase>
+
+<clitic-pronoun-accusative> ::= @CASE[accusative] ( "mă" | "te" | "îl" | "o" | "ne" | "vă" | "îi" | "le" )
+
+<clitic-pronoun-dative> ::= @CASE[dative] ( "îmi" | "îți" | "îi" | "ne" | "vă" | "le" )
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+<adverb> ::= <manner-adverb> | <time-adverb> | <place-adverb>
+
+<manner-adverb> ::= "bine" | "rău" | "repede" | "încet" | "ușor" | "greu" | /[a-zăâîșț]+ește/
+
+<time-adverb> ::= "acum" | "ieri" | "azi" | "mâine" | "întotdeauna" | "niciodată" | "deja" | "încă" | "devreme" | "târziu"
+
+<place-adverb> ::= "aici" | "acolo" | "unde" | "aproape" | "departe" | "sus" | "jos"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "în" | "la" | "pe" | "cu" | "din" | "pentru" | "fără" | "până" | "spre" | "prin" | "după" | "înaintea" | "între" | "sub" | "peste" | "lângă" | "despre"
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
+
+<subordinating-conjunction> ::= "că" | "să" | "dacă" | "când" | "unde" | "cum" | "deoarece" | "pentru că" | "deși"
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<relative-pronoun> ::= "care" | "ce" | "cine" | "căruia" | "cui"
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "și" | "sau" | "dar" | "însă" | "ci" | "ori"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+                    | <main-clause> <opt-whitespace> <subordinate-clause> <opt-whitespace> <subordinate-clause>
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <yes-no-question> | <wh-question>
+
+<yes-no-question> ::= <declarative-clause> "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+<question-word> ::= "cine" | "ce" | "când" | "unde" | "cum" | "de ce" | "care"
+
+/* Imperative clauses */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+<verb-imperative> ::= <verb-stem> ( "ă" | "ește" | "iți" | "ați" )
+                   | <irregular-imperative>
+
+<irregular-imperative> ::= "fii" | "fiți" /* a fi */
+                        | "ai" | "aveți" /* a avea */
+
+/* Negation */
+<negation> ::= "nu" | "nimic" | "nimeni" | "niciodată"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[noun-adjective-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.@GENDER == <noun>.@GENDER AND <adjective>.@NUMBER == <noun>.@NUMBER
+    ELSE ERROR "Adjective must agree with noun in gender and number"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@PERSON == <verb>.@PERSON AND <subject>.@NUMBER == <verb>.@NUMBER
+    THEN VALID
+    ELSE WARNING "Subject and verb should agree"
+
+@CONTEXT_RULE[definite-article-suffix]:
+    IF <noun> IS definite
+    THEN USE <noun-with-definite-suffix>
+    ELSE USE <noun-indefinite>
+
+@CONTEXT_RULE[genitive-dative-case-merger]:
+    IF <case> IS genitive OR <case> IS dative
+    THEN FORMS_ARE_IDENTICAL
+    ELSE VALID /* Unique Romanian feature: genitive and dative merged */
+
+@CONTEXT_RULE[clitic-doubling]:
+    IF <indirect-object> IS <full-noun-phrase>
+    THEN MAY_USE <clitic-pronoun-dative> BEFORE <verb>
+    ELSE VALID /* Clitic doubling is optional but common */
+
+@CONTEXT_RULE[subjunctive-after-modals]:
+    IF <modal-verb> IS "trebuie" OR <modal-verb> EXPRESSES obligation
+    THEN REQUIRES "să" + <subjunctive>
+    ELSE VALID
+
+@CONTEXT_RULE[pe-accusative-marking]:
+    IF <direct-object> IS animate OR <direct-object> IS definite-human
+    THEN USE "pe" BEFORE <noun-phrase>
+    ELSE OPTIONAL /* Differential object marking */
+
+@CONTEXT_RULE[neuter-gender-pattern]:
+    IF <noun>.@GENDER == neuter
+    THEN SINGULAR_LIKE masculine AND PLURAL_LIKE feminine
+    ELSE VALID /* Romanian neuter: masculine in singular, feminine in plural */
+
+@CONTEXT_RULE[future-subjunctive-alternation]:
+    IF <verb>.@TENSE == future
+    THEN MAY_USE "o să" + <subjunctive> OR "voi/vei/va/vom/veți/vor" + <infinitive>
+    ELSE VALID /* Two ways to express future */
+
+@CONTEXT_RULE[compound-past-preference]:
+    IF <verb>.@TENSE == past
+    THEN PREFER <perfect-compus> OVER <simple-perfect>
+    ELSE VALID /* Simple perfect is literary/archaic */
