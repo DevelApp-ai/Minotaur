@@ -25,6 +25,13 @@ SymbolTableSharing: hierarchical
 
 Keywords: en, of, maar, want, dus, omdat, dat, die, wat, wie, wanneer, waar, hoe, waarom, als, dan, voor, met, zonder, in, op, aan, van, de, het, een, deze, dit, die, dat, mijn, mij, jouw, jou, zijn, haar, ons, onze, jullie, hun, ik, jij, je, u, hij, zij, ze, wij, we, jullie, zij, ze, me, je, hem, haar, ons, jullie, hen, ze, niet, geen, nooit, niemand, niets
 
+/* Dialect markers for Dutch regional varieties */
+@DIALECT[netherlandic]      /* Standard Dutch (Netherlands) */
+@DIALECT[flemish]           /* Flemish (Belgium) */
+@DIALECT[brabants]          /* Brabants (North Brabant/Flemish Brabant) */
+@DIALECT[limburgs]          /* Limburgish */
+@DIALECT[frisian]           /* West Frisian influenced */
+
 /* Top-level sentence structure */
 <sentence> ::= <main-clause>
             | <subordinate-clause>
@@ -190,7 +197,7 @@ Keywords: en, of, maar, want, dus, omdat, dat, die, wat, wie, wanneer, waar, hoe
 
 <infinitive> ::= <verb-stem> "en" | "te" <opt-whitespace> <verb-stem> "en"
 
-/* Irregular verbs */
+/* Irregular verbs - expanded */
 <irregular-present> ::= @IRREGULAR ( "ben" | "bent" | "is" | "zijn" /* zijn */
                     | "heb" | "hebt" | "heeft" | "hebben" /* hebben */
                     | "kan" | "kunt" | "kan" | "kunnen" /* kunnen */
@@ -202,7 +209,46 @@ Keywords: en, of, maar, want, dus, omdat, dat, die, wat, wie, wanneer, waar, hoe
                     | "kom" | "komt" | "komen" /* komen */
                     | "doe" | "doet" | "doen" /* doen */
                     | "zie" | "ziet" | "zien" /* zien */
-                    | "geef" | "geeft" | "geven" ) /* geven */
+                    | "geef" | "geeft" | "geven" /* geven */
+                    | "sta" | "staat" | "staan" /* staan */
+                    | "lees" | "leest" | "lezen" /* lezen */
+                    | "eet" | "eet" | "eten" /* eten */
+                    | "drink" | "drinkt" | "drinken" /* drinken */
+                    | "loop" | "loopt" | "lopen" /* lopen */
+                    | "slaap" | "slaapt" | "slapen" /* slapen */
+                    | "vind" | "vindt" | "vinden" /* vinden */
+                    | "hou" | "houdt" | "houden" /* houden */
+                    | "word" | "wordt" | "worden" /* worden */
+                    | "blijf" | "blijft" | "blijven" /* blijven */
+                    | "zeg" | "zegt" | "zeggen" /* zeggen */
+                    | "denk" | "denkt" | "denken" /* denken */
+                    | "weet" | "weet" | "weten" ) /* weten */
+
+/* Irregular past participles - expanded */
+<irregular-past-participle> ::= @IRREGULAR ( "geweest" /* zijn */
+                             | "gehad" /* hebben */
+                             | "gekund" /* kunnen */
+                             | "gemogen" /* mogen */
+                             | "gemoeten" /* moeten */
+                             | "gewild" /* willen */
+                             | "gegaan" /* gaan */
+                             | "gekomen" /* komen */
+                             | "gedaan" /* doen */
+                             | "gezien" /* zien */
+                             | "gegeven" /* geven */
+                             | "gestaan" /* staan */
+                             | "gelezen" /* lezen */
+                             | "gegeten" /* eten */
+                             | "gedronken" /* drinken */
+                             | "gelopen" /* lopen */
+                             | "geslapen" /* slapen */
+                             | "gevonden" /* vinden */
+                             | "gehouden" /* houden */
+                             | "geworden" /* worden */
+                             | "gebleven" /* blijven */
+                             | "gezegd" /* zeggen */
+                             | "gedacht" /* denken */
+                             | "geweten" ) /* weten */
 
 <verb-stem> ::= /[a-zäëïöü]+/
 

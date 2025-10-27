@@ -1,6 +1,38 @@
 # Dutch Language Grammar
 
-Comprehensive Dutch grammar covering all major language features including unique Dutch characteristics.
+Comprehensive Dutch grammar covering all major language features including unique Dutch characteristics and regional variations.
+
+## Grammar Size & Scope
+
+- **394 lines** of comprehensive grammar rules
+- **5 regional dialects**: Netherlandic (Standard), Flemish (Belgium), Brabants, Limburgish, West Frisian-influenced
+- **25+ irregular verbs** with full conjugations
+- **Expanded verb coverage** including strong and weak patterns
+
+## Regional Dialectal Support
+
+### Netherlandic Dutch (Netherlands - Standard)
+- Standard pronunciation
+- Standard grammar conventions
+- Formal register distinctions
+
+### Flemish Dutch (Belgium)
+- Belgian vocabulary preferences
+- Softer pronunciation
+- French loanword influences
+
+### Brabants (North Brabant/Flemish Brabant)
+- Regional pronunciation features
+- Distinctive vocabulary
+
+### Limburgish (Limburg)
+- Tonal accent system
+- Distinct phonology
+- Germanic features
+
+### West Frisian-Influenced
+- Frisian substrate influences
+- Regional vocabulary
 
 ## Unique Dutch Features
 
@@ -38,8 +70,8 @@ Unique productive diminutive system (always neuter):
 - **Perfect**: heb gewerkt, ben gekomen
 - **Future**: zal werken
 
-### Major Irregular Verbs
-zijn, hebben, kunnen, mogen, moeten, willen, zullen, gaan, komen, doen, zien, geven
+### Major Irregular Verbs (25+)
+zijn, hebben, kunnen, mogen, moeten, willen, zullen, gaan, komen, doen, zien, geven, staan, lezen, eten, drinken, lopen, slapen, vinden, houden, worden, blijven, zeggen, denken, weten, and more
 
 ### Adjective Inflection
 - **Uninflected**: een groot huis (neuter, indefinite)

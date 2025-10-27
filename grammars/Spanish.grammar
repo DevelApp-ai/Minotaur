@@ -32,6 +32,18 @@ SymbolTableSharing: hierarchical
 
 Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, qué, si, pues, así, para, con, sin, en, de, del, a, al, el, la, los, las, un, una, unos, unas, este, esta, estos, estas, ese, esa, esos, esas, aquel, aquella, aquellos, aquellas, mi, mis, tu, tus, su, sus, nuestro, nuestra, nuestros, nuestras, vuestro, vuestra, vuestros, vuestras, no, ni, nunca, nada, nadie, tampoco, yo, tú, él, ella, usted, nosotros, nosotras, vosotros, vosotras, ellos, ellas, ustedes, me, te, se, le, la, lo, les, las, los, nos, os
 
+/* Dialect markers for Spanish regional varieties */
+@DIALECT[castilian]        /* Castilian Spanish (Spain - standard) */
+@DIALECT[andalusian]       /* Andalusian Spanish (Southern Spain) */
+@DIALECT[canarian]         /* Canarian Spanish (Canary Islands) */
+@DIALECT[mexican]          /* Mexican Spanish */
+@DIALECT[caribbean]        /* Caribbean Spanish (Cuba, Puerto Rico, Dominican Republic) */
+@DIALECT[andean]           /* Andean Spanish (Peru, Bolivia, Ecuador) */
+@DIALECT[rioplatense]      /* Rioplatense Spanish (Argentina, Uruguay) */
+@DIALECT[chilean]          /* Chilean Spanish */
+@DIALECT[colombian]        /* Colombian Spanish */
+@DIALECT[central_american] /* Central American Spanish */
+
 /* Top-level sentence structure */
 <sentence> ::= <main-clause>
             | <subordinate-clause>
@@ -67,10 +79,27 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
                    | <indefinite-pronoun>
                    | <interrogative-pronoun>
 
-<personal-pronoun-nominative> ::= @CASE[nominative] ( "yo" | "tú" | "él" | "ella" | "usted" | "nosotros" | "nosotras" | "vosotros" | "vosotras" | "ellos" | "ellas" | "ustedes" )
+<personal-pronoun-nominative> ::= @CASE[nominative] ( <standard-nominative> | <dialect-nominative> )
 
-/* Object pronouns (direct and indirect) */
-<object-pronoun> ::= @CASE[accusative] ( "me" | "te" | "lo" | "la" | "le" | "nos" | "os" | "los" | "las" | "les" | "se" )
+<standard-nominative> ::= "yo" | "tú" | "él" | "ella" | "usted" | "nosotros" | "nosotras" | "vosotros" | "vosotras" | "ellos" | "ellas" | "ustedes"
+
+/* Dialectal pronoun variations */
+<dialect-nominative> ::= @DIALECT[rioplatense] ( "vos" | "ustedes" ) /* voseo */
+                      | @DIALECT[mexican] "ustedes" /* no vosotros usage */
+                      | @DIALECT[caribbean] "ustedes" /* no vosotros usage */
+                      | @DIALECT[andean] "ustedes"
+                      | @DIALECT[central_american] ( "vos" | "ustedes" ) /* voseo in some regions */
+                      | @DIALECT[chilean] "ustedes"
+                      | @DIALECT[colombian] "ustedes"
+
+/* Object pronouns (direct and indirect) with dialectal variations */
+<object-pronoun> ::= @CASE[accusative] ( <standard-object-pronoun> | <dialect-object-pronoun> )
+
+<standard-object-pronoun> ::= "me" | "te" | "lo" | "la" | "le" | "nos" | "os" | "los" | "las" | "les" | "se"
+
+<dialect-object-pronoun> ::= @DIALECT[castilian] ( "le" | "les" ) /* leísmo */
+                          | @DIALECT[andalusian] ( "ustedes" ) /* ustedes instead of os */
+                          | @DIALECT[caribbean] "los" /* loísmo tendency */
 
 /* Reflexive pronouns */
 <reflexive-pronoun> ::= @REFLEXIVE ( "me" | "te" | "se" | "nos" | "os" | "se" )
@@ -166,11 +195,11 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
 
 <numeral> ::= <cardinal-number> | <ordinal-number>
 
-<cardinal-number> ::= "uno" | "dos" | "tres" | "cuatro" | "cinco" | "seis" | "siete" | "ocho" | "nueve" | "diez" | "once" | "doce" | "trece" | "catorce" | "quince" | "dieciséis" | "diecisiete" | "dieciocho" | "diecinueve" | "veinte" | "treinta" | "cuarenta" | "cincuenta" | "sesenta" | "setenta" | "ochenta" | "noventa" | "cien" | "ciento" | "mil" | "millón" | /[0-9]+/
+<cardinal-number> ::= "cero" | "uno" | "una" | "dos" | "tres" | "cuatro" | "cinco" | "seis" | "siete" | "ocho" | "nueve" | "diez" | "once" | "doce" | "trece" | "catorce" | "quince" | "dieciséis" | "diecisiete" | "dieciocho" | "diecinueve" | "veinte" | "veintiuno" | "veintidós" | "veintitrés" | "veinticuatro" | "veinticinco" | "veintiséis" | "veintisiete" | "veintiocho" | "veintinueve" | "treinta" | "cuarenta" | "cincuenta" | "sesenta" | "setenta" | "ochenta" | "noventa" | "cien" | "ciento" | "doscientos" | "trescientos" | "cuatrocientos" | "quinientos" | "seiscientos" | "setecientos" | "ochocientos" | "novecientos" | "mil" | "millón" | "millones" | "billón" | "billones" | /[0-9]+/
 
-<ordinal-number> ::= "primero" | "segundo" | "tercero" | "cuarto" | "quinto" | "sexto" | "séptimo" | "octavo" | "noveno" | "décimo"
+<ordinal-number> ::= "primero" | "primera" | "segundo" | "segunda" | "tercero" | "tercera" | "cuarto" | "cuarta" | "quinto" | "quinta" | "sexto" | "sexta" | "séptimo" | "séptima" | "octavo" | "octava" | "noveno" | "novena" | "décimo" | "décima" | "undécimo" | "duodécimo" | "vigésimo" | "trigésimo" | "cuadragésimo" | "quincuagésimo" | "sexagésimo" | "septuagésimo" | "octogésimo" | "nonagésimo" | "centésimo" | "milésimo"
 
-<indefinite-quantifier> ::= "muchos" | "muchas" | "pocos" | "pocas" | "varios" | "varias" | "algunos" | "algunas" | "bastante" | "bastantes" | "demasiados" | "demasiadas" | "todos" | "todas" | "ambos" | "ambas"
+<indefinite-quantifier> ::= "muchos" | "muchas" | "pocos" | "pocas" | "varios" | "varias" | "algunos" | "algunas" | "bastante" | "bastantes" | "demasiados" | "demasiadas" | "todos" | "todas" | "ambos" | "ambas" | "sendos" | "sendas" | "ciertos" | "ciertas" | "tales" | "diversos" | "diversas" | "numerosos" | "numerosas" | "infinitos" | "infinitas" | "escasos" | "escasas" | "suficientes"
 
 /* Nouns with gender and number */
 <noun> ::= <simple-noun>
@@ -280,13 +309,35 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
 <reflexive-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <finite-verb>
 
 /* Regular verb conjugations - AR verbs */
-<verb-present> ::= @TENSE[present] ( <regular-ar-present> | <regular-er-present> | <regular-ir-present> | <irregular-present> )
+<verb-present> ::= @TENSE[present] ( <regular-ar-present> | <regular-er-present> | <regular-ir-present> | <irregular-present> | <dialect-present> )
 
 <regular-ar-present> ::= <verb-stem-ar> ( "o" | "as" | "a" | "amos" | "áis" | "an" )
 
 <regular-er-present> ::= <verb-stem-er> ( "o" | "es" | "e" | "emos" | "éis" | "en" )
 
 <regular-ir-present> ::= <verb-stem-ir> ( "o" | "es" | "e" | "imos" | "ís" | "en" )
+
+/* Dialectal present tense variations */
+<dialect-present> ::= @DIALECT[rioplatense] <voseo-present> /* vos conjugation */
+                   | @DIALECT[andalusian] <andalusian-present> /* aspirated endings */
+                   | @DIALECT[caribbean] <caribbean-present> /* -s deletion */
+                   | @DIALECT[chilean] <chilean-present> /* voseo with -ái endings */
+
+<voseo-present> ::= <verb-stem-ar> ( "ás" | "á" ) /* vos hablás */
+                 | <verb-stem-er> "és" /* vos comés */
+                 | <verb-stem-ir> "ís" /* vos vivís */
+
+<andalusian-present> ::= <verb-stem-ar> ( "o" | "a" | "a" | "amo" | "áih" | "an" ) /* final -s aspiration */
+                      | <verb-stem-er> ( "o" | "e" | "e" | "emo" | "éih" | "en" )
+                      | <verb-stem-ir> ( "o" | "e" | "e" | "imo" | "íh" | "en" )
+
+<caribbean-present> ::= <verb-stem-ar> ( "o" | "a" | "a" | "amo" | "an" | "an" ) /* -s deletion */
+                     | <verb-stem-er> ( "o" | "e" | "e" | "emo" | "en" | "en" )
+                     | <verb-stem-ir> ( "o" | "e" | "e" | "imo" | "en" | "en" )
+
+<chilean-present> ::= <verb-stem-ar> "ái" /* vos hablái */
+                   | <verb-stem-er> "ís" /* vos comís */
+                   | <verb-stem-ir> "ís" /* vos vivís */
 
 /* Preterite tense */
 <verb-preterite> ::= @TENSE[preterite] ( <regular-ar-preterite> | <regular-er-preterite> | <regular-ir-preterite> | <irregular-preterite> )
@@ -349,7 +400,21 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
                     | "quiero" | "quieres" | "quiere" | "queremos" | "queréis" | "quieren" /* querer */
                     | "puedo" | "puedes" | "puede" | "podemos" | "podéis" | "pueden" /* poder */
                     | "veo" | "ves" | "ve" | "vemos" | "veis" | "ven" /* ver */
-                    | "doy" | "das" | "da" | "damos" | "dais" | "dan" ) /* dar */
+                    | "doy" | "das" | "da" | "damos" | "dais" | "dan" /* dar */
+                    | "salgo" | "sales" | "sale" | "salimos" | "salís" | "salen" /* salir */
+                    | "valgo" | "vales" | "vale" | "valemos" | "valéis" | "valen" /* valer */
+                    | "caigo" | "caes" | "cae" | "caemos" | "caéis" | "caen" /* caer */
+                    | "traigo" | "traes" | "trae" | "traemos" | "traéis" | "traen" /* traer */
+                    | "oigo" | "oyes" | "oye" | "oímos" | "oís" | "oyen" /* oír */
+                    | "conozco" | "conoces" | "conoce" | "conocemos" | "conocéis" | "conocen" /* conocer */
+                    | "conduzco" | "conduces" | "conduce" | "conducimos" | "conducís" | "conducen" /* conducir */
+                    | "traduzco" | "traduces" | "traduce" | "traducimos" | "traducís" | "traducen" /* traducir */
+                    | "cierro" | "cierras" | "cierra" | "cerramos" | "cerráis" | "cierran" /* cerrar (e>ie) */
+                    | "pienso" | "piensas" | "piensa" | "pensamos" | "pensáis" | "piensan" /* pensar (e>ie) */
+                    | "cuento" | "cuentas" | "cuenta" | "contamos" | "contáis" | "cuentan" /* contar (o>ue) */
+                    | "duermo" | "duermes" | "duerme" | "dormimos" | "dormís" | "duermen" /* dormir (o>ue) */
+                    | "pido" | "pides" | "pide" | "pedimos" | "pedís" | "piden" /* pedir (e>i) */
+                    | "sigo" | "sigues" | "sigue" | "seguimos" | "seguís" | "siguen" ) /* seguir (e>i) */
 
 <irregular-preterite> ::= @IRREGULAR ( "fui" | "fuiste" | "fue" | "fuimos" | "fuisteis" | "fueron" /* ser/ir */
                       | "estuve" | "estuviste" | "estuvo" | "estuvimos" | "estuvisteis" | "estuvieron" /* estar */
@@ -417,13 +482,13 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
 
 <regular-past-participle> ::= <verb-stem-ar> "ado" | <verb-stem-er> "ido" | <verb-stem-ir> "ido"
 
-<irregular-past-participle> ::= @IRREGULAR ( "sido" | "estado" | "habido" | "ido" | "tenido" | "hecho" | "dicho" | "venido" | "puesto" | "sabido" | "querido" | "podido" | "visto" | "dado" | "abierto" | "cubierto" | "escrito" | "muerto" | "vuelto" | "roto" )
+<irregular-past-participle> ::= @IRREGULAR ( "sido" | "estado" | "habido" | "ido" | "tenido" | "hecho" | "dicho" | "venido" | "puesto" | "sabido" | "querido" | "podido" | "visto" | "dado" | "abierto" | "cubierto" | "escrito" | "muerto" | "vuelto" | "roto" | "resuelto" | "disuelto" | "devuelto" | "envuelto" | "descubierto" | "descrito" | "inscrito" | "prescrito" | "suscrito" | "frito" | "impreso" | "opuesto" | "compuesto" | "supuesto" | "impuesto" | "expuesto" | "propuesto" | "satisfecho" | "deshecho" | "provisto" )
 
 <gerund> ::= <verb-stem-ar> "ando" | <verb-stem-er> "iendo" | <verb-stem-ir> "iendo"
 
 <verb-imperative> ::= <verb-stem> | <irregular-imperative>
 
-<irregular-imperative> ::= "sé" | "ten" | "ven" | "pon" | "sal" | "haz" | "di" | "ve"
+<irregular-imperative> ::= "sé" | "ten" | "ven" | "pon" | "sal" | "haz" | "di" | "ve" | "oye" | "trae" | "conoce" | "conduce" | "traduce"
 
 <verb-stem> ::= /[a-záéíóúñü]+/
 
@@ -473,18 +538,28 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
           | <degree-adverb>
           | <frequency-adverb>
           | <modal-adverb>
+          | <dialect-adverb>
 
-<time-adverb> ::= "ahora" | "hoy" | "ayer" | "mañana" | "anteayer" | "pasado" <opt-whitespace> "mañana" | "antes" | "después" | "luego" | "siempre" | "nunca" | "ya" | "todavía" | "aún" | "pronto" | "tarde" | "temprano"
+<time-adverb> ::= "ahora" | "hoy" | "ayer" | "mañana" | "anteayer" | "pasado" <opt-whitespace> "mañana" | "antes" | "después" | "luego" | "siempre" | "nunca" | "ya" | "todavía" | "aún" | "pronto" | "tarde" | "temprano" | "antaño" | "hogaño" | "enseguida" | "inmediatamente" | "recientemente"
 
-<place-adverb> ::= "aquí" | "ahí" | "allí" | "acá" | "allá" | "donde" | "cerca" | "lejos" | "arriba" | "abajo" | "delante" | "detrás" | "dentro" | "fuera" | "encima" | "debajo"
+<place-adverb> ::= "aquí" | "ahí" | "allí" | "acá" | "allá" | "donde" | "cerca" | "lejos" | "arriba" | "abajo" | "delante" | "detrás" | "dentro" | "fuera" | "encima" | "debajo" | "enfrente" | "detrás" | "alrededor"
 
-<manner-adverb> ::= "bien" | "mal" | "así" | "despacio" | "rápido" | "fácilmente" | "difícilmente" | /[a-záéíóúñü]+mente/
+<manner-adverb> ::= "bien" | "mal" | "así" | "despacio" | "rápido" | "fácilmente" | "difícilmente" | "apenas" | "adrede" | "aposta" | "gratis" | /[a-záéíóúñü]+mente/
 
-<degree-adverb> ::= "muy" | "más" | "menos" | "tan" | "tanto" | "poco" | "mucho" | "bastante" | "demasiado" | "casi" | "apenas"
+<degree-adverb> ::= "muy" | "más" | "menos" | "tan" | "tanto" | "poco" | "mucho" | "bastante" | "demasiado" | "casi" | "apenas" | "harto" | "sumamente" | "extremadamente"
 
-<frequency-adverb> ::= "siempre" | "nunca" | "jamás" | "a" <opt-whitespace> "veces" | "frecuentemente" | "raramente" | "a" <opt-whitespace> "menudo"
+<frequency-adverb> ::= "siempre" | "nunca" | "jamás" | "a" <opt-whitespace> "veces" | "frecuentemente" | "raramente" | "a" <opt-whitespace> "menudo" | "constantemente" | "continuamente" | "ocasionalmente"
 
-<modal-adverb> ::= "quizá" | "quizás" | "tal" <opt-whitespace> "vez" | "posiblemente" | "probablemente" | "seguramente" | "ciertamente" | "efectivamente"
+<modal-adverb> ::= "quizá" | "quizás" | "tal" <opt-whitespace> "vez" | "posiblemente" | "probablemente" | "seguramente" | "ciertamente" | "efectivamente" | "acaso" | "ojalá" | "obviamente" | "evidentemente"
+
+/* Dialectal adverbs from different Spanish varieties */
+<dialect-adverb> ::= @DIALECT[mexican] ( "ahorita" | "luego" <opt-whitespace> "luego" | "al" <opt-whitespace> "rato" | "órale" )
+                  | @DIALECT[caribbean] ( "ahorita" | "ahoritita" | "pa'" <opt-whitespace> "allá" )
+                  | @DIALECT[rioplatense] ( "recién" | "nomás" )
+                  | @DIALECT[chilean] ( "altiro" | "al" <opt-whitespace> "tiro" | "al" <opt-whitespace> "toque" )
+                  | @DIALECT[andean] ( "ahorita" | "nomás" | "pues" )
+                  | @DIALECT[canarian] ( "argo" | "agora" )
+                  | @DIALECT[andalusian] ( "tó" | "ná" )
 
 /* Prepositional phrases */
 <prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
@@ -642,22 +717,35 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
 <exclamative-clause> ::= <exclamative-word> <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
                       | "¡" <exclamative-word> <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
 
-/* Negation */
-<negation> ::= "no" | "nunca" | "jamás" | "tampoco" | "ni" | "nada" | "nadie"
+/* Negation with dialectal variations */
+<negation> ::= <standard-negation> | <dialect-negation>
 
-/* Discourse markers */
+<standard-negation> ::= "no" | "nunca" | "jamás" | "tampoco" | "ni" | "nada" | "nadie"
+
+<dialect-negation> ::= @DIALECT[andalusian] ( "na" | "ná" | "naide" ) /* reduced forms */
+                    | @DIALECT[caribbean] ( "na'" | "pa'" <opt-whitespace> "ná" ) /* syllable deletion */
+                    | @DIALECT[canarian] ( "nun" | "ná" )
+                    | @DIALECT[rioplatense] "ni" <opt-whitespace> "ahí" /* ni ahí = de ninguna manera */
+
+/* Discourse markers - Extended */
 <discourse-marker> ::= <temporal-discourse>
                     | <causal-discourse>
                     | <contrastive-discourse>
                     | <additive-discourse>
+                    | <reformulation-discourse>
+                    | <exemplification-discourse>
 
-<temporal-discourse> ::= "primero" | "luego" | "después" | "entonces" | "finalmente" | "al" <opt-whitespace> "final"
+<temporal-discourse> ::= "primero" | "luego" | "después" | "entonces" | "finalmente" | "al" <opt-whitespace> "final" | "en" <opt-whitespace> "primer" <opt-whitespace> "lugar" | "a" <opt-whitespace> "continuación" | "seguidamente" | "posteriormente" | "anteriormente" | "simultáneamente" | "mientras" <opt-whitespace> "tanto"
 
-<causal-discourse> ::= "por" <opt-whitespace> "lo" <opt-whitespace> "tanto" | "por" <opt-whitespace> "eso" | "por" <opt-whitespace> "consiguiente"
+<causal-discourse> ::= "por" <opt-whitespace> "lo" <opt-whitespace> "tanto" | "por" <opt-whitespace> "eso" | "por" <opt-whitespace> "consiguiente" | "en" <opt-whitespace> "consecuencia" | "de" <opt-whitespace> "ahí" <opt-whitespace> "que" | "por" <opt-whitespace> "ende" | "pues" | "entonces" | "así" <opt-whitespace> "pues"
 
-<contrastive-discourse> ::= "sin" <opt-whitespace> "embargo" | "no" <opt-whitespace> "obstante" | "en" <opt-whitespace> "cambio" | "por" <opt-whitespace> "el" <opt-whitespace> "contrario"
+<contrastive-discourse> ::= "sin" <opt-whitespace> "embargo" | "no" <opt-whitespace> "obstante" | "en" <opt-whitespace> "cambio" | "por" <opt-whitespace> "el" <opt-whitespace> "contrario" | "ahora" <opt-whitespace> "bien" | "con" <opt-whitespace> "todo" | "aun" <opt-whitespace> "así" | "de" <opt-whitespace> "todas" <opt-whitespace> "formas" | "de" <opt-whitespace> "todos" <opt-whitespace> "modos"
 
-<additive-discourse> ::= "además" | "también" | "asimismo" | "igualmente"
+<additive-discourse> ::= "además" | "también" | "asimismo" | "igualmente" | "encima" | "incluso" | "es" <opt-whitespace> "más" | "más" <opt-whitespace> "aún" | "todavía" <opt-whitespace> "más" | "por" <opt-whitespace> "añadidura"
+
+<reformulation-discourse> ::= "es" <opt-whitespace> "decir" | "o" <opt-whitespace> "sea" | "esto" <opt-whitespace> "es" | "en" <opt-whitespace> "otras" <opt-whitespace> "palabras" | "dicho" <opt-whitespace> "de" <opt-whitespace> "otro" <opt-whitespace> "modo" | "mejor" <opt-whitespace> "dicho"
+
+<exemplification-discourse> ::= "por" <opt-whitespace> "ejemplo" | "así" | "en" <opt-whitespace> "particular" | "en" <opt-whitespace> "concreto" | "pongamos" <opt-whitespace> "por" <opt-whitespace> "caso" | "verbigracia"
 
 /* Cleft sentences */
 <cleft-sentence> ::= <it-cleft>
@@ -734,3 +822,34 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
     IF <main-clause>.@TENSE == <subordinate-clause>.@TENSE
     THEN VALID
     ELSE WARNING "Consider tense concordance in complex sentences"
+
+@CONTEXT_RULE[voseo-conjugation]:
+    IF <pronoun> == "vos" AND @DIALECT IN [rioplatense, central_american, chilean]
+    THEN <verb> MUST USE <voseo-present>
+    ELSE WARNING "Vos requires specific conjugation"
+
+@CONTEXT_RULE[ustedes-usage]:
+    IF @DIALECT IN [mexican, caribbean, andean, chilean, colombian, central_american]
+    THEN USE "ustedes" INSTEAD OF "vosotros"
+    ELSE VALID
+
+@CONTEXT_RULE[leismo-laismo]:
+    IF @DIALECT[castilian] AND <object> IS <indirect-masculine-person>
+    THEN MAY_USE "le" FOR <direct-object>
+    ELSE WARNING "Leísmo usage"
+
+@CONTEXT_RULE[s-aspiration]:
+    IF @DIALECT IN [andalusian, caribbean, canarian]
+    THEN FINAL_S MAY_BE <aspirated-or-deleted>
+    ELSE VALID
+
+@CONTEXT_RULE[yeismo-distinction]:
+    IF @DIALECT IN [castilian, andean]
+    THEN DISTINGUISH "ll" VS "y"
+    ELSE MERGE_AS "y" /* yeísmo */
+
+@CONTEXT_RULE[seseo-ceceo]:
+    IF @DIALECT IN [andalusian, canarian] OR @DIALECT IS_LATIN_AMERICAN
+    THEN USE <seseo> /* s sound for c/z */
+    ELSE IF @DIALECT[andalusian] MAY_USE <ceceo> /* th sound for s */
+    ELSE USE <distinción> /* Castilian distinction */

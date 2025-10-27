@@ -1,13 +1,39 @@
 # Comprehensive Portuguese Language Grammar
 
-This grammar provides extensive coverage of the Portuguese language, including unique features not found in other Romance languages.
+This grammar provides extensive coverage of the Portuguese language, including unique features not found in other Romance languages and regional variations.
 
 ## Grammar Size & Scope
 
-- **619 lines** of comprehensive grammar rules
+- **649 lines** of comprehensive grammar rules
 - **Production-ready** for European and Brazilian Portuguese
 - **Unique Portuguese features**: Personal infinitive, future subjunctive
 - **Full coverage of Portuguese verb system** including all tenses and moods
+- **5 regional dialects**: European, Brazilian, African, Azorean, Madeiran
+
+## Regional Dialectal Support
+
+### European Portuguese (Portugal)
+- Tu/vós pronoun usage maintained
+- Standard clitic pronoun usage
+- Closed vowel pronunciation
+- Progressive with "estar a + infinitive"
+
+### Brazilian Portuguese
+- Você/vocês predominant (tu in some regions)
+- Subject pronouns as objects (ele/ela instead of o/a)
+- Open vowel pronunciation
+- Progressive with "estar + gerund"
+- Reduced consonant clusters
+
+### African Portuguese (Angola, Mozambique, etc.)
+- Você/vocês usage
+- Simplified pronoun system
+- Retention of archaic forms
+
+### Azorean & Madeiran Portuguese
+- Conservative features
+- Distinct phonology
+- Regional vocabulary
 
 ## Unique Portuguese Features
 

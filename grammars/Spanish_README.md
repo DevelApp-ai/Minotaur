@@ -1,17 +1,64 @@
 # Comprehensive Spanish Language Grammar
 
-This grammar provides extensive coverage of the Spanish language, from basic sentence structures to complex multi-level nested sentences and all major grammatical features.
+This grammar provides extensive coverage of the Spanish language, from basic sentence structures to complex multi-level nested sentences and dialectal variations.
 
 ## Grammar Size & Scope
 
-- **950+ lines** of comprehensive grammar rules
+- **855+ lines** of comprehensive grammar rules
 - **Production-ready** for advanced natural language processing applications
 - **Supports nested sub-sentences** up to 3+ levels of embedding
 - **Full coverage of Spanish verb system** including all tenses and moods
+- **10 regional dialects**: Castilian, Andalusian, Canarian, Mexican, Caribbean, Andean, Rioplatense, Chilean, Colombian, Central American
 
 ## Core Features
 
-### 1. Complete Verb System
+### 1. Regional Dialectal Variations (10 Dialects)
+
+The grammar includes comprehensive support for major Spanish regional dialects with distinctive features:
+
+#### Castilian Spanish (Spain - Standard)
+- Distinction between c/z and s sounds (distinción)
+- Use of vosotros/vosotras for plural "you"
+- Leísmo (use of "le" for direct objects)
+
+#### Andalusian Spanish (Southern Spain)
+- Seseo or ceceo (merging of s/c/z sounds)
+- Final -s aspiration or deletion
+- Reduced forms: na' (nada), ná (nada)
+
+#### Caribbean Spanish (Cuba, Puerto Rico, Dominican Republic)
+- Final -s deletion
+- Syllable deletion: pa' ná (para nada)
+- No distinction between ll and y (yeísmo)
+
+#### Mexican Spanish
+- Ustedes usage instead of vosotros
+- Diminutive -ito/-ita very common
+- Indigenous loanwords
+- Dialectal adverbs: ahorita, luego luego, órale
+
+#### Rioplatense Spanish (Argentina, Uruguay)
+- Voseo: vos instead of tú
+- Special vos conjugation: vos hablás, vos comés
+- Distinctive pronunciation (yeísmo rehilado)
+- Dialectal adverbs: recién, nomás
+
+#### Andean Spanish (Peru, Bolivia, Ecuador)
+- Quechua/Aymara influences
+- Ustedes usage
+- Dialectal adverbs: nomás, pues
+
+#### Chilean Spanish
+- Voseo with unique conjugations: hablái, comís
+- Rapid speech patterns
+- Dialectal adverbs: altiro, al toque
+
+#### Other Regions
+- Canarian (Canary Islands): Similar to Caribbean
+- Colombian: Clear pronunciation, ustedes usage
+- Central American: Mixed voseo usage
+
+### 2. Complete Verb System
 
 #### Three Verb Conjugation Groups
 - **-ar verbs**: hablar, cantar, trabajar (most common)
@@ -28,8 +75,8 @@ This grammar provides extensive coverage of the Spanish language, from basic sen
 - **Imperfect Subjunctive**: hablara/hablase, comieras/comieses, viviera/viviese
 - **Compound tenses** with haber: he hablado, había comido, habrá vivido
 
-#### Major Irregular Verbs (20+)
-Including: ser, estar, haber, ir, tener, hacer, decir, venir, poner, saber, querer, poder, ver, dar
+#### Major Irregular Verbs (30+)
+Including: ser, estar, haber, ir, tener, hacer, decir, venir, poner, saber, querer, poder, ver, dar, salir, valer, caer, traer, oír, conocer, conducir, traducir, cerrar, pensar, contar, dormir, pedir, seguir, and stem-changing verbs
 
 ### 2. Gender and Number Agreement
 
