@@ -437,3 +437,256 @@ Keywords: i, a, ale, lub, czy, że, który, która, które, kto, co, kiedy, gdzi
     IF <modal-verb-phrase> CONTAINS <modal-verb>
     THEN <infinitive> CAN_BE perfective OR imperfective
     ELSE VALID
+
+@CONTEXT_RULE[pronoun-case-agreement]:
+    IF <pronoun> IN <prepositional-phrase>
+    THEN <pronoun>.@CASE == <preposition>.REQUIRED_CASE
+    ELSE VALID
+
+@CONTEXT_RULE[genitive-of-quantity]:
+    IF <noun-phrase> CONTAINS <quantity-numeral> AND <quantity-numeral> > 4
+    THEN <noun>.@CASE == genitive
+    ELSE VALID
+
+@CONTEXT_RULE[temporal-case-requirement]:
+    IF <temporal-expression> USES <preposition>
+    THEN <noun>.@CASE == <preposition>.REQUIRED_CASE
+    ELSE VALID
+
+@CONTEXT_RULE[comparative-case-government]:
+    IF <comparative-clause> USES "niż"
+    THEN <noun-phrase> USES nominative
+    ELSE IF <comparative-clause> USES "od"
+    THEN <noun-phrase>.@CASE == genitive
+    ELSE VALID
+
+@CONTEXT_RULE[quantifier-agreement]:
+    IF <noun-phrase> CONTAINS <indefinite-quantifier>
+    THEN <noun>.@NUMBER == <indefinite-quantifier>.REQUIRED_NUMBER
+    ELSE VALID
+
+/* Extended sentence structures */
+<parenthetical-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <punctuation>?
+
+<parenthetical-insertion> ::= <subordinate-clause>
+                           | <relative-clause>
+                           | <adverbial-phrase>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+
+<extraposed-clause> ::= <correlate-pronoun> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+<correlate-pronoun> ::= "to" | "tego"
+
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> ){2,}
+
+<infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<clause-as-subject> ::= "że" <opt-whitespace> <subordinate-content>
+
+/* Comprehensive pronoun systems */
+<demonstrative-pronoun> ::= <demonstrative-proximal> | <demonstrative-distal>
+
+<demonstrative-proximal> ::= @CASE[nominative] @GENDER[masculine-personal] @NUMBER[singular] "ten"
+                          | @CASE[nominative] @GENDER[feminine] @NUMBER[singular] "ta"
+                          | @CASE[nominative] @GENDER[neuter] @NUMBER[singular] "to"
+                          | @CASE[nominative] @GENDER[masculine-personal] @NUMBER[plural] "ci"
+                          | @CASE[nominative] @GENDER[non-masculine-personal] @NUMBER[plural] "te"
+                          | @CASE[genitive] @GENDER[masculine] @NUMBER[singular] "tego"
+                          | @CASE[genitive] @GENDER[feminine] @NUMBER[singular] "tej"
+                          | @CASE[genitive] @NUMBER[plural] "tych"
+                          | @CASE[dative] @GENDER[masculine] @NUMBER[singular] "temu"
+                          | @CASE[dative] @GENDER[feminine] @NUMBER[singular] "tej"
+                          | @CASE[dative] @NUMBER[plural] "tym"
+                          | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[singular] "tego"
+                          | @CASE[accusative] @GENDER[masculine-inanimate] @NUMBER[singular] "ten"
+                          | @CASE[accusative] @GENDER[feminine] @NUMBER[singular] "tę"
+                          | @CASE[accusative] @GENDER[neuter] @NUMBER[singular] "to"
+                          | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[plural] "tych"
+                          | @CASE[accusative] @GENDER[non-masculine-personal] @NUMBER[plural] "te"
+                          | @CASE[instrumental] @GENDER[masculine] @NUMBER[singular] "tym"
+                          | @CASE[instrumental] @GENDER[feminine] @NUMBER[singular] "tą"
+                          | @CASE[instrumental] @NUMBER[plural] "tymi"
+                          | @CASE[locative] @GENDER[masculine] @NUMBER[singular] "tym"
+                          | @CASE[locative] @GENDER[feminine] @NUMBER[singular] "tej"
+                          | @CASE[locative] @NUMBER[plural] "tych"
+
+<demonstrative-distal> ::= @CASE[nominative] @GENDER[masculine-personal] @NUMBER[singular] "tamten"
+                        | @CASE[nominative] @GENDER[feminine] @NUMBER[singular] "tamta"
+                        | @CASE[nominative] @GENDER[neuter] @NUMBER[singular] "tamto"
+                        | @CASE[nominative] @GENDER[masculine-personal] @NUMBER[plural] "tamci"
+                        | @CASE[nominative] @GENDER[non-masculine-personal] @NUMBER[plural] "tamte"
+                        | @CASE[genitive] @GENDER[masculine] @NUMBER[singular] "tamtego"
+                        | @CASE[genitive] @GENDER[feminine] @NUMBER[singular] "tamtej"
+                        | @CASE[genitive] @NUMBER[plural] "tamtych"
+                        | @CASE[dative] @GENDER[masculine] @NUMBER[singular] "tamtemu"
+                        | @CASE[dative] @GENDER[feminine] @NUMBER[singular] "tamtej"
+                        | @CASE[dative] @NUMBER[plural] "tamtym"
+                        | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[singular] "tamtego"
+                        | @CASE[accusative] @GENDER[masculine-inanimate] @NUMBER[singular] "tamten"
+                        | @CASE[accusative] @GENDER[feminine] @NUMBER[singular] "tamtę"
+                        | @CASE[accusative] @GENDER[neuter] @NUMBER[singular] "tamto"
+                        | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[plural] "tamtych"
+                        | @CASE[accusative] @GENDER[non-masculine-personal] @NUMBER[plural] "tamte"
+                        | @CASE[instrumental] @GENDER[masculine] @NUMBER[singular] "tamtym"
+                        | @CASE[instrumental] @GENDER[feminine] @NUMBER[singular] "tamtą"
+                        | @CASE[instrumental] @NUMBER[plural] "tamtymi"
+                        | @CASE[locative] @GENDER[masculine] @NUMBER[singular] "tamtym"
+                        | @CASE[locative] @GENDER[feminine] @NUMBER[singular] "tamtej"
+                        | @CASE[locative] @NUMBER[plural] "tamtych"
+
+<interrogative-pronoun-extended> ::= @CASE[nominative] "kto" | "co" | "który" | "jaki" | "czyj"
+                                  | @CASE[genitive] "kogo" | "czego" | "którego" | "jakiego" | "czyje go"
+                                  | @CASE[dative] "komu" | "czemu" | "któremu" | "jakiemu" | "czyjem u"
+                                  | @CASE[accusative] "kogo" | "co" | "którego" | "jakiego" | "czyje go"
+                                  | @CASE[instrumental] "kim" | "czym" | "którym" | "jakim" | "czyi m"
+                                  | @CASE[locative] "kim" | "czym" | "którym" | "jakim" | "czyim"
+
+<indefinite-pronoun> ::= "ktoś" | "coś" | "jakiś" | "któryś" | "pewien" | "pewna" | "pewne"
+                      | "niektóry" | "każdy" | "wszystko" | "wszyscy" | "wszelki" | "oba" | "obaj"
+                      | "żaden" | "nikt" | "nic" | "żadna" | "żadne"
+
+<reciprocal-pronoun> ::= "siebie" <opt-whitespace> "nawzajem"
+                      | "wzajemnie"
+                      | "jeden" <opt-whitespace> "drugiego"
+
+/* Full numeral system */
+<numeral-system> ::= <cardinal-numeral> | <ordinal-numeral> | <fractional-numeral> | <distributive-numeral>
+
+<cardinal-numeral> ::= "zero" | "jeden" | "dwa" | "trzy" | "cztery" | "pięć" | "sześć" | "siedem" | "osiem" | "dziewięć" | "dziesięć"
+                    | "jedenaście" | "dwanaście" | "trzynaście" | "czternaście" | "piętnaście" | "szesnaście" | "siedemnaście" | "osiemnaście" | "dziewiętnaście"
+                    | "dwadzieścia" | "trzydzieści" | "czterdzieści" | "pięćdziesiąt" | "sześćdziesiąt" | "siedemdziesiąt" | "osiemdziesiąt" | "dziewięćdziesiąt"
+                    | "sto" | "dwieście" | "trzysta" | "czterysta" | "pięćset" | "sześćset" | "siedemset" | "osiemset" | "dziewięćset"
+                    | "tysiąc" | "milion" | "miliard" | /[0-9]+/
+
+<ordinal-numeral> ::= "pierwszy" | "drugi" | "trzeci" | "czwarty" | "piąty" | "szósty" | "siódmy" | "ósmy" | "dziewiąty" | "dziesiąty"
+                   | "jedenasty" | "dwunasty" | "trzynasty" | "czternasty" | "piętnasty" | "szesnasty" | "siedemnasty" | "osiemnasty" | "dziewiętnasty"
+                   | "dwudziesty" | "trzydziesty" | "czterdziesty" | "pięćdziesiąty" | "sześćdziesiąty" | "siedemdziesiąty" | "osiemdziesiąty" | "dziewięćdziesiąty"
+                   | "setny" | "tysięczny" | "milionowy"
+
+<fractional-numeral> ::= "pół" | "jedna" <opt-whitespace> "druga" | "jedna" <opt-whitespace> "trzecia" | "jedna" <opt-whitespace> "czwarta"
+                      | "dwie" <opt-whitespace> "trzecie" | "trzy" <opt-whitespace> "czwarte"
+
+<distributive-numeral> ::= "po" <opt-whitespace> <cardinal-numeral>
+
+/* Indefinite and universal quantifiers */
+<indefinite-quantifier> ::= "parę" | "kilka" | "kilkanaście" | "kilkadziesiąt" | "kilkaset"
+                         | "wiele" | "dużo" | "mało" | "trochę" | "niewiele" | "sporo"
+                         | "więcej" | "mniej" | "więcej" <opt-whitespace> "niż" | "mniej" <opt-whitespace> "niż"
+
+<universal-quantifier> ::= "każdy" | "wszystko" | "wszyscy" | "cały" | "wszystek" | "wszelki"
+
+<negative-quantifier> ::= "żaden" | "nic" | "nikt" | "ani" <opt-whitespace> "jeden"
+
+/* Temporal and spatial expressions */
+<temporal-adverbial> ::= <time-point> | <time-duration> | <frequency> | <time-of-day>
+
+<time-point> ::= "wczoraj" | "dzisiaj" | "dziś" | "jutro" | "przedwczoraj" | "pojutrze"
+              | "teraz" | "obecnie" | "wtedy" | "wówczas" | "kiedyś" | "już" | "jeszcze" | "zaraz" | "niedawno"
+              | "dawno" <opt-whitespace> "temu" | "za" <opt-whitespace> <cardinal-numeral> <opt-whitespace> <time-unit>
+              | <cardinal-numeral> <opt-whitespace> <time-unit> <opt-whitespace> "temu"
+
+<time-duration> ::= "przez" <opt-whitespace> <cardinal-numeral> <opt-whitespace> <time-unit>
+                 | "od" <opt-whitespace> <time-point> <opt-whitespace> "do" <opt-whitespace> <time-point>
+
+<time-unit> ::= "sekunda" | "sekund" | "sekund" | "minuta" | "minut" | "minuty"
+             | "godzina" | "godzin" | "godziny" | "dzień" | "dni" | "dzień"
+             | "tydzień" | "tygodni" | "tygodnie" | "miesiąc" | "miesięcy" | "miesiące"
+             | "rok" | "lat" | "lata"
+
+<frequency> ::= "zawsze" | "często" | "rzadko" | "czasami" | "czasem" | "nigdy" | "nieraz" | "wielokrotnie"
+             | "codziennie" | "co" <opt-whitespace> "dzień" | "co" <opt-whitespace> "tydzień" | "co" <opt-whitespace> "miesiąc" | "co" <opt-whitespace> "rok"
+             | "raz" | "dwa" <opt-whitespace> "razy" | "trzy" <opt-whitespace> "razy" | <cardinal-numeral> <opt-whitespace> "razy"
+
+<time-of-day> ::= "rano" | "w" <opt-whitespace> "południe" | "po" <opt-whitespace> "południu"
+               | "wieczorem" | "w" <opt-whitespace> "nocy" | "o" <opt-whitespace> "północy"
+               | "o" <opt-whitespace> <cardinal-numeral> ( ":" <cardinal-numeral> )?
+
+<spatial-adverbial> ::= <location> | <direction> | <distance>
+
+<location> ::= "tu" | "tutaj" | "tam" | "wszędzie" | "nigdzie" | "gdzieś" | "blisko" | "daleko"
+            | "w" <opt-whitespace> "środku" | "na" <opt-whitespace> "zewnątrz" | "wewnątrz"
+            | "powyżej" | "poniżej" | "obok" | "naprzeciwko"
+
+<direction> ::= "stąd" | "stamtąd" | "dokąd" | "skąd" | "w" <opt-whitespace> "górę" | "w" <opt-whitespace> "dół"
+             | "na" <opt-whitespace> "prawo" | "na" <opt-whitespace> "lewo" | "do" <opt-whitespace> "przodu"
+             | "do" <opt-whitespace> "tyłu" | "na" <opt-whitespace> "wprost"
+
+<distance> ::= "blisko" | "daleko" | "niedaleko" | <cardinal-numeral> <opt-whitespace> <distance-unit> <opt-whitespace> "stąd"
+
+<distance-unit> ::= "metr" | "metrów" | "metry" | "kilometr" | "kilometrów" | "kilometry" | "krok" | "kroków" | "kroki"
+
+/* Comparative constructions */
+<comparative-clause> ::= <comparative-with-niż> | <comparative-with-od> | <equality-comparison> | <proportional-comparison>
+
+<comparative-with-niż> ::= <adjective-comparative> <opt-whitespace> "niż" <opt-whitespace> <noun-phrase>
+
+<comparative-with-od> ::= <adjective-comparative> <opt-whitespace> "od" <opt-whitespace> @CASE[genitive] <noun-phrase>
+
+<equality-comparison> ::= "tak" <opt-whitespace> <adjective> <opt-whitespace> "jak" <opt-whitespace> <noun-phrase>
+                       | "taki" <opt-whitespace> "sam" <opt-whitespace> "jak" <opt-whitespace> <noun-phrase>
+
+<proportional-comparison> ::= "im" <opt-whitespace> <adjective-comparative> <opt-whitespace> "," <opt-whitespace> "tym" <opt-whitespace> <adjective-comparative>
+
+/* Genitive and compound patterns */
+<genitive-modifier> ::= @CASE[genitive] <noun-phrase>
+                     | <possessive-genitive>
+                     | <partitive-genitive>
+                     | <quantified-genitive>
+
+<possessive-genitive> ::= @CASE[genitive] <proper-noun> | <personal-pronoun-genitive>
+
+<partitive-genitive> ::= @CASE[genitive] <noun> /* część czegoś */
+
+<quantified-genitive> ::= <indefinite-quantifier> <opt-whitespace> @CASE[genitive] <noun>
+
+<compound-noun> ::= <noun> "-" <noun>
+                 | <noun> <opt-whitespace> <noun> /* closely bound compound */
+
+<double-genitive> ::= @CASE[genitive] <noun-phrase> <opt-whitespace> @CASE[genitive] <noun-phrase>
+
+/* Extended question words */
+<question-word-extended> ::= "kto" | "co" | "kiedy" | "gdzie" | "jak" | "dlaczego" | "po" <opt-whitespace> "co"
+                          | "czemu" | "skąd" | "dokąd" | "ile" | "czyj" | "jaki" | "który"
+                          | "jak" <opt-whitespace> "długo" | "jak" <opt-whitespace> "często" | "jak" <opt-whitespace> "daleko"
+
+/* Expanded subordinating conjunctions */
+<subordinating-conjunction-extended> ::= "że" | "czy" | "jeśli" | "gdyby" | "gdy" | "kiedy" | "zanim" | "po" <opt-whitespace> "tym" <opt-whitespace> "jak"
+                                      | "żeby" | "aby" | "chociaż" | "choć" | "mimo" <opt-whitespace> "że"
+                                      | "ponieważ" | "dlatego" <opt-whitespace> "że" | "gdyż" | "bo"
+                                      | "podczas" <opt-whitespace> "gdy" | "dopóki" | "aż" | "odkąd"
+
+/* Expanded coordinating conjunctions */
+<coordinating-conjunction-extended> ::= "i" | "a" | "ale" | "lecz" | "lub" | "albo" | "czy" | "ani" | "tudzież" | "bądź" | "oraz"
+
+/* Sentence adverbs and modal particles */
+<sentence-adverb-extended> ::= "przecież" | "właśnie" | "właściwie" | "zresztą" | "oczywiście" | "naprawdę"
+                            | "prawdopodobnie" | "możliwe" | "chyba" | "może" | "widocznie" | "najwyraźniej"
+                            | "zapewne" | "niewątpliwie" | "rzeczywiście" | "faktycznie"
+
+/* Prepositional phrases with all case governments */
+<prepositional-phrase-comprehensive> ::= <preposition-with-genitive> <opt-whitespace> @CASE[genitive] <noun-phrase>
+                                      | <preposition-with-dative> <opt-whitespace> @CASE[dative] <noun-phrase>
+                                      | <preposition-with-accusative> <opt-whitespace> @CASE[accusative] <noun-phrase>
+                                      | <preposition-with-instrumental> <opt-whitespace> @CASE[instrumental] <noun-phrase>
+                                      | <preposition-with-locative> <opt-whitespace> @CASE[locative] <noun-phrase>
+
+<preposition-with-genitive> ::= "od" | "do" | "z" | "ze" | "bez" | "dla" | "koło" | "obok" | "wokół" | "u" | "spod" | "znad" | "spoza"
+
+<preposition-with-dative> ::= "ku" | "wbrew" | "dzięki" | "przeciw"
+
+<preposition-with-accusative> ::= "na" | "w" | "przez" | "o" | "za" | "po" | "pod" | "nad" | "między" | "mimo"
+
+<preposition-with-instrumental> ::= "z" | "ze" | "nad" | "pod" | "przed" | "za" | "między"
+
+<preposition-with-locative> ::= "w" | "na" | "o" | "po" | "przy"
+
+/* Adjectival phrases with agreement */
+<adjective-phrase-extended> ::= <adverb>? <opt-whitespace> <adjective> <opt-whitespace> <prepositional-phrase>?
+
+/* Additional whitespace and punctuation handling */
+<opt-whitespace> ::= /\s*/
+
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":" | "..." | "–" | "—"
