@@ -1,0 +1,529 @@
+# Portuguese Language Example Sentences
+
+## Regular Verbs - AR verbs - Present Tense
+
+Eu falo português.
+Tu falas inglês.
+Você fala francês.
+Ele trabalha em Lisboa.
+Ela canta bem.
+Nós estudamos muito.
+Vós cantais.
+Vocês compram livros.
+Eles dançam.
+Elas trabalham.
+
+## Regular Verbs - ER verbs - Present Tense
+
+Eu como pão.
+Tu bebes água.
+Você lê o jornal.
+Ele corre rápido.
+Ela aprende português.
+Nós comemos juntos.
+Vós bebeis.
+Vocês compreendem a lição.
+Eles aprendem depressa.
+Elas correm.
+
+## Regular Verbs - IR verbs - Present Tense
+
+Eu parto amanhã.
+Tu vives no Porto.
+Você escreve cartas.
+Ele abre a porta.
+Ela sobe as escadas.
+Nós vivemos aqui.
+Vós partis cedo.
+Vocês recebem presentes.
+Eles decidem rápido.
+Elas sobem.
+
+## Preterite Tense (Pretérito Perfeito)
+
+Eu falei com a Maria.
+Tu comeste pizza.
+Você viveu em Paris.
+Ele trabalhou ontem.
+Ela estudou à noite.
+Nós cantámos bem.
+Vós dançastes.
+Vocês compraram flores.
+Eles partiram cedo.
+Elas vieram.
+
+## Imperfect Tense (Pretérito Imperfeito)
+
+Eu falava português.
+Tu comias muito.
+Você vivia no México.
+Ele trabalhava às segundas.
+Ela estudava todos os dias.
+Nós cantávamos no coro.
+Vós dançáveis.
+Vocês compravam legumes.
+Eles partiam cedo.
+Elas vinham sempre.
+
+## Future Tense
+
+Eu falarei amanhã.
+Tu comerás às três.
+Você viverá em Espanha.
+Ele trabalhará aqui.
+Ela estudará mais.
+Nós cantaremos na festa.
+Vós dançareis.
+Vocês comprarão um carro.
+Eles partirão.
+Elas virão.
+
+## Conditional
+
+Eu falaria contigo.
+Tu comerias mais.
+Você viveria em Itália.
+Ele trabalharia melhor.
+Ela estudaria connosco.
+Nós cantaríamos bem.
+Vós dançaríeis.
+Vocês comprariam a casa.
+Eles partiriam.
+Elas viriam.
+
+## Perfect Tense (with ter)
+
+Eu tenho falado com ele.
+Tu tens comido já.
+Você tem vivido aqui.
+Ele tem trabalhado muito.
+Ela tem estudado.
+Nós temos cantado.
+Vós tendes dançado.
+Vocês têm comprado flores.
+Eles têm partido cedo.
+Elas têm vindo.
+
+## Irregular Verb: ser (to be - permanent)
+
+# Present
+Eu sou estudante.
+Tu és português.
+Você é espanhol.
+Él é médico.
+Ela é inteligente.
+Nós somos amigos.
+Vós sois de Lisboa.
+Vocês são professores.
+Eles são irmãos.
+Elas são irmãs.
+
+# Preterite
+Eu fui ao parque.
+Tu foste ontem.
+Você foi à loja.
+Ele foi muito amável.
+Ela foi simpática.
+Nós fomos juntos.
+Vós fostes primeiro.
+Vocês foram cedo.
+Eles foram felizes.
+Elas foram amigas.
+
+# Imperfect
+Eu era jovem.
+Tu eras muito alto.
+Você era professor.
+Ele era bonito.
+Ela era bonita.
+Nós éramos estudantes.
+Vós éreis bons.
+Vocês eram vizinhos.
+Eles eram amigos.
+Elas eram amigas.
+
+# Future
+Eu serei médico.
+Tu serás famoso.
+Você será o chefe.
+Ele será doutor.
+Ela será doutora.
+Nós seremos ricos.
+Vós sereis felizes.
+Vocês serão campeões.
+Eles serão bem-vindos.
+Elas serão bem-vindas.
+
+## Irregular Verb: estar (to be - temporary/location)
+
+# Present
+Eu estou aqui.
+Tu estás cansado.
+Você está em casa.
+Ele está contente.
+Ela está bem.
+Nós estamos bem.
+Vós estais ocupados.
+Vocês estão em Lisboa.
+Eles estão prontos.
+Elas estão prontas.
+
+# Preterite
+Eu estive em Paris.
+Tu estiveste doente.
+Você esteve aqui ontem.
+Ele esteve contente.
+Ela esteve feliz.
+Nós estivemos juntos.
+Vós estivestes lá.
+Vocês estiveram presentes.
+Eles estiveram bem.
+Elas estiveram bem.
+
+# Imperfect
+Eu estava em casa.
+Tu estavas triste.
+Você estava ocupado.
+Ele estava feliz.
+Ela estava contente.
+Nós estávamos juntos.
+Vós estáveis cansados.
+Vocês estavam prontos.
+Eles estavam contentes.
+Elas estavam felizes.
+
+## Irregular Verb: ter (to have)
+
+# Present
+Eu tenho um livro.
+Tu tens razão.
+Você tem fome.
+Ele tem sede.
+Ela tem tempo.
+Nós temos sorte.
+Vós tendes.
+Vocês têm dinheiro.
+Eles têm frio.
+Elas têm medo.
+
+# Preterite
+Eu tive uma ideia.
+Tu tiveste sorte.
+Você teve êxito.
+Ele teve medo.
+Ela teve paciência.
+Nós tivemos tempo.
+Vós tivestes razão.
+Vocês tiveram que sair.
+Eles tiveram sorte.
+Elas tiveram tempo.
+
+## Irregular Verb: fazer (to do/make)
+
+# Present
+Eu faço o trabalho.
+Tu fazes exercício.
+Você faz frio.
+Ele faz a comida.
+Ela faz planos.
+Nós fazemos barulho.
+Vós fazeis desporto.
+Vocês fazem perguntas.
+Eles fazem tudo.
+Elas fazem bem.
+
+# Preterite
+Eu fiz o meu trabalho.
+Tu fizeste bem.
+Você fez um bolo.
+Ele fez exercício.
+Ela fez o trabalho.
+Nós fizemos o trabalho.
+Vós fizestes tudo.
+Vocês fizeram um bom trabalho.
+Eles fizeram bem.
+Elas fizeram tudo.
+
+## Irregular Verb: ir (to go)
+
+# Present
+Eu vou ao cinema.
+Tu vais para casa.
+Você vai à escola.
+Ele vai ao trabalho.
+Ela vai de autocarro.
+Nós vamos juntos.
+Vós ides ao parque.
+Vocês vão a Lisboa.
+Eles vão às compras.
+Elas vão de comboio.
+
+# Preterite (same as ser)
+Eu fui ao mercado.
+Tu foste ontem.
+Você foi a Barcelona.
+Ele foi sozinho.
+Ela foi contigo.
+Nós fomos juntos.
+Vós fostes de comboio.
+Vocês foram cedo.
+Eles foram de carro.
+Elas foram a pé.
+
+## Irregular Verb: poder (can)
+
+# Present
+Eu posso nadar.
+Tu podes correr.
+Você pode vir.
+Ele pode ajudar.
+Ela pode ir.
+Nós podemos sair.
+Vós podeis entrar.
+Vocês podem estudar.
+Eles podem participar.
+Elas podem vir.
+
+# Preterite
+Eu pude fazê-lo.
+Tu pudeste vir.
+Você pôde terminar.
+Ele pôde ajudar.
+Ela pôde ir.
+Nós pudemos ganhar.
+Vós pudestes sair.
+Vocês puderam ir.
+Eles puderam entrar.
+Elas puderam estudar.
+
+## Gender Agreement - Masculine
+
+um livro grande
+o gato preto
+um homem alto
+o rapaz feliz
+um carro vermelho
+o cão pequeno
+
+## Gender Agreement - Feminine
+
+uma casa grande
+a gata preta
+uma mulher alta
+a rapariga feliz
+uma mesa vermelha
+a cadela pequena
+
+## Demonstratives
+
+Este livro é interessante.
+Esta casa é bonita.
+Estes livros são novos.
+Estas casas são grandes.
+Esse homem é alto.
+Essa mulher é inteligente.
+Esses rapazes são felizes.
+Essas raparigas são estudiosas.
+Aquele edifício é antigo.
+Aquela montanha é alta.
+Aqueles árvores são velhas.
+Aquelas flores são lindas.
+
+## Possessives
+
+O meu livro está aqui.
+A tua casa é grande.
+O seu carro é vermelho.
+O nosso cão é pequeno.
+O vosso gato é preto.
+Os seus livros são interessantes.
+
+## Clitic Pronoun Placement
+
+# Proclisis
+Não o vejo.
+Já te disse.
+Nunca me telefonas.
+Sempre lhe dou razão.
+
+# Enclisis
+Vejo-o todos os dias.
+Disse-me que sim.
+Dá-lhe o livro.
+Comprei-o ontem.
+
+# Mesoclisis (future/conditional)
+Vê-lo-ei amanhã.
+Dar-lhe-ia se pudesse.
+Fá-lo-emos juntos.
+Dir-te-ia a verdade.
+
+## Reflexive Verbs
+
+Eu lavo-me as mãos.
+Tu levantas-te cedo.
+Você barbeia-se.
+Ele penteia-se.
+Ela veste-se.
+Nós banhamo-nos.
+Vós vestis-vos.
+Vocês sentam-se.
+Eles deitam-se tarde.
+Elas levantam-se cedo.
+
+## Personal Infinitive (unique to Portuguese)
+
+É importante estudar.
+É importante estudares.
+É importante estudarmos.
+É bom ir.
+É bom ires.
+É bom irmos.
+Para ler melhor.
+Para leres melhor.
+Para lermos melhor.
+
+## Future Subjunctive (unique to Portuguese)
+
+Quando for ao Brasil visitarei o Rio.
+Se tiveres tempo vem visitar-me.
+Quando fores a Lisboa telefona-me.
+Se puder ajudarei.
+Quando vier o Verão iremos à praia.
+Se quiseres podes vir.
+
+## Present Subjunctive
+
+Espero que venhas.
+Duvido que seja verdade.
+É importante que estudeis.
+Quero que me ajudes.
+Alegro-me de que estejas bem.
+Não creio que tenha razão.
+
+## Imperfect Subjunctive
+
+Se tivesse dinheiro viajaria.
+Se fosse rico compraria uma casa.
+Se pudesse ajudaria-te.
+Se soubesse a resposta dir-te-ia.
+Queria que viesses.
+Duvidava que fosse certo.
+
+## Progressive Tenses
+
+# European Portuguese
+Estou a comer.
+Estás a estudar.
+Está a trabalhar.
+Estamos a falar.
+Estais a correr.
+Estão a dançar.
+
+# Brazilian Portuguese
+Estou comendo.
+Estás estudando.
+Está trabalhando.
+Estamos falando.
+Estais correndo.
+Estão dançando.
+
+## Periphrastic Future (ir + infinitive)
+
+Vou estudar.
+Vais comer.
+Vai trabalhar.
+Vamos sair.
+Ides dançar.
+Vão viajar.
+
+## Negation
+
+Não falo inglês.
+Não comes carne.
+Não vive aqui.
+Não trabalha hoje.
+Não estudamos.
+Não cantais.
+Não dançam.
+Não compram nada.
+
+## Questions
+
+Falas português?
+Comes carne?
+Vives aqui?
+Trabalhas hoje?
+Estudas muito?
+Cantas bem?
+Dançam salsa?
+Compram livros?
+
+## Wh-Questions
+
+O que fazes?
+Quem és?
+Onde vives?
+Quando chegas?
+Como estás?
+Porquê estudas português?
+Qual preferes?
+Quantos anos tens?
+
+## Subordinate Clauses
+
+Creio que é verdade.
+Penso que tens razão.
+Sei que ele vem.
+Digo que ela trabalha.
+Espero que estejas bem.
+Duvido que seja certo.
+
+## Relative Clauses
+
+O livro que li é interessante.
+A mulher que conheci é amável.
+O homem que trabalha aqui é o meu pai.
+A casa que comprámos é grande.
+Os rapazes que jogam são felizes.
+As flores que plantámos são bonitas.
+
+## Conditional Sentences
+
+Se tiver tempo irei.
+Se estudares aprovarás.
+Se chover ficaremos em casa.
+Se vieres ver-te-ei.
+Se puder ajudarei.
+Se quiseres podemos ir.
+
+## Absolute Superlatives
+
+Este livro é interessantíssimo.
+Ela é belíssima.
+O filme foi óptimo.
+A casa é grandíssima.
+Estou cansadíssimo.
+É facílimo.
+
+## Comparatives
+
+O João é mais alto que o Pedro.
+A Maria é menos inteligente que a Ana.
+Este livro é tão interessante como esse.
+Sou melhor que tu em futebol.
+Ela é pior que ele em matemática.
+O meu irmão é maior que eu.
+A tua irmã é menor que tu.
+
+## Compound Tenses
+
+Tenho falado com ele.
+Tens comido bem.
+Tem vivido aqui.
+Temos estudado.
+Tendes trabalhado.
+Têm viajado muito.
+Tinha falado antes.
+Tinha comido já.
+Tinha vivido lá.

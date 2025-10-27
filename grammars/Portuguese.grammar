@@ -1,0 +1,619 @@
+Grammar: Portuguese
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Portuguese Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Portuguese language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Three verb groups (-ar, -er, -ir verbs)
+ * - Reflexive (pronominal) verbs
+ * - Context-sensitive agreement rules (gender, number, person)
+ * - Masculine and feminine gender agreement
+ * - Definite, indefinite, and partitive articles
+ * - Multiple tenses (presente, pretérito perfeito, imperfeito, futuro, etc.)
+ * - Conditional and subjunctive moods
+ * - SVO word order with variations
+ * - Relative clauses and subordinate structures
+ * - Comparative and superlative adjectives
+ * - Negation patterns
+ * - Object pronouns and their placement (mesoclisis, enclisis)
+ * - Compound tenses with ter
+ * - Ser vs estar vs ficar distinction
+ * - Multi-embedded sentence structures
+ * - Personal infinitive (unique to Portuguese)
+ * - Future subjunctive (unique to Portuguese)
+ */
+
+Keywords: e, ou, mas, porém, contudo, porque, que, quem, quando, onde, como, por, se, então, assim, para, com, sem, em, de, do, da, dos, das, a, ao, aos, à, às, o, os, a, as, um, uma, uns, umas, este, esta, estes, estas, esse, essa, esses, essas, aquele, aquela, aqueles, aquelas, meu, minha, meus, minhas, teu, tua, teus, tuas, seu, sua, seus, suas, nosso, nossa, nossos, nossas, vosso, vossa, vossos, vossas, não, nem, nunca, nada, ninguém, tampouco, eu, tu, você, ele, ela, nós, vós, vocês, eles, elas, me, te, se, lhe, o, a, nos, vos, lhes, os, as
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+            | <multi-embedded-sentence>
+
+/* Main clause with SVO word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+
+<declarative-clause> ::= <subject>? <opt-whitespace> <negation>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+/* Subject (can be omitted - pro-drop language) */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+           | <infinitive-as-subject>
+
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+                   | <indefinite-pronoun>
+                   | <interrogative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( "eu" | "tu" | "você" | "ele" | "ela" | "nós" | "vós" | "vocês" | "eles" | "elas" | "a" <opt-whitespace> "gente" )
+
+/* Object pronouns with clitic placement */
+<object-pronoun> ::= @CASE[accusative] ( "me" | "te" | "o" | "a" | "se" | "nos" | "vos" | "os" | "as" )
+                  | @CASE[dative] ( "me" | "te" | "lhe" | "se" | "nos" | "vos" | "lhes" )
+
+/* Reflexive pronouns */
+<reflexive-pronoun> ::= @REFLEXIVE ( "me" | "te" | "se" | "nos" | "vos" | "se" )
+
+/* Possessive pronouns with gender/number agreement */
+<possessive-pronoun> ::= @GENDER[masculine] @NUMBER[singular] ( "meu" | "teu" | "seu" | "nosso" | "vosso" )
+                      | @GENDER[feminine] @NUMBER[singular] ( "minha" | "tua" | "sua" | "nossa" | "vossa" )
+                      | @GENDER[masculine] @NUMBER[plural] ( "meus" | "teus" | "seus" | "nossos" | "vossos" )
+                      | @GENDER[feminine] @NUMBER[plural] ( "minhas" | "tuas" | "suas" | "nossas" | "vossas" )
+
+<demonstrative-pronoun> ::= @GENDER[masculine] @NUMBER[singular] ( "este" | "esse" | "aquele" )
+                         | @GENDER[feminine] @NUMBER[singular] ( "esta" | "essa" | "aquela" )
+                         | @GENDER[masculine] @NUMBER[plural] ( "estes" | "esses" | "aqueles" )
+                         | @GENDER[feminine] @NUMBER[plural] ( "estas" | "essas" | "aquelas" )
+                         | @GENDER[neuter] ( "isto" | "isso" | "aquilo" )
+
+<relative-pronoun> ::= "que" | "quem" | "o" <opt-whitespace> "qual" | "a" <opt-whitespace> "qual" | "os" <opt-whitespace> "quais" | "as" <opt-whitespace> "quais" | "cujo" | "cuja" | "cujos" | "cujas" | "onde" | "quando" | "como"
+
+<indefinite-pronoun> ::= "alguém" | "ninguém" | "algo" | "nada" | "algum" | "alguma" | "alguns" | "algumas" | "nenhum" | "nenhuma" | "um" | "uma" | "uns" | "umas" | "todo" | "toda" | "todos" | "todas" | "outro" | "outra" | "outros" | "outras" | "muito" | "muita" | "muitos" | "muitas" | "pouco" | "pouca" | "poucos" | "poucas"
+
+<interrogative-pronoun> ::= "quem" | "que" | "qual" | "quais" | "quanto" | "quanta" | "quantos" | "quantas"
+
+/* Noun phrase with gender agreement */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <adjective-phrase>* <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <article> | <demonstrative-determiner> | <possessive-determiner>
+
+<article> ::= <definite-article> | <indefinite-article>
+
+/* Definite articles with gender/number and contractions */
+<definite-article> ::= @GENDER[masculine] @NUMBER[singular] ( "o" | "do" | "ao" | "no" | "pelo" )
+                    | @GENDER[feminine] @NUMBER[singular] ( "a" | "da" | "à" | "na" | "pela" )
+                    | @GENDER[masculine] @NUMBER[plural] ( "os" | "dos" | "aos" | "nos" | "pelos" )
+                    | @GENDER[feminine] @NUMBER[plural] ( "as" | "das" | "às" | "nas" | "pelas" )
+
+/* Indefinite articles */
+<indefinite-article> ::= @GENDER[masculine] @NUMBER[singular] "um"
+                      | @GENDER[feminine] @NUMBER[singular] "uma"
+                      | @GENDER[masculine] @NUMBER[plural] "uns"
+                      | @GENDER[feminine] @NUMBER[plural] "umas"
+
+<demonstrative-determiner> ::= <demonstrative-pronoun>
+
+<possessive-determiner> ::= <possessive-pronoun>
+
+/* Quantifiers */
+<quantifier> ::= <numeral> | <indefinite-quantifier>
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "um" | "uma" | "dois" | "duas" | "três" | "quatro" | "cinco" | "seis" | "sete" | "oito" | "nove" | "dez" | "onze" | "doze" | "treze" | "catorze" | "quinze" | "dezasseis" | "dezassete" | "dezoito" | "dezanove" | "vinte" | "trinta" | "quarenta" | "cinquenta" | "sessenta" | "setenta" | "oitenta" | "noventa" | "cem" | "cento" | "mil" | "milhão" | /[0-9]+/
+
+<ordinal-number> ::= "primeiro" | "segunda" | "terceiro" | "quarto" | "quinto" | "sexto" | "sétimo" | "oitavo" | "nono" | "décimo"
+
+<indefinite-quantifier> ::= "muitos" | "muitas" | "poucos" | "poucas" | "vários" | "várias" | "alguns" | "algumas" | "bastante" | "bastantes" | "todos" | "todas" | "ambos" | "ambas"
+
+/* Nouns with gender and number */
+<noun> ::= <simple-noun> | <compound-noun>
+
+<simple-noun> ::= <noun-masculine-singular>
+               | <noun-feminine-singular>
+               | <noun-masculine-plural>
+               | <noun-feminine-plural>
+
+<noun-masculine-singular> ::= @GENDER[masculine] @NUMBER[singular] <noun-stem>
+
+<noun-feminine-singular> ::= @GENDER[feminine] @NUMBER[singular] <noun-stem>
+
+<noun-masculine-plural> ::= @GENDER[masculine] @NUMBER[plural] <noun-stem> "s"
+                          | @GENDER[masculine] @NUMBER[plural] <noun-stem> "es"
+
+<noun-feminine-plural> ::= @GENDER[feminine] @NUMBER[plural] <noun-stem> "s"
+                         | @GENDER[feminine] @NUMBER[plural] <noun-stem> "es"
+
+<compound-noun> ::= <noun> <opt-whitespace> <preposition> <opt-whitespace> <noun>
+
+<noun-stem> ::= /[a-záàâãéêíóôõúüç]+/
+
+<proper-noun> ::= /[A-ZÁÀÂÃÉÊÍÓÔÕÚÜÇ][a-záàâãéêíóôõúüç]*/
+
+/* Adjectives with gender/number agreement and comparison */
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "muito" | "mais" | "menos" | "tão" | "bastante" | "demasiado" | "pouco"
+
+<adjective> ::= <adjective-positive> | <adjective-comparative> | <adjective-superlative>
+
+<adjective-positive> ::= <adjective-masculine-singular>
+                      | <adjective-feminine-singular>
+                      | <adjective-masculine-plural>
+                      | <adjective-feminine-plural>
+
+<adjective-masculine-singular> ::= @GENDER[masculine] @NUMBER[singular] @DEGREE[positive] <adjective-stem>
+
+<adjective-feminine-singular> ::= @GENDER[feminine] @NUMBER[singular] @DEGREE[positive] <adjective-stem> "a"?
+
+<adjective-masculine-plural> ::= @GENDER[masculine] @NUMBER[plural] @DEGREE[positive] <adjective-stem> "os"?
+
+<adjective-feminine-plural> ::= @GENDER[feminine] @NUMBER[plural] @DEGREE[positive] <adjective-stem> "as"?
+
+<adjective-comparative> ::= @DEGREE[comparative] ( "mais" <opt-whitespace> <adjective-stem> | "menos" <opt-whitespace> <adjective-stem> | <irregular-comparative> )
+
+<irregular-comparative> ::= "melhor" | "pior" | "maior" | "menor"
+
+<adjective-superlative> ::= @DEGREE[superlative] ( "o" <opt-whitespace> "mais" <opt-whitespace> <adjective-stem> | "a" <opt-whitespace> "mais" <opt-whitespace> <adjective-stem> | <irregular-superlative> | <absolute-superlative> )
+
+<irregular-superlative> ::= "o" <opt-whitespace> "melhor" | "a" <opt-whitespace> "melhor" | "o" <opt-whitespace> "pior" | "a" <opt-whitespace> "pior"
+
+<absolute-superlative> ::= <adjective-stem> "íssimo" | <adjective-stem> "íssima"
+
+<adjective-stem> ::= /[a-záàâãéêíóôõúüç]+/
+
+/* Verb phrases with tense, mood, and aspect */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <periphrastic-verb-phrase>
+               | <reflexive-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb> ( <opt-whitespace> <adverb> )?
+
+<finite-verb> ::= <verb-present>
+               | <verb-preterite>
+               | <verb-imperfect>
+               | <verb-pluperfect>
+               | <verb-future>
+               | <verb-conditional>
+               | <verb-present-subjunctive>
+               | <verb-imperfect-subjunctive>
+               | <verb-future-subjunctive>
+
+/* Compound tenses with ter */
+<compound-verb-phrase> ::= <auxiliary-ter> <opt-whitespace> <past-participle>
+
+<auxiliary-ter> ::= <ter-present> | <ter-imperfect> | <ter-preterite> | <ter-future>
+
+<ter-present> ::= @TENSE[present] ( "tenho" | "tens" | "tem" | "temos" | "tendes" | "têm" )
+
+<ter-imperfect> ::= @TENSE[imperfect] ( "tinha" | "tinhas" | "tinha" | "tínhamos" | "tínheis" | "tinham" )
+
+<ter-preterite> ::= @TENSE[preterite] ( "tive" | "tiveste" | "teve" | "tivemos" | "tivestes" | "tiveram" )
+
+<ter-future> ::= @TENSE[future] ( "terei" | "terás" | "terá" | "teremos" | "tereis" | "terão" )
+
+/* Periphrastic constructions */
+<periphrastic-verb-phrase> ::= <ir-verb> <opt-whitespace> <verb-infinitive>
+                            | <estar-verb> <opt-whitespace> "a" <opt-whitespace> <verb-infinitive>
+                            | <estar-verb> <opt-whitespace> <gerund>
+                            | <modal-verb> <opt-whitespace> <verb-infinitive>
+
+<ir-verb> ::= "vou" | "vais" | "vai" | "vamos" | "ides" | "vão"
+
+<estar-verb> ::= "estou" | "estás" | "está" | "estamos" | "estais" | "estão"
+
+<modal-verb> ::= "poder" | "posso" | "podes" | "pode" | "podemos" | "podeis" | "podem"
+              | "dever" | "devo" | "deves" | "deve" | "devemos" | "deveis" | "devem"
+              | "querer" | "quero" | "queres" | "quer" | "queremos" | "quereis" | "querem"
+
+<reflexive-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <finite-verb>
+                         | <finite-verb> "-" <reflexive-pronoun> /* enclisis */
+
+/* Regular verb conjugations */
+<verb-present> ::= @TENSE[present] ( <regular-ar-present> | <regular-er-present> | <regular-ir-present> | <irregular-present> )
+
+<regular-ar-present> ::= <verb-stem-ar> ( "o" | "as" | "a" | "amos" | "ais" | "am" )
+
+<regular-er-present> ::= <verb-stem-er> ( "o" | "es" | "e" | "emos" | "eis" | "em" )
+
+<regular-ir-present> ::= <verb-stem-ir> ( "o" | "es" | "e" | "imos" | "is" | "em" )
+
+/* Preterite tense (pretérito perfeito) */
+<verb-preterite> ::= @TENSE[preterite] ( <regular-ar-preterite> | <regular-er-preterite> | <regular-ir-preterite> | <irregular-preterite> )
+
+<regular-ar-preterite> ::= <verb-stem-ar> ( "ei" | "aste" | "ou" | "ámos" | "astes" | "aram" )
+
+<regular-er-preterite> ::= <verb-stem-er> ( "i" | "este" | "eu" | "emos" | "estes" | "eram" )
+
+<regular-ir-preterite> ::= <verb-stem-ir> ( "i" | "iste" | "iu" | "imos" | "istes" | "iram" )
+
+/* Imperfect tense */
+<verb-imperfect> ::= @TENSE[imperfect] ( <regular-ar-imperfect> | <regular-er-imperfect> | <regular-ir-imperfect> | <irregular-imperfect> )
+
+<regular-ar-imperfect> ::= <verb-stem-ar> ( "ava" | "avas" | "ava" | "ávamos" | "áveis" | "avam" )
+
+<regular-er-imperfect> ::= <verb-stem-er> ( "ia" | "ias" | "ia" | "íamos" | "íeis" | "iam" )
+
+<regular-ir-imperfect> ::= <verb-stem-ir> ( "ia" | "ias" | "ia" | "íamos" | "íeis" | "iam" )
+
+/* Pluperfect tense (simple form, archaic but exists) */
+<verb-pluperfect> ::= @TENSE[pluperfect] ( <regular-ar-pluperfect> | <regular-er-pluperfect> | <regular-ir-pluperfect> )
+
+<regular-ar-pluperfect> ::= <verb-stem-ar> ( "ara" | "aras" | "ara" | "áramos" | "áreis" | "aram" )
+
+<regular-er-pluperfect> ::= <verb-stem-er> ( "era" | "eras" | "era" | "êramos" | "êreis" | "eram" )
+
+<regular-ir-pluperfect> ::= <verb-stem-ir> ( "ira" | "iras" | "ira" | "íramos" | "íreis" | "iram" )
+
+/* Future tense */
+<verb-future> ::= @TENSE[future] ( <regular-future> | <irregular-future> )
+
+<regular-future> ::= <verb-infinitive> ( "ei" | "ás" | "á" | "emos" | "eis" | "ão" )
+
+/* Conditional mood */
+<verb-conditional> ::= @MOOD[conditional] <verb-infinitive> ( "ia" | "ias" | "ia" | "íamos" | "íeis" | "iam" )
+
+/* Present subjunctive */
+<verb-present-subjunctive> ::= @MOOD[subjunctive] @TENSE[present] ( <regular-ar-subjunctive> | <regular-er-subjunctive> | <regular-ir-subjunctive> | <irregular-subjunctive> )
+
+<regular-ar-subjunctive> ::= <verb-stem-ar> ( "e" | "es" | "e" | "emos" | "eis" | "em" )
+
+<regular-er-subjunctive> ::= <verb-stem-er> ( "a" | "as" | "a" | "amos" | "ais" | "am" )
+
+<regular-ir-subjunctive> ::= <verb-stem-ir> ( "a" | "as" | "a" | "amos" | "ais" | "am" )
+
+/* Imperfect subjunctive */
+<verb-imperfect-subjunctive> ::= @MOOD[subjunctive] @TENSE[imperfect] ( <regular-ar-imp-subj> | <regular-er-imp-subj> | <regular-ir-imp-subj> )
+
+<regular-ar-imp-subj> ::= <verb-stem-ar> ( "asse" | "asses" | "asse" | "ássemos" | "ásseis" | "assem" )
+
+<regular-er-imp-subj> ::= <verb-stem-er> ( "esse" | "esses" | "esse" | "êssemos" | "êsseis" | "essem" )
+
+<regular-ir-imp-subj> ::= <verb-stem-ir> ( "isse" | "isses" | "isse" | "íssemos" | "ísseis" | "issem" )
+
+/* Future subjunctive (unique to Portuguese) */
+<verb-future-subjunctive> ::= @MOOD[subjunctive] @TENSE[future] ( <regular-ar-fut-subj> | <regular-er-fut-subj> | <regular-ir-fut-subj> )
+
+<regular-ar-fut-subj> ::= <verb-stem-ar> ( "ar" | "ares" | "ar" | "armos" | "ardes" | "arem" )
+
+<regular-er-fut-subj> ::= <verb-stem-er> ( "er" | "eres" | "er" | "ermos" | "erdes" | "erem" )
+
+<regular-ir-fut-subj> ::= <verb-stem-ir> ( "ir" | "ires" | "ir" | "irmos" | "irdes" | "irem" )
+
+/* Irregular verbs (major ones) */
+<irregular-present> ::= @IRREGULAR ( "sou" | "és" | "é" | "somos" | "sois" | "são" /* ser */
+                    | "estou" | "estás" | "está" | "estamos" | "estais" | "estão" /* estar */
+                    | "tenho" | "tens" | "tem" | "temos" | "tendes" | "têm" /* ter */
+                    | "hei" | "hás" | "há" | "havemos" | "haveis" | "hão" /* haver */
+                    | "vou" | "vais" | "vai" | "vamos" | "ides" | "vão" /* ir */
+                    | "faço" | "fazes" | "faz" | "fazemos" | "fazeis" | "fazem" /* fazer */
+                    | "digo" | "dizes" | "diz" | "dizemos" | "dizeis" | "dizem" /* dizer */
+                    | "venho" | "vens" | "vem" | "vimos" | "vindes" | "vêm" /* vir */
+                    | "ponho" | "pões" | "põe" | "pomos" | "pondes" | "põem" /* pôr */
+                    | "sei" | "sabes" | "sabe" | "sabemos" | "sabeis" | "sabem" /* saber */
+                    | "quero" | "queres" | "quer" | "queremos" | "quereis" | "querem" /* querer */
+                    | "posso" | "podes" | "pode" | "podemos" | "podeis" | "podem" /* poder */
+                    | "vejo" | "vês" | "vê" | "vemos" | "vedes" | "vêem" /* ver */
+                    | "dou" | "dás" | "dá" | "damos" | "dais" | "dão" ) /* dar */
+
+<irregular-preterite> ::= @IRREGULAR ( "fui" | "foste" | "foi" | "fomos" | "fostes" | "foram" /* ser/ir */
+                      | "estive" | "estiveste" | "esteve" | "estivemos" | "estivestes" | "estiveram" /* estar */
+                      | "tive" | "tiveste" | "teve" | "tivemos" | "tivestes" | "tiveram" /* ter */
+                      | "houve" | "houveste" | "houve" | "houvemos" | "houvestes" | "houveram" /* haver */
+                      | "fiz" | "fizeste" | "fez" | "fizemos" | "fizestes" | "fizeram" /* fazer */
+                      | "disse" | "disseste" | "disse" | "dissemos" | "dissestes" | "disseram" /* dizer */
+                      | "vim" | "vieste" | "veio" | "viemos" | "viestes" | "vieram" /* vir */
+                      | "pus" | "puseste" | "pôs" | "pusemos" | "pusestes" | "puseram" /* pôr */
+                      | "soube" | "soubeste" | "soube" | "soubemos" | "soubestes" | "souberam" /* saber */
+                      | "quis" | "quiseste" | "quis" | "quisemos" | "quisestes" | "quiseram" /* querer */
+                      | "pude" | "pudeste" | "pôde" | "pudemos" | "pudestes" | "puderam" /* poder */
+                      | "vi" | "viste" | "viu" | "vimos" | "vistes" | "viram" /* ver */
+                      | "dei" | "deste" | "deu" | "demos" | "destes" | "deram" ) /* dar */
+
+<irregular-imperfect> ::= @IRREGULAR ( "era" | "eras" | "era" | "éramos" | "éreis" | "eram" /* ser */
+                      | "ia" | "ias" | "ia" | "íamos" | "íeis" | "iam" /* ir */
+                      | "tinha" | "tinhas" | "tinha" | "tínhamos" | "tínheis" | "tinham" /* ter */
+                      | "vinha" | "vinhas" | "vinha" | "vínhamos" | "vínheis" | "vinham" /* vir */
+                      | "punha" | "punhas" | "punha" | "púnhamos" | "púnheis" | "punham" ) /* pôr */
+
+<irregular-future> ::= @IRREGULAR ( "serei" | "serás" | "será" | "seremos" | "sereis" | "serão" /* ser */
+                   | "terei" | "terás" | "terá" | "teremos" | "tereis" | "terão" /* ter */
+                   | "farei" | "farás" | "fará" | "faremos" | "fareis" | "farão" /* fazer */
+                   | "direi" | "dirás" | "dirá" | "diremos" | "direis" | "dirão" /* dizer */
+                   | "virei" | "virás" | "virá" | "viremos" | "vireis" | "virão" /* vir */
+                   | "porei" | "porás" | "porá" | "poremos" | "poreis" | "porão" /* pôr */
+                   | "saberei" | "saberás" | "saberá" | "saberemos" | "sabereis" | "saberão" /* saber */
+                   | "quererei" | "quererás" | "quererá" | "quereremos" | "querereis" | "quererão" /* querer */
+                   | "poderei" | "poderás" | "poderá" | "poderemos" | "podereis" | "poderão" ) /* poder */
+
+<irregular-subjunctive> ::= @IRREGULAR ( "seja" | "sejas" | "seja" | "sejamos" | "sejais" | "sejam" /* ser */
+                        | "esteja" | "estejas" | "esteja" | "estejamos" | "estejais" | "estejam" /* estar */
+                        | "tenha" | "tenhas" | "tenha" | "tenhamos" | "tenhais" | "tenham" /* ter */
+                        | "haja" | "hajas" | "haja" | "hajamos" | "hajais" | "hajam" /* haver */
+                        | "vá" | "vás" | "vá" | "vamos" | "vades" | "vão" /* ir */
+                        | "faça" | "faças" | "faça" | "façamos" | "façais" | "façam" /* fazer */
+                        | "diga" | "digas" | "diga" | "digamos" | "digais" | "digam" /* dizer */
+                        | "venha" | "venhas" | "venha" | "venhamos" | "venhais" | "venham" /* vir */
+                        | "ponha" | "ponhas" | "ponha" | "ponhamos" | "ponhais" | "ponham" /* pôr */
+                        | "saiba" | "saibas" | "saiba" | "saibamos" | "saibais" | "saibam" /* saber */
+                        | "queira" | "queiras" | "queira" | "queiramos" | "queirais" | "queiram" /* querer */
+                        | "possa" | "possas" | "possa" | "possamos" | "possais" | "possam" ) /* poder */
+
+/* Verb stems and forms */
+<verb-stem-ar> ::= /[a-záàâãéêíóôõúüç]+/
+
+<verb-stem-er> ::= /[a-záàâãéêíóôõúüç]+/
+
+<verb-stem-ir> ::= /[a-záàâãéêíóôõúüç]+/
+
+<verb-infinitive> ::= <verb-stem-ar> "ar" | <verb-stem-er> "er" | <verb-stem-ir> "ir"
+
+/* Personal infinitive (unique to Portuguese) */
+<personal-infinitive> ::= <verb-infinitive> ( "es" | "mos" | "des" | "em" )?
+
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle>
+
+<regular-past-participle> ::= <verb-stem-ar> "ado" | <verb-stem-er> "ido" | <verb-stem-ir> "ido"
+
+<irregular-past-participle> ::= @IRREGULAR ( "sido" | "estado" | "tido" | "havido" | "ido" | "feito" | "dito" | "vindo" | "posto" | "sabido" | "querido" | "podido" | "visto" | "dado" | "aberto" | "coberto" | "escrito" | "morto" | "volvido" )
+
+<gerund> ::= <verb-stem-ar> "ando" | <verb-stem-er> "endo" | <verb-stem-ir> "indo"
+
+<verb-imperative> ::= <verb-stem> | <irregular-imperative>
+
+<irregular-imperative> ::= "sê" | "tem" | "vem" | "põe" | "sai" | "faz" | "diz" | "vai"
+
+<verb-stem> ::= /[a-záàâãéêíóôõúüç]+/
+
+/* Object */
+<object> ::= <direct-object> | <indirect-object>
+
+<direct-object> ::= <noun-phrase>
+                 | <object-pronoun>
+                 | <clause-object>
+                 | <infinitive-phrase>
+
+<indirect-object> ::= "a" <opt-whitespace> <noun-phrase>
+                   | "a" <opt-whitespace> <pronoun>
+                   | <object-pronoun>
+
+<clause-object> ::= <that-clause>
+                 | <wh-clause>
+                 | <if-clause>
+                 | <infinitival-clause>
+
+<that-clause> ::= "que" <opt-whitespace> <subordinate-content>
+
+<wh-clause> ::= <interrogative-clause-embedded>
+
+<if-clause> ::= "se" <opt-whitespace> <subordinate-content>
+
+<infinitival-clause> ::= <verb-infinitive> ( <opt-whitespace> <object> )? ( <opt-whitespace> <adverbial> )?
+
+<infinitive-phrase> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<interrogative-clause-embedded> ::= <question-word> <opt-whitespace> <subordinate-content>
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <adverb-phrase>
+             | <prepositional-phrase>
+             | <adverb-clause>
+
+<adverb-phrase> ::= <degree-adverb-modifier>? <opt-whitespace> <adverb>
+
+<degree-adverb-modifier> ::= "muito" | "mais" | "menos" | "tão" | "bastante"
+
+<adverb> ::= <time-adverb>
+          | <place-adverb>
+          | <manner-adverb>
+          | <degree-adverb>
+          | <frequency-adverb>
+          | <modal-adverb>
+
+<time-adverb> ::= "agora" | "hoje" | "ontem" | "amanhã" | "anteontem" | "depois" <opt-whitespace> "de" <opt-whitespace> "amanhã" | "antes" | "depois" | "logo" | "sempre" | "nunca" | "já" | "ainda" | "cedo" | "tarde"
+
+<place-adverb> ::= "aqui" | "aí" | "ali" | "lá" | "cá" | "onde" | "perto" | "longe" | "acima" | "abaixo" | "diante" | "atrás" | "dentro" | "fora" | "em" <opt-whitespace> "cima" | "embaixo"
+
+<manner-adverb> ::= "bem" | "mal" | "assim" | "devagar" | "depressa" | "facilmente" | "dificilmente" | /[a-záàâãéêíóôõúüç]+mente/
+
+<degree-adverb> ::= "muito" | "mais" | "menos" | "tão" | "tanto" | "pouco" | "bastante" | "demasiado" | "quase" | "apenas"
+
+<frequency-adverb> ::= "sempre" | "nunca" | "jamais" | "às" <opt-whitespace> "vezes" | "frequentemente" | "raramente" | "muitas" <opt-whitespace> "vezes"
+
+<modal-adverb> ::= "talvez" | "possivelmente" | "provavelmente" | "certamente" | "efetivamente"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+                        | <preposition> <opt-whitespace> <pronoun>
+                        | <complex-preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "a" | "ante" | "após" | "até" | "com" | "contra" | "de" | "desde" | "em" | "entre" | "para" | "perante" | "por" | "sem" | "sob" | "sobre" | "trás"
+
+<complex-preposition> ::= "através" <opt-whitespace> "de"
+                       | "acerca" <opt-whitespace> "de"
+                       | "além" <opt-whitespace> "de"
+                       | "ao" <opt-whitespace> "lado" <opt-whitespace> "de"
+                       | "em" <opt-whitespace> "vez" <opt-whitespace> "de"
+                       | "apesar" <opt-whitespace> "de"
+                       | "antes" <opt-whitespace> "de"
+                       | "depois" <opt-whitespace> "de"
+                       | "dentro" <opt-whitespace> "de"
+                       | "fora" <opt-whitespace> "de"
+                       | "em" <opt-whitespace> "cima" <opt-whitespace> "de"
+                       | "em" <opt-whitespace> "frente" <opt-whitespace> "de"
+                       | "por" <opt-whitespace> "causa" <opt-whitespace> "de"
+                       | "a" <opt-whitespace> "fim" <opt-whitespace> "de"
+
+/* Adverb clauses */
+<adverb-clause> ::= <temporal-clause>
+                 | <causal-clause>
+                 | <conditional-clause>
+                 | <concessive-clause>
+                 | <purpose-clause>
+                 | <result-clause>
+
+<temporal-clause> ::= <temporal-conjunction> <opt-whitespace> <subordinate-content>
+
+<temporal-conjunction> ::= "quando" | "enquanto" | "antes" <opt-whitespace> "de" | "depois" <opt-whitespace> "de" | "até" <opt-whitespace> "que" | "desde" <opt-whitespace> "que" | "logo" <opt-whitespace> "que" | "assim" <opt-whitespace> "que" | "mal"
+
+<causal-clause> ::= <causal-conjunction> <opt-whitespace> <subordinate-content>
+
+<causal-conjunction> ::= "porque" | "como" | "visto" <opt-whitespace> "que" | "já" <opt-whitespace> "que" | "uma" <opt-whitespace> "vez" <opt-whitespace> "que"
+
+<conditional-clause> ::= <conditional-conjunction> <opt-whitespace> <subordinate-content>
+
+<conditional-conjunction> ::= "se" | "caso" | "desde" <opt-whitespace> "que" | "contanto" <opt-whitespace> "que" | "a" <opt-whitespace> "não" <opt-whitespace> "ser" <opt-whitespace> "que" | "salvo" <opt-whitespace> "se"
+
+<concessive-clause> ::= <concessive-conjunction> <opt-whitespace> <subordinate-content>
+
+<concessive-conjunction> ::= "embora" | "ainda" <opt-whitespace> "que" | "mesmo" <opt-whitespace> "que" | "apesar" <opt-whitespace> "de" | "conquanto"
+
+<purpose-clause> ::= <purpose-conjunction> <opt-whitespace> <subordinate-content>
+
+<purpose-conjunction> ::= "para" <opt-whitespace> "que" | "a" <opt-whitespace> "fim" <opt-whitespace> "de" <opt-whitespace> "que"
+
+<result-clause> ::= <result-conjunction> <opt-whitespace> <subordinate-content>
+
+<result-conjunction> ::= "de" <opt-whitespace> "modo" <opt-whitespace> "que" | "de" <opt-whitespace> "forma" <opt-whitespace> "que" | "de" <opt-whitespace> "maneira" <opt-whitespace> "que"
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <nested-final-field>?
+
+<nested-final-field> ::= <subordinate-clause> | <relative-clause> | <prepositional-phrase>
+
+<subordinate-content> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>*
+
+<subordinating-conjunction> ::= <temporal-conjunction>
+                             | <causal-conjunction>
+                             | <conditional-conjunction>
+                             | <concessive-conjunction>
+                             | <purpose-conjunction>
+                             | <result-conjunction>
+                             | "que"
+
+/* Relative clauses */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <subordinate-clause>
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "e" | "ou" | "mas" | "porém" | "contudo" | "todavia" | "nem" | "portanto"
+
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <yes-no-question> | <wh-question>
+
+<yes-no-question> ::= <declarative-clause> "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+<question-word> ::= <interrogative-pronoun> | <interrogative-adverb>
+
+<interrogative-adverb> ::= "onde" | "quando" | "como" | "por" <opt-whitespace> "que" | "para" <opt-whitespace> "que"
+
+/* Imperative clauses */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+/* Exclamative clauses */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
+
+<exclamative-word> ::= "Que" | "Quão" | "Como"
+
+/* Negation */
+<negation> ::= "não" | "nunca" | "jamais" | "nem" | "nada" | "ninguém"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":" | "..." | "-"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER AND <article>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Article and noun must agree in gender and number"
+
+@CONTEXT_RULE[adjective-noun-agreement]:
+    IF <adjective>.@GENDER == <noun>.@GENDER AND <adjective>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun in gender and number"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@PERSON == <verb>.@PERSON AND <subject>.@NUMBER == <verb>.@NUMBER
+    THEN VALID
+    ELSE WARNING "Consider subject-verb agreement"
+
+@CONTEXT_RULE[ser-estar-ficar-distinction]:
+    IF <copula-verb> IS "ser" THEN REQUIRES <permanent-quality>
+    ELSE IF <copula-verb> IS "estar" THEN REQUIRES <temporary-state-or-location>
+    ELSE IF <copula-verb> IS "ficar" THEN REQUIRES <change-of-state>
+    ELSE WARNING "Consider copula verb selection"
+
+@CONTEXT_RULE[subjunctive-mood-context]:
+    IF <subordinate-clause> REQUIRES <subjunctive-trigger>
+    THEN <verb>.@MOOD MUST BE subjunctive
+    ELSE WARNING "Subjunctive mood may be required"
+
+@CONTEXT_RULE[clitic-placement]:
+    IF <object-pronoun> IN <verb-phrase>
+    THEN <object-pronoun> ( BEFORE <finite-verb> OR AFTER <finite-verb> OR BETWEEN <verb-stem> AND <ending> )
+    ELSE WARNING "Consider clitic placement (proclisis, enclisis, mesoclisis)"
+
+@CONTEXT_RULE[personal-infinitive]:
+    IF <infinitive> HAS <subject>
+    THEN MAY_USE <personal-infinitive>
+    ELSE VALID
+
+@CONTEXT_RULE[future-subjunctive-context]:
+    IF <temporal-clause> OR <conditional-clause> REFERS_TO <future-event>
+    THEN MAY_USE <future-subjunctive>
+    ELSE VALID
+
+@CONTEXT_RULE[article-contraction]:
+    IF <preposition> IN ["a", "de", "em", "por"] AND <article> IN ["o", "a", "os", "as"]
+    THEN USE <contracted-form>
+    ELSE VALID
+
+@CONTEXT_RULE[tense-concordance]:
+    IF <main-clause>.@TENSE == <subordinate-clause>.@TENSE
+    THEN VALID
+    ELSE WARNING "Consider tense concordance"
