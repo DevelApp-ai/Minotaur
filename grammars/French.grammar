@@ -419,8 +419,8 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 /* Third group (irregular -re, -oir verbs) */
 <third-group-present> ::= @GROUP[3] <verb-stem> ( "s" | "t" | "ons" | "ez" | "ent" )
 
-/* Common irregular verbs */
-<irregular-present> ::= @IRREGULAR ( <etre-present> | <avoir-present> | <aller-present> | <faire-present> | <venir-present> | <pouvoir-present> | <vouloir-present> | <devoir-present> | <savoir-present> )
+/* Common irregular verbs - expanded */
+<irregular-present> ::= @IRREGULAR ( <etre-present> | <avoir-present> | <aller-present> | <faire-present> | <venir-present> | <pouvoir-present> | <vouloir-present> | <devoir-present> | <savoir-present> | <prendre-present> | <mettre-present> | <voir-present> | <dire-present> | <ecrire-present> | <lire-present> | <connaitre-present> | <vivre-present> )
 
 <etre-present> ::= "suis" | "es" | "est" | "sommes" | "êtes" | "sont"
 
@@ -440,8 +440,37 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 
 <savoir-present> ::= "sais" | "sais" | "sait" | "savons" | "savez" | "savent"
 
+<prendre-present> ::= "prends" | "prends" | "prend" | "prenons" | "prenez" | "prennent"
+
+<mettre-present> ::= "mets" | "mets" | "met" | "mettons" | "mettez" | "mettent"
+
+<voir-present> ::= "vois" | "vois" | "voit" | "voyons" | "voyez" | "voient"
+
+<dire-present> ::= "dis" | "dis" | "dit" | "disons" | "dites" | "disent"
+
+<ecrire-present> ::= "écris" | "écris" | "écrit" | "écrivons" | "écrivez" | "écrivent"
+
+<lire-present> ::= "lis" | "lis" | "lit" | "lisons" | "lisez" | "lisent"
+
+<connaitre-present> ::= "connais" | "connais" | "connaît" | "connaissons" | "connaissez" | "connaissent"
+
+<vivre-present> ::= "vis" | "vis" | "vit" | "vivons" | "vivez" | "vivent"
+
+/* Irregular imperfect forms */
+<irregular-imperfect> ::= <etre-imperfect> | <avoir-imperfect> | <faire-imperfect>
+
+<etre-imperfect> ::= "étais" | "étais" | "était" | "étions" | "étiez" | "étaient"
+
+<avoir-imperfect> ::= "avais" | "avais" | "avait" | "avions" | "aviez" | "avaient"
+
+<faire-imperfect> ::= "faisais" | "faisais" | "faisait" | "faisions" | "faisiez" | "faisaient"
+
+/* Irregular past participles */
+<irregular-past-participle> ::= "été" | "eu" | "fait" | "pris" | "mis" | "vu" | "dit" | "écrit" | "lu" | "connu" | "vécu" | "allé" | "venu" | "pu" | "voulu" | "dû" | "su"
+
 /* Imperfect tense */
 <verb-imperfect> ::= @TENSE[imperfect] @MOOD[indicative] <verb-stem> ( "ais" | "ais" | "ait" | "ions" | "iez" | "aient" )
+                  | <irregular-imperfect>
 
 /* Future tense */
 <verb-future> ::= @TENSE[future] @MOOD[indicative] <future-stem> ( "ai" | "as" | "a" | "ons" | "ez" | "ont" )
@@ -490,10 +519,22 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 
 <irregular-past-participle> ::= @IRREGULAR ( "été" | "eu" | "fait" | "dit" | "mis" | "pris" | "vu" | "su" | "pu" | "voulu" | "dû" | "venu" | "allé" | "mort" | "né" | "ouvert" | "offert" | "écrit" | "lu" | "bu" | "couru" | "reçu" )
 
-/* Verb stems */
+/* Verb stems - expanded with common vocabulary */
 <verb-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+             | "parl" | "aim" | "donn" | "demand" | "cherch" | "trouv" | "écout" | "regard" | "arriv" | "rest"
+
 <first-group-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+                    | "parl" | "aim" | "donn" | "demand" | "cherch" | "trouv" | "écout" | "regard" | "arriv" | "rest" | "mang" | "march" | "dans" | "chant" | "jou" | "pass" | "tourn"
+
 <second-group-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+                     | "fin" | "chois" | "réfléch" | "réuss" | "obé" | "grossi" | "maigri" | "rougi" | "blan ch"
+
+<third-group-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+                    | "vend" | "attend" | "répond" | "descend" | "perd" | "entend" | "rend"
+
+/* Noun stems and vocabulary */
+<noun-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+             | "maison" | "livre" | "table" | "chaise" | "fenêtre" | "porte" | "homme" | "femme" | "enfant" | "garçon" | "fille" | "père" | "mère" | "frère" | "sœur" | "ami" | "chat" | "chien" | "ville" | "pays" | "jour" | "nuit" | "temps" | "vie" | "mort" | "chose" | "travail" | "école" | "rue" | "voiture"
 
 /* Object */
 <object> ::= <direct-object>
@@ -575,6 +616,108 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
                         | "jusqu'à"
                         | "quant" <opt-whitespace> "à"
                         | "par" <opt-whitespace> "rapport" <opt-whitespace> "à"
+
+/* Noun compounds and constructions */
+<compound-noun-french> ::= <noun> <opt-whitespace> "à" <opt-whitespace> <noun>
+                        | <noun> <opt-whitespace> "de" <opt-whitespace> <noun>
+                        | <noun> <opt-whitespace> "-" <opt-whitespace> <noun>
+
+/* Causative constructions */
+<causative-construction> ::= "faire" <opt-whitespace> <verb-infinitive>
+                          | "laisser" <opt-whitespace> <verb-infinitive>
+
+/* Perception verb constructions */
+<perception-construction> ::= <perception-verb> <opt-whitespace> <verb-infinitive>
+
+<perception-verb> ::= "voir" | "regarder" | "entendre" | "écouter" | "sentir"
+
+/* Conditional constructions */
+<conditional-construction> ::= <si-clause> <opt-whitespace> "," <opt-whitespace> <consequence-clause>
+
+<si-clause> ::= "si" <opt-whitespace> <subject> <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<consequence-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Hypothetical constructions */
+<hypothetical-construction> ::= <si-clause-pluperfect> <opt-whitespace> "," <opt-whitespace> <conditional-perfect>
+
+<si-clause-pluperfect> ::= "si" <opt-whitespace> <subject> <opt-whitespace> <verb-plus-que-parfait> <opt-whitespace> <object>?
+
+<conditional-perfect> ::= <subject> <opt-whitespace> <auxiliary-conditional> <opt-whitespace> <past-participle>
+
+<auxiliary-conditional> ::= "aurais" | "aurait" | "aurions" | "auriez" | "auraient" | "serais" | "serait" | "serions" | "seriez" | "seraient"
+
+/* Temporal constructions */
+<temporal-construction> ::= <temporal-connector> <opt-whitespace> <subordinate-content>
+
+<temporal-connector> ::= "quand" | "lorsque" | "dès" <opt-whitespace> "que" | "aussitôt" <opt-whitespace> "que" | "pendant" <opt-whitespace> "que" | "tandis" <opt-whitespace> "que"
+
+/* Comparative constructions */
+<comparative-construction> ::= <comparison-type> <opt-whitespace> <adjective> <opt-whitespace> "que" <opt-whitespace> <noun-phrase>
+
+<comparison-type> ::= "plus" | "moins" | "aussi" | "autant"
+
+/* Superlative constructions */
+<superlative-construction> ::= "le" <opt-whitespace> "plus" <opt-whitespace> <adjective>
+                            | "le" <opt-whitespace> "moins" <opt-whitespace> <adjective>
+                            | "la" <opt-whitespace> "plus" <opt-whitespace> <adjective>
+                            | "la" <opt-whitespace> "moins" <opt-whitespace> <adjective>
+
+/* Gerund constructions (en + present participle) */
+<gerund-construction> ::= "en" <opt-whitespace> <present-participle>
+
+<present-participle> ::= <verb-stem> "ant"
+
+/* Infinitive constructions */
+<infinitive-construction> ::= <infinitive-with-preposition> | <bare-infinitive>
+
+<infinitive-with-preposition> ::= ( "à" | "de" | "pour" | "sans" | "avant" <opt-whitespace> "de" | "après" ) <opt-whitespace> <verb-infinitive>
+
+<bare-infinitive> ::= <verb-infinitive>
+
+/* Impersonal expressions */
+<impersonal-expression> ::= "il" <opt-whitespace> <impersonal-verb> <opt-whitespace> <complement>
+
+<impersonal-verb> ::= "faut" | "pleut" | "neige" | "fait" <opt-whitespace> ( "chaud" | "froid" | "beau" | "mauvais" ) | "est" <opt-whitespace> ( "nécessaire" | "possible" | "impossible" | "important" | "facile" | "difficile" )
+
+<complement> ::= "que" <opt-whitespace> <subject> <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+              | <verb-infinitive>
+
+/* Passive voice constructions */
+<passive-construction> ::= <subject> <opt-whitespace> "être" <opt-whitespace> <past-participle> ( <opt-whitespace> "par" <opt-whitespace> <noun-phrase> )?
+
+/* Relative clause variations */
+<relative-clause-expanded> ::= <relative-pronoun-qui> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+                            | <relative-pronoun-que> <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+                            | <relative-pronoun-dont> <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+                            | <relative-pronoun-ou> <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+
+<relative-pronoun-qui> ::= "qui"
+
+<relative-pronoun-que> ::= "que" | "qu'"
+
+<relative-pronoun-dont> ::= "dont"
+
+<relative-pronoun-ou> ::= "où"
+
+/* Interrogative constructions */
+<interrogative-construction> ::= <est-ce-que-question> | <inversion-question> | <indirect-question>
+
+<est-ce-que-question> ::= "est-ce" <opt-whitespace> "que" <opt-whitespace> <declarative-clause>
+
+<inversion-question> ::= <verb> <opt-whitespace> "-" <opt-whitespace> <subject-pronoun> <opt-whitespace> <object>? "?"
+
+<indirect-question> ::= "Je" <opt-whitespace> ( "ne" <opt-whitespace> )? ( "sais" | "demande" ) <opt-whitespace> ( "si" | <question-word> ) <opt-whitespace> <subordinate-content>
+
+/* Emphatic constructions */
+<emphatic-construction> ::= "c'est" <opt-whitespace> <noun-phrase> <opt-whitespace> "qui" <opt-whitespace> <verb-phrase>
+                         | "c'est" <opt-whitespace> <noun-phrase> <opt-whitespace> "que" <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+
+/* Exclamative constructions */
+<exclamative-construction> ::= "Quel" <opt-whitespace> <noun> "!"
+                            | "Quelle" <opt-whitespace> <noun> "!"
+                            | "Que" <opt-whitespace> <declarative-clause> "!"
+                            | "Comme" <opt-whitespace> <declarative-clause> "!"
 
 /* Negation patterns */
 <negation-part1> ::= "ne" | "n'"

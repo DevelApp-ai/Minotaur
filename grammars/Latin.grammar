@@ -350,12 +350,29 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 <fifth-decl-ablative> ::= @DECLENSION[5] @GENDER[feminine] @NUMBER[singular] @CASE[ablative] <fifth-decl-stem> "e"
                        | @DECLENSION[5] @GENDER[feminine] @NUMBER[plural] @CASE[ablative] <fifth-decl-stem> "ebus"
 
-/* Noun stems */
+/* Noun stems - expanded with common vocabulary */
 <first-decl-stem> ::= /[a-z]+/
+                   | "puell" | "ros" | "vit" | "fili" | "terr" | "aqu" | "femn" | "port"
+
 <second-decl-stem> ::= /[a-z]+/
+                    | "domin" | "serv" | "lib" | "magistr" | "amic" | "bell" | "vir"
+
 <third-decl-stem> ::= /[a-z]+/
+                   | "reg" | "duc" | "civis" | "urb" | "corp" | "hom" | "nomin" | "tempor"
+
 <fourth-decl-stem> ::= /[a-z]+/
+                    | "man" | "exercit" | "fruct" | "port" | "sens"
+
 <fifth-decl-stem> ::= /[a-z]+/
+                   | "di" | "r" | "spi" | "faci"
+
+/* Compound nouns */
+<compound-noun> ::= <noun-stem-compound> <linking-element>? <noun-nominative>
+                 | <adjective-nominative> <opt-whitespace> <noun-nominative>
+
+<noun-stem-compound> ::= <first-decl-stem> | <second-decl-stem> | <third-decl-stem>
+
+<linking-element> ::= "i" | "o"
 
 /* Proper nouns */
 <proper-noun-nominative> ::= /[A-Z][a-z]*/
@@ -557,17 +574,72 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
                        | @CONJUGATION[4] @PERSON[2] @NUMBER[plural] <fourth-conj-stem> "itis"
                        | @CONJUGATION[4] @PERSON[3] @NUMBER[plural] <fourth-conj-stem> "iunt"
 
-/* Irregular verb - sum, esse (to be) */
-<irregular-present> ::= @IRREGULAR "sum" | "es" | "est" | "sumus" | "estis" | "sunt"
+/* Irregular verbs - comprehensive coverage */
+<irregular-present> ::= <irregular-sum>
+                     | <irregular-eo>
+                     | <irregular-fero>
+                     | <irregular-fio>
+                     | <irregular-edo>
+
+/* sum, esse (to be) */
+<irregular-sum> ::= @IRREGULAR "sum" | "es" | "est" | "sumus" | "estis" | "sunt"
+
+/* eo, ire (to go) */
+<irregular-eo> ::= @IRREGULAR "eo" | "is" | "it" | "imus" | "itis" | "eunt"
+
+/* fero, ferre (to carry/bear) */
+<irregular-fero> ::= @IRREGULAR "fero" | "fers" | "fert" | "ferimus" | "fertis" | "ferunt"
+
+/* fio, fieri (to become, be made) */
+<irregular-fio> ::= @IRREGULAR "fio" | "fis" | "fit" | "fimus" | "fitis" | "fiunt"
+
+/* edo, edere/esse (to eat) */
+<irregular-edo> ::= @IRREGULAR "edo" | "es" | "est" | "edimus" | "editis" | "edunt"
+
+/* Irregular imperfect forms */
+<irregular-imperfect> ::= <irregular-sum-imperfect>
+                       | <irregular-eo-imperfect>
+                       | <irregular-fero-imperfect>
+
+<irregular-sum-imperfect> ::= @IRREGULAR @TENSE[imperfect] "eram" | "eras" | "erat" | "eramus" | "eratis" | "erant"
+
+<irregular-eo-imperfect> ::= @IRREGULAR @TENSE[imperfect] "ibam" | "ibas" | "ibat" | "ibamus" | "ibatis" | "ibant"
+
+<irregular-fero-imperfect> ::= @IRREGULAR @TENSE[imperfect] "ferebam" | "ferebas" | "ferebat" | "ferebamus" | "ferebatis" | "ferebant"
+
+/* Irregular future forms */
+<irregular-future> ::= <irregular-sum-future>
+                    | <irregular-eo-future>
+                    | <irregular-fero-future>
+
+<irregular-sum-future> ::= @IRREGULAR @TENSE[future] "ero" | "eris" | "erit" | "erimus" | "eritis" | "erunt"
+
+<irregular-eo-future> ::= @IRREGULAR @TENSE[future] "ibo" | "ibis" | "ibit" | "ibimus" | "ibitis" | "ibunt"
+
+<irregular-fero-future> ::= @IRREGULAR @TENSE[future] "feram" | "feres" | "feret" | "feremus" | "feretis" | "ferent"
+
+/* Irregular perfect forms */
+<irregular-perfect> ::= <irregular-sum-perfect>
+                     | <irregular-eo-perfect>
+                     | <irregular-fero-perfect>
+
+<irregular-sum-perfect> ::= @IRREGULAR @TENSE[perfect] "fui" | "fuisti" | "fuit" | "fuimus" | "fuistis" | "fuerunt"
+
+<irregular-eo-perfect> ::= @IRREGULAR @TENSE[perfect] "ii" | "isti" | "iit" | "iimus" | "iistis" | "ierunt"
+
+<irregular-fero-perfect> ::= @IRREGULAR @TENSE[perfect] "tuli" | "tulisti" | "tulit" | "tulimus" | "tulistis" | "tulerunt"
 
 /* Imperfect tense */
 <verb-imperfect> ::= @TENSE[imperfect] @VOICE[active] @MOOD[indicative] <verb-stem> ( "bam" | "bas" | "bat" | "bamus" | "batis" | "bant" )
+                  | <irregular-imperfect>
 
 /* Future tense */
 <verb-future> ::= @TENSE[future] @VOICE[active] @MOOD[indicative] <verb-stem> ( "bo" | "bis" | "bit" | "bimus" | "bitis" | "bunt" | "am" | "es" | "et" | "emus" | "etis" | "ent" )
+               | <irregular-future>
 
 /* Perfect tense */
 <verb-perfect> ::= @TENSE[perfect] @VOICE[active] @MOOD[indicative] <perfect-stem> ( "i" | "isti" | "it" | "imus" | "istis" | "erunt" )
+                | <irregular-perfect>
 
 /* Pluperfect tense */
 <verb-pluperfect> ::= @TENSE[pluperfect] @VOICE[active] @MOOD[indicative] <perfect-stem> ( "eram" | "eras" | "erat" | "eramus" | "eratis" | "erant" )
@@ -750,6 +822,57 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 /* Periodic sentences (complex rhetorical structures) */
 <periodic-sentence> ::= <subordinate-clause> ( <opt-whitespace> "," <opt-whitespace> <subordinate-clause> )+ <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Purpose clauses (ut + subjunctive, ne + subjunctive) */
+<purpose-clause> ::= <positive-purpose> | <negative-purpose>
+
+<positive-purpose> ::= "ut" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+<negative-purpose> ::= "ne" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+/* Result clauses (ut + subjunctive, ut non) */
+<result-clause> ::= <positive-result> | <negative-result>
+
+<positive-result> ::= "ut" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+<negative-result> ::= "ut" <opt-whitespace> "non" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+/* Fear clauses (ne + subjunctive, ut + subjunctive) */
+<fear-clause> ::= <fear-positive> | <fear-negative>
+
+<fear-positive> ::= "ne" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+<fear-negative> ::= "ut" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+/* Causal clauses */
+<causal-clause> ::= <causal-conjunction> <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<causal-conjunction> ::= "quod" | "quia" | "quoniam" | "cum"
+
+/* Concessive clauses */
+<concessive-clause> ::= <concessive-conjunction> <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<concessive-conjunction> ::= "quamquam" | "etsi" | "tametsi" | "licet" | "cum"
+
+/* Comparison clauses */
+<comparison-clause> ::= <comparative-conjunction> <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<comparative-conjunction> ::= "quam" | "ut" | "sicut" | "velut" | "tamquam" | "quasi"
+
+/* Substantive clauses (noun clauses) */
+<substantive-clause> ::= <ut-clause> | <quod-clause> | <quin-clause>
+
+<ut-clause> ::= "ut" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+<quod-clause> ::= "quod" <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<quin-clause> ::= "quin" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+/* Relative clause of characteristic */
+<relative-characteristic> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+/* Relative clause of purpose */
+<relative-purpose> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
 
 /* Elliptical structures (reduced clauses) */
 <elliptical-clause> ::= <elliptical-response>

@@ -418,8 +418,8 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
                        | @GROUP[3] @PERSON[2] @NUMBER[plural] <third-group-stem> "ite"
                        | @GROUP[3] @PERSON[3] @NUMBER[plural] <third-group-stem> "iscono"
 
-/* Common irregular verbs */
-<irregular-present> ::= @IRREGULAR ( <essere-present> | <avere-present> | <andare-present> | <fare-present> | <dare-present> | <stare-present> | <sapere-present> | <volere-present> | <potere-present> | <dovere-present> )
+/* Common irregular verbs - expanded */
+<irregular-present> ::= @IRREGULAR ( <essere-present> | <avere-present> | <andare-present> | <fare-present> | <dare-present> | <stare-present> | <sapere-present> | <volere-present> | <potere-present> | <dovere-present> | <venire-present> | <dire-present> | <bere-present> | <uscire-present> | <salire-present> | <morire-present> | <sedere-present> | <porre-present> )
 
 <essere-present> ::= "sono" | "sei" | "è" | "siamo" | "siete" | "sono"
 
@@ -441,8 +441,39 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
 
 <dovere-present> ::= "devo" | "devi" | "deve" | "dobbiamo" | "dovete" | "devono"
 
+<venire-present> ::= "vengo" | "vieni" | "viene" | "veniamo" | "venite" | "vengono"
+
+<dire-present> ::= "dico" | "dici" | "dice" | "diciamo" | "dite" | "dicono"
+
+<bere-present> ::= "bevo" | "bevi" | "beve" | "beviamo" | "bevete" | "bevono"
+
+<uscire-present> ::= "esco" | "esci" | "esce" | "usciamo" | "uscite" | "escono"
+
+<salire-present> ::= "salgo" | "sali" | "sale" | "saliamo" | "salite" | "salgono"
+
+<morire-present> ::= "muoio" | "muori" | "muore" | "moriamo" | "morite" | "muoiono"
+
+<sedere-present> ::= "siedo" | "siedi" | "siede" | "sediamo" | "sedete" | "siedono"
+
+<porre-present> ::= "pongo" | "poni" | "pone" | "poniamo" | "ponete" | "pongono"
+
+/* Irregular imperfect forms */
+<irregular-imperfect> ::= <essere-imperfect> | <fare-imperfect> | <dire-imperfect> | <bere-imperfect>
+
+<essere-imperfect> ::= "ero" | "eri" | "era" | "eravamo" | "eravate" | "erano"
+
+<fare-imperfect> ::= "facevo" | "facevi" | "faceva" | "facevamo" | "facevate" | "facevano"
+
+<dire-imperfect> ::= "dicevo" | "dicevi" | "diceva" | "dicevamo" | "dicevate" | "dicevano"
+
+<bere-imperfect> ::= "bevevo" | "bevevi" | "beveva" | "bevevamo" | "bevevate" | "bevevano"
+
+/* Irregular past participles */
+<irregular-past-participle> ::= "stato" | "avuto" | "fatto" | "dato" | "visto" | "detto" | "scritto" | "letto" | "preso" | "messo" | "aperto" | "chiuso" | "venuto" | "nato" | "morto" | "corso" | "vissuto" | "stato" | "bevuto"
+
 /* Imperfect tense */
 <verb-imperfect> ::= @TENSE[imperfect] @MOOD[indicative] <verb-stem> ( "avo" | "avi" | "ava" | "avamo" | "avate" | "avano" | "evo" | "evi" | "eva" | "evamo" | "evate" | "evano" | "ivo" | "ivi" | "iva" | "ivamo" | "ivate" | "ivano" )
+                  | <irregular-imperfect>
 
 /* Future tense */
 <verb-future> ::= @TENSE[future] @MOOD[indicative] <future-stem> ( "ò" | "ai" | "à" | "emo" | "ete" | "anno" )
@@ -491,11 +522,22 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
 
 <irregular-past-participle> ::= @IRREGULAR ( "stato" | "stata" | "stati" | "state" | "avuto" | "avuta" | "avuti" | "avute" | "fatto" | "fatta" | "fatti" | "fatte" | "detto" | "detta" | "detti" | "dette" | "messo" | "messa" | "messi" | "messe" | "preso" | "presa" | "presi" | "prese" | "visto" | "vista" | "visti" | "viste" | "venuto" | "venuta" | "venuti" | "venute" | "andato" | "andata" | "andati" | "andate" | "nato" | "nata" | "nati" | "nate" | "morto" | "morta" | "morti" | "morte" )
 
-/* Verb stems */
+/* Verb stems - expanded with common vocabulary */
 <verb-stem> ::= /[a-zàèéìíîòóùú]+/
+             | "parl" | "am" | "mangi" | "lavor" | "studi" | "cant" | "ball" | "gioc" | "cammin" | "guard"
+
 <first-group-stem> ::= /[a-zàèéìíîòóùú]+/
+                    | "parl" | "am" | "mangi" | "lavor" | "studi" | "cant" | "ball" | "gioc" | "cammin" | "guard" | "scolt" | "cerc" | "trov" | "pens" | "arriv" | "rest"
+
 <second-group-stem> ::= /[a-zàèéìíîòóùú]+/
+                     | "cap" | "fin" | "prefer" | "sent" | "dorm" | "part" | "serv" | "apr"
+
 <third-group-stem> ::= /[a-zàèéìíîòóùú]+/
+                    | "vend" | "prend" | "scriv" | "legg" | "viv" | "corr" | "cred" | "mett" | "chied"
+
+/* Noun stems and vocabulary */
+<noun-stem> ::= /[a-zàèéìíîòóùú]+/
+             | "casa" | "libro" | "tavolo" | "sedia" | "finestra" | "porta" | "uomo" | "donna" | "bambino" | "ragazzo" | "ragazza" | "padre" | "madre" | "fratello" | "sorella" | "amico" | "gatto" | "cane" | "città" | "paese" | "giorno" | "notte" | "tempo" | "vita" | "morte" | "cosa" | "lavoro" | "scuola" | "strada" | "macchina"
 
 /* Object */
 <object> ::= <direct-object>
@@ -578,6 +620,103 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
                         | "assieme" <opt-whitespace> "a"
                         | "insieme" <opt-whitespace> "a"
                         | "al" <opt-whitespace> "di" <opt-whitespace> "là" <opt-whitespace> "di"
+
+/* Noun compounds */
+<compound-noun-italian> ::= <noun> <opt-whitespace> "di" <opt-whitespace> <noun>
+                         | <noun> <opt-whitespace> "-" <opt-whitespace> <noun>
+
+/* Causative constructions */
+<causative-construction> ::= "fare" <opt-whitespace> <verb-infinitive>
+                          | "lasciare" <opt-whitespace> <verb-infinitive>
+
+/* Perception verb constructions */
+<perception-construction> ::= <perception-verb> <opt-whitespace> <verb-infinitive>
+
+<perception-verb> ::= "vedere" | "guardare" | "sentire" | "ascoltare"
+
+/* Conditional constructions */
+<conditional-construction> ::= <se-clause> <opt-whitespace> "," <opt-whitespace> <consequence-clause>
+
+<se-clause> ::= "se" <opt-whitespace> <subject> <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<consequence-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Hypothetical constructions */
+<hypothetical-construction> ::= <se-clause-trapassato> <opt-whitespace> "," <opt-whitespace> <conditional-perfect>
+
+<se-clause-trapassato> ::= "se" <opt-whitespace> <subject> <opt-whitespace> <verb-trapassato-prossimo> <opt-whitespace> <object>?
+
+<conditional-perfect> ::= <subject> <opt-whitespace> <auxiliary-conditional> <opt-whitespace> <past-participle>
+
+<auxiliary-conditional> ::= "avrei" | "avresti" | "avrebbe" | "avremmo" | "avreste" | "avrebbero" | "sarei" | "saresti" | "sarebbe" | "saremmo" | "sareste" | "sarebbero"
+
+/* Temporal constructions */
+<temporal-construction> ::= <temporal-connector> <opt-whitespace> <subordinate-content>
+
+<temporal-connector> ::= "quando" | "mentre" | "appena" | "dopo" <opt-whitespace> "che" | "prima" <opt-whitespace> "che" | "finché" | "da" <opt-whitespace> "quando"
+
+/* Comparative constructions */
+<comparative-construction> ::= <comparison-type> <opt-whitespace> <adjective> <opt-whitespace> "di" <opt-whitespace> <noun-phrase>
+                            | <comparison-type> <opt-whitespace> <adjective> <opt-whitespace> "che" <opt-whitespace> <noun-phrase>
+
+<comparison-type> ::= "più" | "meno" | "tanto" | "così"
+
+/* Superlative constructions */
+<superlative-construction> ::= "il" <opt-whitespace> "più" <opt-whitespace> <adjective>
+                            | "il" <opt-whitespace> "meno" <opt-whitespace> <adjective>
+                            | "la" <opt-whitespace> "più" <opt-whitespace> <adjective>
+                            | "la" <opt-whitespace> "meno" <opt-whitespace> <adjective>
+
+/* Gerund constructions */
+<gerund-construction> ::= <gerundio>
+
+<gerundio> ::= <verb-stem> ( "ando" | "endo" )
+
+/* Infinitive constructions */
+<infinitive-construction> ::= <infinitive-with-preposition> | <bare-infinitive>
+
+<infinitive-with-preposition> ::= ( "a" | "di" | "per" | "da" | "senza" | "prima" <opt-whitespace> "di" | "dopo" ) <opt-whitespace> <verb-infinitive>
+
+<bare-infinitive> ::= <verb-infinitive>
+
+/* Impersonal expressions */
+<impersonal-expression> ::= "bisogna" <opt-whitespace> <verb-infinitive>
+                         | "occorre" <opt-whitespace> <verb-infinitive>
+                         | "è" <opt-whitespace> ( "necessario" | "possibile" | "impossibile" | "importante" | "facile" | "difficile" ) <opt-whitespace> ( <verb-infinitive> | "che" <opt-whitespace> <subject> <opt-whitespace> <verb-subjunctive> )
+                         | "piove"
+                         | "nevica"
+                         | "fa" <opt-whitespace> ( "caldo" | "freddo" | "bello" | "brutto" )
+
+/* Passive voice constructions */
+<passive-construction> ::= <subject> <opt-whitespace> ( "essere" | "venire" ) <opt-whitespace> <past-participle> ( <opt-whitespace> "da" <opt-whitespace> <noun-phrase> )?
+
+/* Relative clause variations */
+<relative-clause-expanded> ::= <relative-pronoun-che> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+                            | <relative-pronoun-cui> <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+                            | <relative-pronoun-quale> <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+
+<relative-pronoun-che> ::= "che"
+
+<relative-pronoun-cui> ::= "cui" | "di" <opt-whitespace> "cui" | "a" <opt-whitespace> "cui" | "da" <opt-whitespace> "cui" | "in" <opt-whitespace> "cui" | "con" <opt-whitespace> "cui"
+
+<relative-pronoun-quale> ::= "il" <opt-whitespace> "quale" | "la" <opt-whitespace> "quale" | "i" <opt-whitespace> "quali" | "le" <opt-whitespace> "quali"
+
+/* Interrogative constructions */
+<interrogative-construction> ::= <direct-question> | <indirect-question>
+
+<direct-question> ::= <declarative-clause> "?"
+                   | <question-word> <opt-whitespace> <verb> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+<indirect-question> ::= ( "Non" <opt-whitespace> )? ( "so" | "chiedo" ) <opt-whitespace> ( "se" | <question-word> ) <opt-whitespace> <subordinate-content>
+
+/* Emphatic constructions */
+<emphatic-construction> ::= "è" <opt-whitespace> <noun-phrase> <opt-whitespace> "che" <opt-whitespace> <verb-phrase>
+                         | "è" <opt-whitespace> <noun-phrase> <opt-whitespace> "chi" <opt-whitespace> <verb-phrase>
+
+/* Exclamative constructions */
+<exclamative-construction> ::= "Che" <opt-whitespace> <noun> "!"
+                            | "Come" <opt-whitespace> <verb-phrase> "!"
+                            | "Quanto" <opt-whitespace> <adjective> "!"
 
 /* Prepositional articles (contractions) */
 <prepositional-article> ::= "al" | "allo" | "alla" | "ai" | "agli" | "alle"
