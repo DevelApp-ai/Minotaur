@@ -120,6 +120,7 @@ dotnet test src/Minotaur.sln --collect:"XPlat Code Coverage"
 ## 📚 Documentation
 
 - [Grammar Generation Guide](./src/Minotaur/GrammarGeneration/README.md)
+- [UI Flow Documentation](./docs/ui-screenshots/UI_FLOW.md) - Comprehensive guide to all UI pages with screenshots
 - [GAP Analysis](./GAP_Analysis_StepParser_Implementation.md)
 - [Technical Design Documents](./docs/)
 
