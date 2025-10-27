@@ -1,0 +1,210 @@
+@* Railroad Diagram Component for Grammar Visualization *@
+
+<div class="railroad-diagram-container">
+    @if (!string.IsNullOrEmpty(RuleName) && !string.IsNullOrEmpty(RuleDefinition))
+    {
+        <div class="diagram-header">
+            <h6>@RuleName</h6>
+            <div class="diagram-actions">
+                <button class="btn btn-sm btn-outline-secondary" @onclick="ExportSVG" title="Export as SVG">
+                    <i class="bi bi-download"></i> SVG
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" @onclick="ExportPNG" title="Export as PNG">
+                    <i class="bi bi-image"></i> PNG
+                </button>
+            </div>
+        </div>
+        
+        <div class="diagram-canvas" @ref="diagramRef">
+            @* SVG Railroad Diagram will be rendered here *@
+            <svg width="100%" height="@(DiagramHeight)px" class="railroad-svg">
+                @((MarkupString)GenerateSVGDiagram())
+            </svg>
+        </div>
+        
+        <div class="diagram-info">
+            <small class="text-muted">
+                <i class="bi bi-info-circle"></i> 
+                Railroad diagram shows the syntax flow for this grammar rule
+            </small>
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-muted p-4">
+            <i class="bi bi-diagram-3 fs-1"></i>
+            <p>Select a grammar rule to view its railroad diagram</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? RuleName { get; set; }
+    
+    [Parameter]
+    public string? RuleDefinition { get; set; }
+    
+    [Parameter]
+    public int DiagramHeight { get; set; } = 200;
+    
+    private ElementReference diagramRef;
+    
+    private string GenerateSVGDiagram()
+    {
+        if (string.IsNullOrEmpty(RuleDefinition))
+            return string.Empty;
+            
+        // Simple railroad diagram generation
+        // This is a basic implementation - can be enhanced with full EBNF parser
+        var sb = new System.Text.StringBuilder();
+        
+        // Start with basic SVG structure
+        int y = 50;
+        int x = 20;
+        
+        // Entry point
+        sb.Append($"<circle cx=\"{x}\" cy=\"{y}\" r=\"5\" fill=\"#007bff\" />");
+        x += 15;
+        
+        // Parse the rule definition into components
+        var components = ParseRuleComponents(RuleDefinition);
+        
+        foreach (var component in components)
+        {
+            if (component.Type == "terminal")
+            {
+                // Terminal: rounded rectangle
+                int width = Math.Max(60, component.Text.Length * 10);
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" rx=\"15\" fill=\"#e3f2fd\" stroke=\"#2196f3\" stroke-width=\"2\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"12\" fill=\"#1565c0\">{System.Web.HttpUtility.HtmlEncode(component.Text)}</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
+            }
+            else if (component.Type == "nonterminal")
+            {
+                // Non-terminal: rectangle
+                int width = Math.Max(80, component.Text.Length * 10);
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" fill=\"#fff3e0\" stroke=\"#ff9800\" stroke-width=\"2\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#e65100\">{System.Web.HttpUtility.HtmlEncode(component.Text)}</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
+            }
+            else if (component.Type == "choice")
+            {
+                // Choice operator (|)
+                sb.Append($"<text x=\"{x}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"16\" font-weight=\"bold\" fill=\"#d32f2f\">|</text>");
+                sb.Append($"<line x1=\"{x + 10}\" y1=\"{y}\" x2=\"{x + 30}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += 30;
+            }
+        }
+        
+        // Exit point
+        sb.Append($"<circle cx=\"{x}\" cy=\"{y}\" r=\"5\" fill=\"#007bff\" />");
+        sb.Append($"<circle cx=\"{x}\" cy=\"{y}\" r=\"8\" fill=\"none\" stroke=\"#007bff\" stroke-width=\"2\" />");
+        
+        return sb.ToString();
+    }
+    
+    private List<DiagramComponent> ParseRuleComponents(string definition)
+    {
+        var components = new List<DiagramComponent>();
+        
+        // Simple parser - split by common patterns
+        // This is a basic implementation, can be enhanced with proper ANTLR parsing
+        var parts = definition.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var part in parts)
+        {
+            if (part == "|")
+            {
+                components.Add(new DiagramComponent { Type = "choice", Text = "|" });
+            }
+            else if (part.StartsWith("'") || part.StartsWith("\""))
+            {
+                // Terminal (literal)
+                components.Add(new DiagramComponent { Type = "terminal", Text = part.Trim('\'', '"') });
+            }
+            else if (char.IsUpper(part[0]) && part.All(c => char.IsUpper(c) || c == '_'))
+            {
+                // Token/Terminal (uppercase)
+                components.Add(new DiagramComponent { Type = "terminal", Text = part });
+            }
+            else if (part != ":" && part != ";" && part != "(" && part != ")" && part != "*" && part != "+" && part != "?")
+            {
+                // Non-terminal rule reference
+                components.Add(new DiagramComponent { Type = "nonterminal", Text = part });
+            }
+        }
+        
+        return components;
+    }
+    
+    private async Task ExportSVG()
+    {
+        // Export functionality - can be implemented with JS interop
+        await Task.CompletedTask;
+        // TODO: Implement SVG export
+    }
+    
+    private async Task ExportPNG()
+    {
+        // Export functionality - can be implemented with JS interop
+        await Task.CompletedTask;
+        // TODO: Implement PNG export
+    }
+    
+    private class DiagramComponent
+    {
+        public string Type { get; set; } = "";
+        public string Text { get; set; } = "";
+    }
+}
+
+<style>
+    .railroad-diagram-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .diagram-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .diagram-header h6 {
+        margin: 0;
+        color: #495057;
+    }
+    
+    .diagram-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .diagram-canvas {
+        flex: 1;
+        overflow: auto;
+        padding: 1rem;
+        background: #f8f9fa;
+    }
+    
+    .railroad-svg {
+        display: block;
+        margin: 0 auto;
+    }
+    
+    .diagram-info {
+        padding: 0.5rem;
+        border-top: 1px solid #dee2e6;
+        background: #f8f9fa;
+    }
+</style>
