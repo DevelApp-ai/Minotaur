@@ -1,0 +1,582 @@
+# Spanish Language Example Sentences
+# Demonstrating Regular and Irregular Verbs with Context-Sensitive Rules
+
+## Regular Verbs - AR verbs - Present Tense
+
+Yo hablo español.
+Tú hablas inglés.
+Él habla francés.
+Ella trabaja en Madrid.
+Nosotros estudiamos mucho.
+Vosotros cantáis bien.
+Ellos bailan salsa.
+Ustedes compran libros.
+
+## Regular Verbs - ER verbs - Present Tense
+
+Yo como pan.
+Tú bebes agua.
+Él lee el periódico.
+Ella corre rápido.
+Nosotros comemos juntos.
+Vosotros leéis novelas.
+Ellos aprenden español.
+Ustedes comprenden la lección.
+
+## Regular Verbs - IR verbs - Present Tense
+
+Yo vivo en Barcelona.
+Tú escribes cartas.
+Él abre la puerta.
+Ella sube las escaleras.
+Nosotros vivimos aquí.
+Vosotros escribís poemas.
+Ellos reciben regalos.
+Ustedes deciden rápido.
+
+## Regular Verbs - Preterite Tense
+
+Yo hablé con María.
+Tú comiste pizza.
+Él vivió en París.
+Ella trabajó ayer.
+Nosotros estudiamos anoche.
+Vosotros cantasteis bien.
+Ellos bailaron toda la noche.
+Ustedes compraron flores.
+
+## Regular Verbs - Imperfect Tense
+
+Yo hablaba español.
+Tú comías mucho.
+Él vivía en México.
+Ella trabajaba los lunes.
+Nosotros estudiábamos juntos.
+Vosotros cantabais en el coro.
+Ellos bailaban cada día.
+Ustedes compraban verduras.
+
+## Regular Verbs - Future Tense
+
+Yo hablaré mañana.
+Tú comerás a las tres.
+Él vivirá en España.
+Ella trabajará aquí.
+Nosotros estudiaremos más.
+Vosotros cantaréis en la fiesta.
+Ellos bailarán salsa.
+Ustedes comprarán un coche.
+
+## Regular Verbs - Conditional
+
+Yo hablaría contigo.
+Tú comerías más.
+Él viviría en Italia.
+Ella trabajaría mejor.
+Nosotros estudiaríamos juntos.
+Vosotros cantaríais bien.
+Ellos bailarían tango.
+Ustedes comprarían la casa.
+
+## Regular Verbs - Perfect Tense
+
+Yo he hablado con él.
+Tú has comido ya.
+Él ha vivido aquí.
+Ella ha trabajado mucho.
+Nosotros hemos estudiado.
+Vosotros habéis cantado.
+Ellos han bailado.
+Ustedes han comprado flores.
+
+## Irregular Verb: ser (to be - permanent)
+
+# Present
+Yo soy estudiante.
+Tú eres español.
+Él es médico.
+Ella es inteligente.
+Nosotros somos amigos.
+Vosotros sois de Madrid.
+Ellos son hermanos.
+Ustedes son profesores.
+
+# Preterite
+Yo fui al parque.
+Tú fuiste ayer.
+Él fue a la tienda.
+Ella fue muy amable.
+Nosotros fuimos juntos.
+Vosotros fuisteis primero.
+Ellos fueron temprano.
+Ustedes fueron felices.
+
+# Imperfect
+Yo era joven.
+Tú eras muy alto.
+Él era profesor.
+Ella era bonita.
+Nosotros éramos estudiantes.
+Vosotros erais buenos.
+Ellos eran vecinos.
+Ustedes eran amigos.
+
+# Future
+Yo seré médico.
+Tú serás famoso.
+Él será el jefe.
+Ella será doctora.
+Nosotros seremos ricos.
+Vosotros seréis felices.
+Ellos serán campeones.
+Ustedes serán bienvenidos.
+
+## Irregular Verb: estar (to be - temporary/location)
+
+# Present
+Yo estoy aquí.
+Tú estás cansado.
+Él está en casa.
+Ella está contenta.
+Nosotros estamos bien.
+Vosotros estáis ocupados.
+Ellos están en Madrid.
+Ustedes están listos.
+
+# Preterite
+Yo estuve en París.
+Tú estuviste enfermo.
+Él estuvo aquí ayer.
+Ella estuvo contenta.
+Nosotros estuvimos juntos.
+Vosotros estuvisteis allí.
+Ellos estuvieron presentes.
+Ustedes estuvieron bien.
+
+# Imperfect
+Yo estaba en casa.
+Tú estabas triste.
+Él estaba ocupado.
+Ella estaba feliz.
+Nosotros estábamos juntos.
+Vosotros estabais cansados.
+Ellos estaban contentos.
+Ustedes estaban preparados.
+
+## Irregular Verb: haber (to have - auxiliary)
+
+# Present Perfect
+Yo he comido.
+Tú has trabajado.
+Él ha llegado.
+Ella ha estudiado.
+Nosotros hemos visto.
+Vosotros habéis hecho.
+Ellos han ido.
+Ustedes han venido.
+
+# Pluperfect
+Yo había comido antes.
+Tú habías trabajado ya.
+Él había llegado tarde.
+Ella había estudiado mucho.
+Nosotros habíamos visto eso.
+Vosotros habíais hecho todo.
+Ellos habían ido allí.
+Ustedes habían venido temprano.
+
+## Irregular Verb: tener (to have)
+
+# Present
+Yo tengo un libro.
+Tú tienes razón.
+Él tiene hambre.
+Ella tiene sed.
+Nosotros tenemos tiempo.
+Vosotros tenéis suerte.
+Ellos tienen dinero.
+Ustedes tienen frío.
+
+# Preterite
+Yo tuve una idea.
+Tú tuviste suerte.
+Él tuvo éxito.
+Ella tuvo miedo.
+Nosotros tuvimos tiempo.
+Vosotros tuvisteis razón.
+Ellos tuvieron paciencia.
+Ustedes tuvieron que salir.
+
+# Future
+Yo tendré más tiempo.
+Tú tendrás éxito.
+Él tendrá que estudiar.
+Ella tendrá razón.
+Nosotros tendremos hambre.
+Vosotros tendréis suerte.
+Ellos tendrán dinero.
+Ustedes tendrán que esperar.
+
+## Irregular Verb: hacer (to do/make)
+
+# Present
+Yo hago la tarea.
+Tú haces ejercicio.
+Él hace frío.
+Ella hace la comida.
+Nosotros hacemos planes.
+Vosotros hacéis ruido.
+Ellos hacen deporte.
+Ustedes hacen preguntas.
+
+# Preterite
+Yo hice mi trabajo.
+Tú hiciste bien.
+Él hizo un pastel.
+Ella hizo ejercicio.
+Nosotros hicimos la tarea.
+Vosotros hicisteis todo.
+Ellos hicieron el trabajo.
+Ustedes hicieron un buen trabajo.
+
+# Future
+Yo haré todo.
+Tú harás la tarea.
+Él hará ejercicio.
+Ella hará la cena.
+Nosotros haremos planes.
+Vosotros haréis deporte.
+Ellos harán preguntas.
+Ustedes harán lo posible.
+
+## Irregular Verb: ir (to go)
+
+# Present
+Yo voy al cine.
+Tú vas a casa.
+Él va a la escuela.
+Ella va al trabajo.
+Nosotros vamos juntos.
+Vosotros vais al parque.
+Ellos van a Madrid.
+Ustedes van de compras.
+
+# Preterite (same as ser)
+Yo fui al mercado.
+Tú fuiste ayer.
+Él fue a Barcelona.
+Ella fue sola.
+Nosotros fuimos juntos.
+Vosotros fuisteis en tren.
+Ellos fueron temprano.
+Ustedes fueron en coche.
+
+# Imperfect
+Yo iba al colegio.
+Tú ibas cada día.
+Él iba a menudo.
+Ella iba siempre.
+Nosotros íbamos juntos.
+Vosotros ibais al gimnasio.
+Ellos iban al parque.
+Ustedes iban de viaje.
+
+## Irregular Verb: poder (can/to be able)
+
+# Present
+Yo puedo nadar.
+Tú puedes correr.
+Él puede venir.
+Ella puede ayudar.
+Nosotros podemos ir.
+Vosotros podéis salir.
+Ellos pueden estudiar.
+Ustedes pueden entrar.
+
+# Preterite
+Yo pude hacerlo.
+Tú pudiste venir.
+Él pudo terminar.
+Ella pudo ayudar.
+Nosotros pudimos ganar.
+Vosotros pudisteis salir.
+Ellos pudieron ir.
+Ustedes pudieron entrar.
+
+# Future
+Yo podré ayudarte.
+Tú podrás venir.
+Él podrá hacerlo.
+Ella podrá ir.
+Nosotros podremos salir.
+Vosotros podréis entrar.
+Ellos podrán estudiar.
+Ustedes podrán participar.
+
+## Irregular Verb: querer (to want/love)
+
+# Present
+Yo quiero café.
+Tú quieres agua.
+Él quiere comer.
+Ella quiere salir.
+Nosotros queremos ir.
+Vosotros queréis estudiar.
+Ellos quieren dormir.
+Ustedes quieren ayudar.
+
+# Preterite
+Yo quise ir.
+Tú quisiste venir.
+Él quiso ayudar.
+Ella quiso estudiar.
+Nosotros quisimos salir.
+Vosotros quisisteis participar.
+Ellos quisieron ir.
+Ustedes quisieron quedarse.
+
+## Gender Agreement - Masculine
+
+un libro grande
+el gato negro
+un hombre alto
+el niño feliz
+un coche rojo
+el perro pequeño
+
+## Gender Agreement - Feminine
+
+una casa grande
+la gata negra
+una mujer alta
+la niña feliz
+una mesa roja
+la perra pequeña
+
+## Articles - Definite
+
+el libro
+la casa
+los libros
+las casas
+
+## Articles - Indefinite
+
+un libro
+una casa
+unos libros
+unas casas
+
+## Demonstratives
+
+Este libro es interesante.
+Esta casa es bonita.
+Estos libros son nuevos.
+Estas casas son grandes.
+Ese hombre es alto.
+Esa mujer es inteligente.
+Esos niños son felices.
+Esas niñas son estudiosas.
+Aquel edificio es antiguo.
+Aquella montaña es alta.
+Aquellos árboles son viejos.
+Aquellas flores son hermosas.
+
+## Possessives
+
+Mi libro está aquí.
+Tu casa es grande.
+Su coche es rojo.
+Nuestro perro es pequeño.
+Vuestro gato es negro.
+Sus libros son interesantes.
+
+## Adjectives - Position
+
+una casa blanca
+un coche nuevo
+una chica inteligente
+un hombre viejo
+una buena idea
+un gran libro
+el primer día
+la tercera vez
+
+## Comparatives
+
+Juan es más alto que Pedro.
+María es menos inteligente que Ana.
+Este libro es tan interesante como ese.
+Yo soy mejor que tú en fútbol.
+Ella es peor que él en matemáticas.
+Mi hermano es mayor que yo.
+Tu hermana es menor que tú.
+
+## Superlatives
+
+Juan es el más alto.
+María es la más inteligente.
+Este es el mejor libro.
+Esa es la peor película.
+Él es el mayor de la familia.
+Ella es la menor de todas.
+
+## Reflexive Verbs
+
+Yo me lavo las manos.
+Tú te levantas temprano.
+Él se afeita cada día.
+Ella se peina el pelo.
+Nosotros nos bañamos por la noche.
+Vosotros os vestís rápido.
+Ellos se acuestan tarde.
+Ustedes se sientan aquí.
+
+## Progressive Tense (estar + gerund)
+
+Yo estoy comiendo.
+Tú estás estudiando.
+Él está trabajando.
+Ella está leyendo.
+Nosotros estamos hablando.
+Vosotros estáis corriendo.
+Ellos están bailando.
+Ustedes están escribiendo.
+
+## Periphrastic Future (ir a + infinitive)
+
+Yo voy a estudiar.
+Tú vas a comer.
+Él va a trabajar.
+Ella va a leer.
+Nosotros vamos a salir.
+Vosotros vais a bailar.
+Ellos van a viajar.
+Ustedes van a comprar.
+
+## Negation
+
+Yo no hablo inglés.
+Tú no comes carne.
+Él no vive aquí.
+Ella no trabaja hoy.
+Nosotros no estudiamos.
+Vosotros no cantáis.
+Ellos no bailan.
+Ustedes no compran nada.
+
+## Double Negation (grammatical in Spanish)
+
+No tengo nada.
+No veo a nadie.
+Nunca he estado allí.
+Tampoco quiero ir.
+Ni él ni ella vienen.
+No como nunca carne.
+
+## Questions - Yes/No
+
+¿Hablas español?
+¿Comes carne?
+¿Vives aquí?
+¿Trabajas hoy?
+¿Estudias mucho?
+¿Cantas bien?
+¿Bailas salsa?
+¿Compras libros?
+
+## Questions - Wh-questions
+
+¿Qué haces?
+¿Quién eres?
+¿Dónde vives?
+¿Cuándo llegas?
+¿Cómo estás?
+¿Por qué estudias?
+¿Cuál prefieres?
+¿Cuántos años tienes?
+
+## Subordinate Clauses with que
+
+Creo que es verdad.
+Pienso que tienes razón.
+Sé que él viene.
+Digo que ella trabaja.
+Espero que estés bien.
+Dudo que sea cierto.
+
+## Relative Clauses
+
+El libro que leí es interesante.
+La mujer que conocí es amable.
+El hombre que trabaja aquí es mi padre.
+La casa que compramos es grande.
+Los niños que juegan son felices.
+Las flores que plantamos son bonitas.
+
+## Conditional Sentences
+
+Si tengo tiempo iré.
+Si estudias aprobarás.
+Si llueve nos quedaremos.
+Si vienes te veré.
+Si puedo ayudaré.
+Si quieres podemos ir.
+
+## Complex Sentences
+
+Yo creo que él dijo que vendría.
+Ella piensa que nosotros sabemos que es verdad.
+Sé que tú crees que ella tiene razón.
+Dudo que él piense que vendremos.
+
+## Subjunctive - Present
+
+Espero que vengas.
+Dudo que sea verdad.
+Es importante que estudies.
+Quiero que me ayudes.
+Me alegro de que estés bien.
+No creo que tenga razón.
+
+## Subjunctive - Imperfect
+
+Si tuviera dinero viajaría.
+Si fuera rico compraría una casa.
+Si pudiera te ayudaría.
+Si supiera la respuesta te la diría.
+Quería que vinieras.
+Dudaba que fuera cierto.
+
+## Imperative
+
+¡Habla más despacio!
+¡Come tu comida!
+¡Vive tu vida!
+¡Trabaja duro!
+¡Estudia más!
+¡Canta una canción!
+¡Baila conmigo!
+¡Compra pan!
+
+## Negative Imperative (uses subjunctive)
+
+¡No hables!
+¡No comas eso!
+¡No vivas aquí!
+¡No trabajes tanto!
+¡No estudies ahora!
+¡No cantes alto!
+¡No bailes solo!
+¡No compres nada!
+
+## Discourse Markers
+
+Primero vamos al mercado.
+Luego iremos a casa.
+Después comeremos.
+Finalmente descansaremos.
+Sin embargo no tengo tiempo.
+Por lo tanto me quedo.
+Además quiero estudiar.
+También necesito ayuda.
