@@ -5,83 +5,163 @@ ContextSensitive: true
 SymbolTableSharing: hierarchical
 
 /*
- * Croatian Natural Language Grammar
+ * Croatian Natural Language Grammar - Comprehensive Edition
  * South Slavic with 7 cases, three genders, aspect system
+ * Includes full verb conjugations, passive voice, and complex sentence structures
  */
 
-Keywords: i, ili, ali, a, da, koji, koja, koje, tko, što, kada, gdje, kako, zašto, ako, bi, to, tako, ne, ni, nikad, ništa, nitko, u, na, iz, do, od, za, s, bez, poslije, prije, nad, pod, između, kod, oko, taj, ta, to, ti, te, moj, moja, moje, tvoj, tvoja, tvoje, njegov, njen, njihov, naš, naša, naše, vaš, vaša, vaše, ja, ti, on, ona, ono, mi, vi, oni, one, mene, tebe, njega, nju, nas, vas, njih
+Keywords: i, ili, ali, a, da, koji, koja, koje, tko, što, kada, gdje, kako, zašto, ako, bi, to, tako, ne, ni, nikad, ništa, nitko, u, na, iz, do, od, za, s, sa, bez, poslije, prije, nad, pod, ispod, iznad, između, kod, oko, kraj, pored, prema, uz, preko, kroz, nakon, tokom, tijekom, taj, ta, to, ti, ta, ta, te, tog, tome, tom, tim, moj, moja, moje, tvoj, tvoja, tvoje, njegov, njegova, njegovo, njen, njena, njeno, njihov, njihova, njihovo, naš, naša, naše, vaš, vaša, vaše, ja, ti, on, ona, ono, mi, vi, oni, one, ona, mene, meni, tebe, tebi, njega, njemu, nju, njoj, nas, nama, vas, vama, njih, njima, jesam, jesi, jest, jesmo, jeste, jesu, bio, bila, bilo, bili, bile, biti, bih, bi, bismo, biste, biše
 
-<sentence> ::= <main-clause> | <subordinate-clause> | <compound-sentence> | <complex-sentence>
+<sentence> ::= <main-clause> | <subordinate-clause> | <compound-sentence> | <complex-sentence> | <multi-embedded-sentence> | <split-complex-sentence>
 
-<main-clause> ::= <declarative-clause> | <interrogative-clause> | <imperative-clause>
+<main-clause> ::= <declarative-clause> | <interrogative-clause> | <imperative-clause> | <exclamative-clause>
 
 <declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
 
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
 <subject> ::= <pronoun-subject> | <noun-phrase> | <proper-noun>
 
-<pronoun-subject> ::= @CASE[nominative] ( "ja" | "ti" | "on" | "ona" | "ono" | "mi" | "vi" | "oni" | "one" )
+<pronoun-subject> ::= @CASE[nominative] ( "ja" | "ti" | "on" | "ona" | "ono" | "mi" | "vi" | "oni" | "one" | "ona" )
+
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
+
+<exclamative-word> ::= "kakav" | "kakva" | "kakvo" | "što za" | "kako"
 
 <noun-phrase> ::= <determiner>? <opt-whitespace> <adjective>* <opt-whitespace> <noun>
 
-<determiner> ::= "taj" | "ta" | "to" | "moj" | "moja" | "tvoj" | "tvoja"
+<determiner> ::= "taj" | "ta" | "to" | "ti" | "ta" | "te" | "tog" | "tome" | "tom" | "tim" | "moj" | "moja" | "tvoj" | "tvoja" | "njegov" | "njen" | "naš" | "naša" | "vaš" | "vaša"
 
-<noun> ::= <noun-stem> <case-ending>?
+/* Seven-case noun system */
+<noun> ::= <noun-nominative> | <noun-genitive> | <noun-dative> | <noun-accusative> | <noun-vocative> | <noun-locative> | <noun-instrumental>
+
+<noun-nominative> ::= @CASE[nominative] <noun-stem> ( "" | "a" | "o" | "e" | "i" )
+
+<noun-genitive> ::= @CASE[genitive] <noun-stem> ( "a" | "e" | "i" | "u" )
+
+<noun-dative> ::= @CASE[dative] <noun-stem> ( "u" | "i" | "ovi" | "ima" )
+
+<noun-accusative> ::= @CASE[accusative] <noun-stem> ( "" | "a" | "u" | "o" | "e" )
+
+<noun-vocative> ::= @CASE[vocative] <noun-stem> ( "e" | "o" | "u" | "a" )
+
+<noun-locative> ::= @CASE[locative] <noun-stem> ( "u" | "i" | "ima" )
+
+<noun-instrumental> ::= @CASE[instrumental] <noun-stem> ( "om" | "em" | "ima" )
 
 <noun-stem> ::= /[a-zčćđšž]+/
 
-<case-ending> ::= "a" | "u" | "e" | "i" | "om" | "ima"
+<case-ending> ::= "a" | "u" | "e" | "i" | "om" | "ima" | "ovi" | "ovima"
 
-<adjective> ::= <adj-stem> ( "i" | "a" | "o" | "iji" | "ija" | "ije" )
+<adjective> ::= <adj-stem> <adj-ending>
+
+<adj-ending> ::= "i" | "a" | "o" | "e" | "og" | "om" | "oj" | "ih" | "im" | "ima" | "iji" | "ija" | "ije" | "ijeg" | "ijem" | "ijoj" | "ijim" | "naj" <adj-stem> <adj-ending>
 
 <adj-stem> ::= /[a-zčćđšž]+/
 
-<verb-phrase> ::= <finite-verb> | <modal-verb> <opt-whitespace> <infinitive>
+<verb-phrase> ::= <finite-verb> | <modal-verb> <opt-whitespace> <infinitive> | <passive-voice> | <aspectual-construction>
 
-<finite-verb> ::= <verb-present> | <verb-past> | <verb-future>
+<passive-voice> ::= @VOICE[passive] <auxiliary-verb> <opt-whitespace> <past-participle> ( <opt-whitespace> <agent-phrase> )?
 
-<verb-present> ::= @TENSE[present] <verb-stem> ( "m" | "š" | "" | "mo" | "te" | "ju" )
+<auxiliary-verb> ::= "jesam" | "jesi" | "jest" | "jesmo" | "jeste" | "jesu" | "bio" | "bila" | "bilo" | "bili" | "bile" | "sam" | "si" | "je" | "smo" | "ste" | "su"
 
-<verb-past> ::= @TENSE[past] <verb-stem> ( "o" | "la" | "lo" | "li" | "le" )
+<past-participle> ::= <verb-stem> ( "o" | "la" | "lo" | "li" | "le" ) | <verb-stem> ( "n" | "na" | "no" | "ni" | "ne" ) | <verb-stem> ( "t" | "ta" | "to" | "ti" | "te" )
 
-<verb-future> ::= @TENSE[future] ( "ću" | "ćeš" | "će" ) <opt-whitespace> <infinitive>
+<agent-phrase> ::= @AGENT ( "od" | "od strane" ) <opt-whitespace> <noun-phrase-genitive>
 
-<infinitive> ::= <verb-stem> ( "ti" | "ati" | "iti" )
+<noun-phrase-genitive> ::= <noun-genitive>
 
-<modal-verb> ::= "mogu" | "možeš" | "može" | "hoću" | "hoćeš" | "hoće" | "moram" | "moraš" | "mora"
+<aspectual-construction> ::= <aspectual-verb> <opt-whitespace> <infinitive>
+
+<aspectual-verb> ::= "početi" | "počinjem" | "počinješ" | "počinje" | "prestati" | "prestajem" | "prestaješ" | "prestaje" | "nastaviti" | "nastavljam" | "nastavljaš" | "nastavlja"
+
+<finite-verb> ::= <verb-present> | <verb-past> | <verb-future> | <verb-conditional> | <irregular-verb>
+
+<verb-present> ::= @TENSE[present] <verb-stem> ( "am" | "aš" | "a" | "amo" | "ate" | "aju" | "im" | "iš" | "i" | "imo" | "ite" | "e" | "m" | "š" | "" | "mo" | "te" | "ju" )
+
+<verb-past> ::= @TENSE[past] ( "jesam" | "jesi" | "jest" | "jesmo" | "jeste" | "jesu" | "sam" | "si" | "je" | "smo" | "ste" | "su" )? <opt-whitespace> <verb-stem> ( "o" | "la" | "lo" | "li" | "le" )
+
+<verb-future> ::= @TENSE[future] ( "ću" | "ćeš" | "će" | "ćemo" | "ćete" | "će" ) <opt-whitespace> <infinitive>
+
+<verb-conditional> ::= @MOOD[conditional] ( "bih" | "bi" | "bismo" | "biste" | "bi" ) <opt-whitespace> <past-participle>
+
+/* Twelve irregular verbs */
+<irregular-verb> ::= <verb-biti> | <verb-htjeti> | <verb-moći> | <verb-znati> | <verb-ići> | <verb-jesti> | <verb-piti> | <verb-raditi> | <verb-govoriti> | <verb-doći> | <verb-dati> | <verb-vidjeti>
+
+<verb-biti> ::= "jesam" | "jesi" | "jest" | "jesmo" | "jeste" | "jesu" | "sam" | "si" | "je" | "smo" | "ste" | "su" | "bio" | "bila" | "bilo" | "bili" | "bile" | "ću biti" | "ćeš biti" | "će biti" | "biti"
+
+<verb-htjeti> ::= "hoću" | "hoćeš" | "hoće" | "hoćemo" | "hoćete" | "hoće" | "htio" | "htjela" | "htjelo" | "htjeli" | "htjele" | "htjeti"
+
+<verb-moći> ::= "mogu" | "možeš" | "može" | "možemo" | "možete" | "mogu" | "mogao" | "mogla" | "moglo" | "mogli" | "mogle" | "moći"
+
+<verb-znati> ::= "znam" | "znaš" | "zna" | "znamo" | "znate" | "znaju" | "znao" | "znala" | "znalo" | "znali" | "znale" | "znati"
+
+<verb-ići> ::= "idem" | "ideš" | "ide" | "idemo" | "idete" | "idu" | "išao" | "išla" | "išlo" | "išli" | "išle" | "ići"
+
+<verb-jesti> ::= "jedem" | "jedeš" | "jede" | "jedemo" | "jedete" | "jedu" | "jeo" | "jela" | "jelo" | "jeli" | "jele" | "jesti"
+
+<verb-piti> ::= "pijem" | "piješ" | "pije" | "pijemo" | "pijete" | "piju" | "pio" | "pila" | "pilo" | "pili" | "pile" | "piti"
+
+<verb-raditi> ::= "radim" | "radiš" | "radi" | "radimo" | "radite" | "rade" | "radio" | "radila" | "radilo" | "radili" | "radile" | "raditi"
+
+<verb-govoriti> ::= "govorim" | "govoriš" | "govori" | "govorimo" | "govorite" | "govore" | "govorio" | "govorila" | "govorilo" | "govorili" | "govorile" | "govoriti"
+
+<verb-doći> ::= "dođem" | "dođeš" | "dođe" | "dođemo" | "dođete" | "dođu" | "došao" | "došla" | "došlo" | "došli" | "došle" | "doći"
+
+<verb-dati> ::= "dam" | "daš" | "da" | "damo" | "date" | "daju" | "dao" | "dala" | "dalo" | "dali" | "dale" | "dati"
+
+<verb-vidjeti> ::= "vidim" | "vidiš" | "vidi" | "vidimo" | "vidite" | "vide" | "vidio" | "vidjela" | "vidjelo" | "vidjeli" | "vidjele" | "vidjeti"
+
+<infinitive> ::= <verb-stem> ( "ti" | "ati" | "iti" | "eti" )
+
+<modal-verb> ::= "mogu" | "možeš" | "može" | "možemo" | "možete" | "mogu" | "hoću" | "hoćeš" | "hoće" | "hoćemo" | "hoćete" | "hoće" | "moram" | "moraš" | "mora" | "moramo" | "morate" | "moraju"
 
 <verb-stem> ::= /[a-zčćđšž]+/
 
+/* Conditional sentences */
+<conditional-sentence> ::= <simple-conditional> | <contrary-to-fact-conditional>
+
+<simple-conditional> ::= "ako" <opt-whitespace> <declarative-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<contrary-to-fact-conditional> ::= "kad" <opt-whitespace> <verb-past> <opt-whitespace> "," <opt-whitespace> <verb-conditional>
+
 <object> ::= <noun-phrase> | <pronoun-object>
 
-<pronoun-object> ::= "me" | "te" | "ga" | "je" | "nas" | "vas" | "ih"
+<pronoun-object> ::= @CASE[accusative] ( "me" | "mene" | "te" | "tebe" | "ga" | "njega" | "je" | "nju" | "nas" | "vas" | "ih" | "njih" )
 
-<adverbial> ::= <adverb> | <prepositional-phrase>
+<adverbial> ::= <adverb> | <prepositional-phrase> | <temporal-expression>
 
-<adverb> ::= "dobro" | "loše" | "brzo" | "polako" | "sada" | "jučer" | "danas" | "sutra"
+<adverb> ::= "dobro" | "loše" | "brzo" | "polako" | "sada" | "jučer" | "danas" | "sutra" | "uvijek" | "nikad" | "često" | "ponekad" | "svugdje" | "nigdje" | "tamo" | "ovdje" | "gore" | "dolje"
+
+<temporal-expression> ::= "prije" <opt-whitespace> <time-noun> | "poslije" <opt-whitespace> <time-noun> | "tijekom" <opt-whitespace> <time-noun>
+
+<time-noun> ::= "sata" | "dana" | "tjedna" | "mjeseca" | "godine"
 
 <prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
 
-<preposition> ::= "u" | "na" | "iz" | "do" | "od" | "za" | "s" | "bez" | "nad" | "pod"
+<preposition> ::= "u" | "na" | "iz" | "do" | "od" | "za" | "s" | "sa" | "bez" | "nad" | "pod" | "poslije" | "prije" | "ispod" | "iznad" | "između" | "kod" | "oko" | "kraj" | "pored" | "prema" | "uz" | "preko" | "kroz"
 
 <subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
 
-<subordinating-conjunction> ::= "da" | "ako" | "kada" | "jer" | "iako"
+<subordinating-conjunction> ::= "da" | "ako" | "kada" | "kad" | "jer" | "iako" | "dok" | "kako" | "što" | "pošto" | "prije nego" | "poslije što"
 
-<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase>
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase> ( <opt-whitespace> <object> )? ( <opt-whitespace> <adverbial> )?
 
-<relative-pronoun> ::= "koji" | "koja" | "koje" | "tko" | "što"
+<relative-pronoun> ::= "koji" | "koja" | "koje" | "kojeg" | "kojemu" | "kojim" | "kojom" | "kojih" | "kojima" | "tko" | "što" | "čiji" | "čija" | "čije"
 
 <compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
 
-<coordinating-conjunction> ::= "i" | "ili" | "ali" | "a" | "ni"
+<coordinating-conjunction> ::= "i" | "ili" | "ali" | "a" | "ni" | "već" | "pa" | "te"
 
-<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
 
-<interrogative-clause> ::= <declarative-clause> "?" | <question-word> <opt-whitespace> <verb-phrase> "?"
+<interrogative-clause> ::= <declarative-clause> "?" | <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? "?"
 
-<question-word> ::= "tko" | "što" | "kada" | "gdje" | "kako" | "zašto"
+<question-word> ::= "tko" | "što" | "kada" | "kad" | "gdje" | "kako" | "zašto" | "koliko" | "kakav" | "koji"
 
-<imperative-clause> ::= <verb-stem> ( "i" | "ite" )
+<imperative-clause> ::= <verb-stem> ( "i" | "ite" | "imo" ) <opt-whitespace> <object>? <opt-whitespace> <adverbial>?
 
 <proper-noun> ::= /[A-ZČĆĐŠŽ][a-zčćđšž]*/
 
@@ -91,6 +171,7 @@ Keywords: i, ili, ali, a, da, koji, koja, koje, tko, što, kada, gdje, kako, za�
 
 <opt-whitespace> ::= /[ \t\n\r]*/
 
+/* Context rules for Croatian */
 @CONTEXT_RULE[case-agreement]:
     IF <adjective> MODIFIES <noun>
     THEN <adjective>.@CASE == <noun>.@CASE
@@ -100,3 +181,53 @@ Keywords: i, ili, ali, a, da, koji, koja, koje, tko, što, kada, gdje, kako, za�
     IF <verb>.@TENSE == present
     THEN <verb>.@ASPECT IS imperfective
     ELSE VALID
+
+@CONTEXT_RULE[passive-agent-case]:
+    IF <passive-voice> HAS <agent-phrase>
+    THEN <agent-phrase> USES genitive-case
+    ELSE VALID
+
+@CONTEXT_RULE[reflexive-passive-no-agent]:
+    IF <passive-voice> IS reflexive
+    THEN <agent-phrase> NOT-PRESENT
+    ELSE WARNING "Reflexive passive typically has no agent"
+
+@CONTEXT_RULE[participle-agreement]:
+    IF <past-participle> IN <sentence>
+    THEN <past-participle> AGREES-WITH <subject> IN gender AND number
+    ELSE ERROR "Participle must agree with subject"
+
+@CONTEXT_RULE[conditional-tense-agreement]:
+    IF <conditional-sentence> IS <contrary-to-fact-conditional>
+    THEN <verb> IN BOTH-CLAUSES IS past OR conditional
+    ELSE ERROR "Conditional requires appropriate verb forms"
+
+@CONTEXT_RULE[aspectual-verb-selection]:
+    IF <aspectual-construction>
+    THEN <infinitive> MUST-BE compatible-aspect
+    ELSE WARNING "Aspectual verb requires compatible aspect"
+
+@CONTEXT_RULE[preposition-case-government]:
+    IF <preposition> IN <prepositional-phrase>
+    THEN <noun-phrase> TAKES required-case FOR <preposition>
+    ELSE ERROR "Preposition governs specific case"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject> AND <finite-verb> IN <clause>
+    THEN <finite-verb> AGREES-WITH <subject> IN person AND number
+    ELSE ERROR "Verb must agree with subject"
+
+@CONTEXT_RULE[gender-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective> AGREES-WITH <noun> IN gender
+    ELSE ERROR "Adjective must agree in gender"
+
+@CONTEXT_RULE[number-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective> AGREES-WITH <noun> IN number
+    ELSE ERROR "Adjective must agree in number"
+
+@CONTEXT_RULE[aspect-consistency]:
+    IF <verb-phrase> CONTAINS aspectual-marker
+    THEN aspect-pair MUST-BE consistent
+    ELSE WARNING "Check aspect consistency"

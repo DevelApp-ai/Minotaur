@@ -7,82 +7,162 @@ SymbolTableSharing: hierarchical
 /*
  * Slovak Natural Language Grammar - Comprehensive Edition
  * 
- * Six grammatical cases with aspectual verb system and rhythmic law.
+ * Seven grammatical cases with aspectual verb system and rhythmic law.
+ * Includes full verb conjugations, passive voice, and complex sentence structures.
  */
 
-Keywords: a, ale, alebo, či, že, ktorý, ktorá, ktoré, kto, čo, kedy, kde, ako, prečo, ak, keby, to, tak, nie, ani, nikdy, nič, nikto, na, v, z, do, od, pre, cez, o, po, pred, za, nad, pod, bez, vedľa, pri, okolo, ten, tá, to, tí, tých, môj, moja, moje, tvoj, tvoja, tvoje, jeho, jej, náš, naša, naše, váš, vaša, vaše, ich, ja, ty, on, ona, ono, my, vy, oni, ony, ma, ťa, ho, ju, nás, vás, ich
+Keywords: a, ale, alebo, či, že, ktorý, ktorá, ktoré, kto, čo, kedy, kde, ako, prečo, ak, keby, to, tak, nie, ani, nikdy, nič, nikto, na, v, z, do, od, pre, cez, o, po, pred, za, nad, pod, bez, vedľa, pri, okolo, medzi, skrz, počas, pomocou, vďaka, kvôli, ten, tá, to, tí, tie, tých, toho, tomu, tom, tým, môj, moja, moje, tvoj, tvoja, tvoje, jeho, jej, náš, naša, naše, váš, vaša, vaše, ich, ja, ty, on, ona, ono, my, vy, oni, ony, ma, ťa, ho, ju, nás, vás, ich, som, si, je, sme, ste, sú, bol, bola, bolo, boli, budem, budeš, bude, budeme, budete, budú
 
-<sentence> ::= <main-clause> | <subordinate-clause> | <compound-sentence> | <complex-sentence>
+<sentence> ::= <main-clause> | <subordinate-clause> | <compound-sentence> | <complex-sentence> | <multi-embedded-sentence> | <split-complex-sentence>
 
-<main-clause> ::= <declarative-clause> | <interrogative-clause> | <imperative-clause>
+<main-clause> ::= <declarative-clause> | <interrogative-clause> | <imperative-clause> | <exclamative-clause>
 
 <declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
 
 <subject> ::= <pronoun-subject> | <noun-phrase> | <proper-noun>
 
 <pronoun-subject> ::= @CASE[nominative] ( "ja" | "ty" | "on" | "ona" | "ono" | "my" | "vy" | "oni" | "ony" )
 
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
+
+<exclamative-word> ::= "aký" | "aká" | "aké" | "čo za" | "ako"
+
 <noun-phrase> ::= <determiner>? <opt-whitespace> <adjective>* <opt-whitespace> <noun> <opt-whitespace> <relative-clause>?
 
-<determiner> ::= "ten" | "tá" | "to" | "tí" | "môj" | "moja" | "tvoj" | "tvoja"
+<determiner> ::= "ten" | "tá" | "to" | "tí" | "tie" | "toho" | "tomu" | "tým" | "tom" | "tých" | "môj" | "moja" | "tvoj" | "tvoja" | "jeho" | "jej" | "náš" | "naša" | "váš" | "vaša"
 
-<noun> ::= <noun-stem> <case-ending>?
+/* Seven-case noun system */
+<noun> ::= <noun-nominative> | <noun-genitive> | <noun-dative> | <noun-accusative> | <noun-locative> | <noun-instrumental> | <noun-vocative>
+
+<noun-nominative> ::= @CASE[nominative] <noun-stem> ( "" | "a" | "o" | "y" | "i" | "ia" | "ie" )
+
+<noun-genitive> ::= @CASE[genitive] <noun-stem> ( "a" | "u" | "y" | "i" | "ov" | "ej" | "ích" )
+
+<noun-dative> ::= @CASE[dative] <noun-stem> ( "u" | "ovi" | "e" | "i" | "om" | "iam" )
+
+<noun-accusative> ::= @CASE[accusative] <noun-stem> ( "" | "a" | "u" | "o" | "y" | "i" | "ov" )
+
+<noun-locative> ::= @CASE[locative] <noun-stem> ( "e" | "i" | "u" | "och" | "ách" | "iach" )
+
+<noun-instrumental> ::= @CASE[instrumental] <noun-stem> ( "om" | "ou" | "ami" | "ími" )
+
+<noun-vocative> ::= @CASE[vocative] <noun-stem> ( "e" | "u" | "a" | "o" | "i" )
 
 <noun-stem> ::= /[a-záäčďéíĺľňóôŕšťúýž]+/
 
 <case-ending> ::= "a" | "u" | "y" | "e" | "i" | "ou" | "ovi" | "om" | "och" | "ami" | "ách"
 
-<adjective> ::= <adj-stem> ( "ý" | "á" | "é" | "í" | "ší" | "šia" | "šie" )
+<adjective> ::= <adj-stem> <adj-ending>
+
+<adj-ending> ::= "ý" | "á" | "é" | "í" | "ého" | "ému" | "ým" | "om" | "ej" | "ú" | "ou" | "ými" | "ých" | "ší" | "šia" | "šie" | "ejší" | "ejšia" | "ejšie" | "naj" <adj-stem> <adj-ending>
 
 <adj-stem> ::= /[a-záäčďéíĺľňóôŕšťúýž]+/
 
-<verb-phrase> ::= <finite-verb> | <modal-verb> <opt-whitespace> <infinitive>
+<verb-phrase> ::= <finite-verb> | <modal-verb> <opt-whitespace> <infinitive> | <passive-voice> | <aspectual-construction>
 
-<finite-verb> ::= <verb-present> | <verb-past> | <verb-future>
+<passive-voice> ::= @VOICE[passive] <auxiliary-verb> <opt-whitespace> <past-participle> ( <opt-whitespace> <agent-phrase> )?
 
-<verb-present> ::= @TENSE[present] <verb-stem> ( "iem" | "ieš" | "ie" | "iete" | "ia" )
+<auxiliary-verb> ::= "som" | "si" | "je" | "sme" | "ste" | "sú" | "bol" | "bola" | "bolo" | "boli"
+
+<past-participle> ::= <verb-stem> "l" ( "" | "a" | "o" | "i" | "y" ) | <verb-stem> "ný" | <verb-stem> "tý"
+
+<agent-phrase> ::= @AGENT ( "od" | "zo strany" ) <opt-whitespace> <noun-phrase-genitive>
+
+<noun-phrase-genitive> ::= <noun-genitive>
+
+<aspectual-construction> ::= <aspectual-verb> <opt-whitespace> <infinitive>
+
+<aspectual-verb> ::= "začať" | "začínam" | "začínaš" | "začína" | "prestať" | "prestavám" | "prestávaš" | "prestáva" | "pokračovať" | "pokračujem" | "pokračuješ" | "pokračuje"
+
+<finite-verb> ::= <verb-present> | <verb-past> | <verb-future> | <verb-conditional> | <irregular-verb>
+
+<verb-present> ::= @TENSE[present] <verb-stem> ( "em" | "eš" | "e" | "iem" | "ieš" | "ie" | "ete" | "iete" | "ú" | "ia" )
 
 <verb-past> ::= @TENSE[past] <verb-stem> "l" ( "" | "a" | "o" | "i" | "y" )
 
-<verb-future> ::= @TENSE[future] ( "budem" | "budeš" | "bude" ) <opt-whitespace> <infinitive>
+<verb-future> ::= @TENSE[future] ( "budem" | "budeš" | "bude" | "budeme" | "budete" | "budú" ) <opt-whitespace> <infinitive>
 
-<infinitive> ::= <verb-stem> ( "ť" | "ať" | "ieť" )
+<verb-conditional> ::= @MOOD[conditional] ( "by som" | "by si" | "by" | "by sme" | "by ste" | "by" ) <opt-whitespace> <past-participle>
 
-<modal-verb> ::= "môžem" | "môžeš" | "môže" | "chcem" | "chceš" | "chce" | "musím" | "musíš" | "musí"
+/* Twelve irregular verbs */
+<irregular-verb> ::= <verb-byť> | <verb-mať> | <verb-vedieť> | <verb-chcieť> | <verb-ísť> | <verb-jesť> | <verb-piť> | <verb-robiť> | <verb-hovoriť> | <verb-prísť> | <verb-dať> | <verb-vidieť>
+
+<verb-byť> ::= "som" | "si" | "je" | "sme" | "ste" | "sú" | "bol" | "bola" | "bolo" | "boli" | "budem" | "budeš" | "bude" | "budeme" | "budete" | "budú" | "byť"
+
+<verb-mať> ::= "mám" | "máš" | "má" | "máme" | "máte" | "majú" | "mal" | "mala" | "malo" | "mali" | "budem mať" | "budeš mať" | "bude mať" | "mať"
+
+<verb-vedieť> ::= "viem" | "vieš" | "vie" | "vieme" | "viete" | "vedia" | "vedel" | "vedela" | "vedelo" | "vedeli" | "vedieť"
+
+<verb-chcieť> ::= "chcem" | "chceš" | "chce" | "chceme" | "chcete" | "chcú" | "chcel" | "chcela" | "chcelo" | "chceli" | "chcieť"
+
+<verb-ísť> ::= "idem" | "ideš" | "ide" | "ideme" | "idete" | "idú" | "išiel" | "išla" | "išlo" | "išli" | "ísť"
+
+<verb-jesť> ::= "jem" | "ješ" | "je" | "jeme" | "jete" | "jedia" | "jedol" | "jedla" | "jedlo" | "jedli" | "jesť"
+
+<verb-piť> ::= "pijem" | "piješ" | "pije" | "pijeme" | "pijete" | "pijú" | "pil" | "pila" | "pilo" | "pili" | "piť"
+
+<verb-robiť> ::= "robím" | "robíš" | "robí" | "robíme" | "robíte" | "robia" | "robil" | "robila" | "robilo" | "robili" | "robiť"
+
+<verb-hovoriť> ::= "hovorím" | "hovoríš" | "hovorí" | "hovoríme" | "hovoríte" | "hovoria" | "hovoril" | "hovorila" | "hovorilo" | "hovorili" | "hovoriť"
+
+<verb-prísť> ::= "prídem" | "prídeš" | "príde" | "prídeme" | "prídete" | "prídu" | "prišiel" | "prišla" | "prišlo" | "prišli" | "prísť"
+
+<verb-dať> ::= "dám" | "dáš" | "dá" | "dáme" | "dáte" | "dajú" | "dal" | "dala" | "dalo" | "dali" | "dať"
+
+<verb-vidieť> ::= "vidím" | "vidíš" | "vidí" | "vidíme" | "vidíte" | "vidia" | "videl" | "videla" | "videlo" | "videli" | "vidieť"
+
+<infinitive> ::= <verb-stem> ( "ť" | "ať" | "ieť" | "ovať" | "núť" )
+
+<modal-verb> ::= "môžem" | "môžeš" | "môže" | "môžeme" | "môžete" | "môžu" | "chcem" | "chceš" | "chce" | "chceme" | "chcete" | "chcú" | "musím" | "musíš" | "musí" | "musíme" | "musíte" | "musia"
 
 <verb-stem> ::= /[a-záäčďéíĺľňóôŕšťúýž]+/
 
+/* Conditional sentences */
+<conditional-sentence> ::= <simple-conditional> | <contrary-to-fact-conditional>
+
+<simple-conditional> ::= "ak" <opt-whitespace> <declarative-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<contrary-to-fact-conditional> ::= "keby" <opt-whitespace> <verb-past> <opt-whitespace> "," <opt-whitespace> <verb-conditional>
+
 <object> ::= <noun-phrase> | <pronoun-object>
 
-<pronoun-object> ::= "ma" | "ťa" | "ho" | "ju" | "nás" | "vás" | "ich"
+<pronoun-object> ::= @CASE[accusative] ( "ma" | "ťa" | "ho" | "ju" | "nás" | "vás" | "ich" )
 
-<adverbial> ::= <adverb> | <prepositional-phrase>
+<adverbial> ::= <adverb> | <prepositional-phrase> | <temporal-expression>
 
-<adverb> ::= "dobre" | "zle" | "rýchlo" | "pomaly" | "teraz" | "včera" | "dnes" | "zajtra"
+<adverb> ::= "dobre" | "zle" | "rýchlo" | "pomaly" | "teraz" | "včera" | "dnes" | "zajtra" | "vždy" | "nikdy" | "často" | "niekedy" | "všade" | "nikde" | "tam" | "tu" | "sem"
+
+<temporal-expression> ::= "pred" <opt-whitespace> <time-noun> | "po" <opt-whitespace> <time-noun> | "počas" <opt-whitespace> <time-noun>
+
+<time-noun> ::= "hodinou" | "dňom" | "týždňom" | "mesiacom" | "rokom"
 
 <prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
 
-<preposition> ::= "v" | "na" | "z" | "do" | "od" | "pre" | "cez" | "o" | "po" | "nad" | "pod"
+<preposition> ::= "v" | "na" | "z" | "do" | "od" | "pre" | "cez" | "o" | "po" | "nad" | "pod" | "pred" | "za" | "bez" | "okolo" | "medzi" | "skrz"
 
 <subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
 
-<subordinating-conjunction> ::= "že" | "ak" | "keby" | "keď" | "lebo" | "hoci"
+<subordinating-conjunction> ::= "že" | "ak" | "keby" | "keď" | "lebo" | "hoci" | "pretože" | "kým" | "pokiaľ" | "ako" | "aby"
 
-<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase>
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase> ( <opt-whitespace> <object> )? ( <opt-whitespace> <adverbial> )?
 
-<relative-pronoun> ::= "ktorý" | "ktorá" | "ktoré" | "kto" | "čo"
+<relative-pronoun> ::= "ktorý" | "ktorá" | "ktoré" | "ktorého" | "ktorému" | "ktorom" | "ktorými" | "kto" | "čo"
 
 <compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
 
-<coordinating-conjunction> ::= "a" | "ale" | "alebo" | "či" | "ani"
+<coordinating-conjunction> ::= "a" | "ale" | "alebo" | "či" | "ani" | "aj" | "no" | "však"
 
-<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
 
 <interrogative-clause> ::= <declarative-clause> "?" | <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? "?"
 
-<question-word> ::= "kto" | "čo" | "kedy" | "kde" | "ako" | "prečo"
+<question-word> ::= "kto" | "čo" | "kedy" | "kde" | "ako" | "prečo" | "koľko" | "aký" | "ktorý"
 
-<imperative-clause> ::= <verb-stem> ( "" | "te" ) <opt-whitespace> <object>?
+<imperative-clause> ::= <verb-stem> ( "" | "te" | "me" ) <opt-whitespace> <object>? <opt-whitespace> <adverbial>?
 
 <proper-noun> ::= /[A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ][a-záäčďéíĺľňóôŕšťúýž]*/
 
@@ -92,6 +172,7 @@ Keywords: a, ale, alebo, či, že, ktorý, ktorá, ktoré, kto, čo, kedy, kde, 
 
 <opt-whitespace> ::= /[ \t\n\r]*/
 
+/* Context rules for Slovak */
 @CONTEXT_RULE[rhythmic-law]:
     IF <word> CONTAINS two-consecutive-long-syllables
     THEN SHORTEN second-syllable
@@ -101,3 +182,53 @@ Keywords: a, ale, alebo, či, že, ktorý, ktorá, ktoré, kto, čo, kedy, kde, 
     IF <adjective> MODIFIES <noun>
     THEN <adjective>.@CASE == <noun>.@CASE
     ELSE ERROR "Case must agree"
+
+@CONTEXT_RULE[passive-agent-case]:
+    IF <passive-voice> HAS <agent-phrase>
+    THEN <agent-phrase> USES genitive-case
+    ELSE VALID
+
+@CONTEXT_RULE[reflexive-passive-no-agent]:
+    IF <passive-voice> IS reflexive
+    THEN <agent-phrase> NOT-PRESENT
+    ELSE WARNING "Reflexive passive typically has no agent"
+
+@CONTEXT_RULE[participle-agreement]:
+    IF <past-participle> IN <sentence>
+    THEN <past-participle> AGREES-WITH <subject> IN gender AND number
+    ELSE ERROR "Participle must agree with subject"
+
+@CONTEXT_RULE[conditional-tense-agreement]:
+    IF <conditional-sentence> IS <contrary-to-fact-conditional>
+    THEN <verb> IN BOTH-CLAUSES IS past OR conditional
+    ELSE ERROR "Conditional requires appropriate verb forms"
+
+@CONTEXT_RULE[aspectual-verb-selection]:
+    IF <aspectual-construction>
+    THEN <infinitive> MUST-BE compatible-aspect
+    ELSE WARNING "Aspectual verb requires compatible aspect"
+
+@CONTEXT_RULE[preposition-case-government]:
+    IF <preposition> IN <prepositional-phrase>
+    THEN <noun-phrase> TAKES required-case FOR <preposition>
+    ELSE ERROR "Preposition governs specific case"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject> AND <finite-verb> IN <clause>
+    THEN <finite-verb> AGREES-WITH <subject> IN person AND number
+    ELSE ERROR "Verb must agree with subject"
+
+@CONTEXT_RULE[gender-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective> AGREES-WITH <noun> IN gender
+    ELSE ERROR "Adjective must agree in gender"
+
+@CONTEXT_RULE[number-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective> AGREES-WITH <noun> IN number
+    ELSE ERROR "Adjective must agree in number"
+
+@CONTEXT_RULE[aspect-consistency]:
+    IF <verb-phrase> CONTAINS aspectual-marker
+    THEN aspect-pair MUST-BE consistent
+    ELSE WARNING "Check aspect consistency"
