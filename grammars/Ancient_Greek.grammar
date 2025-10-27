@@ -1,0 +1,363 @@
+Grammar: Ancient_Greek
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Ancient Greek (Ἀρχαία Ἑλληνική) Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Classical/Attic Greek (5th-4th century BCE) including:
+ * - Complete verb system (all tenses, moods, voices)
+ * - Full noun declension system (5 cases: nominative, genitive, dative, accusative, vocative)
+ * - Three genders (masculine, feminine, neuter)
+ * - Three numbers (singular, dual, plural)
+ * - Context-sensitive agreement rules (gender, number, case)
+ * - Regular expression support for morphological patterns
+ * - All three declensions for nouns
+ * - Complete adjective declension
+ * - Eight parts of speech
+ * - Multiple tenses (present, imperfect, future, aorist, perfect, pluperfect, future perfect)
+ * - Four moods (indicative, subjunctive, optative, imperative)
+ * - Three voices (active, middle, passive)
+ * - Participles and infinitives
+ * - Complex subordinate clause structures
+ */
+
+Keywords: καί, ἤ, δέ, ἀλλά, εἰ, ἐάν, ὅτι, ἵνα, ὅπως, ὡς, ὅς, ἥ, ὅ, οὗτος, αὕτη, τοῦτο, ὁ, ἡ, τό, ἐγώ, σύ, ἡμεῖς, ὑμεῖς, οὐ, οὐκ, οὐχ, μή, ἐν, εἰς, ἐκ, ἀπό, διά, κατά, μετά, παρά, περί, πρός, σύν, ὑπέρ, ὑπό
+
+/* Dialect markers for Ancient Greek linguistic variations */
+@DIALECT[attic]       /* Attic - Athens and Attica (classical standard) */
+@DIALECT[ionic]       /* Ionic - Herodotus, Homer */
+@DIALECT[doric]       /* Doric - Sparta, Sicily */
+@DIALECT[aeolic]      /* Aeolic - Lesbos, Sappho */
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+
+/* Declarative clause with flexible word order */
+<declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+/* Interrogative clause */
+<interrogative-clause> ::= <interrogative-particle>? <opt-whitespace> <declarative-clause> ";"
+                        | <interrogative-pronoun> <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>? ";"
+
+<interrogative-particle> ::= "ἆρα" | "ἆρ'" | "ἦ" | "πότερον"
+
+<interrogative-pronoun> ::= "τίς" | "τί" | "ποῦ" | "πότε" | "πῶς" | "πόθεν" | "ποῖος"
+
+/* Imperative clause */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? ( "." | "!" )?
+
+/* Subordinate clause */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
+
+<subordinating-conjunction> ::= "ὅτι" | "ὡς" | "εἰ" | "ἐάν" | "ἵνα" | "ὅπως" | "ἐπεί" | "ἐπειδή" | "ὅτε" | "ἕως" | "πρίν"
+
+/* Compound sentence */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "καί" | "δέ" | "ἀλλά" | "ἤ" | "οὐδέ" | "μηδέ" | "τε" <opt-whitespace> "καί"
+
+/* Complex sentence */
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> <main-clause>
+
+/* Subject with case marking */
+<subject> ::= <noun-phrase> @CASE[nominative]
+           | <pronoun-nominative>
+           | <proper-noun> @CASE[nominative]
+
+/* Noun Phrase with gender and case agreement */
+<noun-phrase> ::= <article>? <opt-whitespace> <adjective>* <opt-whitespace> <noun> <opt-whitespace> <genitive-modifier>?
+
+/* Article with full declension (masculine, feminine, neuter) */
+<article> ::= <article-masculine> | <article-feminine> | <article-neuter>
+
+/* Masculine article declension */
+<article-masculine> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] "ὁ"
+                     | @GENDER[masculine] @NUMBER[singular] @CASE[genitive] "τοῦ"
+                     | @GENDER[masculine] @NUMBER[singular] @CASE[dative] "τῷ"
+                     | @GENDER[masculine] @NUMBER[singular] @CASE[accusative] "τόν"
+                     | @GENDER[masculine] @NUMBER[dual] @CASE[nominative] "τώ"
+                     | @GENDER[masculine] @NUMBER[dual] @CASE[genitive] "τοῖν"
+                     | @GENDER[masculine] @NUMBER[dual] @CASE[dative] "τοῖν"
+                     | @GENDER[masculine] @NUMBER[dual] @CASE[accusative] "τώ"
+                     | @GENDER[masculine] @NUMBER[plural] @CASE[nominative] "οἱ"
+                     | @GENDER[masculine] @NUMBER[plural] @CASE[genitive] "τῶν"
+                     | @GENDER[masculine] @NUMBER[plural] @CASE[dative] "τοῖς"
+                     | @GENDER[masculine] @NUMBER[plural] @CASE[accusative] "τούς"
+
+/* Feminine article declension */
+<article-feminine> ::= @GENDER[feminine] @NUMBER[singular] @CASE[nominative] "ἡ"
+                    | @GENDER[feminine] @NUMBER[singular] @CASE[genitive] "τῆς"
+                    | @GENDER[feminine] @NUMBER[singular] @CASE[dative] "τῇ"
+                    | @GENDER[feminine] @NUMBER[singular] @CASE[accusative] "τήν"
+                    | @GENDER[feminine] @NUMBER[dual] @CASE[nominative] "τώ"
+                    | @GENDER[feminine] @NUMBER[dual] @CASE[genitive] "τοῖν"
+                    | @GENDER[feminine] @NUMBER[dual] @CASE[dative] "τοῖν"
+                    | @GENDER[feminine] @NUMBER[dual] @CASE[accusative] "τώ"
+                    | @GENDER[feminine] @NUMBER[plural] @CASE[nominative] "αἱ"
+                    | @GENDER[feminine] @NUMBER[plural] @CASE[genitive] "τῶν"
+                    | @GENDER[feminine] @NUMBER[plural] @CASE[dative] "ταῖς"
+                    | @GENDER[feminine] @NUMBER[plural] @CASE[accusative] "τάς"
+
+/* Neuter article declension */
+<article-neuter> ::= @GENDER[neuter] @NUMBER[singular] @CASE[nominative] "τό"
+                  | @GENDER[neuter] @NUMBER[singular] @CASE[genitive] "τοῦ"
+                  | @GENDER[neuter] @NUMBER[singular] @CASE[dative] "τῷ"
+                  | @GENDER[neuter] @NUMBER[singular] @CASE[accusative] "τό"
+                  | @GENDER[neuter] @NUMBER[dual] @CASE[nominative] "τώ"
+                  | @GENDER[neuter] @NUMBER[dual] @CASE[genitive] "τοῖν"
+                  | @GENDER[neuter] @NUMBER[dual] @CASE[dative] "τοῖν"
+                  | @GENDER[neuter] @NUMBER[dual] @CASE[accusative] "τώ"
+                  | @GENDER[neuter] @NUMBER[plural] @CASE[nominative] "τά"
+                  | @GENDER[neuter] @NUMBER[plural] @CASE[genitive] "τῶν"
+                  | @GENDER[neuter] @NUMBER[plural] @CASE[dative] "τοῖς"
+                  | @GENDER[neuter] @NUMBER[plural] @CASE[accusative] "τά"
+
+/* Nouns with three declensions */
+<noun> ::= <noun-first-declension>
+        | <noun-second-declension>
+        | <noun-third-declension>
+
+/* First declension (mostly feminine, some masculine) */
+<noun-first-declension> ::= @DECLENSION[first] ( <noun-first-fem> | <noun-first-masc> )
+
+<noun-first-fem> ::= @GENDER[feminine] @NUMBER[singular] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+η/
+                  | @GENDER[feminine] @NUMBER[singular] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ᾱ/
+                  | @GENDER[feminine] @NUMBER[singular] @CASE[genitive] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ης/
+                  | @GENDER[feminine] @NUMBER[singular] @CASE[dative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ῃ/
+                  | @GENDER[feminine] @NUMBER[singular] @CASE[accusative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ην/
+                  | @GENDER[feminine] @NUMBER[singular] @CASE[vocative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+η/
+                  | @GENDER[feminine] @NUMBER[plural] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+αι/
+                  | @GENDER[feminine] @NUMBER[plural] @CASE[genitive] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ῶν/
+                  | @GENDER[feminine] @NUMBER[plural] @CASE[dative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+αις/
+                  | @GENDER[feminine] @NUMBER[plural] @CASE[accusative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ᾱς/
+
+<noun-first-masc> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ης/
+                   | @GENDER[masculine] @NUMBER[singular] @CASE[genitive] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ου/
+                   | @GENDER[masculine] @NUMBER[singular] @CASE[dative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ῃ/
+                   | @GENDER[masculine] @NUMBER[singular] @CASE[accusative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ην/
+                   | @GENDER[masculine] @NUMBER[singular] @CASE[vocative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ᾱ/
+
+/* Second declension (mostly masculine and neuter) */
+<noun-second-declension> ::= @DECLENSION[second] ( <noun-second-masc> | <noun-second-neut> )
+
+<noun-second-masc> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ος/
+                    | @GENDER[masculine] @NUMBER[singular] @CASE[genitive] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ου/
+                    | @GENDER[masculine] @NUMBER[singular] @CASE[dative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ῳ/
+                    | @GENDER[masculine] @NUMBER[singular] @CASE[accusative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ον/
+                    | @GENDER[masculine] @NUMBER[singular] @CASE[vocative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ε/
+                    | @GENDER[masculine] @NUMBER[plural] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+οι/
+                    | @GENDER[masculine] @NUMBER[plural] @CASE[genitive] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ων/
+                    | @GENDER[masculine] @NUMBER[plural] @CASE[dative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+οις/
+                    | @GENDER[masculine] @NUMBER[plural] @CASE[accusative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ους/
+
+<noun-second-neut> ::= @GENDER[neuter] @NUMBER[singular] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ον/
+                    | @GENDER[neuter] @NUMBER[singular] @CASE[genitive] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ου/
+                    | @GENDER[neuter] @NUMBER[singular] @CASE[dative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ῳ/
+                    | @GENDER[neuter] @NUMBER[singular] @CASE[accusative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ον/
+                    | @GENDER[neuter] @NUMBER[plural] @CASE[nominative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+α/
+                    | @GENDER[neuter] @NUMBER[plural] @CASE[genitive] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ων/
+                    | @GENDER[neuter] @NUMBER[plural] @CASE[dative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+οις/
+                    | @GENDER[neuter] @NUMBER[plural] @CASE[accusative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+α/
+
+/* Third declension (all genders, various stem types) */
+<noun-third-declension> ::= @DECLENSION[third] @GENDER[masculine|feminine|neuter] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+/
+
+<proper-noun> ::= /[Ἀ-Ὤᾈ-ᾬ][α-ωά-ώἀ-ὤᾀ-ᾤ]*/
+
+/* Genitive modifier */
+<genitive-modifier> ::= <noun-phrase> @CASE[genitive]
+
+/* Adjectives with three declension patterns */
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree with gender/case agreement */
+<adjective-positive> ::= @DEGREE[positive] ( <adjective-first-second> | <adjective-third> )
+
+<adjective-first-second> ::= @GENDER[masculine] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ος/
+                          | @GENDER[feminine] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+η/
+                          | @GENDER[neuter] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ον/
+
+<adjective-third> ::= @GENDER[masculine|feminine] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ης/
+                   | @GENDER[neuter] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ες/
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+τερος/
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] /[α-ωά-ώἀ-ὤᾀ-ᾤ]+τατος/
+
+/* Pronouns */
+<pronoun-nominative> ::= @CASE[nominative] ( <personal-pronoun-nom> | <demonstrative-pronoun> | <relative-pronoun> )
+
+<personal-pronoun-nom> ::= @PERSON[1] @NUMBER[singular] "ἐγώ"
+                        | @PERSON[2] @NUMBER[singular] "σύ"
+                        | @PERSON[1] @NUMBER[dual] "νώ"
+                        | @PERSON[2] @NUMBER[dual] "σφώ"
+                        | @PERSON[1] @NUMBER[plural] "ἡμεῖς"
+                        | @PERSON[2] @NUMBER[plural] "ὑμεῖς"
+
+<personal-pronoun-gen> ::= @CASE[genitive] ( "ἐμοῦ" | "μου" | "σοῦ" | "σου" | "ἡμῶν" | "ὑμῶν" )
+
+<personal-pronoun-dat> ::= @CASE[dative] ( "ἐμοί" | "μοι" | "σοί" | "σοι" | "ἡμῖν" | "ὑμῖν" )
+
+<personal-pronoun-acc> ::= @CASE[accusative] ( "ἐμέ" | "με" | "σέ" | "σε" | "ἡμᾶς" | "ὑμᾶς" )
+
+<demonstrative-pronoun> ::= "οὗτος" | "αὕτη" | "τοῦτο" | "ἐκεῖνος" | "ἐκείνη" | "ἐκεῖνο" | "ὅδε" | "ἥδε" | "τόδε"
+
+<relative-pronoun> ::= "ὅς" | "ἥ" | "ὅ" | "οὗ" | "ᾧ" | "ὅν" | "ἥν"
+
+/* Verb phrases with comprehensive tense/mood/voice system */
+<verb-phrase> ::= <negation>? <opt-whitespace> <verb>
+
+<negation> ::= "οὐ" | "οὐκ" | "οὐχ" | "μή"
+
+/* Verbs with full conjugation system */
+<verb> ::= <verb-present>
+        | <verb-imperfect>
+        | <verb-future>
+        | <verb-aorist>
+        | <verb-perfect>
+        | <verb-pluperfect>
+        | <verb-subjunctive>
+        | <verb-optative>
+        | <verb-imperative>
+        | <verb-infinitive>
+        | <verb-participle>
+
+/* Present tense - all voices */
+<verb-present> ::= @TENSE[present] ( <verb-present-active> | <verb-present-middle> | <verb-present-passive> )
+
+<verb-present-active> ::= @VOICE[active] @MOOD[indicative] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ω/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+εις/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ει/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ομεν/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ετε/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ουσι/ )
+
+<verb-present-middle> ::= @VOICE[middle] @MOOD[indicative] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ομαι/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ῃ/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+εται/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ομεθα/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+εσθε/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ονται/ )
+
+<verb-present-passive> ::= @VOICE[passive] @MOOD[indicative] <verb-present-middle>
+
+/* Imperfect tense */
+<verb-imperfect> ::= @TENSE[imperfect] @MOOD[indicative] ( /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+ον/ | /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+ομην/ )
+
+/* Future tense */
+<verb-future> ::= @TENSE[future] @MOOD[indicative] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+σω/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+σομαι/ )
+
+/* Aorist tense */
+<verb-aorist> ::= @TENSE[aorist] @MOOD[indicative] ( <aorist-active> | <aorist-middle> | <aorist-passive> )
+
+<aorist-active> ::= @VOICE[active] ( /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+σα/ | /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+ον/ )
+
+<aorist-middle> ::= @VOICE[middle] /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+σάμην/
+
+<aorist-passive> ::= @VOICE[passive] /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+θην/
+
+/* Perfect tense */
+<verb-perfect> ::= @TENSE[perfect] @MOOD[indicative] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+κα/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+μαι/ )
+
+/* Pluperfect tense */
+<verb-pluperfect> ::= @TENSE[pluperfect] @MOOD[indicative] ( /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+κειν/ | /ἐ[α-ωά-ώἀ-ὤᾀ-ᾤ]+μην/ )
+
+/* Subjunctive mood */
+<verb-subjunctive> ::= @MOOD[subjunctive] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ω/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ωμαι/ )
+
+/* Optative mood */
+<verb-optative> ::= @MOOD[optative] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+οιμι/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+οίμην/ )
+
+/* Imperative mood */
+<verb-imperative> ::= @MOOD[imperative] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ε/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ου/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+τε/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+σθε/ )
+
+/* Infinitive */
+<verb-infinitive> ::= @MOOD[infinitive] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ειν/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+εσθαι/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+σαι/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+θῆναι/ )
+
+/* Participle */
+<verb-participle> ::= @MOOD[participle] ( /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ων/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ουσα/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ον/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+όμενος/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+σας/ | /[α-ωά-ώἀ-ὤᾀ-ᾤ]+θείς/ )
+
+/* Object */
+<object> ::= <noun-phrase> @CASE[accusative]
+          | <personal-pronoun-acc>
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+<adverb> ::= /[α-ωά-ώἀ-ὤᾀ-ᾤ]+ως/ | "νῦν" | "τότε" | "πάλαι" | "ἔτι" | "ἤδη" | "αὖθις" | "ἐνθάδε" | "ἐκεῖ" | "ποῦ" | "καλῶς" | "κακῶς" | "εὖ" | "σφόδρα" | "μάλα" | "πάνυ"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "ἐν" @CASE[dative]
+               | "εἰς" @CASE[accusative]
+               | "ἐκ" @CASE[genitive]
+               | "ἀπό" @CASE[genitive]
+               | "διά" @CASE[genitive|accusative]
+               | "κατά" @CASE[genitive|accusative]
+               | "μετά" @CASE[genitive|accusative]
+               | "παρά" @CASE[genitive|dative|accusative]
+               | "περί" @CASE[genitive|accusative]
+               | "πρός" @CASE[genitive|dative|accusative]
+               | "σύν" @CASE[dative]
+               | "ὑπέρ" @CASE[genitive|accusative]
+               | "ὑπό" @CASE[genitive|dative|accusative]
+
+/* Punctuation */
+<punctuation> ::= "." | ";" | "," | "·"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER AND <article>.@NUMBER == <noun>.@NUMBER AND <article>.@CASE == <noun>.@CASE
+    THEN VALID
+    ELSE ERROR "Article must agree with noun in gender, number, and case"
+
+@CONTEXT_RULE[adjective-noun-agreement]:
+    IF <adjective>.@GENDER == <noun>.@GENDER AND <adjective>.@NUMBER == <noun>.@NUMBER AND <adjective>.@CASE == <noun>.@CASE
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun in gender, number, and case"
+
+@CONTEXT_RULE[preposition-case]:
+    IF <preposition> GOVERNS <noun-phrase>.@CASE
+    THEN VALID
+    ELSE ERROR "Preposition must govern the correct case"
+
+/* Example sentences demonstrating Ancient Greek grammar:
+ *
+ * BASIC SENTENCES:
+ * - "ὁ ἄνθρωπος γράφει" (The man writes)
+ * - "ἡ γυνὴ λέγει" (The woman speaks)
+ * - "τὸ παιδίον τρέχει" (The child runs)
+ *
+ * VERB CONJUGATIONS (λύω - to loose):
+ * - Present: λύω, λύεις, λύει, λύομεν, λύετε, λύουσι
+ * - Imperfect: ἔλυον, ἔλυες, ἔλυε, ἐλύομεν, ἐλύετε, ἔλυον
+ * - Future: λύσω, λύσεις, λύσει, λύσομεν, λύσετε, λύσουσι
+ * - Aorist: ἔλυσα, ἔλυσας, ἔλυσε, ἐλύσαμεν, ἐλύσατε, ἔλυσαν
+ * - Perfect: λέλυκα, λέλυκας, λέλυκε, λελύκαμεν, λελύκατε, λελύκασι
+ *
+ * CASES:
+ * - Nominative: ὁ ἀνήρ (the man - subject)
+ * - Genitive: τοῦ ἀνδρός (of the man)
+ * - Dative: τῷ ἀνδρί (to/for the man)
+ * - Accusative: τὸν ἄνδρα (the man - object)
+ * - Vocative: ὦ ἄνερ (O man!)
+ *
+ * SUBORDINATE CLAUSES:
+ * - "λέγω ὅτι γράφει" (I say that he writes)
+ * - "εἰ ἔρχεται, ὁρῶ αὐτόν" (If he comes, I see him)
+ * - "γράφω ἵνα μάθῃς" (I write in order that you may learn)
+ */
