@@ -1,0 +1,299 @@
+Grammar: Bulgarian
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Bulgarian Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Bulgarian language structures including:
+ * - Regular and irregular verb conjugations (perfective and imperfective aspects)
+ * - NO grammatical cases (unique among Slavic languages)
+ * - Three genders (masculine, feminine, neuter)
+ * - Definite articles as suffixes (unique among Slavic languages)
+ * - Context-sensitive agreement rules (gender, number, aspect)
+ * - Verb aspects (perfective and imperfective)
+ * - Multiple tenses (present, aorist, imperfect, perfect, pluperfect, future)
+ * - SVO word order
+ * - Relative clauses and subordinate structures
+ */
+
+Keywords: и, или, но, а, ами, че, който, която, което, които, кой, какво, кога, къде, как, защо, ако, да, не, нито, никога, нищо, никой, в, на, от, до, за, с, без, след, пред, над, под, между, при, по, при, този, тази, това, тези, аз, ти, той, тя, то, ние, вие, те, мен, теб, него, нея, нас, вас, тях, мой, моя, мое, мои, твой, твоя, твое, твои, негов, нейн, техен
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause - SVO word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+
+<declarative-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+
+<personal-pronoun-nominative> ::= "аз" | "ти" | "той" | "тя" | "то" | "ние" | "вие" | "те"
+
+/* Noun phrase with definite article suffixes */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <demonstrative-determiner>
+              | <possessive-adjective>
+
+/* Demonstrative determiners with gender/number agreement */
+<demonstrative-determiner> ::= @GENDER[masculine] @NUMBER[singular] ( "този" | "онзи" )
+                            | @GENDER[feminine] @NUMBER[singular] ( "тази" | "онази" )
+                            | @GENDER[neuter] @NUMBER[singular] ( "това" | "онова" )
+                            | @NUMBER[plural] ( "тези" | "онези" )
+
+/* Possessive adjectives with gender/number agreement */
+<possessive-adjective> ::= @GENDER[masculine] @NUMBER[singular] ( "мой" | "твой" | "негов" | "наш" | "ваш" | "техен" )
+                        | @GENDER[feminine] @NUMBER[singular] ( "моя" | "твоя" | "нейна" | "наша" | "ваша" | "тяхна" )
+                        | @GENDER[neuter] @NUMBER[singular] ( "мое" | "твое" | "негово" | "наше" | "ваше" | "тяхно" )
+                        | @NUMBER[plural] ( "мои" | "твои" | "негови" | "наши" | "ваши" | "техни" )
+
+/* Nouns with definite article suffixes (NO CASES) */
+<noun> ::= <noun-indefinite> | <noun-definite>
+
+<noun-indefinite> ::= <noun-stem>
+
+/* Definite article suffixes - unique Bulgarian feature */
+<noun-definite> ::= <noun-with-definite-suffix>
+
+<noun-with-definite-suffix> ::= @GENDER[masculine] @NUMBER[singular] <noun-stem> ( "ът" | "я" )
+                             | @GENDER[feminine] @NUMBER[singular] <noun-stem> "та"
+                             | @GENDER[neuter] @NUMBER[singular] <noun-stem> "то"
+                             | @GENDER[masculine] @NUMBER[plural] <noun-stem> "те"
+                             | @GENDER[feminine] @NUMBER[plural] <noun-stem> "те"
+                             | @GENDER[neuter] @NUMBER[plural] <noun-stem> "та"
+
+<noun-stem> ::= /[а-я]+/
+
+<proper-noun> ::= /[А-Я][а-я]*/
+
+/* Adjectives with gender/number agreement (no case) */
+<adjective-phrase> ::= <adjective>
+
+<adjective> ::= <adjective-positive> | <adjective-comparative> | <adjective-superlative>
+
+<adjective-positive> ::= @DEGREE[positive] <adjective-with-agreement>
+
+<adjective-with-agreement> ::= @GENDER[masculine] @NUMBER[singular] <adjective-stem>
+                            | @GENDER[feminine] @NUMBER[singular] <adjective-stem> "а"
+                            | @GENDER[neuter] @NUMBER[singular] <adjective-stem> "о"
+                            | @NUMBER[plural] <adjective-stem> "и"
+
+<adjective-comparative> ::= @DEGREE[comparative] ( "по-" <adjective-stem> )
+
+<adjective-superlative> ::= @DEGREE[superlative] ( "най-" <adjective-stem> )
+
+<adjective-stem> ::= /[а-я]+/
+
+/* Verb phrases with aspect distinction */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <modal-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb>
+
+<finite-verb> ::= <verb-present>
+               | <verb-aorist>
+               | <verb-imperfect>
+               | <verb-perfect>
+               | <verb-pluperfect>
+               | <verb-future>
+               | <verb-conditional>
+
+/* Present tense (imperfective aspect) */
+<verb-present> ::= @TENSE[present] @ASPECT[imperfective] <present-conjugation>
+
+<present-conjugation> ::= <verb-stem> ( "а" | "аш" | "а" | "аме" | "ате" | "ат" )
+                       | <verb-stem> ( "я" | "иш" | "и" | "им" | "ите" | "ят" )
+                       | <irregular-present>
+
+<irregular-present> ::= "съм" | "си" | "е" | "сме" | "сте" | "са" /* съм (to be) */
+                     | "имам" | "имаш" | "има" | "имаме" | "имате" | "имат" /* имам (to have) */
+                     | "мога" | "можеш" | "може" | "можем" | "можете" | "могат" /* мога (can) */
+                     | "искам" | "искаш" | "иска" | "искаме" | "искате" | "искат" /* искам (want) */
+
+/* Aorist (simple past, perfective) */
+<verb-aorist> ::= @TENSE[aorist] @ASPECT[perfective] <aorist-conjugation>
+
+<aorist-conjugation> ::= <verb-stem> ( "х" | "" | "" | "хме" | "хте" | "ха" )
+
+/* Imperfect (past, imperfective) */
+<verb-imperfect> ::= @TENSE[imperfect] @ASPECT[imperfective] <imperfect-conjugation>
+
+<imperfect-conjugation> ::= <verb-stem> ( "ех" | "еше" | "еше" | "ехме" | "ехте" | "еха" )
+                         | "бях" | "беше" | "беше" | "бяхме" | "бяхте" | "бяха" /* бъда */
+
+/* Perfect (compound past) */
+<verb-perfect> ::= @TENSE[perfect] <aux-perfect> <opt-whitespace> <past-participle>
+
+<aux-perfect> ::= "съм" | "си" | "е" | "сме" | "сте" | "са"
+
+<past-participle> ::= <verb-stem> ( "л" | "ла" | "ло" | "ли" )
+
+/* Pluperfect */
+<verb-pluperfect> ::= @TENSE[pluperfect] <aux-pluperfect> <opt-whitespace> <past-participle>
+
+<aux-pluperfect> ::= "бях" | "беше" | "беше" | "бяхме" | "бяхте" | "бяха"
+
+/* Future */
+<verb-future> ::= @TENSE[future] "ще" <opt-whitespace> <verb-present>
+
+/* Future in the past */
+<verb-future-in-past> ::= "щях" <opt-whitespace> "да" <opt-whitespace> <verb-present>
+
+/* Conditional */
+<verb-conditional> ::= @MOOD[conditional] "бих" <opt-whitespace> <past-participle>
+                    | "би" <opt-whitespace> <past-participle>
+                    | "бихме" <opt-whitespace> <past-participle>
+                    | "бихте" <opt-whitespace> <past-participle>
+                    | "биха" <opt-whitespace> <past-participle>
+
+/* Да-construction (subjunctive/imperative) */
+<da-construction> ::= "да" <opt-whitespace> <verb-present>
+
+/* Compound verb phrases */
+<compound-verb-phrase> ::= <modal-verb> <opt-whitespace> <da-construction>
+
+<modal-verb> ::= "мога" | "можеш" | "може" | "можем" | "можете" | "могат"
+              | "искам" | "искаш" | "иска" | "искаме" | "искате" | "искат"
+              | "трябва" <opt-whitespace> "да"
+
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <da-construction>
+
+<verb-stem> ::= /[а-я]+/
+
+/* Object (no case marking) */
+<object> ::= <direct-object> | <indirect-object>
+
+<direct-object> ::= <noun-phrase>
+                 | <pronoun-accusative>
+
+<indirect-object> ::= <prepositional-phrase>
+                   | <pronoun-dative>
+
+<pronoun-accusative> ::= "ме" | "те" | "го" | "я" | "ни" | "ви" | "ги"
+
+<pronoun-dative> ::= "ми" | "ти" | "му" | "й" | "ни" | "ви" | "им"
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+<adverb> ::= <manner-adverb> | <time-adverb> | <place-adverb>
+
+<manner-adverb> ::= "добре" | "зле" | "бързо" | "бавно" | "лесно" | "трудно" | /[а-я]+о/
+
+<time-adverb> ::= "сега" | "вчера" | "днес" | "утре" | "винаги" | "никога" | "вече" | "още" | "рано" | "късно"
+
+<place-adverb> ::= "тук" | "там" | "къде" | "близо" | "далеч" | "горе" | "долу"
+
+/* Prepositional phrases (no case marking) */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "в" | "на" | "от" | "до" | "за" | "с" | "без" | "след" | "пред" | "над" | "под" | "между" | "при" | "по"
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
+
+<subordinating-conjunction> ::= "че" | "да" | "ако" | "когато" | "където" | "защото" | "въпреки че"
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<relative-pronoun> ::= "който" | "която" | "което" | "които" | "кой" | "какво"
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "и" | "или" | "но" | "а" | "ами" | "нито"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <yes-no-question> | <wh-question>
+
+<yes-no-question> ::= <declarative-clause> "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+<question-word> ::= "кой" | "какво" | "кога" | "къде" | "как" | "защо" | "кой" | "колко"
+
+/* Imperative clauses */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+<verb-imperative> ::= <da-construction>
+                   | <verb-stem> ( "й" | "ете" )
+
+/* Negation */
+<negation> ::= "не" | "никога" | "нищо" | "никой" | "нито"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[noun-adjective-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.@GENDER == <noun>.@GENDER AND <adjective>.@NUMBER == <noun>.@NUMBER
+    ELSE ERROR "Adjective must agree with noun in gender and number"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@PERSON == <verb>.@PERSON AND <subject>.@NUMBER == <verb>.@NUMBER
+    THEN VALID
+    ELSE WARNING "Subject and verb should agree"
+
+@CONTEXT_RULE[no-case-system]:
+    IF <noun> PRESENT
+    THEN NO case-marking REQUIRED
+    ELSE VALID /* Bulgarian lost the Slavic case system */
+
+@CONTEXT_RULE[definite-article-suffix]:
+    IF <noun> IS definite
+    THEN USE <noun-with-definite-suffix>
+    ELSE USE <noun-indefinite>
+
+@CONTEXT_RULE[aspect-tense-correlation]:
+    IF <verb>.@TENSE == aorist
+    THEN <verb>.@ASPECT SHOULD BE perfective
+    ELSE IF <verb>.@TENSE == imperfect
+    THEN <verb>.@ASPECT SHOULD BE imperfective
+    ELSE IF <verb>.@TENSE == present
+    THEN <verb>.@ASPECT SHOULD BE imperfective
+    ELSE VALID
+
+@CONTEXT_RULE[da-construction-usage]:
+    IF <modal-verb> OR <imperative> OR <subjunctive>
+    THEN REQUIRES "да" + <present-tense-verb>
+    ELSE VALID
+
+@CONTEXT_RULE[clitic-pronoun-doubling]:
+    IF <object> IS full-noun-phrase
+    THEN MAY_USE <clitic-pronoun> BEFORE <verb>
+    ELSE VALID /* Optional clitic doubling */
+
+@CONTEXT_RULE[comparative-superlative-formation]:
+    IF <adjective>.@DEGREE == comparative
+    THEN USE "по-" PREFIX
+    ELSE IF <adjective>.@DEGREE == superlative
+    THEN USE "най-" PREFIX
+    ELSE VALID

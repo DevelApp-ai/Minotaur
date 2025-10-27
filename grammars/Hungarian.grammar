@@ -1,0 +1,363 @@
+Grammar: Hungarian
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Hungarian Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Hungarian language structures including:
+ * - Agglutinative morphology (extensive use of suffixes)
+ * - 18+ grammatical cases (expressed through suffixes)
+ * - No grammatical gender
+ * - Vowel harmony (front vs back vowels)
+ * - Definite and indefinite conjugation
+ * - Free word order (SOV/Topic-prominent)
+ * - Postpositions instead of prepositions
+ * - Multiple tenses and moods
+ */
+
+Keywords: és, vagy, de, hanem, hogy, aki, ami, amely, amelyik, ki, mi, mikor, hol, hogyan, miért, ha, hogyha, akkor, úgy, nem, se, sem, soha, semmi, senki, sehol, a, az, ez, ezt, az, azt, emez, amaz, én, te, ő, mi, ti, ők, engem, téged, őt, minket, titeket, őket, -ban, -ben, -on, -en, -ön, -hoz, -hez, -höz, -ra, -re, -ról, -ről, -nak, -nek, -val, -vel, lenni, van, volt, lesz, csinál, tesz, mond, lát, tud, akar, lehet
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause - Topic-Comment structure */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+
+<declarative-clause> ::= <topic>? <opt-whitespace> <subject>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <verb-phrase> <opt-whitespace> <punctuation>?
+
+<topic> ::= <noun-phrase> | <adverbial>
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( "én" | "te" | "ő" | "mi" | "ti" | "ők" )
+
+/* Noun phrase - no articles for indefinite, 'a/az' for definite */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <definite-article>
+              | <demonstrative-determiner>
+              | <possessive-suffix>
+
+/* Definite articles - a before consonants, az before vowels */
+<definite-article> ::= "a" | "az"
+
+/* Demonstrative determiners - no gender */
+<demonstrative-determiner> ::= "ez" | "ezt" | "az" | "azt" | "emez" | "amaz"
+
+/* Nouns with 18+ cases (suffix-based) */
+<noun> ::= <noun-stem> <case-suffix>* <possessive-suffix>? <plural-suffix>?
+
+<noun-stem> ::= /[a-záéíóöőúüű]+/
+
+/* Case suffixes - agglutinative */
+<case-suffix> ::= <nominative-suffix>
+               | <accusative-suffix>
+               | <dative-suffix>
+               | <instrumental-suffix>
+               | <causal-final-suffix>
+               | <translative-suffix>
+               | <terminative-suffix>
+               | <essive-formal-suffix>
+               | <essive-modal-suffix>
+               | <inessive-suffix>
+               | <superessive-suffix>
+               | <adessive-suffix>
+               | <illative-suffix>
+               | <sublative-suffix>
+               | <allative-suffix>
+               | <elative-suffix>
+               | <delative-suffix>
+               | <ablative-suffix>
+
+<nominative-suffix> ::= @CASE[nominative] ""
+
+<accusative-suffix> ::= @CASE[accusative] <vowel-harmony-t>
+
+<dative-suffix> ::= @CASE[dative] <vowel-harmony-nak>
+
+<instrumental-suffix> ::= @CASE[instrumental] <vowel-harmony-val>
+
+<causal-final-suffix> ::= @CASE[causal-final] <vowel-harmony-ert>
+
+<translative-suffix> ::= @CASE[translative] <vowel-harmony-va>
+
+<terminative-suffix> ::= @CASE[terminative] <vowel-harmony-ig>
+
+<essive-formal-suffix> ::= @CASE[essive-formal] <vowel-harmony-kent>
+
+<essive-modal-suffix> ::= @CASE[essive-modal] <vowel-harmony-ul>
+
+<inessive-suffix> ::= @CASE[inessive] <vowel-harmony-ban>
+
+<superessive-suffix> ::= @CASE[superessive] <vowel-harmony-on>
+
+<adessive-suffix> ::= @CASE[adessive] <vowel-harmony-nal>
+
+<illative-suffix> ::= @CASE[illative] <vowel-harmony-ba>
+
+<sublative-suffix> ::= @CASE[sublative] <vowel-harmony-ra>
+
+<allative-suffix> ::= @CASE[allative] <vowel-harmony-hoz>
+
+<elative-suffix> ::= @CASE[elative] <vowel-harmony-bol>
+
+<delative-suffix> ::= @CASE[delative] <vowel-harmony-rol>
+
+<ablative-suffix> ::= @CASE[ablative] <vowel-harmony-tol>
+
+/* Vowel harmony suffixes - back vowels vs front vowels */
+<vowel-harmony-t> ::= "t" | "ot" | "et" | "öt"
+
+<vowel-harmony-nak> ::= "nak" | "nek"
+
+<vowel-harmony-val> ::= "val" | "vel"
+
+<vowel-harmony-ert> ::= "ért" | "ért"
+
+<vowel-harmony-va> ::= "vá" | "vé"
+
+<vowel-harmony-ig> ::= "ig"
+
+<vowel-harmony-kent> ::= "ként"
+
+<vowel-harmony-ul> ::= "ul" | "ül"
+
+<vowel-harmony-ban> ::= "ban" | "ben"
+
+<vowel-harmony-on> ::= "on" | "en" | "ön"
+
+<vowel-harmony-nal> ::= "nál" | "nél"
+
+<vowel-harmony-ba> ::= "ba" | "be"
+
+<vowel-harmony-ra> ::= "ra" | "re"
+
+<vowel-harmony-hoz> ::= "hoz" | "hez" | "höz"
+
+<vowel-harmony-bol> ::= "ból" | "ből"
+
+<vowel-harmony-rol> ::= "ról" | "ről"
+
+<vowel-harmony-tol> ::= "tól" | "től"
+
+/* Possessive suffixes */
+<possessive-suffix> ::= <poss-1sg> | <poss-2sg> | <poss-3sg> | <poss-1pl> | <poss-2pl> | <poss-3pl>
+
+<poss-1sg> ::= "m" | "am" | "em" | "om"
+
+<poss-2sg> ::= "d" | "ad" | "ed" | "od"
+
+<poss-3sg> ::= "a" | "e" | "ja" | "je"
+
+<poss-1pl> ::= "unk" | "ünk"
+
+<poss-2pl> ::= "tok" | "tek" | "tök"
+
+<poss-3pl> ::= "uk" | "ük" | "juk" | "jük"
+
+/* Plural suffix */
+<plural-suffix> ::= "k" | "ok" | "ek" | "ök"
+
+<proper-noun> ::= /[A-ZÁÉÍÓÖŐÚÜŰ][a-záéíóöőúüű]*/
+
+/* Adjectives - no gender, only number agreement */
+<adjective-phrase> ::= <adjective>
+
+<adjective> ::= <adjective-positive> | <adjective-comparative> | <adjective-superlative>
+
+<adjective-positive> ::= @DEGREE[positive] <adjective-stem>
+
+<adjective-comparative> ::= @DEGREE[comparative] ( <adjective-stem> "bb" | "jobban" )
+
+<adjective-superlative> ::= @DEGREE[superlative] ( "leg" <adjective-stem> "bb" | "legjobban" )
+
+<adjective-stem> ::= /[a-záéíóöőúüű]+/
+
+/* Verb phrases - definite vs indefinite conjugation */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb>
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+               | <verb-future>
+               | <verb-conditional>
+               | <verb-subjunctive>
+
+/* Present tense - definite vs indefinite conjugation */
+<verb-present> ::= @TENSE[present] ( <present-indefinite> | <present-definite> )
+
+<present-indefinite> ::= @CONJUGATION[indefinite] <verb-stem> ( "ok" | "sz" | "" | "unk" | "tok" | "nak" )
+                      | <verb-stem> ( "ek" | "sz" | "" | "ünk" | "tek" | "nek" )
+
+<present-definite> ::= @CONJUGATION[definite] <verb-stem> ( "om" | "od" | "ja" | "juk" | "játok" | "ják" )
+                    | <verb-stem> ( "em" | "ed" | "i" | "jük" | "itek" | "ik" )
+
+/* Irregular present */
+<irregular-present> ::= "vagyok" | "vagy" | "van" | "vagyunk" | "vagytok" | "vannak" /* lenni */
+                     | "megyek" | "mész" | "megy" | "megyünk" | "mentek" | "mennek" /* menni */
+                     | "jövök" | "jössz" | "jön" | "jövünk" | "jöttök" | "jönnek" /* jönni */
+
+/* Past tense */
+<verb-past> ::= @TENSE[past] <past-conjugation>
+
+<past-conjugation> ::= <verb-stem> "t" ( "am" | "ál" | "" | "unk" | "atok" | "ak" )
+                    | <verb-stem> "t" ( "em" | "él" | "" | "ünk" | "etek" | "ek" )
+                    | "volt" | "voltam" | "voltál" | "voltak"
+
+/* Future tense */
+<verb-future> ::= @TENSE[future] ( "fog" <opt-whitespace> <infinitive> )
+
+<fog-conjugation> ::= "fogok" | "fogsz" | "fog" | "fogunk" | "fogtok" | "fognak"
+
+<infinitive> ::= <verb-stem> ( "ni" | "ani" | "eni" )
+
+/* Conditional mood */
+<verb-conditional> ::= @MOOD[conditional] <verb-stem> ( "nék" | "nál" | "na" | "nánk" | "nátok" | "nának" )
+                    | <verb-stem> ( "nék" | "nél" | "ne" | "nénk" | "nétek" | "nének" )
+
+/* Subjunctive/Imperative mood */
+<verb-subjunctive> ::= @MOOD[subjunctive] <verb-stem> ( "jak" | "j" | "jon" | "junk" | "jatok" | "janak" )
+
+/* Compound verb phrases */
+<compound-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+
+<modal-verb> ::= "akar" | "tud" | "kell" | "szabad" | "lehet"
+
+<verb-stem> ::= /[a-záéíóöőúüű]+/
+
+/* Object with case marking */
+<object> ::= <direct-object> | <indirect-object>
+
+<direct-object> ::= <noun-phrase-accusative>
+                 | <pronoun-accusative>
+
+<indirect-object> ::= <noun-phrase-dative>
+                   | <pronoun-dative>
+
+<noun-phrase-accusative> ::= @CASE[accusative] <noun-phrase>
+
+<noun-phrase-dative> ::= @CASE[dative] <noun-phrase>
+
+<pronoun-accusative> ::= @CASE[accusative] ( "engem" | "téged" | "őt" | "minket" | "titeket" | "őket" )
+
+<pronoun-dative> ::= @CASE[dative] ( "nekem" | "neked" | "neki" | "nekünk" | "nektek" | "nekik" )
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <postpositional-phrase>
+
+<adverb> ::= <manner-adverb> | <time-adverb> | <place-adverb>
+
+<manner-adverb> ::= "jól" | "rosszul" | "gyorsan" | "lassan" | "könnyen" | "nehezen" | /[a-záéíóöőúüű]+an/ | /[a-záéíóöőúüű]+en/
+
+<time-adverb> ::= "most" | "ma" | "holnap" | "tegnap" | "mindig" | "soha" | "már" | "még" | "korán" | "későn"
+
+<place-adverb> ::= "itt" | "ott" | "hol" | "közel" | "messze" | "fent" | "lent"
+
+/* Postpositional phrases - Hungarian uses postpositions, not prepositions */
+<postpositional-phrase> ::= <noun-phrase> <opt-whitespace> <postposition>
+
+<postposition> ::= "miatt" | "számára" | "nélkül" | "helyett" | "után" | "előtt" | "között" | "mellett" | "alatt" | "fölött" | "körül"
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
+
+<subordinating-conjunction> ::= "hogy" | "ha" | "hogyha" | "mikor" | "amikor" | "ahol" | "mivel" | "bár" | "noha"
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<relative-pronoun> ::= "aki" | "ami" | "amely" | "amelyik" | "akinek" | "aminek"
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "és" | "vagy" | "de" | "hanem" | "sem"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <yes-no-question> | <wh-question>
+
+<yes-no-question> ::= <declarative-clause> "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+<question-word> ::= "ki" | "mi" | "mikor" | "hol" | "hogyan" | "miért" | "melyik" | "mennyi"
+
+/* Imperative clauses */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+<verb-imperative> ::= <verb-stem> ( "j" | "jon" | "junk" | "jatok" | "janak" )
+
+/* Negation */
+<negation> ::= "nem" | "se" | "sem" | "soha" | "semmi" | "senki" | "sehol"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[vowel-harmony]:
+    IF <noun-stem> CONTAINS back-vowels (a, á, o, ó, u, ú)
+    THEN USE back-vowel-suffixes
+    ELSE IF <noun-stem> CONTAINS front-vowels (e, é, i, í, ö, ő, ü, ű)
+    THEN USE front-vowel-suffixes
+    ELSE VALID
+
+@CONTEXT_RULE[definite-conjugation]:
+    IF <object> IS definite
+    THEN <verb> USES <present-definite>
+    ELSE <verb> USES <present-indefinite>
+
+@CONTEXT_RULE[no-gender-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN NO gender-agreement REQUIRED /* Hungarian has no grammatical gender */
+    ELSE VALID
+
+@CONTEXT_RULE[sov-word-order]:
+    IF <sentence> IS unmarked
+    THEN PREFER <subject> <object> <verb> ORDER
+    ELSE VALID /* Topic-prominent language */
+
+@CONTEXT_RULE[postposition-follows-noun]:
+    IF <postpositional-phrase> PRESENT
+    THEN <postposition> FOLLOWS <noun-phrase>
+    ELSE ERROR "Postposition must follow noun phrase"
+
+@CONTEXT_RULE[case-suffix-order]:
+    IF <noun> HAS multiple-suffixes
+    THEN ORDER: <stem> + <case> + <possessive> + <plural>
+    ELSE VALID
+
+@CONTEXT_RULE[article-definiteness]:
+    IF <noun-phrase> HAS "a" OR "az"
+    THEN <noun> IS definite
+    ELSE <noun> IS indefinite
+
+@CONTEXT_RULE[agglutination-phonetic]:
+    IF <suffix> ATTACHES_TO <stem>
+    THEN APPLY <vowel-harmony> AND <consonant-assimilation>
+    ELSE VALID
