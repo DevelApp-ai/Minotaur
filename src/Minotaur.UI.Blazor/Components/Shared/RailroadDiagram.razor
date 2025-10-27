@@ -55,13 +55,13 @@
         if (string.IsNullOrEmpty(RuleDefinition))
             return string.Empty;
             
-        // Simple railroad diagram generation
-        // This is a basic implementation - can be enhanced with full EBNF parser
+        // Enhanced railroad diagram generation with support for more grammar patterns
         var sb = new System.Text.StringBuilder();
         
         // Start with basic SVG structure
         int y = 50;
         int x = 20;
+        int startX = x;
         
         // Entry point
         sb.Append($"<circle cx=\"{x}\" cy=\"{y}\" r=\"5\" fill=\"#007bff\" />");
@@ -85,9 +85,9 @@
             }
             else if (component.Type == "nonterminal")
             {
-                // Non-terminal: rectangle
+                // Non-terminal: rectangle (clickable in future)
                 int width = Math.Max(80, component.Text.Length * 10);
-                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" fill=\"#fff3e0\" stroke=\"#ff9800\" stroke-width=\"2\" />");
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" fill=\"#fff3e0\" stroke=\"#ff9800\" stroke-width=\"2\" class=\"nonterminal-ref\" />");
                 sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#e65100\">{System.Web.HttpUtility.HtmlEncode(component.Text)}</text>");
                 
                 // Connection line
@@ -100,6 +100,39 @@
                 sb.Append($"<text x=\"{x}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"16\" font-weight=\"bold\" fill=\"#d32f2f\">|</text>");
                 sb.Append($"<line x1=\"{x + 10}\" y1=\"{y}\" x2=\"{x + 30}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
                 x += 30;
+            }
+            else if (component.Type == "optional")
+            {
+                // Optional: ? - show with bypass path
+                int width = Math.Max(80, component.Text.Length * 10);
+                
+                // Draw bypass arc above
+                sb.Append($"<path d=\"M {x} {y} Q {x + width/2} {y - 25} {x + width} {y}\" fill=\"none\" stroke=\"#9e9e9e\" stroke-width=\"1\" stroke-dasharray=\"3,3\" />");
+                
+                // Draw main element
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" rx=\"5\" fill=\"#f3e5f5\" stroke=\"#9c27b0\" stroke-width=\"2\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#6a1b9a\">{System.Web.HttpUtility.HtmlEncode(component.Text)}?</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
+            }
+            else if (component.Type == "repeat")
+            {
+                // Repetition: * or + - show with loop back
+                int width = Math.Max(80, component.Text.Length * 10);
+                
+                // Draw loop arc below
+                sb.Append($"<path d=\"M {x + width} {y} Q {x + width/2} {y + 25} {x} {y}\" fill=\"none\" stroke=\"#4caf50\" stroke-width=\"2\" />");
+                sb.Append($"<polygon points=\"{x + 5},{y - 3} {x},{y} {x + 5},{y + 3}\" fill=\"#4caf50\" />");
+                
+                // Draw main element
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" rx=\"5\" fill=\"#e8f5e9\" stroke=\"#4caf50\" stroke-width=\"2\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#2e7d32\">{System.Web.HttpUtility.HtmlEncode(component.Text)}{component.Modifier}</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
             }
         }
         
@@ -114,30 +147,71 @@
     {
         var components = new List<DiagramComponent>();
         
-        // Simple parser - split by common patterns
-        // This is a basic implementation, can be enhanced with proper ANTLR parsing
+        // Enhanced parser with support for ?, *, + modifiers
         var parts = definition.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         
-        foreach (var part in parts)
+        for (int i = 0; i < parts.Length; i++)
         {
+            var part = parts[i];
+            
+            // Skip grammar syntax
+            if (part == ":" || part == ";" || part == "(" || part == ")")
+                continue;
+                
             if (part == "|")
             {
                 components.Add(new DiagramComponent { Type = "choice", Text = "|" });
             }
             else if (part.StartsWith("'") || part.StartsWith("\""))
             {
-                // Terminal (literal)
-                components.Add(new DiagramComponent { Type = "terminal", Text = part.Trim('\'', '"') });
+                // Terminal (literal) - check for modifiers
+                var text = part.Trim('\'', '"', '?', '*', '+');
+                var type = "terminal";
+                
+                if (part.EndsWith("?"))
+                    type = "optional";
+                else if (part.EndsWith("*") || part.EndsWith("+"))
+                {
+                    type = "repeat";
+                    components.Add(new DiagramComponent { Type = type, Text = text, Modifier = part.EndsWith("*") ? "*" : "+" });
+                    continue;
+                }
+                
+                components.Add(new DiagramComponent { Type = type, Text = text });
             }
-            else if (char.IsUpper(part[0]) && part.All(c => char.IsUpper(c) || c == '_'))
+            else if (char.IsUpper(part[0]) && part.TrimEnd('?', '*', '+').All(c => char.IsUpper(c) || c == '_'))
             {
-                // Token/Terminal (uppercase)
-                components.Add(new DiagramComponent { Type = "terminal", Text = part });
+                // Token/Terminal (uppercase) - check for modifiers
+                var text = part.TrimEnd('?', '*', '+');
+                var type = "terminal";
+                
+                if (part.EndsWith("?"))
+                    type = "optional";
+                else if (part.EndsWith("*") || part.EndsWith("+"))
+                {
+                    type = "repeat";
+                    components.Add(new DiagramComponent { Type = type, Text = text, Modifier = part.EndsWith("*") ? "*" : "+" });
+                    continue;
+                }
+                
+                components.Add(new DiagramComponent { Type = type, Text = text });
             }
-            else if (part != ":" && part != ";" && part != "(" && part != ")" && part != "*" && part != "+" && part != "?")
+            else
             {
-                // Non-terminal rule reference
-                components.Add(new DiagramComponent { Type = "nonterminal", Text = part });
+                // Non-terminal rule reference - check for modifiers
+                var text = part.TrimEnd('?', '*', '+');
+                var type = "nonterminal";
+                
+                if (part.EndsWith("?"))
+                    type = "optional";
+                else if (part.EndsWith("*") || part.EndsWith("+"))
+                {
+                    type = "repeat";
+                    components.Add(new DiagramComponent { Type = type, Text = text, Modifier = part.EndsWith("*") ? "*" : "+" });
+                    continue;
+                }
+                
+                components.Add(new DiagramComponent { Type = type, Text = text });
             }
         }
         
@@ -162,6 +236,7 @@
     {
         public string Type { get; set; } = "";
         public string Text { get; set; } = "";
+        public string Modifier { get; set; } = "";
     }
 }
 
@@ -200,6 +275,16 @@
     .railroad-svg {
         display: block;
         margin: 0 auto;
+    }
+    
+    .railroad-svg .nonterminal-ref {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .railroad-svg .nonterminal-ref:hover {
+        filter: brightness(0.9);
+        stroke-width: 3;
     }
     
     .diagram-info {
