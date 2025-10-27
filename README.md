@@ -30,9 +30,21 @@ Minotaur is a powerful compiler-compiler platform that revolutionizes grammar de
 
 ## 📦 Installation
 
+### Core Framework
 ```bash
 dotnet add package DevelApp.Minotaur
 ```
+
+### Templates and Examples
+For complete source code examples and templates to build applications on top of Minotaur:
+```bash
+dotnet add package DevelApp.Minotaur.Templates
+```
+
+The Templates package includes:
+- **Demo Application**: Console app demonstrating core library integration
+- **Blazor UI Application**: Complete web application with GraphQL API and real-time updates
+- **All source code**: Ready-to-use examples for building your own applications
 
 ## 🔧 Quick Start
 

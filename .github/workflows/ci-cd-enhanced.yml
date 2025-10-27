@@ -361,6 +361,7 @@ jobs:
           ### Installation
           ```bash
           dotnet add package DevelApp.Minotaur --version ${{ needs.calculate-version.outputs.full-version }}
+          dotnet add package DevelApp.Minotaur.Templates --version ${{ needs.calculate-version.outputs.full-version }}
           ```
           
           **Note**: This is a pre-release version intended for testing.
@@ -424,6 +425,7 @@ jobs:
 
           ```bash
           dotnet add package DevelApp.Minotaur --version ${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
+          dotnet add package DevelApp.Minotaur.Templates --version ${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
           ```
 
           ### 🔧 Requirements
@@ -511,6 +513,7 @@ jobs:
 
           ```bash
           dotnet add package DevelApp.Minotaur --version 1.0.0
+          dotnet add package DevelApp.Minotaur.Templates --version 1.0.0
           ```
 
           ### 🔧 Requirements
