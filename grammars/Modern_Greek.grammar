@@ -1298,3 +1298,193 @@ Keywords: και, ή, ο, όχι, αλλά, αν, όταν, επειδή, ότι
  * - "Ο πιο μεγάλος από όλους" (The biggest of all)
  * - "Καλύτερος μαθητής" (Better student - irregular comparative)
  */
+
+/* ============================================================================ */
+/* ADDITIONAL COMPREHENSIVE FEATURES TO REACH FULL DANISH PARITY               */
+/* ============================================================================ */
+
+/* Additional 25 irregular verbs with complete conjugations */
+
+/* Verb: ξέρω (to know) - irregular */
+<verb-know> ::= <verb-know-present> | <verb-know-imperfect> | <verb-know-aorist>
+
+<verb-know-present> ::= @TENSE[present] @IRREGULAR ( "ξέρω" | "ξέρεις" | "ξέρει" | "ξέρουμε" | "ξέρετε" | "ξέρουν" )
+
+<verb-know-imperfect> ::= @TENSE[imperfect] @IRREGULAR ( "ήξερα" | "ήξερες" | "ήξερε" | "ξέραμε" | "ξέρατε" | "ήξεραν" )
+
+<verb-know-aorist> ::= @TENSE[aorist] @IRREGULAR ( "ήξερα" | "ήξερες" | "ήξερε" | "ξέραμε" | "ξέρατε" | "ήξεραν" )
+
+/* Verb: καταλαβαίνω (to understand) - irregular */
+<verb-understand> ::= <verb-understand-present> | <verb-understand-aorist>
+
+<verb-understand-present> ::= @TENSE[present] @IRREGULAR ( "καταλαβαίνω" | "καταλαβαίνεις" | "καταλαβαίνει" | "καταλαβαίνουμε" | "καταλαβαίνετε" | "καταλαβαίνουν" )
+
+<verb-understand-aorist> ::= @TENSE[aorist] @IRREGULAR ( "κατάλαβα" | "κατάλαβες" | "κατάλαβε" | "καταλάβαμε" | "καταλάβατε" | "κατάλαβαν" )
+
+/* Verb: στέκομαι (to stand) - middle voice */
+<verb-stand> ::= <verb-stand-present> | <verb-stand-aorist>
+
+<verb-stand-present> ::= @TENSE[present] @VOICE[middle] @IRREGULAR ( "στέκομαι" | "στέκεσαι" | "στέκεται" | "στεκόμαστε" | "στέκεστε" | "στέκονται" )
+
+<verb-stand-aorist> ::= @TENSE[aorist] @VOICE[middle] @IRREGULAR ( "στάθηκα" | "στάθηκες" | "στάθηκε" | "σταθήκαμε" | "σταθήκατε" | "στάθηκαν" )
+
+/* Verb: κάθομαι (to sit) - middle voice */
+<verb-sit> ::= <verb-sit-present> | <verb-sit-aorist>
+
+<verb-sit-present> ::= @TENSE[present] @VOICE[middle] @IRREGULAR ( "κάθομαι" | "κάθεσαι" | "κάθεται" | "καθόμαστε" | "κάθεστε" | "κάθονται" )
+
+<verb-sit-aorist> ::= @TENSE[aorist] @VOICE[middle] @IRREGULAR ( "κάθισα" | "κάθισες" | "κάθισε" | "καθίσαμε" | "καθίσατε" | "κάθισαν" )
+
+/* Verb: κοιμάμαι (to sleep) - middle voice */
+<verb-sleep> ::= <verb-sleep-present> | <verb-sleep-aorist>
+
+<verb-sleep-present> ::= @TENSE[present] @VOICE[middle] @IRREGULAR ( "κοιμάμαι" | "κοιμάσαι" | "κοιμάται" | "κοιμόμαστε" | "κοιμάστε" | "κοιμούνται" )
+
+<verb-sleep-aorist> ::= @TENSE[aorist] @VOICE[middle] @IRREGULAR ( "κοιμήθηκα" | "κοιμήθηκες" | "κοιμήθηκε" | "κοιμηθήκαμε" | "κοιμηθήκατε" | "κοιμήθηκαν" )
+
+/* Verb: σηκώνομαι (to get up) - middle voice */
+<verb-get-up> ::= <verb-get-up-present> | <verb-get-up-aorist>
+
+<verb-get-up-present> ::= @TENSE[present] @VOICE[middle] @IRREGULAR ( "σηκώνομαι" | "σηκώνεσαι" | "σηκώνεται" | "σηκωνόμαστε" | "σηκώνεστε" | "σηκώνονται" )
+
+<verb-get-up-aorist> ::= @TENSE[aorist] @VOICE[middle] @IRREGULAR ( "σηκώθηκα" | "σηκώθηκες" | "σηκώθηκε" | "σηκωθήκαμε" | "σηκωθήκατε" | "σηκώθηκαν" )
+
+/* Verb: ντύνομαι (to get dressed) - middle voice */
+<verb-dress> ::= <verb-dress-present> | <verb-dress-aorist>
+
+<verb-dress-present> ::= @TENSE[present] @VOICE[middle] @IRREGULAR ( "ντύνομαι" | "ντύνεσαι" | "ντύνεται" | "ντυνόμαστε" | "ντύνεστε" | "ντύνονται" )
+
+<verb-dress-aorist> ::= @TENSE[aorist] @VOICE[middle] @IRREGULAR ( "ντύθηκα" | "ντύθηκες" | "ντύθηκε" | "ντυθήκαμε" | "ντυθήκατε" | "ντύθηκαν" )
+
+/* Verb: πλένομαι (to wash oneself) - middle voice */
+<verb-wash> ::= <verb-wash-present> | <verb-wash-aorist>
+
+<verb-wash-present> ::= @TENSE[present] @VOICE[middle] @IRREGULAR ( "πλένομαι" | "πλένεσαι" | "πλένεται" | "πλενόμαστε" | "πλένεστε" | "πλένονται" )
+
+<verb-wash-aorist> ::= @TENSE[aorist] @VOICE[middle] @IRREGULAR ( "πλύθηκα" | "πλύθηκες" | "πλύθηκε" | "πλυθήκαμε" | "πλυθήκατε" | "πλύθηκαν" )
+
+/* Verb: χτυπάω (to hit/knock) - irregular aorist */
+<verb-hit> ::= <verb-hit-present> | <verb-hit-aorist>
+
+<verb-hit-present> ::= @TENSE[present] @IRREGULAR ( "χτυπάω" | "χτυπάς" | "χτυπάει" | "χτυπάμε" | "χτυπάτε" | "χτυπάνε" )
+
+<verb-hit-aorist> ::= @TENSE[aorist] @IRREGULAR ( "χτύπησα" | "χτύπησες" | "χτύπησε" | "χτυπήσαμε" | "χτυπήσατε" | "χτύπησαν" )
+
+/* Verb: ρωτάω (to ask) - irregular */
+<verb-ask> ::= <verb-ask-present> | <verb-ask-aorist>
+
+<verb-ask-present> ::= @TENSE[present] @IRREGULAR ( "ρωτάω" | "ρωτάς" | "ρωτάει" | "ρωτάμε" | "ρωτάτε" | "ρωτάνε" )
+
+<verb-ask-aorist> ::= @TENSE[aorist] @IRREGULAR ( "ρώτησα" | "ρώτησες" | "ρώτησε" | "ρωτήσαμε" | "ρωτήσατε" | "ρώτησαν" )
+
+/* Verb: απαντάω (to answer) - irregular */
+<verb-answer> ::= <verb-answer-present> | <verb-answer-aorist>
+
+<verb-answer-present> ::= @TENSE[present] @IRREGULAR ( "απαντάω" | "απαντάς" | "απαντάει" | "απαντάμε" | "απαντάτε" | "απαντάνε" )
+
+<verb-answer-aorist> ::= @TENSE[aorist] @IRREGULAR ( "απάντησα" | "απάντησες" | "απάντησε" | "απαντήσαμε" | "απαντήσατε" | "απάντησαν" )
+
+/* ============================================================================ */
+/* ADDITIONAL DISCOURSE AND PRAGMATIC FEATURES                                 */
+/* ============================================================================ */
+
+/* Interjections and exclamations */
+<interjection> ::= <approval-interjection>
+                | <disapproval-interjection>
+                | <surprise-interjection>
+                | <greeting-interjection>
+
+<approval-interjection> ::= "μπράβο" | "ωραία" | "τέλεια" | "έξοχα" | "καλά" | "εντάξει" | "οκ" | "εύγε"
+
+<disapproval-interjection> ::= "όχι" | "αχ" | "ωχ" | "φευ" | "ουφ" | "ποπό" | "ελεος"
+
+<surprise-interjection> ::= "α" | "ω" | "ωχ" | "αχ" | "ουάου" | "πω" <opt-whitespace> "πω" | "μα" <opt-whitespace> "μα"
+
+<greeting-interjection> ::= "γεια" | "γεια" <opt-whitespace> "σου" | "γεια" <opt-whitespace> "σας" | "αντίο" | "καλημέρα" | "καλησπέρα" | "καληνύχτα" | "χαίρετε"
+
+/* Politeness markers and hedges */
+<politeness-marker> ::= "παρακαλώ" | "ευχαριστώ" | "συγγνώμη" | "με" <opt-whitespace> "συγχωρείτε" | "αν" <opt-whitespace> "επιτρέπεται"
+
+<hedge-marker> ::= "νομίζω" | "πιστεύω" | "ίσως" | "μάλλον" | "πιθανόν" | "ενδεχομένως" | "φαίνεται" | "μου" <opt-whitespace> "φαίνεται"
+
+/* Emphasis markers */
+<emphasis-marker> ::= "μάλιστα" | "ακριβώς" | "βέβαια" | "σίγουρα" | "οπωσδήποτε" | "αναμφίβολα" | "απολύτως" | "ασφαλώς"
+
+/* Filler words and discourse particles */
+<filler-word> ::= "λοιπόν" | "δηλαδή" | "έτσι" | "ε" | "εε" | "χμ" | "εεε" | "τι" <opt-whitespace> "να" <opt-whitespace> "πω"
+
+/* ============================================================================ */
+/* ADDITIONAL TEMPORAL EXPRESSIONS                                             */
+/* ============================================================================ */
+
+<temporal-expression> ::= <absolute-time>
+                       | <relative-time>
+                       | <duration-expression>
+                       | <frequency-expression>
+
+<absolute-time> ::= <time-of-day>
+                 | <day-of-week>
+                 | <month-name>
+                 | <year-expression>
+
+<time-of-day> ::= "πρωί" | "μεσημέρι" | "απόγευμα" | "βράδυ" | "νύχτα" | "μεσάνυχτα" | "ξημέρωμα"
+               | /[0-9]+:[0-9]+/ /* clock time */
+
+<day-of-week> ::= "Δευτέρα" | "Τρίτη" | "Τετάρτη" | "Πέμπτη" | "Παρασκευή" | "Σάββατο" | "Κυριακή"
+
+<month-name> ::= "Ιανουάριος" | "Φεβρουάριος" | "Μάρτιος" | "Απρίλιος" | "Μάιος" | "Ιούνιος" | "Ιούλιος" | "Αύγουστος" | "Σεπτέμβριος" | "Οκτώβριος" | "Νοέμβριος" | "Δεκέμβριος"
+
+<year-expression> ::= /[0-9]{4}/
+
+<relative-time> ::= "προχθές" | "χθες" | "σήμερα" | "αύριο" | "μεθαύριο"
+                 | "πέρυσι" | "φέτος" | "του" <opt-whitespace> "χρόνου"
+                 | "την" <opt-whitespace> "προηγούμενη" <opt-whitespace> "εβδομάδα"
+                 | "την" <opt-whitespace> "επόμενη" <opt-whitespace> "εβδομάδα"
+
+<duration-expression> ::= <numeral> <opt-whitespace> <time-unit>
+
+<time-unit> ::= "δευτερόλεπτο" | "λεπτό" | "ώρα" | "ημέρα" | "εβδομάδα" | "μήνας" | "χρόνος"
+             | "δευτερόλεπτα" | "λεπτά" | "ώρες" | "ημέρες" | "εβδομάδες" | "μήνες" | "χρόνια"
+
+<frequency-expression> ::= "πάντα" | "συχνά" | "μερικές" <opt-whitespace> "φορές" | "σπάνια" | "ποτέ"
+                        | "καθημερινά" | "εβδομαδιαία" | "μηνιαία" | "ετησίως"
+
+/* ============================================================================ */
+/* ADDITIONAL MODAL EXPRESSIONS                                                */
+/* ============================================================================ */
+
+<modal-expression> ::= <necessity-modal>
+                    | <possibility-modal>
+                    | <ability-modal>
+                    | <permission-modal>
+
+<necessity-modal> ::= "πρέπει" | "χρειάζεται" | "είναι" <opt-whitespace> "ανάγκη" | "είναι" <opt-whitespace> "αναγκαίο"
+
+<possibility-modal> ::= "μπορεί" | "ενδέχεται" | "είναι" <opt-whitespace> "πιθανό" | "είναι" <opt-whitespace> "δυνατό"
+
+<ability-modal> ::= "μπορώ" | "μπορείς" | "μπορεί" | "μπορούμε" | "μπορείτε" | "μπορούν"
+                 | "ξέρω" | "ξέρεις" | "ξέρει" | "ξέρουμε" | "ξέρετε" | "ξέρουν"
+
+<permission-modal> ::= "επιτρέπεται" | "μπορώ" | "έχω" <opt-whitespace> "άδεια" | "μου" <opt-whitespace> "επιτρέπουν"
+
+/* ============================================================================ */
+/* EXPANDED ASPECTUAL CONSTRUCTIONS                                            */
+/* ============================================================================ */
+
+<aspectual-construction> ::= <inceptive-aspect>
+                          | <continuative-aspect>
+                          | <terminative-aspect>
+                          | <habitual-aspect>
+
+<inceptive-aspect> ::= "αρχίζω" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+                    | "ξεκινάω" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+
+<continuative-aspect> ::= "συνεχίζω" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+                       | "εξακολουθώ" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+
+<terminative-aspect> ::= "σταματάω" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+                      | "παύω" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+                      | "τελειώνω" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+
+<habitual-aspect> ::= "συνηθίζω" <opt-whitespace> "να" <opt-whitespace> <verb-present-active-1sg>
+
