@@ -1,0 +1,1293 @@
+// Finnish Language Grammar (Suomen kieli)
+// Comprehensive CEBNF specification matching Danish-level comprehensiveness
+// ~1,400 lines covering morphology, syntax, dialects, and complex patterns
+//
+// Finnish is a Uralic language with:
+// - 15 grammatical cases
+// - Extensive vowel harmony
+// - Agglutinative morphology
+// - No grammatical gender
+// - SOV word order tendency
+// - Regional dialectal variations
+
+grammar Finnish;
+
+// ============================================================================
+// METADATA AND CONFIGURATION
+// ============================================================================
+
+metadata {
+    language: "Finnish";
+    iso_code: "fi";
+    family: "Uralic";
+    subfamily: "Finnic";
+    speakers: "5.5 million";
+    official_in: "Finland, EU";
+}
+
+options {
+    token_splitting: space;
+    case_sensitive: true;
+    symbol_table: hierarchical_sharing;
+}
+
+// ============================================================================
+// TOP-LEVEL SENTENCE STRUCTURES
+// ============================================================================
+
+<sentence> ::= <declarative-sentence>
+             | <interrogative-sentence>
+             | <imperative-sentence>
+             | <exclamatory-sentence>
+             | <compound-sentence>
+             | <complex-sentence>
+             | <cleft-sentence>
+             | <existential-sentence>
+             ;
+
+<declarative-sentence> ::= <subject-phrase> <predicate> "."
+                         | <topicalized-sentence> "."
+                         ;
+
+<interrogative-sentence> ::= <yes-no-question> "?"
+                           | <wh-question> "?"
+                           | <tag-question> "?"
+                           ;
+
+<imperative-sentence> ::= <imperative-verb> <object-phrase>? <adverbial-phrase>* "."
+                        | <negative-imperative> <infinitive> <object-phrase>? "."
+                        ;
+
+<exclamatory-sentence> ::= <subject-phrase> <predicate> "!"
+                         | <exclamation> "!"
+                         ;
+
+// ============================================================================
+// COMPOUND AND COMPLEX SENTENCES
+// ============================================================================
+
+<compound-sentence> ::= <simple-clause> <coordinating-conjunction> <simple-clause> ("." | "," <coordinating-conjunction> <simple-clause>)* "."
+                      ;
+
+<complex-sentence> ::= <main-clause> <subordinate-clause>+ "."
+                     | <subordinate-clause> "," <main-clause> "."
+                     | <nested-complex-sentence> "."
+                     ;
+
+<nested-complex-sentence> ::= <main-clause> <subordinate-clause> <subordinate-clause> <subordinate-clause>? "."
+                            ;
+
+<simple-clause> ::= <subject-phrase> <predicate>
+                  ;
+
+<main-clause> ::= <subject-phrase> <predicate>
+                ;
+
+<subordinate-clause> ::= <että-clause>
+                       | <relative-clause>
+                       | <temporal-clause>
+                       | <conditional-clause>
+                       | <causal-clause>
+                       | <concessive-clause>
+                       | <purpose-clause>
+                       | <comparative-clause>
+                       ;
+
+// ============================================================================
+// SUBORDINATE CLAUSE TYPES
+// ============================================================================
+
+<että-clause> ::= "että" <subject-phrase> <predicate>
+                @CLAUSE_TYPE[complement]
+                ;
+
+<relative-clause> ::= "joka" <predicate>
+                    | "joka" <subject-phrase> <predicate>
+                    | "mikä" <predicate>
+                    | "mikä" <subject-phrase> <predicate>
+                    @CLAUSE_TYPE[relative]
+                    ;
+
+<temporal-clause> ::= <temporal-conjunction> <subject-phrase> <predicate>
+                    @CLAUSE_TYPE[temporal]
+                    ;
+
+<conditional-clause> ::= "jos" <subject-phrase> <predicate>
+                       | "jollei" <subject-phrase> <predicate>
+                       | "ellei" <subject-phrase> <predicate>
+                       @CLAUSE_TYPE[conditional]
+                       ;
+
+<causal-clause> ::= <causal-conjunction> <subject-phrase> <predicate>
+                  @CLAUSE_TYPE[causal]
+                  ;
+
+<concessive-clause> ::= <concessive-conjunction> <subject-phrase> <predicate>
+                      @CLAUSE_TYPE[concessive]
+                      ;
+
+<purpose-clause> ::= "jotta" <subject-phrase> <predicate>
+                   | <infinitive-purpose>
+                   @CLAUSE_TYPE[purpose]
+                   ;
+
+<comparative-clause> ::= <comparative-conjunction> <subject-phrase> <predicate>
+                       @CLAUSE_TYPE[comparative]
+                       ;
+
+// ============================================================================
+// SPECIAL SENTENCE TYPES
+// ============================================================================
+
+<cleft-sentence> ::= "se" "on" <noun-phrase> "," "joka" <predicate> "."
+                   | "se" "," "mikä" <predicate> "," "on" <noun-phrase> "."
+                   @SENTENCE_TYPE[cleft]
+                   ;
+
+<existential-sentence> ::= "on" <noun-phrase-partitive> "."
+                         | "ei" "ole" <noun-phrase-partitive> "."
+                         @SENTENCE_TYPE[existential]
+                         ;
+
+<topicalized-sentence> ::= <adverbial-phrase> <subject-phrase> <predicate>
+                         | <object-phrase> <subject-phrase> <predicate>
+                         @WORD_ORDER[topicalized]
+                         ;
+
+// ============================================================================
+// QUESTION TYPES
+// ============================================================================
+
+<yes-no-question> ::= <verb-interrogative> <subject-phrase> <object-phrase>? <adverbial-phrase>*
+                    | <subject-phrase> <verb-interrogative> <object-phrase>? <adverbial-phrase>*
+                    ;
+
+<wh-question> ::= <question-word> <subject-phrase>? <predicate>?
+                ;
+
+<tag-question> ::= <declarative-sentence-base> "," <question-tag>
+                 ;
+
+<question-tag> ::= "eikö" | "vai" | "vai mitä" | "eiks totta"
+                 ;
+
+// ============================================================================
+// PHRASE STRUCTURES
+// ============================================================================
+
+<subject-phrase> ::= <noun-phrase-nominative>
+                   | <pronoun-nominative>
+                   @CASE[nominative]
+                   @FUNCTION[subject]
+                   ;
+
+<predicate> ::= <verb-phrase>
+              | <copula> <predicate-complement>
+              ;
+
+<object-phrase> ::= <noun-phrase-accusative>
+                  | <noun-phrase-genitive>
+                  | <noun-phrase-partitive>
+                  | <pronoun-accusative>
+                  | <pronoun-genitive>
+                  | <pronoun-partitive>
+                  @FUNCTION[object]
+                  ;
+
+<predicate-complement> ::= <noun-phrase-nominative>
+                         | <noun-phrase-essive>
+                         | <adjective-phrase>
+                         | <adverb>
+                         ;
+
+<adverbial-phrase> ::= <adverb>
+                     | <noun-phrase-inessive>
+                     | <noun-phrase-elative>
+                     | <noun-phrase-illative>
+                     | <noun-phrase-adessive>
+                     | <noun-phrase-ablative>
+                     | <noun-phrase-allative>
+                     | <noun-phrase-translative>
+                     | <postpositional-phrase>
+                     @FUNCTION[adverbial]
+                     ;
+
+// ============================================================================
+// NOUN PHRASES (15 CASES)
+// ============================================================================
+
+<noun-phrase-nominative> ::= <determiner>? <adjective>* <noun-nominative> <genitive-modifier>?
+                           @CASE[nominative]
+                           ;
+
+<noun-phrase-genitive> ::= <determiner>? <adjective>* <noun-genitive> <genitive-modifier>?
+                         @CASE[genitive]
+                         ;
+
+<noun-phrase-partitive> ::= <determiner>? <adjective>* <noun-partitive> <genitive-modifier>?
+                          @CASE[partitive]
+                          ;
+
+<noun-phrase-accusative> ::= <determiner>? <adjective>* <noun-accusative> <genitive-modifier>?
+                           @CASE[accusative]
+                           ;
+
+<noun-phrase-inessive> ::= <determiner>? <adjective>* <noun-inessive> <genitive-modifier>?
+                         @CASE[inessive]
+                         ;
+
+<noun-phrase-elative> ::= <determiner>? <adjective>* <noun-elative> <genitive-modifier>?
+                        @CASE[elative]
+                        ;
+
+<noun-phrase-illative> ::= <determiner>? <adjective>* <noun-illative> <genitive-modifier>?
+                         @CASE[illative]
+                         ;
+
+<noun-phrase-adessive> ::= <determiner>? <adjective>* <noun-adessive> <genitive-modifier>?
+                         @CASE[adessive]
+                         ;
+
+<noun-phrase-ablative> ::= <determiner>? <adjective>* <noun-ablative> <genitive-modifier>?
+                         @CASE[ablative]
+                         ;
+
+<noun-phrase-allative> ::= <determiner>? <adjective>* <noun-allative> <genitive-modifier>?
+                         @CASE[allative]
+                         ;
+
+<noun-phrase-essive> ::= <determiner>? <adjective>* <noun-essive> <genitive-modifier>?
+                       @CASE[essive]
+                       ;
+
+<noun-phrase-translative> ::= <determiner>? <adjective>* <noun-translative> <genitive-modifier>?
+                            @CASE[translative]
+                            ;
+
+<noun-phrase-abessive> ::= <determiner>? <adjective>* <noun-abessive> <genitive-modifier>?
+                         @CASE[abessive]
+                         ;
+
+<noun-phrase-instructive> ::= <determiner>? <adjective>* <noun-instructive> <genitive-modifier>?
+                            @CASE[instructive]
+                            ;
+
+<noun-phrase-comitative> ::= <determiner>? <adjective>* <noun-comitative> <genitive-modifier>?
+                           @CASE[comitative]
+                           ;
+
+// ============================================================================
+// NOUN DECLENSIONS (15 CASES)
+// ============================================================================
+
+<noun-nominative> ::= <noun-stem>
+                    | <noun-stem-back-harmony>
+                    | <noun-stem-front-harmony>
+                    @CASE[nominative]
+                    ;
+
+<noun-genitive> ::= <noun-stem> "n"
+                  | <noun-stem-back-harmony> "n"
+                  | <noun-stem-front-harmony> "n"
+                  @CASE[genitive]
+                  ;
+
+<noun-partitive> ::= <noun-stem> ( "a" | "ä" | "ta" | "tä" )
+                   @CASE[partitive]
+                   @VOWEL_HARMONY[checked]
+                   ;
+
+<noun-accusative> ::= <noun-nominative>
+                    | <noun-genitive>
+                    @CASE[accusative]
+                    ;
+
+<noun-inessive> ::= <noun-stem> ( "ssa" | "ssä" )
+                  @CASE[inessive]
+                  @MEANING[in]
+                  @VOWEL_HARMONY[checked]
+                  ;
+
+<noun-elative> ::= <noun-stem> ( "sta" | "stä" )
+                 @CASE[elative]
+                 @MEANING[from_inside]
+                 @VOWEL_HARMONY[checked]
+                 ;
+
+<noun-illative> ::= <noun-stem> ( "an" | "än" | "han" | "hän" | "seen" | "siin" | "iin" | "hon" | "hön" )
+                  @CASE[illative]
+                  @MEANING[into]
+                  @VOWEL_HARMONY[checked]
+                  ;
+
+<noun-adessive> ::= <noun-stem> ( "lla" | "llä" )
+                  @CASE[adessive]
+                  @MEANING[at_on]
+                  @VOWEL_HARMONY[checked]
+                  ;
+
+<noun-ablative> ::= <noun-stem> ( "lta" | "ltä" )
+                  @CASE[ablative]
+                  @MEANING[from_off]
+                  @VOWEL_HARMONY[checked]
+                  ;
+
+<noun-allative> ::= <noun-stem> ( "lle" )
+                  @CASE[allative]
+                  @MEANING[onto_to]
+                  ;
+
+<noun-essive> ::= <noun-stem> ( "na" | "nä" )
+                @CASE[essive]
+                @MEANING[as_in_the_capacity_of]
+                @VOWEL_HARMONY[checked]
+                ;
+
+<noun-translative> ::= <noun-stem> ( "ksi" )
+                     @CASE[translative]
+                     @MEANING[into_becoming]
+                     ;
+
+<noun-abessive> ::= <noun-stem> ( "tta" | "ttä" )
+                  @CASE[abessive]
+                  @MEANING[without]
+                  @VOWEL_HARMONY[checked]
+                  ;
+
+<noun-instructive> ::= <noun-stem-plural> "in"
+                     @CASE[instructive]
+                     @MEANING[by_means_of]
+                     @NUMBER[plural_only]
+                     ;
+
+<noun-comitative> ::= <noun-stem-plural> ( "ne" ) ( "n" )
+                    @CASE[comitative]
+                    @MEANING[with]
+                    @NUMBER[plural_only]
+                    ;
+
+// ============================================================================
+// NOUN STEMS AND VOWEL HARMONY
+// ============================================================================
+
+<noun-stem> ::= /[a-zäöåšž]+/
+              ;
+
+<noun-stem-back-harmony> ::= /[aouAOU][a-zäöåšž]*/
+                           @VOWEL_HARMONY[back]
+                           ;
+
+<noun-stem-front-harmony> ::= /[äöyÄÖY][a-zäöåšž]*/
+                            @VOWEL_HARMONY[front]
+                            ;
+
+<noun-stem-plural> ::= <noun-stem> ( "i" | "j" )
+                     | <noun-stem> ( "e" )
+                     @NUMBER[plural]
+                     ;
+
+// ============================================================================
+// COMMON NOUNS (Examples)
+// ============================================================================
+
+<common-noun> ::= "talo" | "kissa" | "koira" | "kirja" | "auto" | "mies" | "nainen" 
+                | "lapsi" | "kaupunki" | "maa" | "vesi" | "ruoka" | "työ" | "koti"
+                | "ystävä" | "opettaja" | "opiskelija" | "perhe" | "äiti" | "isä"
+                | "veli" | "sisar" | "kieli" | "päivä" | "yö" | "aika" | "vuosi"
+                | "kuukausi" | "viikko" | "tunti" | "minuutti" | "sekunti"
+                ;
+
+<proper-noun> ::= /[A-ZÄÖÅ][a-zäöåšž]*/
+                @NOUN_TYPE[proper]
+                ;
+
+// ============================================================================
+// PRONOUNS (PERSONAL, DEMONSTRATIVE, INTERROGATIVE)
+// ============================================================================
+
+<pronoun-nominative> ::= "minä" | "sinä" | "hän" | "me" | "te" | "he"
+                       | "mä" | "sä"  // Colloquial
+                       @CASE[nominative]
+                       @PRONOUN_TYPE[personal]
+                       ;
+
+<pronoun-genitive> ::= "minun" | "sinun" | "hänen" | "meidän" | "teidän" | "heidän"
+                     | "mun" | "sun"  // Colloquial
+                     @CASE[genitive]
+                     @PRONOUN_TYPE[personal]
+                     ;
+
+<pronoun-partitive> ::= "minua" | "sinua" | "häntä" | "meitä" | "teitä" | "heitä"
+                      | "mua" | "sua"  // Colloquial
+                      @CASE[partitive]
+                      @PRONOUN_TYPE[personal]
+                      ;
+
+<pronoun-accusative> ::= "minut" | "sinut" | "hänet" | "meidät" | "teidät" | "heidät"
+                       | "mut" | "sut"  // Colloquial
+                       @CASE[accusative]
+                       @PRONOUN_TYPE[personal]
+                       ;
+
+<pronoun-inessive> ::= "minussa" | "sinussa" | "hänessä" | "meissä" | "teissä" | "heissä"
+                     @CASE[inessive]
+                     @PRONOUN_TYPE[personal]
+                     ;
+
+<pronoun-elative> ::= "minusta" | "sinusta" | "hänestä" | "meistä" | "teistä" | "heistä"
+                    @CASE[elative]
+                    @PRONOUN_TYPE[personal]
+                    ;
+
+<pronoun-illative> ::= "minuun" | "sinuun" | "häneen" | "meihin" | "teihin" | "heihin"
+                     @CASE[illative]
+                     @PRONOUN_TYPE[personal]
+                     ;
+
+<pronoun-adessive> ::= "minulla" | "sinulla" | "hänellä" | "meillä" | "teillä" | "heillä"
+                     | "mulla" | "sulla"  // Colloquial
+                     @CASE[adessive]
+                     @PRONOUN_TYPE[personal]
+                     ;
+
+<pronoun-ablative> ::= "minulta" | "sinulta" | "häneltä" | "meiltä" | "teiltä" | "heiltä"
+                     | "multa" | "sulta"  // Colloquial
+                     @CASE[ablative]
+                     @PRONOUN_TYPE[personal]
+                     ;
+
+<pronoun-allative> ::= "minulle" | "sinulle" | "hänelle" | "meille" | "teille" | "heille"
+                     | "mulle" | "sulle"  // Colloquial
+                     @CASE[allative]
+                     @PRONOUN_TYPE[personal]
+                     ;
+
+<demonstrative-pronoun> ::= "tämä" | "tuo" | "se" | "nämä" | "nuo" | "ne"
+                          | "tän" | "ton"  // Colloquial
+                          @PRONOUN_TYPE[demonstrative]
+                          ;
+
+<interrogative-pronoun> ::= "kuka" | "mikä" | "kumpi" | "millainen" | "kuinka"
+                          @PRONOUN_TYPE[interrogative]
+                          ;
+
+<relative-pronoun> ::= "joka" | "mikä" | "jotka"
+                     @PRONOUN_TYPE[relative]
+                     ;
+
+<indefinite-pronoun> ::= "joku" | "jokin" | "kukaan" | "mikään" | "jompikumpi"
+                       | "kaikki" | "molemmat" | "muutama" | "usea"
+                       @PRONOUN_TYPE[indefinite]
+                       ;
+
+<reflexive-pronoun> ::= "itse" | "itseä" | "itsensä"
+                      @PRONOUN_TYPE[reflexive]
+                      ;
+
+// ============================================================================
+// ADJECTIVES AND COMPARISON
+// ============================================================================
+
+<adjective-phrase> ::= <adverb-degree>? <adjective>
+                     | <adjective-comparative>
+                     | <adjective-superlative>
+                     ;
+
+<adjective> ::= <adjective-stem>
+              | <adjective-nominative>
+              @DEGREE[positive]
+              ;
+
+<adjective-comparative> ::= <adjective-stem> ( "mpi" | "mpa" | "mpä" )
+                          @DEGREE[comparative]
+                          @VOWEL_HARMONY[checked]
+                          ;
+
+<adjective-superlative> ::= <adjective-stem> ( "in" )
+                          @DEGREE[superlative]
+                          ;
+
+<adjective-stem> ::= /[a-zäöå]+/
+                   ;
+
+<adjective-nominative> ::= "suuri" | "pieni" | "hyvä" | "huono" | "uusi" | "vanha"
+                         | "kaunis" | "ruma" | "nopea" | "hidas" | "kallis" | "halpa"
+                         | "helppo" | "vaikea" | "tärkeä" | "hauska" | "ikävä"
+                         ;
+
+<adverb-degree> ::= "hyvin" | "erittäin" | "todella" | "aika" | "melko" | "kovin"
+                  | "niin" | "näin" | "liian"
+                  @ADVERB_TYPE[degree]
+                  ;
+
+// ============================================================================
+// VERB SYSTEM (TENSES, MOODS, VOICES)
+// ============================================================================
+
+<verb-phrase> ::= <negation>? <verb-finite>
+                | <auxiliary-verb> <verb-participle>
+                | <modal-verb> <infinitive>
+                ;
+
+<verb-finite> ::= <verb-present>
+                | <verb-past>
+                | <verb-conditional>
+                | <verb-potential>
+                | <verb-imperative>
+                ;
+
+// ============================================================================
+// PRESENT TENSE
+// ============================================================================
+
+<verb-present> ::= <verb-stem> <present-suffix>
+                 @TENSE[present]
+                 @MOOD[indicative]
+                 ;
+
+<present-suffix> ::= ( "n" | "t" | "" | "mme" | "tte" | "vat" | "vät" )
+                   @VOWEL_HARMONY[checked]
+                   ;
+
+<verb-present-1sg> ::= <verb-stem> "n"
+                     @PERSON[1]
+                     @NUMBER[singular]
+                     ;
+
+<verb-present-2sg> ::= <verb-stem> "t"
+                     @PERSON[2]
+                     @NUMBER[singular]
+                     ;
+
+<verb-present-3sg> ::= <verb-stem>
+                     | <verb-stem> ( "" )
+                     @PERSON[3]
+                     @NUMBER[singular]
+                     ;
+
+<verb-present-1pl> ::= <verb-stem> "mme"
+                     @PERSON[1]
+                     @NUMBER[plural]
+                     ;
+
+<verb-present-2pl> ::= <verb-stem> "tte"
+                     @PERSON[2]
+                     @NUMBER[plural]
+                     ;
+
+<verb-present-3pl> ::= <verb-stem> ( "vat" | "vät" )
+                     @PERSON[3]
+                     @NUMBER[plural]
+                     @VOWEL_HARMONY[checked]
+                     ;
+
+// ============================================================================
+// PAST TENSE
+// ============================================================================
+
+<verb-past> ::= <verb-stem> <past-marker> <past-suffix>
+              @TENSE[past]
+              @MOOD[indicative]
+              ;
+
+<past-marker> ::= ( "i" | "si" )
+                ;
+
+<past-suffix> ::= ( "n" | "t" | "" | "mme" | "tte" | "vat" | "vät" )
+                @VOWEL_HARMONY[checked]
+                ;
+
+// ============================================================================
+// CONDITIONAL MOOD
+// ============================================================================
+
+<verb-conditional> ::= <verb-stem> ( "isi" ) <conditional-suffix>
+                     @MOOD[conditional]
+                     @TENSE[present]
+                     ;
+
+<conditional-suffix> ::= ( "n" | "t" | "" | "mme" | "tte" | "vat" | "vät" )
+                       ;
+
+// ============================================================================
+// POTENTIAL MOOD
+// ============================================================================
+
+<verb-potential> ::= <verb-stem> ( "ne" ) <potential-suffix>
+                   @MOOD[potential]
+                   ;
+
+<potential-suffix> ::= ( "n" | "t" | "e" | "mme" | "tte" | "vat" | "vät" )
+                     ;
+
+// ============================================================================
+// IMPERATIVE MOOD
+// ============================================================================
+
+<verb-imperative> ::= <imperative-2sg>
+                    | <imperative-2pl>
+                    | <imperative-3sg>
+                    | <imperative-1pl>
+                    @MOOD[imperative]
+                    ;
+
+<imperative-2sg> ::= <verb-stem>
+                   | <verb-stem> ( "" )
+                   @PERSON[2]
+                   @NUMBER[singular]
+                   ;
+
+<imperative-2pl> ::= <verb-stem> ( "kaa" | "kää" )
+                   @PERSON[2]
+                   @NUMBER[plural]
+                   @VOWEL_HARMONY[checked]
+                   ;
+
+<imperative-3sg> ::= <verb-stem> ( "koon" | "köön" )
+                   @PERSON[3]
+                   @NUMBER[singular]
+                   @VOWEL_HARMONY[checked]
+                   ;
+
+<imperative-1pl> ::= <verb-stem> ( "kaamme" | "käämme" )
+                   @PERSON[1]
+                   @NUMBER[plural]
+                   @VOWEL_HARMONY[checked]
+                   ;
+
+// ============================================================================
+// NEGATIVE FORMS
+// ============================================================================
+
+<negation> ::= "en" | "et" | "ei" | "emme" | "ette" | "eivät"
+             @POLARITY[negative]
+             ;
+
+<negative-imperative> ::= "älä" | "älkää" | "älköön"
+                        @POLARITY[negative]
+                        @MOOD[imperative]
+                        ;
+
+<negative-present> ::= <negation> <verb-stem-connegative>
+                     @TENSE[present]
+                     @POLARITY[negative]
+                     ;
+
+<negative-past> ::= <negation> <verb-past-participle-active>
+                  @TENSE[past]
+                  @POLARITY[negative]
+                  ;
+
+<verb-stem-connegative> ::= <verb-stem>
+                          @FORM[connegative]
+                          ;
+
+// ============================================================================
+// INFINITIVES (5 TYPES)
+// ============================================================================
+
+<infinitive> ::= <first-infinitive>
+               | <second-infinitive>
+               | <third-infinitive>
+               | <fourth-infinitive>
+               | <fifth-infinitive>
+               ;
+
+<first-infinitive> ::= <verb-stem> ( "a" | "ä" | "da" | "dä" | "ta" | "tä" | "la" | "lä" | "na" | "nä" | "ra" | "rä" | "sta" | "stä" )
+                     @INFINITIVE[1]
+                     @VOWEL_HARMONY[checked]
+                     ;
+
+<second-infinitive> ::= <verb-stem> ( "essa" | "essä" )  // Inessive
+                      | <verb-stem> ( "en" )  // Instructive
+                      @INFINITIVE[2]
+                      @VOWEL_HARMONY[checked]
+                      ;
+
+<third-infinitive> ::= <verb-stem> ( "ma" | "mä" )  // Inessive: -massa/-mässä
+                     | <verb-stem> ( "ma" | "mä" )  // Elative: -masta/-mästä
+                     | <verb-stem> ( "ma" | "mä" )  // Illative: -maan/-mään
+                     | <verb-stem> ( "ma" | "mä" )  // Adessive: -malla/-mällä
+                     | <verb-stem> ( "ma" | "mä" )  // Abessive: -matta/-mättä
+                     @INFINITIVE[3]
+                     @VOWEL_HARMONY[checked]
+                     ;
+
+<fourth-infinitive> ::= <verb-stem> ( "minen" )
+                      @INFINITIVE[4]
+                      ;
+
+<fifth-infinitive> ::= <verb-stem> ( "maisa" | "mäisä" )
+                     @INFINITIVE[5]
+                     @VOWEL_HARMONY[checked]
+                     ;
+
+<infinitive-purpose> ::= <third-infinitive-illative>
+                       @INFINITIVE[3]
+                       @CASE[illative]
+                       ;
+
+<third-infinitive-illative> ::= <verb-stem> ( "maan" | "mään" )
+                              @VOWEL_HARMONY[checked]
+                              ;
+
+// ============================================================================
+// PARTICIPLES
+// ============================================================================
+
+<verb-participle> ::= <present-participle-active>
+                    | <present-participle-passive>
+                    | <past-participle-active>
+                    | <past-participle-passive>
+                    | <agent-participle>
+                    | <negative-participle>
+                    ;
+
+<present-participle-active> ::= <verb-stem> ( "va" | "vä" )
+                              @PARTICIPLE[present_active]
+                              @VOWEL_HARMONY[checked]
+                              ;
+
+<present-participle-passive> ::= <verb-stem> ( "tava" | "tävä" )
+                               @PARTICIPLE[present_passive]
+                               @VOWEL_HARMONY[checked]
+                               ;
+
+<past-participle-active> ::= <verb-stem> ( "nut" | "nyt" )
+                           @PARTICIPLE[past_active]
+                           @VOWEL_HARMONY[checked]
+                           ;
+
+<past-participle-passive> ::= <verb-stem> ( "ttu" | "tty" )
+                            @PARTICIPLE[past_passive]
+                            @VOWEL_HARMONY[checked]
+                            ;
+
+<agent-participle> ::= <verb-stem> ( "ma" | "mä" )
+                     @PARTICIPLE[agent]
+                     @VOWEL_HARMONY[checked]
+                     ;
+
+<negative-participle> ::= <verb-stem> ( "maton" | "mätön" )
+                        @PARTICIPLE[negative]
+                        @VOWEL_HARMONY[checked]
+                        ;
+
+// ============================================================================
+// PASSIVE VOICE
+// ============================================================================
+
+<passive-present> ::= <verb-stem> ( "taan" | "tään" )
+                    @VOICE[passive]
+                    @TENSE[present]
+                    @VOWEL_HARMONY[checked]
+                    ;
+
+<passive-past> ::= <verb-stem> ( "ttiin" )
+                 @VOICE[passive]
+                 @TENSE[past]
+                 ;
+
+<passive-conditional> ::= <verb-stem> ( "ttaisiin" )
+                        @VOICE[passive]
+                        @MOOD[conditional]
+                        ;
+
+<passive-potential> ::= <verb-stem> ( "ttaneen" )
+                      @VOICE[passive]
+                      @MOOD[potential]
+                      ;
+
+// ============================================================================
+// AUXILIARY AND MODAL VERBS
+// ============================================================================
+
+<auxiliary-verb> ::= <olla-conjugated>
+                   | <tulla-conjugated>
+                   @VERB_TYPE[auxiliary]
+                   ;
+
+<modal-verb> ::= <voida-conjugated>
+               | <saada-conjugated>
+               | <täytyä-conjugated>
+               | <pitää-conjugated>
+               @VERB_TYPE[modal]
+               ;
+
+<olla-conjugated> ::= "olen" | "olet" | "on" | "olemme" | "olette" | "ovat"
+                    | "olin" | "olit" | "oli" | "olimme" | "olitte" | "olivat"
+                    @VERB[olla]
+                    ;
+
+<voida-conjugated> ::= "voin" | "voit" | "voi" | "voimme" | "voitte" | "voivat"
+                     @VERB[voida]
+                     ;
+
+<saada-conjugated> ::= "saan" | "saat" | "saa" | "saamme" | "saatte" | "saavat"
+                     @VERB[saada]
+                     ;
+
+<täytyä-conjugated> ::= "täytyy"
+                      @VERB[täytyä]
+                      @IMPERSONAL[true]
+                      ;
+
+<pitää-conjugated> ::= "pitää"
+                     @VERB[pitää]
+                     @IMPERSONAL[true]
+                     ;
+
+// ============================================================================
+// COMMON IRREGULAR VERBS
+// ============================================================================
+
+<irregular-verb> ::= <olla-conjugated>
+                   | <tulla-conjugated>
+                   | <mennä-conjugated>
+                   | <tehdä-conjugated>
+                   | <nähdä-conjugated>
+                   | <juoda-conjugated>
+                   | <syödä-conjugated>
+                   ;
+
+<tulla-conjugated> ::= "tulen" | "tulet" | "tulee" | "tulemme" | "tulette" | "tulevat"
+                     | "tulin" | "tulit" | "tuli" | "tulimme" | "tulitte" | "tulivat"
+                     @VERB[tulla]
+                     ;
+
+<mennä-conjugated> ::= "menen" | "menet" | "menee" | "menemme" | "menette" | "menevät"
+                     | "menin" | "menit" | "meni" | "menimme" | "menitte" | "menivät"
+                     @VERB[mennä]
+                     ;
+
+<tehdä-conjugated> ::= "teen" | "teet" | "tekee" | "teemme" | "teette" | "tekevät"
+                     | "tein" | "teit" | "teki" | "teimme" | "teitte" | "tekivät"
+                     @VERB[tehdä]
+                     ;
+
+<nähdä-conjugated> ::= "näen" | "näet" | "näkee" | "näemme" | "näette" | "näkevät"
+                     | "näin" | "näit" | "näki" | "näimme" | "näitte" | "näkivät"
+                     @VERB[nähdä]
+                     ;
+
+<juoda-conjugated> ::= "juon" | "juot" | "juo" | "juomme" | "juotte" | "juovat"
+                     | "join" | "joit" | "joi" | "joimme" | "joitte" | "joivat"
+                     @VERB[juoda]
+                     ;
+
+<syödä-conjugated> ::= "syön" | "syöt" | "syö" | "syömme" | "syötte" | "syövät"
+                     | "söin" | "söit" | "söi" | "söimme" | "söitte" | "söivät"
+                     @VERB[syödä]
+                     ;
+
+// ============================================================================
+// VERB STEMS (Regular patterns)
+// ============================================================================
+
+<verb-stem> ::= /[a-zäöå]+/
+              ;
+
+// ============================================================================
+// ADVERBS
+// ============================================================================
+
+<adverb> ::= <temporal-adverb>
+           | <locative-adverb>
+           | <manner-adverb>
+           | <degree-adverb>
+           | <frequency-adverb>
+           | <modal-adverb>
+           ;
+
+<temporal-adverb> ::= "nyt" | "silloin" | "aina" | "usein" | "joskus" | "eilen"
+                    | "tänään" | "huomenna" | "ennen" | "jälkeen" | "aikaisin" | "myöhään"
+                    | "jo" | "vielä" | "kohta" | "pian" | "juuri"
+                    @ADVERB_TYPE[temporal]
+                    ;
+
+<locative-adverb> ::= "täällä" | "tuolla" | "siellä" | "täältä" | "tuolta" | "sieltä"
+                    | "tänne" | "tuonne" | "sinne" | "kotona" | "ulkona" | "sisällä"
+                    | "edessä" | "takana" | "vieressä" | "ylhäällä" | "alhaalla"
+                    @ADVERB_TYPE[locative]
+                    ;
+
+<manner-adverb> ::= "hyvin" | "huonosti" | "nopeasti" | "hitaasti" | "helposti" | "vaikeasti"
+                  | "kauniisti" | "rumasti" | "selvästi" | "hiljaa" | "kovaa"
+                  @ADVERB_TYPE[manner]
+                  ;
+
+<degree-adverb> ::= "erittäin" | "todella" | "hyvin" | "aika" | "melko" | "kovin"
+                  | "niin" | "näin" | "liian" | "varsin" | "sangen"
+                  @ADVERB_TYPE[degree]
+                  ;
+
+<frequency-adverb> ::= "aina" | "usein" | "joskus" | "harvoin" | "ei koskaan"
+                     | "toisinaan" | "välillä" | "säännöllisesti"
+                     @ADVERB_TYPE[frequency]
+                     ;
+
+<modal-adverb> ::= "ehkä" | "varmasti" | "luultavasti" | "mahdollisesti" | "toivottavasti"
+                 | "tietysti" | "toki" | "kai" | "vain" | "vasta"
+                 @ADVERB_TYPE[modal]
+                 ;
+
+// ============================================================================
+// POSTPOSITIONS AND PREPOSITIONS
+// ============================================================================
+
+<postpositional-phrase> ::= <noun-phrase-genitive> <postposition>
+                          @PHRASE_TYPE[postpositional]
+                          ;
+
+<postposition> ::= "kanssa" | "luona" | "luo" | "luota" | "edessä" | "takana"
+                 | "vieressä" | "ympärillä" | "keskellä" | "sisällä" | "ulkopuolella"
+                 | "alla" | "päällä" | "yläpuolella" | "alapuolella"
+                 | "välissä" | "välillä" | "takia" | "vuoksi" | "kautta"
+                 | "jälkeen" | "ennen" | "aikana" | "ajan" | "mukaan"
+                 | "sijasta" | "suhteen" | "lisäksi" | "ohella"
+                 ;
+
+<preposition> ::= "ennen" | "jälkeen" | "ilman" | "kohti"
+                @POSITION[pre]
+                ;
+
+// ============================================================================
+// CONJUNCTIONS
+// ============================================================================
+
+<coordinating-conjunction> ::= "ja" | "sekä" | "tai" | "vai" | "mutta" | "vaan"
+                             | "eli" | "että" | "kun"
+                             @CONJUNCTION_TYPE[coordinating]
+                             ;
+
+<subordinating-conjunction> ::= "että" | "kun" | "jos" | "koska" | "vaikka"
+                              | "jotta" | "kunnes" | "ennen kuin" | "jälkeen kun"
+                              | "siksi että" | "niin että"
+                              @CONJUNCTION_TYPE[subordinating]
+                              ;
+
+<temporal-conjunction> ::= "kun" | "kunnes" | "ennen kuin" | "jälkeen kun"
+                         | "samaan aikaan kun" | "silloin kun" | "aina kun"
+                         @CONJUNCTION_TYPE[temporal]
+                         ;
+
+<causal-conjunction> ::= "koska" | "kun" | "sillä" | "siksi että" | "sen takia että"
+                       @CONJUNCTION_TYPE[causal]
+                       ;
+
+<concessive-conjunction> ::= "vaikka" | "vaikkakin" | "huolimatta siitä että"
+                           @CONJUNCTION_TYPE[concessive]
+                           ;
+
+<comparative-conjunction> ::= "kuin" | "niin kuin" | "kuten" | "samoin kuin"
+                            @CONJUNCTION_TYPE[comparative]
+                            ;
+
+// ============================================================================
+// QUESTION WORDS
+// ============================================================================
+
+<question-word> ::= "kuka" | "mikä" | "missä" | "mistä" | "mihin"
+                  | "milloin" | "miten" | "miksi" | "kuinka" | "kenen"
+                  | "kumpi" | "millainen" | "montako"
+                  @WORD_TYPE[interrogative]
+                  ;
+
+<verb-interrogative> ::= <verb-stem> "ko"
+                       | <verb-stem> "kö"
+                       @QUESTION_PARTICLE[true]
+                       @VOWEL_HARMONY[checked]
+                       ;
+
+// ============================================================================
+// COMPOUND NOUNS AND WORDS
+// ============================================================================
+
+<compound-noun> ::= <noun-stem> <noun-stem>
+                  | <noun-stem> <noun-stem> <noun-stem>
+                  | <adjective-stem> <noun-stem>
+                  @WORD_TYPE[compound]
+                  ;
+
+// ============================================================================
+// DIALECTAL VARIATIONS (6 Major Dialects)
+// ============================================================================
+
+// 1. WESTERN FINNISH DIALECTS (Länsisuomalaiset murteet)
+<western-dialect-pronoun> ::= "mää" | "sää"  // minä, sinä
+                            | "myö" | "työ"  // me, te
+                            @DIALECT[western]
+                            ;
+
+<western-dialect-verb> ::= <verb-stem> ( "aan" | "ään" )  // Present 3pl: -aan/-ään
+                         @DIALECT[western]
+                         @VOWEL_HARMONY[checked]
+                         ;
+
+// 2. EASTERN FINNISH DIALECTS (Itäsuomalaiset murteet)
+<eastern-dialect-pronoun> ::= "mie" | "sie"  // minä, sinä
+                            | "myö" | "työ"  // me, te
+                            @DIALECT[eastern]
+                            ;
+
+<eastern-dialect-diphthong> ::= "ie" | "uo" | "yö"  // Preserved diphthongs
+                              @DIALECT[eastern]
+                              @FEATURE[diphthong_preservation]
+                              ;
+
+// 3. NORTHERN FINNISH DIALECTS (Pohjoissuomalaiset murteet)
+<northern-dialect-pronoun> ::= "mää" | "sää"
+                             @DIALECT[northern]
+                             ;
+
+<northern-dialect-feature> ::= <verb-stem> ( "mma" | "mmä" )  // Different 1pl ending
+                             @DIALECT[northern]
+                             @VOWEL_HARMONY[checked]
+                             ;
+
+// 4. SOUTHWESTERN DIALECTS (Lounaismurteet)
+<southwestern-dialect-pronoun> ::= "mää" | "sää"
+                                 @DIALECT[southwestern]
+                                 ;
+
+<southwestern-dialect-verb> ::= <verb-stem> ( "a" | "ä" )  // 3sg ending -a/-ä instead of null
+                              @DIALECT[southwestern]
+                              @VOWEL_HARMONY[checked]
+                              ;
+
+// 5. SOUTHEASTERN DIALECTS (Kaakkoismurteet)
+<southeastern-dialect-feature> ::= "oo" | "ee"  // Long vowels in certain positions
+                                 @DIALECT[southeastern]
+                                 ;
+
+// 6. MIDDLE FINNISH DIALECTS (Keskisuomalaiset murteet)
+<middle-dialect-feature> ::= <verb-stem> ( "haan" | "hään" )
+                           @DIALECT[middle]
+                           @VOWEL_HARMONY[checked]
+                           ;
+
+// ============================================================================
+// COLLOQUIAL FORMS (Puhekieli)
+// ============================================================================
+
+<colloquial-pronoun> ::= "mä" | "sä" | "mää" | "sää"
+                       | "mun" | "sun"  // Genitive: minun, sinun
+                       | "mua" | "sua"  // Partitive: minua, sinua
+                       | "mut" | "sut"  // Accusative: minut, sinut
+                       | "mulla" | "sulla"  // Adessive: minulla, sinulla
+                       | "mulle" | "sulle"  // Allative: minulle, sinulle
+                       | "multa" | "sulta"  // Ablative: minulta, sinulta
+                       @REGISTER[colloquial]
+                       ;
+
+<colloquial-verb> ::= <verb-stem> ( "aan" | "ään" )  // 3pl: -vat/-vät → -aan/-ään
+                    | "o" | "e"  // olla → o-, mennä → e-
+                    @REGISTER[colloquial]
+                    ;
+
+<colloquial-negation> ::= "mä en" | "sä et" | "se ei" | "me ei" | "te ei" | "ne ei"
+                        | "ei oo" | "ei mee" | "ei tuu"
+                        @REGISTER[colloquial]
+                        @POLARITY[negative]
+                        ;
+
+<colloquial-demonstrative> ::= "tää" | "toi" | "se"  // tämä, tuo, se
+                             | "nää" | "noi" | "ne"  // nämä, nuo, ne
+                             | "tän" | "ton"  // Genitive forms
+                             @REGISTER[colloquial]
+                             ;
+
+// ============================================================================
+// REGIONAL DIALECTAL PRONOUNS
+// ============================================================================
+
+<dialect-pronoun> ::= <western-dialect-pronoun>
+                    | <eastern-dialect-pronoun>
+                    | <northern-dialect-pronoun>
+                    | <southwestern-dialect-pronoun>
+                    ;
+
+<dialect-verb> ::= <western-dialect-verb>
+                 | <northern-dialect-feature>
+                 | <southwestern-dialect-verb>
+                 | <middle-dialect-feature>
+                 ;
+
+// ============================================================================
+// COPULA
+// ============================================================================
+
+<copula> ::= <olla-conjugated>
+           @VERB_TYPE[copula]
+           ;
+
+// ============================================================================
+// DETERMINERS
+// ============================================================================
+
+<determiner> ::= "se" | "tuo" | "tämä" | "ne" | "nuo" | "nämä"
+               | "jokin" | "joku" | "kaikki" | "molemmat"
+               | "yksi" | "kaksi" | "kolme"
+               ;
+
+// ============================================================================
+// NUMERALS
+// ============================================================================
+
+<numeral> ::= <cardinal-number>
+            | <ordinal-number>
+            ;
+
+<cardinal-number> ::= /[0-9]+/
+                    | "yksi" | "kaksi" | "kolme" | "neljä" | "viisi"
+                    | "kuusi" | "seitsemän" | "kahdeksan" | "yhdeksän" | "kymmenen"
+                    | "sata" | "tuhat" | "miljoona"
+                    ;
+
+<ordinal-number> ::= "ensimmäinen" | "toinen" | "kolmas" | "neljäs" | "viides"
+                   | "kuudes" | "seitsemäs" | "kahdeksas" | "yhdeksäs" | "kymmenes"
+                   ;
+
+// ============================================================================
+// GENITIVE MODIFIERS
+// ============================================================================
+
+<genitive-modifier> ::= <noun-phrase-genitive>
+                      | <pronoun-genitive>
+                      @CASE[genitive]
+                      @FUNCTION[modifier]
+                      ;
+
+// ============================================================================
+// EXCLAMATIONS
+// ============================================================================
+
+<exclamation> ::= "voi" | "voi ei" | "hyvä" | "loistava" | "hienoa"
+                | "vau" | "hurraa" | "apua" | "voi luoja"
+                @SENTENCE_TYPE[exclamation]
+                ;
+
+// ============================================================================
+// WHITESPACE AND PUNCTUATION
+// ============================================================================
+
+<whitespace> ::= /[ \t\n\r]+/
+               ;
+
+<punctuation> ::= "." | "," | ";" | ":" | "!" | "?" | "..." | "–" | "—"
+                ;
+
+// ============================================================================
+// CONTEXT-SENSITIVE VALIDATION RULES
+// ============================================================================
+
+// Rule 1: Vowel Harmony Validation
+rule vowel_harmony {
+    when @VOWEL_HARMONY[checked]
+    validate: back_vowels(stem) => back_suffix OR front_vowels(stem) => front_suffix
+    error: "Vowel harmony violation: back and front vowels cannot mix"
+}
+
+// Rule 2: Case Agreement (Adjective-Noun)
+rule adjective_noun_case_agreement {
+    when adjective + noun in same phrase
+    validate: @CASE[adjective] = @CASE[noun]
+    error: "Adjective and noun must agree in case"
+}
+
+// Rule 3: Number Agreement (Subject-Verb)
+rule subject_verb_number_agreement {
+    when subject + verb
+    validate: @NUMBER[subject] = @NUMBER[verb]
+    error: "Subject and verb must agree in number"
+}
+
+// Rule 4: Personal Pronoun Case Selection
+rule personal_pronoun_case {
+    when pronoun in subject position
+    validate: @CASE[nominative]
+    when pronoun in object position
+    validate: @CASE[accusative] OR @CASE[partitive] OR @CASE[genitive]
+    error: "Incorrect case for pronoun function"
+}
+
+// Rule 5: Partitive Object Usage
+rule partitive_object {
+    when object is indefinite OR action is incomplete OR negation present
+    prefer: @CASE[partitive]
+    when object is definite AND action is complete
+    prefer: @CASE[accusative] OR @CASE[genitive]
+}
+
+// Rule 6: Negation Agreement
+rule negation_agreement {
+    when negative verb
+    validate: negation_auxiliary + verb_connegative
+    error: "Negation requires connegative verb form"
+}
+
+// Rule 7: Question Particle Placement
+rule question_particle {
+    when interrogative sentence
+    validate: question_particle after first constituent
+    error: "Question particle (-ko/-kö) must attach to first constituent"
+}
+
+// Rule 8: Relative Pronoun Agreement
+rule relative_pronoun_agreement {
+    when relative clause
+    validate: relative_pronoun agrees with antecedent in number
+    error: "Relative pronoun must agree with antecedent"
+}
+
+// Rule 9: Conditional Consistency
+rule conditional_consistency {
+    when conditional clause
+    validate: jos + verb[conditional] OR jos + verb[present]
+    error: "Conditional clause requires appropriate verb form"
+}
+
+// Rule 10: Infinitive Selection
+rule infinitive_selection {
+    when modal_verb + infinitive
+    validate: first_infinitive OR third_infinitive[illative]
+    error: "Modal verbs require first infinitive (basic form)"
+}
+
+// Rule 11: Passive Construction
+rule passive_construction {
+    when passive voice
+    validate: no explicit subject (impersonal)
+    error: "Passive voice is impersonal in Finnish"
+}
+
+// Rule 12: Dialect Consistency
+rule dialect_consistency {
+    when dialectal form present
+    validate: all dialectal forms from same dialect
+    warn: "Mixing dialects may sound inconsistent"
+}
+
+// Rule 13: Colloquial Register Consistency
+rule register_consistency {
+    when @REGISTER[colloquial]
+    prefer: all forms in colloquial register
+    warn: "Mixing standard and colloquial forms"
+}
+
+// Rule 14: Postposition Case Government
+rule postposition_government {
+    when postposition present
+    validate: noun before postposition in genitive case
+    error: "Postpositions require genitive case"
+}
+
+// Rule 15: Nested Clause Depth
+rule nested_clause_depth {
+    when subordinate_clause count > 3
+    warn: "Deeply nested clauses may be difficult to parse"
+}
+
+// ============================================================================
+// END OF FINNISH GRAMMAR
+// ============================================================================

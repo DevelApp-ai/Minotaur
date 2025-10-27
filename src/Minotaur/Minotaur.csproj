@@ -11,11 +11,11 @@
     <PackageId>DevelApp.Minotaur</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
     <Title>Minotaur Cognitive Graph Editor</Title>
-    <Description>A zero-copy cognitive graph editor and unparser framework with StepParser integration, extensible plugin system, and advanced location tracking capabilities. Implements the complete GrammarForge documentation requirements with production-ready NuGet package dependencies.</Description>
+    <Description>A zero-copy cognitive graph unparser framework with StepParser integration, extensible plugin system, and advanced location tracking capabilities.</Description>
     <Authors>DevelApp AI</Authors>
     <Company>DevelApp AI</Company>
     <Copyright>Copyright © 2024 DevelApp AI</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur2</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur2.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -30,11 +30,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.0.0" />
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.0.2" />
+    <!-- Graph editor backend moved to CognitiveGraph repository -->
+    <!-- <PackageReference Include="DevelApp.CognitiveGraph.Editor" Version="2.0.0" /> -->
     <PackageReference Include="DevelApp.RuntimePluggableClassFactory.Interface" Version="2.0.1" />
     <PackageReference Include="DevelApp.RuntimePluggableClassFactory" Version="2.0.1" />
-    <PackageReference Include="DevelApp.StepLexer" Version="1.0.1" />
-    <PackageReference Include="DevelApp.StepParser" Version="1.0.1" />
+    <PackageReference Include="DevelApp.StepLexer" Version="1.9.0" />
+    <PackageReference Include="DevelApp.StepParser" Version="1.9.0" />
     <PackageReference Include="System.Memory" Version="4.6.3" />
     <PackageReference Include="System.Text.Json" Version="9.0.9" />
   </ItemGroup>

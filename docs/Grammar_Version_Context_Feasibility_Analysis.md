@@ -696,6 +696,7 @@ public class TranspilerEngine
 #### 2.3 Pipeline Template Marketplace
 **Concept**: Reusable CI/CD pipeline templates with grammar integration
 
+{% raw %}
 ```yaml
 # Example: C# to TypeScript Pipeline Template
 name: "C# to TypeScript Migration Pipeline"
@@ -742,6 +743,7 @@ steps:
       sourceAnalysis: ${{ steps.analyze.outputs.analysis }}
       transpilationResult: ${{ steps.transpile.outputs.result }}
 ```
+{% endraw %}
 
 ### 3. Enhanced Collaboration Features
 

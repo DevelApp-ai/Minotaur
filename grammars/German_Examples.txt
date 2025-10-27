@@ -1,0 +1,452 @@
+# German Language Example Sentences
+# Demonstrating Regular and Irregular Verbs with Case System
+
+## Regular Verbs - Present Tense
+
+Ich arbeite.
+Du arbeitest.
+Er arbeitet in Berlin.
+Sie studiert Deutsch.
+Wir lesen ein Buch.
+Ihr schreibt einen Brief.
+Sie spielen Fußball.
+Ich wohne in Deutschland.
+Du lernst Deutsch.
+Er macht seine Hausaufgaben.
+
+## Regular Verbs - Past Tense
+
+Ich arbeitete gestern.
+Du studiertest die ganze Nacht.
+Er spielte Fußball.
+Sie wohnte in Paris.
+Wir lernten Deutsch.
+Ihr machtet eure Hausaufgaben.
+Sie besuchten das Museum.
+Ich kaufte ein Buch.
+Du sagtest die Wahrheit.
+Er öffnete die Tür.
+
+## Regular Verbs - Perfect Tense
+
+Ich habe gearbeitet.
+Du hast studiert.
+Er hat gespielt.
+Sie hat gewohnt.
+Wir haben gelernt.
+Ihr habt gemacht.
+Sie haben besucht.
+Ich habe gekauft.
+Du hast gesagt.
+Er hat geöffnet.
+
+## Irregular Verb: sein (to be)
+
+# Present
+Ich bin Lehrer.
+Du bist Student.
+Er ist deutsch.
+Sie ist glücklich.
+Wir sind Freunde.
+Ihr seid zu Hause.
+Sie sind in der Schule.
+
+# Past
+Ich war müde.
+Du warst hier.
+Er war in der Stadt.
+Sie war krank.
+Wir waren zusammen.
+Ihr wart bei der Arbeit.
+Sie waren im Urlaub.
+
+# Perfect
+Ich bin in Paris gewesen.
+Du bist krank gewesen.
+Er ist hier gewesen.
+Sie ist sehr hilfreich gewesen.
+Wir sind im Museum gewesen.
+Ihr seid gut gewesen.
+Sie sind in Deutschland gewesen.
+
+## Irregular Verb: haben (to have)
+
+# Present
+Ich habe einen Hund.
+Du hast eine Katze.
+Er hat ein Auto.
+Sie hat ein Fahrrad.
+Wir haben Zeit.
+Ihr habt Geld.
+Sie haben Kinder.
+
+# Past
+Ich hatte einen Traum.
+Du hattest recht.
+Er hatte eine Idee.
+Sie hatte Fieber.
+Wir hatten Besuch.
+Ihr hattet Probleme.
+Sie hatten eine Party.
+
+# Perfect
+Ich habe es gut gehabt.
+Du hast die Chance gehabt.
+Er hat einen harten Tag gehabt.
+Sie hat die Grippe gehabt.
+Wir haben viele Erlebnisse gehabt.
+Ihr habt Glück gehabt.
+Sie haben Probleme gehabt.
+
+## Irregular Verb: werden (to become)
+
+# Present
+Ich werde Arzt.
+Du wirst alt.
+Er wird böse.
+Sie wird glücklich.
+Wir werden bald fertig.
+Ihr werdet erwachsen.
+Sie werden besser.
+
+# Past
+Ich wurde überrascht.
+Du wurdest verspätet.
+Er wurde traurig.
+Sie wurde krank.
+Wir wurden einig.
+Ihr wurdet müde.
+Sie wurden zu Hause geblieben.
+
+# Perfect
+Ich bin älter geworden.
+Du bist besser geworden.
+Er ist krank geworden.
+Sie ist Lehrerin geworden.
+Wir sind fertig geworden.
+Ihr seid eingeladen worden.
+Sie sind groß geworden.
+
+## Irregular Verb: gehen (to go)
+
+# Present
+Ich gehe zur Schule.
+Du gehst nach Hause.
+Er geht ins Kino.
+Sie geht spazieren.
+Wir gehen in die Stadt.
+Ihr geht zur Arbeit.
+Sie gehen früh.
+
+# Past
+Ich ging spazieren.
+Du gingst nach Hause.
+Er ging zum Arzt.
+Sie ging vorbei.
+Wir gingen zusammen.
+Ihr gingt hinaus.
+Sie gingen zu Fuß.
+
+# Perfect
+Ich bin viel gegangen.
+Du bist falsch gegangen.
+Er ist zur Schule gegangen.
+Sie ist herumgelaufen.
+Wir sind weit gegangen.
+Ihr seid den ganzen Weg gegangen.
+Sie sind nach Hause gegangen.
+
+## Irregular Verb: kommen (to come)
+
+# Present
+Ich komme jetzt.
+Du kommst morgen.
+Er kommt oft.
+Sie kommt nie zu spät.
+Wir kommen zusammen.
+Ihr kommt bald.
+Sie kommen nicht.
+
+# Past
+Ich kam zu spät.
+Du kamst gestern.
+Er kam laufend.
+Sie kam nach Hause.
+Wir kamen pünktlich.
+Ihr kamt zuerst.
+Sie kamen zuletzt.
+
+# Perfect
+Ich bin nach Hause gekommen.
+Du bist zurückgekommen.
+Er ist wieder gekommen.
+Sie ist gekommen um zu helfen.
+Wir sind weit gekommen.
+Ihr seid gut gestartet.
+Sie sind mit dem Zug gekommen.
+
+## Irregular Verb: sehen (to see)
+
+# Present
+Ich sehe den Film.
+Du siehst gut aus.
+Er sieht fern.
+Sie sieht sich darauf.
+Wir sehen uns.
+Ihr seht die Sterne.
+Sie sehen nichts.
+
+# Past
+Ich sah einen Film.
+Du sahst es nicht.
+Er sah aus dem Fenster.
+Sie sah ihn gestern.
+Wir sahen das Konzert.
+Ihr saht einen Vogel.
+Sie sahen nichts.
+
+# Perfect
+Ich habe es schon gesehen.
+Du hast den Film gesehen.
+Er hat bessere Tage gesehen.
+Sie hat ihn gesehen.
+Wir haben viel gesehen.
+Ihr habt alles gesehen.
+Sie haben die Welt gesehen.
+
+## Irregular Verb: geben (to give)
+
+# Present
+Ich gebe dir ein Geschenk.
+Du gibst ihm einen Rat.
+Er gibt ihr Blumen.
+Sie gibt mir ein Buch.
+Wir geben ihnen Geld.
+Ihr gebt uns Zeit.
+Sie geben auf.
+
+# Past
+Ich gab ihm das Geld.
+Du gabst mir recht.
+Er gab ihr einen Ring.
+Sie gab uns die Chance.
+Wir gaben ihnen Bescheid.
+Ihr gabt euer Bestes.
+Sie gaben nach.
+
+# Perfect
+Ich habe dir die Antwort gegeben.
+Du hast dein Bestes gegeben.
+Er hat ihr Blumen gegeben.
+Sie hat uns Hoffnung gegeben.
+Wir haben ihnen die Möglichkeit gegeben.
+Ihr habt viel gegeben.
+Sie haben aufgegeben.
+
+## Gender Agreement - Masculine (der-words)
+
+der Mann
+ein Mann
+der große Mann
+ein großer Mann
+den Mann sehe ich
+einem Mann gebe ich das Buch
+des Mannes Haus
+
+## Gender Agreement - Feminine (die-words)
+
+die Frau
+eine Frau
+die schöne Frau
+eine schöne Frau
+die Frau sehe ich
+einer Frau gebe ich das Buch
+der Frau Haus
+
+## Gender Agreement - Neuter (das-words)
+
+das Kind
+ein Kind
+das kleine Kind
+ein kleines Kind
+das Kind sehe ich
+einem Kind gebe ich das Buch
+des Kindes Spielzeug
+
+## Modal Verbs with Regular Verbs
+
+Ich kann arbeiten.
+Du willst studieren.
+Er muss kommen.
+Sie darf gehen.
+Wir sollen essen.
+Ihr mögt springen.
+Sie können lesen.
+Ich will schreiben.
+Du musst anrufen.
+
+## Modal Verbs with Irregular Verbs
+
+Ich kann dort sein.
+Du willst es haben.
+Er muss jetzt gehen.
+Sie darf mitkommen.
+Wir sollen den Film sehen.
+Ihr mögt es versuchen.
+Sie können zu Hause bleiben.
+Ich will dich sehen.
+Du solltest es gesagt haben.
+
+## Compound Sentences
+
+Ich arbeite und sie studiert.
+Er geht nach Hause aber sie bleibt.
+Wir essen jetzt oder wir essen später.
+Du kannst kommen und ich kann helfen.
+Sie ist glücklich denn es wurde gut.
+
+## Interrogative Sentences
+
+Wer bist du?
+Was machst du?
+Wo wohnst du?
+Wie geht es dir?
+Warum kommst du nicht?
+Wann gehst du?
+Welches Haus ist deins?
+Kannst du Deutsch sprechen?
+Willst du Kaffee?
+Sollen wir jetzt gehen?
+
+## Imperative Sentences
+
+Komm her!
+Geh weg!
+Sieh mich an!
+Hör zu!
+Lies das Buch!
+Schreib deinen Namen!
+Iss dein Essen!
+Sei still!
+Hab einen guten Tag!
+Bleib hier!
+
+## Subordinate Clauses
+
+Ich weiß dass sie kommt.
+Er sagt dass er arbeitet.
+Wir glauben dass sie zu Hause sind.
+Sie hofft dass du kommen kannst.
+Sie wissen dass wir es gesehen haben.
+Ich denke dass es richtig ist.
+Du sagst dass sie krank ist.
+
+## Conditional Sentences
+
+Wenn du kommst werden wir glücklich sein.
+Als er arbeitete war er konzentriert.
+Obwohl sie müde ist macht sie weiter.
+Weil wir Freunde sind helfe ich.
+Während ihr esst können wir reden.
+
+## Separable Prefix Verbs
+
+Ich stehe um 7 Uhr auf.
+Der Zug kommt um 10 Uhr an.
+Er macht die Tür auf.
+Sie räumt das Zimmer auf.
+Wir gehen heute aus.
+Ihr kommt später zurück.
+Sie nehmen an der Konferenz teil.
+
+## Reflexive Verbs
+
+Ich wasche mich.
+Du freust dich.
+Er erinnert sich.
+Sie setzt sich.
+Wir treffen uns.
+Ihr zieht euch an.
+Sie interessieren sich dafür.
+
+## Passive Voice
+
+Das Buch wird gelesen.
+Der Brief wird geschrieben.
+Das Haus wurde gebaut.
+Die Tür wird geöffnet.
+Das Problem wurde gelöst.
+Die Frage wird beantwortet.
+
+## Relative Clauses
+
+Der Mann der hier wohnt ist Arzt.
+Das Buch das ich lese ist interessant.
+Die Frau die ich gestern sah ist nett.
+Das Kind dessen Spielzeug ich fand ist hier.
+
+## Four Cases in Context
+
+# Nominative
+Der Mann ist groß.
+Die Frau ist schön.
+Das Kind ist klein.
+
+# Accusative
+Ich sehe den Mann.
+Ich sehe die Frau.
+Ich sehe das Kind.
+
+# Dative
+Ich gebe dem Mann das Buch.
+Ich gebe der Frau die Blumen.
+Ich gebe dem Kind das Spielzeug.
+
+# Genitive
+Das Haus des Mannes ist groß.
+Das Auto der Frau ist rot.
+Das Spielzeug des Kindes ist neu.
+
+## Prepositions with Cases
+
+# Accusative Prepositions
+Ich gehe durch den Park.
+Das Geschenk ist für dich.
+Wir sind gegen den Plan.
+Er kommt ohne sie.
+
+# Dative Prepositions
+Ich komme aus Deutschland.
+Sie wohnt bei ihrer Mutter.
+Wir fahren mit dem Auto.
+Er geht nach Hause.
+
+# Two-Way Prepositions (Location = Dative)
+Ich bin in dem Haus.
+Das Buch liegt auf dem Tisch.
+Er steht vor der Tür.
+
+# Two-Way Prepositions (Direction = Accusative)
+Ich gehe in das Haus.
+Ich lege das Buch auf den Tisch.
+Er geht vor die Tür.
+
+## Comparison
+
+# Comparative
+Er ist größer als ich.
+Sie läuft schneller als er.
+Dieses Buch ist besser als jenes.
+
+# Superlative
+Er ist der größte Mann.
+Sie ist am schnellsten.
+Das ist das beste Buch.
+
+## Complex Sentences
+
+Ich weiß dass er sagt dass sie kommt.
+Wenn du arbeitest und ich studiere werden wir müde.
+Falls wir jetzt gehen können wir pünktlich sein.
+Er sagt dass sie glaubt dass sie zu Hause sind.
+Wir hoffen dass ihr kommen könnt wenn wir eine Party haben.

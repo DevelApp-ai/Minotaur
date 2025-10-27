@@ -985,7 +985,7 @@ function setupAntlrLanguage() {
   },
   "keywords": ["grammar", "parser", "antlr", "railroad", "diagram"],
   "author": "DevelApp AI",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "electron": "^28.0.0",
     "electron-builder": "^24.6.4",

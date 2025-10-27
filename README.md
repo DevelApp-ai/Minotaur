@@ -2,7 +2,7 @@
 
 [![CI/CD Pipeline](https://github.com/DevelApp-ai/Minotaur/actions/workflows/ci-cd-enhanced.yml/badge.svg)](https://github.com/DevelApp-ai/Minotaur/actions/workflows/ci-cd-enhanced.yml)
 [![NuGet Version](https://img.shields.io/nuget/v/Minotaur)](https://www.nuget.org/packages/Minotaur)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ![Minotaur Logo](assets/logos/Minotaur_logo.png)
 
@@ -36,79 +36,32 @@ dotnet add package DevelApp.Minotaur
 
 ## 🔧 Quick Start
 
-### Basic Graph Editing
-
-```csharp
-using GolemCognitiveGraph.Core;
-using GolemCognitiveGraph.Editor;
-
-// Create a graph editor with a root node
-var root = new NonTerminalNode("expression", 0);
-var editor = new GraphEditor(root);
-
-// Add child nodes
-var left = new TerminalNode("identifier", "x");
-var op = new TerminalNode("operator", "+");
-var right = new LiteralNode("number", 42);
-
-editor.Root.AddChild(left);
-editor.Root.AddChild(op);
-editor.Root.AddChild(right);
-
-// Undo/Redo support
-Console.WriteLine($"Can undo: {editor.CanUndo}");
-```
-
 ### StepParser Integration
 
 ```csharp
-using GolemCognitiveGraph.Parser;
-using GolemCognitiveGraph.Plugins;
+using Minotaur.Parser;
+using Minotaur.Plugins;
+using Minotaur.Core;
 
 // Create integration with plugin manager
-using var pluginManager = new LanguagePluginManager();
-using var integration = StepParserIntegrationFactory.CreateForFile("Example.cs", pluginManager);
+using var integration = new StepParserIntegration();
 
 // Parse source code to cognitive graph
 var sourceCode = "var x = 42;";
-var editor = await integration.ParseToEditableGraphAsync(sourceCode);
+var cognitiveGraph = await integration.ParseToCognitiveGraphAsync(sourceCode);
 
 // Edit the graph
-editor.Root?.AddChild(new TerminalNode("comment", "// Generated"));
+cognitiveGraph.AddChild(new TerminalNode("comment", "// Generated"));
 
 // Unparse back to code
 var csharpPlugin = integration.PluginManager.GetPlugin("csharp");
-var regeneratedCode = await csharpPlugin.UnparseAsync(editor.Root);
-```
-
-### Advanced Context-Aware Editing
-
-```csharp
-using GolemCognitiveGraph.Advanced;
-
-// Create context-aware editor with precision tracking
-var contextEditor = new ContextAwareEditor(editor);
-var tracker = contextEditor.CreateLocationTracker(sourceCode, "MyFile.cs");
-
-// Register rule activation callbacks
-contextEditor.RegisterCallback(new MyRuleCallback());
-
-// Perform surgical edits with context
-var edit = new ContextualEdit
-{
-    Type = EditType.Insert,
-    NewNode = new TerminalNode("newVariable", "y"),
-    TargetPosition = tracker.GetPositionAt(10),
-    ContextRadius = 2
-};
-
-var result = await contextEditor.EditWithContextAsync(edit);
+var regeneratedCode = await csharpPlugin.UnparseAsync(cognitiveGraph);
 ```
 
 ### Plugin System
 
 ```csharp
-using GolemCognitiveGraph.Plugins;
+using Minotaur.Plugins;
 
 // Built-in language plugins
 using var pluginManager = new LanguagePluginManager();
@@ -130,11 +83,12 @@ Console.WriteLine($"Generated {backendRules.GenerationRules.Count} rules");
 
 ### Core Components
 
-- **GraphEditor**: Zero-copy graph modification with undo/redo
-- **StepParserIntegration**: Bridge between StepParser and cognitive graphs
+- **StepParserIntegration**: Integration with DevelApp.StepParser for parsing
 - **LanguagePluginManager**: Runtime plugin discovery and management
-- **ContextAwareEditor**: Advanced editing with location tracking
-- **PrecisionLocationTracker**: High-precision coordinate tracking
+- **GraphUnparser**: Core unparsing engine for code generation
+- **CognitiveGraphNode**: Base node type for cognitive graph representation
+- **GrammarGenerator**: Automated grammar discovery and generation
+- **SymbolicAnalysisEngine**: Advanced code analysis and verification
 
 ### Architectural Separation
 
@@ -144,13 +98,14 @@ Console.WriteLine($"Generated {backendRules.GenerationRules.Count} rules");
 
 ## 📊 Implementation Status
 
-- ✅ **100% GrammarForge Requirements Implemented**
-- ✅ **56 Comprehensive Unit Tests** (100% passing)
+- ✅ **StepParser Integration** - Parse source code to cognitive graphs
+- ✅ **111 Comprehensive Unit Tests** (100% passing)
+- ✅ **Multi-Language Plugin System** - C#, JavaScript, Python, LLVM support
+- ✅ **Graph Unparsing** - Generate code from cognitive graphs
+- ✅ **Compiler Backend Rules** - Generate backend code generation rules
+- ✅ **Grammar Generation** - Automated grammar discovery and generation
+- ✅ **Symbolic Analysis** - Advanced code analysis capabilities
 - ✅ **Production NuGet Dependencies**
-- ✅ **Advanced Location Tracking**
-- ✅ **Context-Aware Editing**
-- ✅ **Rule Activation Callbacks**
-- ✅ **Multi-Language Plugin System**
 
 ## 🧪 Testing
 
@@ -164,29 +119,31 @@ dotnet test src/Minotaur.sln --collect:"XPlat Code Coverage"
 
 ## 📚 Documentation
 
-- [API Documentation](./docs/api/)
-- [Architecture Guide](./docs/architecture.md)
-- [Plugin Development](./docs/plugins.md)
+- [Grammar Generation Guide](./src/Minotaur/GrammarGeneration/README.md)
 - [GAP Analysis](./GAP_Analysis_StepParser_Implementation.md)
+- [Technical Design Documents](./docs/)
 
 ## 🔗 Dependencies
 
-- [DevelApp.CognitiveGraph 1.0.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph/)
-- [DevelApp.StepLexer 1.0.1](https://www.nuget.org/packages/DevelApp.StepLexer/)
-- [DevelApp.StepParser 1.0.1](https://www.nuget.org/packages/DevelApp.StepParser/)
+### Core Dependencies
+- [DevelApp.CognitiveGraph 1.0.2](https://www.nuget.org/packages/DevelApp.CognitiveGraph/) - Includes simplified GraphQL and fluid interface for high-speed integrations
+- [DevelApp.StepLexer 1.9.0](https://www.nuget.org/packages/DevelApp.StepLexer/)
+- [DevelApp.StepParser 1.9.0](https://www.nuget.org/packages/DevelApp.StepParser/)
 - [DevelApp.RuntimePluggableClassFactory 2.0.1](https://www.nuget.org/packages/DevelApp.RuntimePluggableClassFactory/)
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
+
+**Special Exception for Generated Output**: The copyright owner of Minotaur grants you permission to link, compile, or otherwise combine the output of Minotaur with your own code and distribute the resulting combined work under terms of your choice. This exception applies to any files generated by Minotaur's code and grammar generation facilities.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
+Contributions are welcome! Please feel free to open issues or submit pull requests.
 
 ## 🏷️ Releases
 
-- **v1.0.0**: Initial release with complete GrammarForge implementation
+- **v1.0.0**: Initial release with complete Minotaur implementation
 - **v1.0.0-preview**: Pre-release versions for testing
 
 ## 📈 Roadmap

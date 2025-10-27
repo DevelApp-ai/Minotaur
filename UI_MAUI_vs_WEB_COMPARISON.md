@@ -81,6 +81,7 @@ public class RailroadDiagramView : SKCanvasView
 ### Code Editor with Syntax Highlighting
 
 **Web Implementation:**
+{% raw %}
 ```typescript
 // Monaco Editor provides full IDE features
 import { Editor } from '@monaco-editor/react';
@@ -99,6 +100,7 @@ function GrammarEditor({ value, onChange }: Props) {
   );
 }
 ```
+{% endraw %}
 
 **MAUI Implementation:**
 ```csharp

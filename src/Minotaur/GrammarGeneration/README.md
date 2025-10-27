@@ -37,8 +37,8 @@ The Minotaur Grammar Generation System is a comprehensive framework for automati
 ### Basic Usage
 
 ```csharp
-using GolemCognitiveGraph.GrammarGeneration;
-using GolemCognitiveGraph.GrammarGeneration.Models;
+using Minotaur.GrammarGeneration;
+using Minotaur.GrammarGeneration.Models;
 
 // Initialize the grammar generator
 var generator = new GrammarGenerator();

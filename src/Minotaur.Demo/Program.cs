@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Minotaur.Core;
 using Minotaur.Analysis.Symbolic;
-using Minotaur.Editor;
 
 public class Program
 {
@@ -28,20 +27,8 @@ public class Program
             Console.WriteLine($"   - TerminalNode: {terminalNode.Text} ({terminalNode.TokenType})");
             Console.WriteLine($"   - LiteralNode: {literalNode.Value} ({literalNode.LiteralType})");
 
-            // Test 2: Test GraphEditor
-            Console.WriteLine("\n2. Testing GraphEditor functionality...");
-            var editor = new GraphEditor(nonTerminalNode);
-            var newNode = new TerminalNode("world", "string_literal");
-            var operation = editor.InsertNode(nonTerminalNode.Id, newNode);
-
-            Console.WriteLine($"✅ GraphEditor created and node inserted successfully");
-            Console.WriteLine($"   - Operation ID: {operation.Id}");
-            Console.WriteLine($"   - Can Undo: {editor.CanUndo}");
-            Console.WriteLine($"   - Can Redo: {editor.CanRedo}");
-            Console.WriteLine($"   - Root has {editor.Root?.Children.Count} children");
-
-            // Test 3: Test SymbolicAnalysis types
-            Console.WriteLine("\n3. Testing Symbolic Analysis types...");
+            // Test 2: Test SymbolicAnalysis types
+            Console.WriteLine("\n2. Testing Symbolic Analysis types...");
             var sourceLocation = new SourceLocation(10, 25, 5);
             var error = new SymbolicError(
                 SymbolicErrorType.NullPointerAccess,

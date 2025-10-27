@@ -1,0 +1,483 @@
+/*
+ * Greenlandic Language Grammar (Kalaallisut)
+ * 
+ * Comprehensive grammar for Greenlandic (Kalaallisut) with East and West dialect support.
+ * This grammar covers:
+ * - Highly polysynthetic verb structure with extensive affixation
+ * - Noun incorporation and derivational morphology
+ * - Ergative-absolutive alignment
+ * - SOV (Subject-Object-Verb) word order
+ * - Context-sensitive case marking (8 cases)
+ * - Both West Greenlandic (Kalaallisut) and East Greenlandic (Tunumiisut) dialects
+ * 
+ * Greenlandic is an Eskimo-Aleut language with one of the world's most complex morphological systems.
+ * 
+ * Copyright (C) 2024 Minotaur Project
+ * Licensed under GNU Affero General Public License v3.0 (AGPL-3.0)
+ */
+
+grammar Greenlandic;
+
+/* Entry point - complete sentence */
+<start> ::= <sentence> <opt-punctuation>
+
+/* Optional punctuation */
+<opt-punctuation> ::= "." | "!" | "?" | ""
+
+/* Whitespace handling */
+<opt-whitespace> ::= /[ \t\n\r]+/ | ""
+<whitespace> ::= /[ \t\n\r]+/
+
+/* Main sentence types */
+<sentence> ::= <declarative-sentence>
+           | <interrogative-sentence>
+           | <imperative-sentence>
+           | <complex-sentence>
+
+/* Declarative sentence - SOV word order */
+<declarative-sentence> ::= <subject>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <opt-whitespace> <verb-complex>
+
+/* Interrogative sentence - questions */
+<interrogative-sentence> ::= <wh-question>
+                          | <yes-no-question>
+
+<wh-question> ::= <question-word> <opt-whitespace> <subject>? <opt-whitespace> <object>? <opt-whitespace> <verb-complex>
+
+<question-word> ::= <west-question-word> | <east-question-word>
+
+<west-question-word> ::= @DIALECT[west] ( "kina" | "suna" | "qanoq" | "sooq" | "sumut" | "qassit" | "nalaa" )
+
+<east-question-word> ::= @DIALECT[east] ( "kina" | "huna" | "qanuq" | "huuq" | "humut" | "qahit" | "nalâ" )
+
+<yes-no-question> ::= <declarative-sentence> <opt-whitespace> <question-particle>
+
+<question-particle> ::= <west-question-particle> | <east-question-particle>
+
+<west-question-particle> ::= @DIALECT[west] "va"
+
+<east-question-particle> ::= @DIALECT[east] "wa"
+
+/* Imperative sentence - commands */
+<imperative-sentence> ::= <object>? <opt-whitespace> <verb-imperative>
+
+/* Complex sentence with subordinate clauses */
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> <main-clause>
+
+<main-clause> ::= <declarative-sentence>
+
+<subordinate-clause> ::= <subordinator> <opt-whitespace> <declarative-sentence>
+
+<subordinator> ::= <west-subordinator> | <east-subordinator>
+
+<west-subordinator> ::= @DIALECT[west] ( "-llu" | "-lu" | "-guunar" | "-gunar" | "-lluni" )
+
+<east-subordinator> ::= @DIALECT[east] ( "-llu" | "-lu" | "-kuunar" | "-kunar" | "-lluni" )
+
+/* Subject - noun phrase with absolutive or ergative case */
+<subject> ::= <noun-phrase-absolutive>
+          | <noun-phrase-ergative>
+          | <personal-pronoun>
+
+/* Object - noun phrase with absolutive case (Greenlandic is ergative-absolutive) */
+<object> ::= <noun-phrase-absolutive>
+         | <personal-pronoun>
+
+/* Noun phrase with case marking */
+<noun-phrase-absolutive> ::= @CASE[absolutive] <noun-absolutive>
+
+<noun-phrase-ergative> ::= @CASE[ergative] <noun-ergative>
+
+<noun-phrase-instrumental> ::= @CASE[instrumental] <noun-instrumental>
+
+<noun-phrase-locative> ::= @CASE[locative] <noun-locative>
+
+<noun-phrase-ablative> ::= @CASE[ablative] <noun-ablative>
+
+<noun-phrase-allative> ::= @CASE[allative] <noun-allative>
+
+<noun-phrase-vialis> ::= @CASE[vialis] <noun-vialis>
+
+<noun-phrase-equative> ::= @CASE[equative] <noun-equative>
+
+/* Noun forms with case suffixes - West Greenlandic */
+<noun-absolutive> ::= <west-noun-absolutive> | <east-noun-absolutive>
+
+<west-noun-absolutive> ::= @DIALECT[west] ( <noun-stem> | <noun-stem> "q" )
+
+<east-noun-absolutive> ::= @DIALECT[east] ( <noun-stem> | <noun-stem> "q" )
+
+<noun-ergative> ::= <west-noun-ergative> | <east-noun-ergative>
+
+<west-noun-ergative> ::= @DIALECT[west] ( <noun-stem> "p" | <noun-stem> "up" )
+
+<east-noun-ergative> ::= @DIALECT[east] ( <noun-stem> "p" | <noun-stem> "up" )
+
+<noun-instrumental> ::= <west-noun-instrumental> | <east-noun-instrumental>
+
+<west-noun-instrumental> ::= @DIALECT[west] ( <noun-stem> "mik" | <noun-stem> "umik" )
+
+<east-noun-instrumental> ::= @DIALECT[east] ( <noun-stem> "mik" | <noun-stem> "umik" )
+
+<noun-locative> ::= <west-noun-locative> | <east-noun-locative>
+
+<west-noun-locative> ::= @DIALECT[west] ( <noun-stem> "mi" | <noun-stem> "umi" )
+
+<east-noun-locative> ::= @DIALECT[east] ( <noun-stem> "mi" | <noun-stem> "umi" )
+
+<noun-ablative> ::= <west-noun-ablative> | <east-noun-ablative>
+
+<west-noun-ablative> ::= @DIALECT[west] ( <noun-stem> "mit" | <noun-stem> "umit" )
+
+<east-noun-ablative> ::= @DIALECT[east] ( <noun-stem> "mit" | <noun-stem> "umit" )
+
+<noun-allative> ::= <west-noun-allative> | <east-noun-allative>
+
+<west-noun-allative> ::= @DIALECT[west] ( <noun-stem> "mut" | <noun-stem> "umut" )
+
+<east-noun-allative> ::= @DIALECT[east] ( <noun-stem> "mut" | <noun-stem> "umut" )
+
+<noun-vialis> ::= <west-noun-vialis> | <east-noun-vialis>
+
+<west-noun-vialis> ::= @DIALECT[west] ( <noun-stem> "kkut" | <noun-stem> "ukkut" )
+
+<east-noun-vialis> ::= @DIALECT[east] ( <noun-stem> "kkut" | <noun-stem> "ukkut" )
+
+<noun-equative> ::= <west-noun-equative> | <east-noun-equative>
+
+<west-noun-equative> ::= @DIALECT[west] ( <noun-stem> "tut" | <noun-stem> "utut" )
+
+<east-noun-equative> ::= @DIALECT[east] ( <noun-stem> "tut" | <noun-stem> "utut" )
+
+/* Noun stem - Greenlandic uses Latin alphabet with additional letters */
+<noun-stem> ::= /[a-zA-ZæÆâÂ]+/
+
+/* Personal pronouns - West and East dialects */
+<personal-pronoun> ::= <personal-pronoun-1sg>
+                    | <personal-pronoun-2sg>
+                    | <personal-pronoun-3sg>
+                    | <personal-pronoun-1pl>
+                    | <personal-pronoun-2pl>
+                    | <personal-pronoun-3pl>
+
+<personal-pronoun-1sg> ::= <west-pronoun-1sg> | <east-pronoun-1sg>
+
+<west-pronoun-1sg> ::= @DIALECT[west] "uanga"
+
+<east-pronoun-1sg> ::= @DIALECT[east] "wanga"
+
+<personal-pronoun-2sg> ::= <west-pronoun-2sg> | <east-pronoun-2sg>
+
+<west-pronoun-2sg> ::= @DIALECT[west] "illit"
+
+<east-pronoun-2sg> ::= @DIALECT[east] "illit"
+
+<personal-pronoun-3sg> ::= <west-pronoun-3sg> | <east-pronoun-3sg>
+
+<west-pronoun-3sg> ::= @DIALECT[west] "una"
+
+<east-pronoun-3sg> ::= @DIALECT[east] "una"
+
+<personal-pronoun-1pl> ::= <west-pronoun-1pl> | <east-pronoun-1pl>
+
+<west-pronoun-1pl> ::= @DIALECT[west] "uagut"
+
+<east-pronoun-1pl> ::= @DIALECT[east] "wagut"
+
+<personal-pronoun-2pl> ::= <west-pronoun-2pl> | <east-pronoun-2pl>
+
+<west-pronoun-2pl> ::= @DIALECT[west] "ilissi"
+
+<east-pronoun-2pl> ::= @DIALECT[east] "ilihi"
+
+<personal-pronoun-3pl> ::= <west-pronoun-3pl> | <east-pronoun-3pl>
+
+<west-pronoun-3pl> ::= @DIALECT[west] "ukua"
+
+<east-pronoun-3pl> ::= @DIALECT[east] "ukua"
+
+/* Demonstrative pronouns */
+<demonstrative-pronoun> ::= <west-demonstrative> | <east-demonstrative>
+
+<west-demonstrative> ::= @DIALECT[west] ( "manna" | "taanna" | "una" | "pia" )
+
+<east-demonstrative> ::= @DIALECT[east] ( "manna" | "taanna" | "una" | "pia" )
+
+/* Reflexive pronouns */
+<reflexive-pronoun> ::= <west-reflexive> | <east-reflexive>
+
+<west-reflexive> ::= @DIALECT[west] ( "immi" | "immini" )
+
+<east-reflexive> ::= @DIALECT[east] ( "immi" | "immini" )
+
+/* Verb complex - polysynthetic structure */
+<verb-complex> ::= <verb-base> <opt-whitespace> <verb-mood>
+
+<verb-base> ::= <simple-verb>
+            | <derived-verb>
+            | <incorporated-verb>
+
+/* Simple verb stems */
+<simple-verb> ::= <west-simple-verb> | <east-simple-verb>
+
+<west-simple-verb> ::= @DIALECT[west] <verb-stem>
+
+<east-simple-verb> ::= @DIALECT[east] <verb-stem>
+
+<verb-stem> ::= /[a-zA-ZæÆâÂ]+/
+
+/* Derived verb - base + derivational suffix */
+<derived-verb> ::= <verb-stem> <derivational-suffix>
+
+<derivational-suffix> ::= <west-derivational-suffix> | <east-derivational-suffix>
+
+<west-derivational-suffix> ::= @DIALECT[west] ( "-nngit" | "-sima" | "-galaar" | "-gunar" | "-suaq" | "-liur" | "-riir" | "-gajuk" | "-llaar" )
+
+<east-derivational-suffix> ::= @DIALECT[east] ( "-nngit" | "-hima" | "-kalâr" | "-kunar" | "-huaq" | "-liur" | "-riir" | "-kajuk" | "-llâr" )
+
+/* Incorporated verb - noun + verb */
+<incorporated-verb> ::= <noun-stem> <verb-stem>
+
+/* Verb mood markers */
+<verb-mood> ::= <indicative-mood>
+            | <interrogative-mood>
+            | <imperative-mood>
+            | <optative-mood>
+            | <conditional-mood>
+            | <participial-mood>
+
+/* Indicative mood - statements */
+<indicative-mood> ::= <west-indicative> | <east-indicative>
+
+<west-indicative> ::= @DIALECT[west] @MOOD[indicative] ( "-punga" | "-putit" | "-poq" | "-pput" | "-pusi" | "-pput" )
+
+<east-indicative> ::= @DIALECT[east] @MOOD[indicative] ( "-punga" | "-putit" | "-puq" | "-pput" | "-puhi" | "-pput" )
+
+/* Interrogative mood - questions */
+<interrogative-mood> ::= <west-interrogative> | <east-interrogative>
+
+<west-interrogative> ::= @DIALECT[west] @MOOD[interrogative] ( "-va" | "-vit" | "-va" | "-vat" | "-visi" | "-vat" )
+
+<east-interrogative> ::= @DIALECT[east] @MOOD[interrogative] ( "-wa" | "-wit" | "-wa" | "-wat" | "-wihi" | "-wat" )
+
+/* Imperative mood - commands */
+<imperative-mood> ::= <west-imperative> | <east-imperative>
+
+<west-imperative> ::= @DIALECT[west] @MOOD[imperative] ( "-git" | "-gitse" | "-llit" | "-llise" )
+
+<east-imperative> ::= @DIALECT[east] @MOOD[imperative] ( "-kit" | "-kitce" | "-llit" | "-llihe" )
+
+<verb-imperative> ::= <verb-stem> <imperative-mood>
+
+/* Optative mood - wishes */
+<optative-mood> ::= <west-optative> | <east-optative>
+
+<west-optative> ::= @DIALECT[west] @MOOD[optative] ( "-langa" | "-llagit" | "-llaaq" | "-llanga" | "-llaasi" | "-llaaq" )
+
+<east-optative> ::= @DIALECT[east] @MOOD[optative] ( "-langa" | "-llakity" | "-llâq" | "-llanga" | "-llâhi" | "-llâq" )
+
+/* Conditional mood */
+<conditional-mood> ::= <west-conditional> | <east-conditional>
+
+<west-conditional> ::= @DIALECT[west] @MOOD[conditional] ( "-ppat" | "-ppassi" | "-ppat" | "-ppatik" | "-ppassi" | "-ppata" )
+
+<east-conditional> ::= @DIALECT[east] @MOOD[conditional] ( "-ppat" | "-ppassi" | "-ppat" | "-ppatik" | "-ppassi" | "-ppata" )
+
+/* Participial mood */
+<participial-mood> ::= <west-participial> | <east-participial>
+
+<west-participial> ::= @DIALECT[west] @MOOD[participial] ( "-soq" | "-suq" | "-ssuaq" )
+
+<east-participial> ::= @DIALECT[east] @MOOD[participial] ( "-hoq" | "-huq" | "-hsuaq" )
+
+/* Negation - integrated into verb complex */
+<negation> ::= <west-negation> | <east-negation>
+
+<west-negation> ::= @DIALECT[west] ( "-nngit" | "-nngila" )
+
+<east-negation> ::= @DIALECT[east] ( "-nngit" | "-nngila" )
+
+/* Tense markers - attached to verb */
+<tense-marker> ::= <present-tense>
+               | <past-tense>
+               | <future-tense>
+
+<present-tense> ::= @TENSE[present] ""
+
+<past-tense> ::= <west-past> | <east-past>
+
+<west-past> ::= @DIALECT[west] @TENSE[past] ( "-sima" | "-nikuu" )
+
+<east-past> ::= @DIALECT[east] @TENSE[past] ( "-hima" | "-nikuu" )
+
+<future-tense> ::= <west-future> | <east-future>
+
+<west-future> ::= @DIALECT[west] @TENSE[future] ( "-ssa" | "-niar" )
+
+<east-future> ::= @DIALECT[east] @TENSE[future] ( "-ssa" | "-niar" )
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+            | <adverbial-phrase>
+
+<adverb> ::= <time-adverb>
+         | <place-adverb>
+         | <manner-adverb>
+
+<time-adverb> ::= <west-time-adverb> | <east-time-adverb>
+
+<west-time-adverb> ::= @DIALECT[west] ( "ullumi" | "ippassaq" | "aqagu" | "tamaani" | "suliaq" | "qaammat" )
+
+<east-time-adverb> ::= @DIALECT[east] ( "ullumi" | "ippahaq" | "aqaqu" | "tamâni" | "huliaq" | "qâmat" )
+
+<place-adverb> ::= <west-place-adverb> | <east-place-adverb>
+
+<west-place-adverb> ::= @DIALECT[west] ( "tassani" | "uani" | "avatani" | "iluani" | "qangani" )
+
+<east-place-adverb> ::= @DIALECT[east] ( "tahani" | "wani" | "awatani" | "ilwani" | "qangani" )
+
+<manner-adverb> ::= <west-manner-adverb> | <east-manner-adverb>
+
+<west-manner-adverb> ::= @DIALECT[west] ( "ajunngitsumik" | "ajunngilaq" | "sapinngilaq" )
+
+<east-manner-adverb> ::= @DIALECT[east] ( "ajunngiccumik" | "ajunngilaq" | "hapinngilaq" )
+
+<adverbial-phrase> ::= <noun-phrase-instrumental>
+                   | <noun-phrase-locative>
+                   | <noun-phrase-ablative>
+                   | <noun-phrase-allative>
+                   | <noun-phrase-vialis>
+
+/* Number marking on nouns */
+<number-suffix> ::= <singular-suffix>
+                | <dual-suffix>
+                | <plural-suffix>
+
+<singular-suffix> ::= @NUMBER[singular] ""
+
+<dual-suffix> ::= <west-dual> | <east-dual>
+
+<west-dual> ::= @DIALECT[west] @NUMBER[dual] "k"
+
+<east-dual> ::= @DIALECT[east] @NUMBER[dual] "k"
+
+<plural-suffix> ::= <west-plural> | <east-plural>
+
+<west-plural> ::= @DIALECT[west] @NUMBER[plural] "t"
+
+<east-plural> ::= @DIALECT[east] @NUMBER[plural] "t"
+
+/* Possessive suffixes on nouns */
+<possessive-suffix> ::= <poss-1sg>
+                    | <poss-2sg>
+                    | <poss-3sg>
+                    | <poss-1pl>
+                    | <poss-2pl>
+                    | <poss-3pl>
+
+<poss-1sg> ::= <west-poss-1sg> | <east-poss-1sg>
+
+<west-poss-1sg> ::= @DIALECT[west] ( "-ga" | "-ra" )
+
+<east-poss-1sg> ::= @DIALECT[east] ( "-ka" | "-ra" )
+
+<poss-2sg> ::= <west-poss-2sg> | <east-poss-2sg>
+
+<west-poss-2sg> ::= @DIALECT[west] ( "-nngit" | "-it" )
+
+<east-poss-2sg> ::= @DIALECT[east] ( "-nngit" | "-it" )
+
+<poss-3sg> ::= <west-poss-3sg> | <east-poss-3sg>
+
+<west-poss-3sg> ::= @DIALECT[west] ( "-a" | "-nia" )
+
+<east-poss-3sg> ::= @DIALECT[east] ( "-a" | "-nia" )
+
+<poss-1pl> ::= <west-poss-1pl> | <east-poss-1pl>
+
+<west-poss-1pl> ::= @DIALECT[west] ( "-vut" | "-put" )
+
+<east-poss-1pl> ::= @DIALECT[east] ( "-wut" | "-put" )
+
+<poss-2pl> ::= <west-poss-2pl> | <east-poss-2pl>
+
+<west-poss-2pl> ::= @DIALECT[west] ( "-ssi" | "-si" )
+
+<east-poss-2pl> ::= @DIALECT[east] ( "-hsi" | "-si" )
+
+<poss-3pl> ::= <west-poss-3pl> | <east-poss-3pl>
+
+<west-poss-3pl> ::= @DIALECT[west] ( "-i" | "-nngui" )
+
+<east-poss-3pl> ::= @DIALECT[east] ( "-i" | "-nngui" )
+
+/*
+ * EXAMPLE SENTENCES
+ *
+ * WEST GREENLANDIC (KALAALLISUT) EXAMPLES:
+ *
+ * BASIC SENTENCES:
+ * - "Uanga Nuummoorpunga" (I am from Nuuk)
+ * - "Illit ilinniartorpit" (You are a student)
+ * - "Una angerlarpok" (He/she goes home)
+ *
+ * ERGATIVE-ABSOLUTIVE:
+ * - "Angut qimmip amerlerpaa" (The man sees the dog - ergative subject)
+ * - "Qimmeq amerlerpoq" (The dog sees - absolutive subject)
+ *
+ * CASE MARKING:
+ * - "Illu pissuaq" (A big house - absolutive)
+ * - "Illup tungaa" (The house's back - ergative/genitive)
+ * - "Illumut aavoq" (He goes to the house - allative)
+ * - "Illumit anivoq" (He comes from the house - ablative)
+ * - "Illumi najugaqarpoq" (He lives in the house - locative)
+ *
+ * POLYSYNTHETIC VERBS:
+ * - "Nerisarapugut" (We will eat - future)
+ * - "Nerisimavunga" (I have eaten - past perfective)
+ * - "Nerisuaappunga" (I eat a lot - augmentative)
+ * - "Nerinngippunga" (I don't eat - negative)
+ *
+ * INCORPORATED NOUNS:
+ * - "Qimmernera" (I own a dog - lit: I dog-have)
+ * - "Ilinniartorpoq" (He/she is a student - lit: he/she book-does)
+ *
+ * QUESTIONS:
+ * - "Suna taava?" (What is that?)
+ * - "Kina pitit?" (Who are you?)
+ * - "Nerippita?" (Did you eat? - interrogative mood)
+ *
+ * EAST GREENLANDIC (TUNUMIISUT) EXAMPLES:
+ *
+ * DIALECTAL DIFFERENCES:
+ * - West: "Nerisimavunga" → East: "Nerihimawunga" (I have eaten)
+ * - West: "Nerivit?" → East: "Neriwit?" (Did you eat?)
+ * - West: "Ullumi" → East: "Ullumi" (Today - same)
+ * - West: "Ippassaq" → East: "Ippahaq" (Yesterday)
+ *
+ * PRONOUNS:
+ * - West: "Uanga" → East: "Wanga" (I)
+ * - West: "Uagut" → East: "Wagut" (We)
+ * - West: "Ilissi" → East: "Ilihi" (You plural)
+ *
+ * PHONOLOGICAL DIFFERENCES:
+ * - West /v/ → East /w/: "vit" → "wit"
+ * - West /s/ → East /h/ in some contexts: "sima" → "hima"
+ * - West /g/ → East /k/ in some contexts: "galaar" → "kalâr"
+ *
+ * COMPLEX SENTENCES:
+ * - "Nerillunga sinipput" (When I ate, I slept - subordinate with -llunga)
+ * - "Nerinikuu sininngilaq" (Because he ate, he didn't sleep - causal)
+ * - "Nerissa sinissaaq" (If you eat, you will sleep - conditional)
+ *
+ * NUMBERS:
+ * - "Qimmeq ataaseq" (One dog - singular)
+ * - "Qimmek magguk" (Two dogs - dual)
+ * - "Qimmit pingasut" (Three dogs - plural)
+ *
+ * POSSESSION:
+ * - "Illuga" (My house - 1sg possessive)
+ * - "Illuit" (Your house - 2sg possessive)
+ * - "Illua" (His/her house - 3sg possessive)
+ * - "Illuvut" (Our house - 1pl possessive)
+ */

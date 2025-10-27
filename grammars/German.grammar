@@ -1,0 +1,1367 @@
+Grammar: German
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * German Natural Language Grammar - Comprehensive Edition with Regional Dialects
+ * 
+ * This grammar provides extensive coverage of Standard German (Hochdeutsch) including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Case system (nominative, accusative, dative, genitive)
+ * - Gender agreement (masculine, feminine, neuter)
+ * - Number agreement (singular, plural)
+ * - Strong, weak, and mixed declension patterns
+ * - Modal verbs and auxiliaries
+ * - Separable and inseparable prefix verbs
+ * - V2 word order and verb bracket (Satzklammer)
+ * - Subordinate clause structures with nesting
+ * - Relative clauses with case marking
+ * - Comparative and superlative forms
+ * - Compound nouns (extensive productivity)
+ * - Multiple tenses and moods
+ * - Negation patterns
+ * - Reflexive verbs
+ * - Passive voice constructions
+ * - Regional dialectal variations (Bavarian, Swabian, Saxon, Rhine-Franconian, Low German, Berlin)
+ * - Multi-embedded sentences
+ * - Discourse structures and markers
+ * - Cleft sentences and focus constructions
+ * - Tag questions and elliptical structures
+ * - Reported speech
+ */
+
+Keywords: und, oder, aber, wenn, weil, dass, als, ob, wie, der, die, das, ein, eine, ich, du, er, sie, es, wir, ihr, sie, Sie, mein, dein, sein, ihr, unser, euer, dieser, diese, dieses, jener, welcher, nicht, kein, können, müssen, dürfen, sollen, wollen, mögen, haben, sein, werden, sich, zu, von, mit, nach, bei, in, an, auf, über, unter, vor, hinter, neben, zwischen, doch, halt, eben, mal, schon, noch, ja, nein, vielleicht, also, deshalb, daher, dennoch, trotzdem
+
+/* Dialect markers for German regional varieties */
+@DIALECT[bavarian]          /* Bayerisch (Bavaria and Austria) */
+@DIALECT[swabian]           /* Schwäbisch (Baden-Württemberg) */
+@DIALECT[saxon]             /* Sächsisch (Saxony) */
+@DIALECT[rhine_franconian]  /* Rheinfränkisch (Rhineland-Palatinate, Hesse) */
+@DIALECT[low_german]        /* Niederdeutsch/Plattdeutsch (Northern Germany) */
+@DIALECT[berlin]            /* Berlinerisch (Berlin and Brandenburg) */
+
+/* Top-level sentence structure with advanced constructions */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
+            | <cleft-sentence>
+
+/* Main clause with V2 word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+               | <parenthetical-clause>
+
+/* V2 declarative: TopicField + FiniteVerb + MiddleField + VerbComplement + FinalField */
+<declarative-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? <punctuation>?
+
+/* Topic field (first position) */
+<topic-field> ::= <subject>
+               | <adverbial>
+               | <object>
+               | <prepositional-phrase>
+
+/* Middle field with dialectal particles */
+<middle-field> ::= <middle-field-element> ( <opt-whitespace> <middle-field-element> )*
+
+<middle-field-element> ::= <subject>
+                        | <negation>
+                        | <adverb>
+                        | <modal-particle>
+                        | <object>
+                        | <indirect-object>
+                        | <reflexive-pronoun>
+
+/* Modal particles with dialectal variations */
+<modal-particle> ::= <standard-modal-particle> | <dialect-modal-particle>
+
+<standard-modal-particle> ::= "doch" | "halt" | "eben" | "mal" | "schon" | "noch" | "ja" | "denn" | "etwa" | "bloß" | "nur"
+
+<dialect-modal-particle> ::= @DIALECT[bavarian] ( "halt" | "fei" | "gell" | "gel" | "hoid" )
+                          | @DIALECT[swabian] ( "halt" | "gell" | "no" | "hald" )
+                          | @DIALECT[saxon] ( "nu" | "halt" | "bloß" )
+                          | @DIALECT[rhine_franconian] ( "awwer" | "gell" )
+                          | @DIALECT[low_german] ( "man" | "blots" | "mal" )
+                          | @DIALECT[berlin] ( "wa" | "ne" | "dit" | "det" )
+
+/* Negation with dialectal variations */
+<negation> ::= <standard-negation> | <dialect-negation>
+
+<standard-negation> ::= "nicht" | "nie" | "niemals" | "nirgends" | "nirgendwo" | "niemand" | "nichts" | "kein" | "keine" | "keiner"
+
+<dialect-negation> ::= @DIALECT[bavarian] ( "ned" | "net" | "nia" | "nix" | "koa" )
+                    | @DIALECT[swabian] ( "net" | "ned" | "nia" | "nex" | "koi" )
+                    | @DIALECT[saxon] ( "nich" | "nie" | "nischt" | "keen" )
+                    | @DIALECT[rhine_franconian] ( "net" | "nit" | "nie" | "nix" )
+                    | @DIALECT[low_german] ( "nich" | "nee" | "nix" | "keen" )
+                    | @DIALECT[berlin] ( "nich" | "nüscht" | "keen" | "keene" )
+
+/* Verb complement (separable prefix, infinitive, participle) */
+<verb-complement> ::= <separable-prefix>
+                   | <infinitive-phrase>
+                   | <past-participle>
+                   | <present-participle>
+                   | <predicate-adjective>
+
+<separable-prefix> ::= "ab" | "an" | "auf" | "aus" | "bei" | "ein" | "fest" | "her" | "hin" | "los" | "mit" | "nach" | "vor" | "weg" | "zu" | "zurück" | "zusammen" | "fort" | "weiter" | "raus" | "rein" | "runter" | "rauf" | "rüber"
+
+<infinitive-phrase> ::= ( "zu" <opt-whitespace> )? <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<predicate-adjective> ::= <adjective>
+
+/* Final field with nested structures */
+<final-field> ::= <subordinate-clause>
+               | <relative-clause>
+               | <prepositional-phrase>
+               | <infinitive-clause>
+               | <embedded-clause-sequence>
+
+/* Embedded clause sequence (multiple subordinate clauses) */
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> )+
+
+/* Interrogative clause */
+<interrogative-clause> ::= <yes-no-question>
+                        | <wh-question>
+
+<yes-no-question> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <final-field>? "?"
+
+/* Imperative clause */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <middle-field>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>? ( "!" | "." )?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? <opt-whitespace> <finite-verb>? <opt-whitespace> <middle-field>? "!"
+
+<exclamative-word> ::= "wie" | "was" <opt-whitespace> "für" | "welch" | "so"
+
+/* Subordinate clause (verb-final word order) with nesting */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+                      | <coordinated-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase-subordinate> <opt-whitespace> <nested-final-field>
+
+<nested-final-field> ::= <subordinate-clause>
+                      | <relative-clause>
+                      | <embedded-clause-sequence>
+                      | <prepositional-phrase>
+
+<coordinated-subordinate-clause> ::= <subordinate-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase-subordinate>
+
+<verb-phrase-subordinate> ::= ( <auxiliary-verb> <opt-whitespace> )* <main-verb>
+
+/* Relative clause with nesting */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>?
+
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>? <opt-whitespace> <subordinate-clause>
+
+<relative-pronoun> ::= @CASE[nominative] ( "der" | "die" | "das" | "welcher" | "welche" | "welches" )
+                    | @CASE[accusative] ( "den" | "die" | "das" | "welchen" | "welche" | "welches" )
+                    | @CASE[dative] ( "dem" | "der" | "dem" | "welchem" | "welcher" | "welchem" )
+                    | @CASE[genitive] ( "dessen" | "deren" | "dessen" | "wessen" )
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
+
+<coordinating-conjunction> ::= "und" | "oder" | "aber" | "denn" | "sondern" | "doch" | "sowie" | "sowohl" <opt-whitespace> "als" <opt-whitespace> "auch"
+
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+                    | <split-complex-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+/* Multi-embedded sentence (multiple levels of embedding) */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated complex sentence */
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+                                | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
+
+/* Parenthetical clause */
+<parenthetical-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <punctuation>?
+
+<parenthetical-insertion> ::= <subordinate-clause>
+                           | <main-clause>
+                           | <comment-phrase>
+
+<comment-phrase> ::= <modal-particle> ( <opt-whitespace> <modal-particle> )*
+
+<subordinating-conjunction> ::= "dass" | "ob" | "weil" | "wenn" | "als" | "während" | "bevor" | "nachdem" | "seit" | "bis" | "obwohl" | "damit" | "indem" | "sobald" | "falls" | "sofern" | "sodass" | "so" <opt-whitespace> "dass"
+
+/* Infinitive clause */
+<infinitive-clause> ::= "zu" <opt-whitespace> <verb-infinitive> ( <opt-whitespace> <object> )? ( <opt-whitespace> <adverbial> )?
+
+/* Cleft sentences */
+<cleft-sentence> ::= <es-cleft>
+                  | <wh-cleft>
+
+<es-cleft> ::= "es" <opt-whitespace> "ist" <opt-whitespace> <focused-constituent> <opt-whitespace> <relative-clause>
+
+<wh-cleft> ::= <wh-clause> <opt-whitespace> "ist" <opt-whitespace> <focused-constituent>
+
+<focused-constituent> ::= <noun-phrase>
+                       | <prepositional-phrase>
+                       | <adverb>
+
+<wh-clause> ::= <interrogative-clause-embedded>
+
+/* Subject with case marking */
+<subject> ::= @CASE[nominative] ( <pronoun-subject> | <noun-phrase> | <proper-noun> | <infinitive-as-subject> | <clause-as-subject> )
+
+<infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<clause-as-subject> ::= "dass" <opt-whitespace> <subordinate-content>
+
+/* Pronouns with case and dialectal distinctions */
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+                   | <indefinite-pronoun>
+                   | <interrogative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( <standard-nominative> | <dialect-nominative> )
+
+<standard-nominative> ::= "ich" | "du" | "er" | "sie" | "es" | "wir" | "ihr" | "sie" | "Sie" | "man"
+
+<dialect-nominative> ::= @DIALECT[bavarian] ( "i" | "du" | "ea" | "se" | "des" | "mia" | "enk" | "se" )
+                      | @DIALECT[swabian] ( "i" | "du" | "er" | "se" | "es" | "mr" | "ihr" | "se" )
+                      | @DIALECT[saxon] ( "sch" | "du" | "er" | "se" | "es" | "mir" | "ihr" | "se" )
+                      | @DIALECT[rhine_franconian] ( "isch" | "du" | "er" | "se" | "es" | "mir" | "ihr" | "se" )
+                      | @DIALECT[low_german] ( "ik" | "du" | "he" | "se" | "dat" | "wi" | "ji" | "se" )
+                      | @DIALECT[berlin] ( "ick" | "du" | "er" | "se" | "det" | "wir" | "ihr" | "se" )
+
+<personal-pronoun-accusative> ::= @CASE[accusative] ( <standard-accusative> | <dialect-accusative> )
+
+<standard-accusative> ::= "mich" | "dich" | "ihn" | "sie" | "es" | "uns" | "euch" | "sie" | "Sie"
+
+<dialect-accusative> ::= @DIALECT[bavarian] ( "mi" | "di" | "eam" | "se" | "des" | "uns" | "enk" | "se" )
+                      | @DIALECT[swabian] ( "mi" | "di" | "ihn" | "se" | "es" | "ons" | "eich" | "se" )
+                      | @DIALECT[saxon] ( "mich" | "disch" | "ihn" | "se" | "es" | "uns" | "eich" | "se" )
+                      | @DIALECT[rhine_franconian] ( "misch" | "disch" | "ihn" | "se" | "es" | "uns" | "eisch" | "se" )
+                      | @DIALECT[low_german] ( "mi" | "di" | "em" | "se" | "dat" | "uns" | "ju" | "se" )
+                      | @DIALECT[berlin] ( "mir" | "dir" | "ihn" | "se" | "det" | "uns" | "euch" | "se" )
+
+<personal-pronoun-dative> ::= @CASE[dative] ( <standard-dative> | <dialect-dative> )
+
+<standard-dative> ::= "mir" | "dir" | "ihm" | "ihr" | "ihm" | "uns" | "euch" | "ihnen" | "Ihnen"
+
+<dialect-dative> ::= @DIALECT[bavarian] ( "mia" | "dia" | "eam" | "ia" | "dem" | "uns" | "enk" | "eana" )
+                  | @DIALECT[swabian] ( "mir" | "dir" | "em" | "r" | "em" | "ons" | "eich" | "ne" )
+                  | @DIALECT[saxon] ( "mir" | "dir" | "em" | "r" | "em" | "uns" | "eich" | "ne" )
+                  | @DIALECT[low_german] ( "mi" | "di" | "em" | "r" | "dat" | "uns" | "ju" | "em" )
+                  | @DIALECT[berlin] ( "mir" | "dir" | "ihm" | "r" | "dem" | "uns" | "euch" | "ne" )
+
+<personal-pronoun-genitive> ::= @CASE[genitive] ( "meiner" | "deiner" | "seiner" | "ihrer" | "seiner" | "unser" | "euer" | "ihrer" | "Ihrer" )
+
+<reflexive-pronoun> ::= @REFLEXIVE "mich" | "dich" | "sich" | "uns" | "euch" | "sich"
+
+<pronoun> ::= <personal-pronoun-nominative>
+           | <personal-pronoun-accusative>
+           | <personal-pronoun-dative>
+           | <personal-pronoun-genitive>
+           | <possessive-pronoun>
+           | <demonstrative-pronoun>
+           | <relative-pronoun>
+           | <reflexive-pronoun>
+           | <indefinite-pronoun>
+           | <interrogative-pronoun>
+
+<possessive-pronoun> ::= @GENDER[masculine] @CASE[nominative] ( "mein" | "dein" | "sein" | "ihr" | "unser" | "euer" | "ihr" | "Ihr" )
+                      | @GENDER[feminine] @CASE[nominative] ( "meine" | "deine" | "seine" | "ihre" | "unsere" | "eure" | "ihre" | "Ihre" )
+                      | @GENDER[neuter] @CASE[nominative] ( "mein" | "dein" | "sein" | "ihr" | "unser" | "euer" | "ihr" | "Ihr" )
+                      | @NUMBER[plural] @CASE[nominative] ( "meine" | "deine" | "seine" | "ihre" | "unsere" | "eure" | "ihre" | "Ihre" )
+
+<demonstrative-pronoun> ::= @GENDER[masculine] @CASE[nominative] ( "dieser" | "jener" | "der" )
+                         | @GENDER[feminine] @CASE[nominative] ( "diese" | "jene" | "die" )
+                         | @GENDER[neuter] @CASE[nominative] ( "dieses" | "jenes" | "das" )
+                         | @NUMBER[plural] @CASE[nominative] ( "diese" | "jene" | "die" )
+
+<indefinite-pronoun> ::= "man" | "jemand" | "niemand" | "etwas" | "nichts" | "alle" | "einige" | "manche" | "viele" | "wenige" | "andere" | "einer" | "eine" | "eines"
+
+<interrogative-pronoun> ::= "wer" | "was" | "welcher" | "welche" | "welches"
+
+/* Noun Phrase */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <article>
+              | <demonstrative-determiner>
+              | <possessive-determiner>
+
+<article> ::= <definite-article> | <indefinite-article>
+
+/* Definite articles */
+<definite-article> ::= @GENDER[masculine] @CASE[nominative] "der"
+                    | @GENDER[feminine] @CASE[nominative] "die"
+                    | @GENDER[neuter] @CASE[nominative] "das"
+                    | @NUMBER[plural] @CASE[nominative] "die"
+                    | @GENDER[masculine] @CASE[accusative] "den"
+                    | @GENDER[feminine] @CASE[accusative] "die"
+                    | @GENDER[neuter] @CASE[accusative] "das"
+                    | @NUMBER[plural] @CASE[accusative] "die"
+                    | @GENDER[masculine] @CASE[dative] "dem"
+                    | @GENDER[feminine] @CASE[dative] "der"
+                    | @GENDER[neuter] @CASE[dative] "dem"
+                    | @NUMBER[plural] @CASE[dative] "den"
+                    | @GENDER[masculine] @CASE[genitive] "des"
+                    | @GENDER[feminine] @CASE[genitive] "der"
+                    | @GENDER[neuter] @CASE[genitive] "des"
+                    | @NUMBER[plural] @CASE[genitive] "der"
+
+/* Indefinite articles */
+<indefinite-article> ::= @GENDER[masculine] @CASE[nominative] "ein"
+                      | @GENDER[feminine] @CASE[nominative] "eine"
+                      | @GENDER[neuter] @CASE[nominative] "ein"
+                      | @GENDER[masculine] @CASE[accusative] "einen"
+                      | @GENDER[feminine] @CASE[accusative] "eine"
+                      | @GENDER[neuter] @CASE[accusative] "ein"
+                      | @GENDER[masculine] @CASE[dative] "einem"
+                      | @GENDER[feminine] @CASE[dative] "einer"
+                      | @GENDER[neuter] @CASE[dative] "einem"
+                      | @GENDER[masculine] @CASE[genitive] "eines"
+                      | @GENDER[feminine] @CASE[genitive] "einer"
+                      | @GENDER[neuter] @CASE[genitive] "eines"
+
+<demonstrative-determiner> ::= <demonstrative-pronoun>
+
+<possessive-determiner> ::= <possessive-pronoun>
+
+/* Nouns */
+<noun> ::= <simple-noun>
+        | <compound-noun>
+
+<simple-noun> ::= @GENDER[masculine|feminine|neuter] @NUMBER[singular|plural] @CASE[nominative|accusative|dative|genitive] <noun-stem> <noun-suffix>?
+
+<compound-noun> ::= <noun-stem> <opt-whitespace>? <noun>
+
+<noun-stem> ::= /[A-ZÄÖÜ][a-zäöüß]*/
+
+<noun-suffix> ::= "e" | "en" | "er" | "n" | "s" | "es" | "heit" | "keit" | "ung" | "schaft" | "tum" | "nis" | "chen" | "lein"
+
+<genitive-modifier> ::= <noun-phrase>
+
+<proper-noun> ::= /[A-ZÄÖÜ][a-zäöüß]*/
+               | <multi-word-proper-noun>
+
+<multi-word-proper-noun> ::= /[A-ZÄÖÜ][a-zäöüß]*/ ( <opt-whitespace> /[A-ZÄÖÜ][a-zäöüß]*/ )+
+
+/* Adjective phrases */
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "sehr" | "ziemlich" | "recht" | "äußerst" | "extrem" | "wenig" | "zu" | "so" | "ganz" | "überaus" | "höchst" | "außerordentlich"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+<adjective-positive> ::= <adjective-strong-decl>
+                      | <adjective-weak-decl>
+                      | <adjective-mixed-decl>
+                      | <adjective-undeclined>
+
+<adjective-strong-decl> ::= @DECLENSION[strong] <adjective-stem> <strong-ending>
+
+<adjective-weak-decl> ::= @DECLENSION[weak] <adjective-stem> <weak-ending>
+
+<adjective-mixed-decl> ::= @DECLENSION[mixed] <adjective-stem> <mixed-ending>
+
+<adjective-undeclined> ::= <adjective-stem>
+
+<strong-ending> ::= "er" | "e" | "es" | "en" | "em" | "er"
+
+<weak-ending> ::= "e" | "en"
+
+<mixed-ending> ::= "er" | "e" | "es" | "en"
+
+<adjective-comparative> ::= @DEGREE[comparative] ( <regular-comparative> | <irregular-comparative> )
+
+<regular-comparative> ::= <adjective-stem> "er"
+
+<irregular-comparative> ::= "besser" | "größer" | "höher" | "näher" | "mehr" | "lieber" | "eher"
+
+<adjective-superlative> ::= @DEGREE[superlative] ( <regular-superlative> | <irregular-superlative> )
+
+<regular-superlative> ::= <adjective-stem> "st" ( "e" | "en" | "er" | "es" )?
+                       | "am" <opt-whitespace> <adjective-stem> "sten"
+
+<irregular-superlative> ::= "best" ( "e" | "en" | "er" | "es" )? | "größt" ( "e" | "en" | "er" | "es" )? | "höchst" ( "e" | "en" | "er" | "es" )? | "nächst" ( "e" | "en" | "er" | "es" )? | "meist" ( "e" | "en" | "er" | "es" )? | "liebst" ( "e" | "en" | "er" | "es" )? | "ehest" ( "e" | "en" | "er" | "es" )?
+
+<adjective-stem> ::= /[a-zäöüß]+/
+
+/* Predicate and verb phrases */
+<predicate> ::= <verb-phrase>
+
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <modal-verb-phrase>
+               | <passive-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb> ( <opt-whitespace> <adverb> )?
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+
+<compound-verb-phrase> ::= <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <verb-complement>
+
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <adverb>? <opt-whitespace> <infinitive-phrase>
+
+<passive-verb-phrase> ::= @VOICE[passive] <werden-verb> <opt-whitespace> <past-participle>
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= <modal-verb>
+                  | <haben-verb>
+                  | <sein-verb>
+                  | <werden-verb>
+
+<modal-verb> ::= <modal-present> | <modal-past>
+
+<modal-present> ::= @MOOD[modal] ( "kann" | "kannst" | "können" | "könnt" | "will" | "willst" | "wollen" | "wollt" | "muss" | "musst" | "müssen" | "müsst" | "darf" | "darfst" | "dürfen" | "dürft" | "soll" | "sollst" | "sollen" | "sollt" | "mag" | "magst" | "mögen" | "mögt" | "möchte" | "möchtest" | "möchten" | "möchtet" )
+
+<modal-past> ::= @MOOD[modal] @TENSE[past] ( "konnte" | "konntest" | "konnten" | "konntet" | "wollte" | "wolltest" | "wollten" | "wolltet" | "musste" | "musstest" | "mussten" | "musstet" | "durfte" | "durftest" | "durften" | "durftet" | "sollte" | "solltest" | "sollten" | "solltet" | "mochte" | "mochtest" | "mochten" | "mochtet" )
+
+/* Main verb tenses */
+<main-verb> ::= <verb-present>
+             | <verb-past>
+             | <verb-perfect>
+             | <verb-pluperfect>
+             | <verb-future>
+             | <verb-conditional>
+             | <verb-infinitive>
+
+<verb-infinitive> ::= ( "zu" <opt-whitespace> )? <verb-stem> ( "en" | "n" )
+
+<verb-present> ::= @TENSE[present] ( <regular-verb-present> | <irregular-verb-present> )
+
+<regular-verb-present> ::= <verb-stem> ( "e" | "st" | "t" | "en" | "t" )
+
+<verb-stem> ::= /[a-zäöüß]+/
+
+<irregular-verb-present> ::= @IRREGULAR "bin" | "bist" | "ist" | "sind" | "seid" | "habe" | "hast" | "hat" | "haben" | "habt" | "werde" | "wirst" | "wird" | "werden" | "werdet" | "gehe" | "gehst" | "geht" | "gehen" | "komme" | "kommst" | "kommt" | "kommen" | "nehme" | "nimmst" | "nimmt" | "nehmen" | "nehmt" | "gebe" | "gibst" | "gibt" | "geben" | "gebt" | "sehe" | "siehst" | "sieht" | "sehen" | "seht" | "esse" | "isst" | "isst" | "essen" | "esst" | "fahre" | "fährst" | "fährt" | "fahren" | "fahrt" | "lese" | "liest" | "liest" | "lesen" | "lest" | "spreche" | "sprichst" | "spricht" | "sprechen" | "sprecht" | "laufe" | "läufst" | "läuft" | "laufen" | "lauft" | "schlafe" | "schläfst" | "schläft" | "schlafen" | "schlaft"
+
+<verb-past> ::= @TENSE[past] ( <regular-verb-past> | <irregular-verb-past> )
+
+<regular-verb-past> ::= <verb-stem> ( "te" | "test" | "te" | "ten" | "tet" )
+
+<irregular-verb-past> ::= @IRREGULAR "war" | "warst" | "war" | "waren" | "wart" | "hatte" | "hattest" | "hatte" | "hatten" | "hattet" | "wurde" | "wurdest" | "wurde" | "wurden" | "wurdet" | "ging" | "gingst" | "ging" | "gingen" | "gingt" | "kam" | "kamst" | "kam" | "kamen" | "kamt" | "nahm" | "nahmst" | "nahm" | "nahmen" | "nahmt" | "gab" | "gabst" | "gab" | "gaben" | "gabt" | "sah" | "sahst" | "sah" | "sahen" | "saht" | "aß" | "aßt" | "aß" | "aßen" | "aßt" | "fuhr" | "fuhrst" | "fuhr" | "fuhren" | "fuhrt" | "las" | "last" | "las" | "lasen" | "last" | "sprach" | "sprachst" | "sprach" | "sprachen" | "spracht" | "lief" | "liefst" | "lief" | "liefen" | "lieft" | "schlief" | "schliefst" | "schlief" | "schliefen" | "schlieft"
+
+<verb-perfect> ::= @TENSE[perfect] <perfect-auxiliary> <opt-whitespace> <past-participle>
+
+<perfect-auxiliary> ::= "habe" | "hast" | "hat" | "haben" | "habt" | "bin" | "bist" | "ist" | "sind" | "seid"
+
+<verb-pluperfect> ::= @TENSE[pluperfect] <pluperfect-auxiliary> <opt-whitespace> <past-participle>
+
+<pluperfect-auxiliary> ::= "hatte" | "hattest" | "hatte" | "hatten" | "hattet" | "war" | "warst" | "war" | "waren" | "wart"
+
+<verb-future> ::= @TENSE[future] <future-auxiliary> <opt-whitespace> <verb-infinitive>
+
+<future-auxiliary> ::= "werde" | "wirst" | "wird" | "werden" | "werdet"
+
+<verb-conditional> ::= @MOOD[conditional] "würde" <opt-whitespace> <verb-infinitive>
+                    | @MOOD[conditional] <subjunctive-auxiliary> <opt-whitespace> <past-participle>
+
+<subjunctive-auxiliary> ::= "hätte" | "hättest" | "hätte" | "hätten" | "hättet" | "wäre" | "wärst" | "wäre" | "wären" | "wärt"
+
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle>
+
+<regular-past-participle> ::= "ge" <verb-stem> ( "t" | "et" )
+
+<present-participle> ::= <verb-stem> "end"
+
+<irregular-past-participle> ::= @IRREGULAR "gewesen" | "gehabt" | "geworden" | "gegangen" | "gekommen" | "genommen" | "gegeben" | "gesehen" | "gegessen" | "gefahren" | "gelesen" | "geschrieben" | "gesprochen" | "getrunken" | "gefunden" | "gedacht" | "gebracht" | "gewusst" | "getan" | "gelassen" | "gehalten" | "gestanden" | "verstanden" | "begonnen" | "gewonnen" | "gesungen" | "getragen" | "geschlafen" | "gerufen" | "gelaufen"
+
+<haben-verb> ::= "habe" | "hast" | "hat" | "haben" | "habt" | "hatte" | "hattest" | "hatte" | "hatten" | "hattet"
+
+<sein-verb> ::= "bin" | "bist" | "ist" | "sind" | "seid" | "war" | "warst" | "war" | "waren" | "wart"
+
+<werden-verb> ::= "werde" | "wirst" | "wird" | "werden" | "werdet" | "wurde" | "wurdest" | "wurde" | "wurden" | "wurdet"
+
+<verb-imperative> ::= <verb-stem> ( "e" | "" ) | <irregular-imperative>
+
+<irregular-imperative> ::= "sei" | "seid" | "seien" | "hab" | "habt" | "haben" | "werde" | "werdet" | "werden"
+
+/* Objects */
+<object> ::= <direct-object>
+
+<direct-object> ::= @CASE[accusative] ( <noun-phrase> | <pronoun-object> | <clause-object> | <infinitive-phrase> )
+
+<indirect-object> ::= @CASE[dative] ( <noun-phrase> | <pronoun-object> )
+
+<pronoun-object> ::= <personal-pronoun-accusative>
+                  | <personal-pronoun-dative>
+                  | <demonstrative-pronoun>
+                  | <reflexive-pronoun>
+
+/* Clause as object */
+<clause-object> ::= <that-clause>
+                 | <wh-clause>
+                 | <if-whether-clause>
+                 | <infinitival-clause>
+
+<that-clause> ::= "dass" <opt-whitespace> <subordinate-content>
+
+<wh-clause> ::= <interrogative-clause-embedded>
+
+<if-whether-clause> ::= "ob" <opt-whitespace> <subordinate-content>
+
+<infinitival-clause> ::= "zu" <opt-whitespace> <verb-infinitive> ( <opt-whitespace> <object> )? ( <opt-whitespace> <adverbial> )?
+
+<interrogative-clause-embedded> ::= <question-word> <opt-whitespace> <subordinate-content>
+
+/* Adverbials with dialectal variations */
+<adverbial> ::= <adverb>
+             | <adverb-phrase>
+             | <prepositional-phrase>
+
+<adverb-phrase> ::= <degree-adverb-modifier>? <opt-whitespace> <adverb>
+
+<degree-adverb-modifier> ::= "sehr" | "ziemlich" | "recht" | "ganz"
+
+<adverb> ::= <time-adverb>
+          | <place-adverb>
+          | <manner-adverb>
+          | <degree-adverb>
+
+<time-adverb> ::= <standard-time-adverb> | <dialect-time-adverb>
+
+<standard-time-adverb> ::= "jetzt" | "nun" | "heute" | "gestern" | "morgen" | "bald" | "immer" | "nie" | "oft" | "manchmal" | "schon" | "noch" | "gleich" | "vorher" | "nachher" | "früher" | "später" | "damals" | "neulich" | "sofort" | "gerade" | "eben"
+
+<dialect-time-adverb> ::= @DIALECT[bavarian] ( "iatza" | "heit" | "gestan" | "moang" )
+                       | @DIALECT[swabian] ( "jetzt" | "heid" | "geschder" | "morge" )
+                       | @DIALECT[saxon] ( "nu" | "heide" | "geschdern" | "morschn" )
+                       | @DIALECT[low_german] ( "nu" | "vundaag" | "gistern" | "morgen" )
+                       | @DIALECT[berlin] ( "jetzt" | "heite" | "jestern" | "morjen" )
+
+<place-adverb> ::= <standard-place-adverb> | <dialect-place-adverb>
+
+<standard-place-adverb> ::= "hier" | "dort" | "da" | "überall" | "nirgends" | "irgendwo" | "oben" | "unten" | "vorne" | "hinten" | "links" | "rechts" | "draußen" | "drinnen" | "weg" | "fort"
+
+<dialect-place-adverb> ::= @DIALECT[bavarian] ( "do" | "duat" | "oben" | "untn" )
+                        | @DIALECT[swabian] ( "do" | "dert" | "obe" | "onte" )
+                        | @DIALECT[saxon] ( "hier" | "da" | "oben" | "unten" )
+                        | @DIALECT[low_german] ( "hier" | "dar" | "baven" | "nerrn" )
+                        | @DIALECT[berlin] ( "hier" | "da" | "oben" | "unten" )
+
+<manner-adverb> ::= "gut" | "schlecht" | "schnell" | "langsam" | "gern" | "gerne" | "so" | "anders" | "zusammen" | "allein" | "einfach" | "schwer" | "leicht"
+
+<degree-adverb> ::= "sehr" | "zu" | "ganz" | "ziemlich" | "recht" | "etwas" | "wenig" | "kaum" | "fast" | "etwa"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= <accusative-preposition>
+               | <dative-preposition>
+               | <genitive-preposition>
+               | <two-way-preposition>
+
+<accusative-preposition> ::= @CASE[accusative] ( "durch" | "für" | "gegen" | "ohne" | "um" | "bis" | "entlang" )
+
+<dative-preposition> ::= @CASE[dative] ( "aus" | "bei" | "mit" | "nach" | "seit" | "von" | "zu" | "gegenüber" | "außer" )
+
+<genitive-preposition> ::= @CASE[genitive] ( "während" | "wegen" | "trotz" | "statt" | "anstatt" | "außerhalb" | "innerhalb" | "oberhalb" | "unterhalb" | "infolge" | "angesichts" )
+
+<two-way-preposition> ::= @CASE[accusative|dative] ( "an" | "auf" | "hinter" | "in" | "neben" | "über" | "unter" | "vor" | "zwischen" )
+
+/* Question words */
+<question-word> ::= <interrogative-pronoun>
+                 | <interrogative-adverb>
+
+<interrogative-adverb> ::= "wo" | "wohin" | "woher" | "wann" | "warum" | "wie" | "wieso" | "weshalb" | "weswegen"
+
+/* Discourse markers and connectives */
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+
+<temporal-discourse> ::= "zuerst" | "dann" | "danach" | "schließlich" | "zuletzt" | "endlich" | "gleichzeitig" | "inzwischen"
+
+<causal-discourse> ::= "deshalb" | "daher" | "darum" | "folglich" | "infolgedessen" | "demzufolge"
+
+<contrastive-discourse> ::= "dagegen" | "hingegen" | "im" <opt-whitespace> "Gegenteil" | "andererseits" | "dennoch" | "trotzdem" | "allerdings" | "jedoch"
+
+<additive-discourse> ::= "außerdem" | "ferner" | "weiterhin" | "zudem" | "überdies" | "darüber" <opt-whitespace> "hinaus" | "ebenso" | "ebenfalls"
+
+<conclusive-discourse> ::= "also" | "kurz" <opt-whitespace> "gesagt" | "mit" <opt-whitespace> "anderen" <opt-whitespace> "Worten" | "zusammenfassend"
+
+/* Tag questions */
+<tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <question-tag> "?"
+
+<question-tag> ::= "nicht" <opt-whitespace> "wahr"
+                | "oder"
+                | "nicht"
+                | "gell"
+                | "ne"
+                | "wa"
+
+/* Elliptical structures */
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+
+<elliptical-response> ::= <modal-particle>
+                       | <verb-phrase>
+                       | <noun-phrase>
+
+<elliptical-coordination> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <elliptical-clause>
+
+/* Reported speech */
+<reported-speech> ::= <reporting-verb> <opt-whitespace> <reported-clause>
+
+<reporting-verb> ::= "sagt" | "sagte" | "meint" | "meinte" | "glaubt" | "glaubte" | "fragt" | "fragte" | "erzählt" | "erzählte" | "behauptet" | "behauptete"
+
+<reported-clause> ::= "dass" <opt-whitespace> <subordinate-content>
+                   | <interrogative-clause-embedded>
+
+/* Free indirect speech */
+<free-indirect-speech> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Correlative constructions */
+<correlative-construction> ::= <correlative-pair> <opt-whitespace> <clause-sequence>
+
+<correlative-pair> ::= "sowohl" <opt-whitespace> "als" <opt-whitespace> "auch"
+                    | "weder" <opt-whitespace> "noch"
+                    | "entweder" <opt-whitespace> "oder"
+                    | "nicht" <opt-whitespace> "nur" <opt-whitespace> "sondern" <opt-whitespace> "auch"
+                    | "je" <opt-whitespace> "desto"
+                    | "je" <opt-whitespace> "umso"
+
+<clause-sequence> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":" | "..." | "-" | "–" | "—"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER
+    THEN VALID
+    ELSE ERROR "Article and noun gender must agree"
+
+@CONTEXT_RULE[article-noun-case-agreement]:
+    IF <article>.@CASE == <noun>.@CASE
+    THEN VALID
+    ELSE ERROR "Article and noun case must agree"
+
+@CONTEXT_RULE[adjective-noun-agreement]:
+    IF <adjective>.@GENDER == <noun>.@GENDER AND <adjective>.@CASE == <noun>.@CASE
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun in gender and case"
+
+@CONTEXT_RULE[v2-word-order]:
+    IF <main-clause> CONTAINS <finite-verb> AT_POSITION 2
+    THEN VALID
+    ELSE WARNING "Main clause should have verb in second position (V2)"
+
+@CONTEXT_RULE[reflexive-agreement]:
+    IF <reflexive-pronoun>.@PERSON == <subject>.@PERSON
+    THEN VALID
+    ELSE ERROR "Reflexive pronoun must agree with subject"
+
+@CONTEXT_RULE[verb-bracket]:
+    IF <subordinate-clause> HAS_VERB_FINAL_ORDER
+    THEN VALID
+    ELSE ERROR "Subordinate clause must have verb-final word order"
+
+@CONTEXT_RULE[preposition-case]:
+    IF <preposition>.@CASE == <noun-phrase>.@CASE
+    THEN VALID
+    ELSE ERROR "Preposition governs specific case"
+
+@CONTEXT_RULE[nested-clause-depth]:
+    IF <nested-subordinate-clause> DEPTH <= 3
+    THEN VALID
+    ELSE WARNING "Deep nesting (>3 levels) may reduce readability"
+
+@CONTEXT_RULE[subordinate-word-order]:
+    IF <subordinate-clause> HAS_VERB_FINAL_ORDER
+    THEN VALID
+    ELSE ERROR "Subordinate clause must have verb-final word order"
+
+@CONTEXT_RULE[correlative-matching]:
+    IF <correlative-construction> HAS_MATCHING_PAIR
+    THEN VALID
+    ELSE ERROR "Correlative conjunction pairs must match"
+
+@CONTEXT_RULE[clause-coherence]:
+    IF <multi-embedded-sentence> HAS_COHERENT_REFERENCE_CHAIN
+    THEN VALID
+    ELSE WARNING "Complex sentences should maintain clear reference chains"
+
+@CONTEXT_RULE[reported-speech-tense]:
+    IF <reported-clause> TENSE_CONSISTENT_WITH <reporting-verb>
+    THEN VALID
+    ELSE WARNING "Tense in reported clause should be consistent with reporting verb"
+
+/* Extended dialectal verb forms */
+<dialect-verb-haben> ::= @DIALECT[bavarian] ( "hob" | "host" | "hot" | "hom" | "hobts" | "hom" )
+                      | @DIALECT[swabian] ( "hon" | "hosch" | "hot" | "hend" | "hend" | "hend" )
+                      | @DIALECT[saxon] ( "habb" | "hast" | "hat" | "hamm" | "habt" | "hamm" )
+                      | @DIALECT[low_german] ( "hebb" | "hest" | "hett" | "hebbt" | "hebbt" | "hebbt" )
+                      | @DIALECT[berlin] ( "hab" | "hast" | "hat" | "ham" | "habt" | "ham" )
+
+<dialect-verb-sein> ::= @DIALECT[bavarian] ( "bin" | "bist" | "is" | "san" | "seits" | "san" )
+                     | @DIALECT[swabian] ( "bin" | "bisch" | "isch" | "send" | "send" | "send" )
+                     | @DIALECT[saxon] ( "bin" | "bist" | "is" | "simm" | "seid" | "simm" )
+                     | @DIALECT[low_german] ( "bün" | "büst" | "is" | "sünd" | "sünd" | "sünd" )
+                     | @DIALECT[berlin] ( "bin" | "bist" | "is" | "sind" | "seid" | "sind" )
+
+<dialect-verb-werden> ::= @DIALECT[bavarian] ( "wer" | "wirst" | "wird" | "wern" | "werts" | "wern" )
+                       | @DIALECT[swabian] ( "wer" | "wirsch" | "wird" | "werdet" | "werdet" | "werdet" )
+                       | @DIALECT[saxon] ( "werde" | "wirst" | "wird" | "wern" | "werdet" | "wern" )
+                       | @DIALECT[low_german] ( "warr" | "warrst" | "warrt" | "warrt" | "warrt" | "warrt" )
+                       | @DIALECT[berlin] ( "werd" | "wirst" | "wird" | "wern" | "werdet" | "wern" )
+
+/* Dialectal verb conjugation patterns */
+<dialect-verb-gehen> ::= @DIALECT[bavarian] ( "geh" | "gehst" | "geht" | "geh" | "gehts" | "geh" )
+                      | @DIALECT[swabian] ( "gao" | "gaosch" | "gaot" | "gend" | "gend" | "gend" )
+                      | @DIALECT[saxon] ( "gehe" | "gehst" | "geht" | "gehn" | "geht" | "gehn" )
+                      | @DIALECT[low_german] ( "gah" | "gahst" | "geiht" | "gaht" | "gaht" | "gaht" )
+                      | @DIALECT[berlin] ( "jeh" | "jehst" | "jeht" | "jehn" | "jeht" | "jehn" )
+
+<dialect-verb-kommen> ::= @DIALECT[bavarian] ( "kim" | "kimmst" | "kimmt" | "kemma" | "kemmts" | "kemma" )
+                       | @DIALECT[swabian] ( "komm" | "kommsch" | "kommt" | "kommed" | "kommed" | "kommed" )
+                       | @DIALECT[saxon] ( "komm" | "kommst" | "kommt" | "kommn" | "kommt" | "kommn" )
+                       | @DIALECT[low_german] ( "kuum" | "kümmst" | "kütt" | "kaamt" | "kaamt" | "kaamt" )
+                       | @DIALECT[berlin] | ( "komm" | "kommst" | "kommt" | "kommn" | "kommt" | "kommn" )
+
+<dialect-verb-machen> ::= @DIALECT[bavarian] ( "mach" | "machst" | "macht" | "macha" | "machts" | "macha" )
+                       | @DIALECT[swabian] ( "mach" | "machsch" | "macht" | "machet" | "machet" | "machet" )
+                       | @DIALECT[saxon] ( "mach" | "machst" | "macht" | "machn" | "macht" | "machn" )
+                       | @DIALECT[low_german] ( "maak" | "maakst" | "maakt" | "maakt" | "maakt" | "maakt" )
+                       | @DIALECT[berlin] ( "mach" | "machst" | "macht" | "machn" | "macht" | "machn" )
+
+/* Dialectal demonstratives */
+<dialect-demonstrative> ::= @DIALECT[bavarian] ( "dea" | "de" | "des" | "de" )
+                         | @DIALECT[swabian] ( "deär" | "dia" | "des" | "dia" )
+                         | @DIALECT[saxon] ( "der" | "die" | "das" | "die" )
+                         | @DIALECT[low_german] ( "disse" | "disse" | "dit" | "disse" )
+                         | @DIALECT[berlin] ( "der" | "die" | "dit" | "die" )
+
+/* Extended possessive pronouns with dialectal forms */
+<dialect-possessive> ::= @DIALECT[bavarian] ( "mei" | "dei" | "sei" | "eana" | "unsa" | "enka" )
+                      | @DIALECT[swabian] ( "moi" | "doi" | "soi" | "onsere" | "eiere" )
+                      | @DIALECT[saxon] | ( "mein" | "dein" | "sein" | "unser" | "euer" )
+                      | @DIALECT[low_german] ( "mien" | "dien" | "sien" | "uns" | "jug" )
+                      | @DIALECT[berlin] ( "mein" | "dein" | "sein" | "unser" | "euer" )
+
+/* Dialectal adjective forms */
+<dialect-adjective> ::= @DIALECT[bavarian] ( <bavarian-adjective> )
+                     | @DIALECT[swabian] ( <swabian-adjective> )
+                     | @DIALECT[saxon] ( <saxon-adjective> )
+                     | @DIALECT[low_german] ( <low-german-adjective> )
+                     | @DIALECT[berlin] ( <berlin-adjective> )
+
+<bavarian-adjective> ::= "schee" | "guat" | "griaß" | "kloa" | "neu"
+
+<swabian-adjective> ::= "schää" | "guad" | "groß" | "gloi" | "nei"
+
+<saxon-adjective> ::= "scheen" | "gudd" | "groß" | "gleene" | "neu"
+
+<low-german-adjective> ::= "schöön" | "good" | "groot" | "lütt" | "nee"
+
+<berlin-adjective> ::= "schön" | "jut" | "groß" | "klein" | "neu"
+
+/* Dialectal greetings and expressions */
+<dialect-greeting> ::= @DIALECT[bavarian] ( "Servus" | "Grüß" <opt-whitespace> "Gott" | "Pfiat" <opt-whitespace> "di" | "Habedere" )
+                    | @DIALECT[swabian] ( "Grüß" <opt-whitespace> "Gott" | "Ade" )
+                    | @DIALECT[saxon] ( "Gudn" <opt-whitespace> "Tach" | "Tschüss" )
+                    | @DIALECT[rhine_franconian] ( "Guude" | "Babba" <opt-whitespace> "ei" )
+                    | @DIALECT[low_german] ( "Moin" | "Moin" <opt-whitespace> "Moin" | "Tschüss" )
+                    | @DIALECT[berlin] ( "Tach" | "Juten" <opt-whitespace> "Tach" | "Tschüss" )
+
+/* Dialectal numbers */
+<dialect-numeral> ::= @DIALECT[bavarian] ( "oa" | "zwoa" | "drei" | "via" | "fimf" )
+                   | @DIALECT[swabian] ( "oi" | "zwoi" | "drei" | "vier" | "fünf" )
+                   | @DIALECT[saxon] ( "eens" | "zwee" | "drei" | "viere" | "fünf" )
+                   | @DIALECT[low_german] ( "een" | "twee" | "dree" | "veer" | "fief" )
+                   | @DIALECT[berlin] ( "eins" | "zwee" | "drei" | "viere" | "fünf" )
+
+/* Dialectal question words */
+<dialect-question-word> ::= @DIALECT[bavarian] ( "wos" | "wea" | "wo" | "wia" | "warum" )
+                         | @DIALECT[swabian] ( "was" | "wer" | "wo" | "wia" | "worom" )
+                         | @DIALECT[saxon] ( "was" | "wer" | "wo" | "wie" | "warum" )
+                         | @DIALECT[low_german] ( "wat" | "wokeen" | "wo" | "wo" | "worüm" )
+                         | @DIALECT[berlin] ( "wat" | "wer" | "wo" | "wie" | "warum" )
+
+/* Compound sentence adverbials */
+<compound-adverbial> ::= <temporal-adverbial>
+                      | <causal-adverbial>
+                      | <conditional-adverbial>
+                      | <concessive-adverbial>
+
+<temporal-adverbial> ::= "als" <opt-whitespace> <subordinate-content>
+                      | "während" <opt-whitespace> <subordinate-content>
+                      | "bevor" <opt-whitespace> <subordinate-content>
+                      | "nachdem" <opt-whitespace> <subordinate-content>
+                      | "seitdem" <opt-whitespace> <subordinate-content>
+
+<causal-adverbial> ::= "weil" <opt-whitespace> <subordinate-content>
+                    | "da" <opt-whitespace> <subordinate-content>
+
+<conditional-adverbial> ::= "wenn" <opt-whitespace> <subordinate-content>
+                         | "falls" <opt-whitespace> <subordinate-content>
+
+<concessive-adverbial> ::= "obwohl" <opt-whitespace> <subordinate-content>
+                        | "obgleich" <opt-whitespace> <subordinate-content>
+
+/* Extended prepositional phrases with dialectal prepositions */
+<dialect-preposition> ::= @DIALECT[bavarian] ( "auf" | "bei" | "mit" | "ohne" | "für" | "gegen" )
+                       | @DIALECT[swabian] ( "uf" | "bei" | "mit" | "ohne" | "für" | "gegen" )
+                       | @DIALECT[saxon] ( "uff" | "bei" | "mit" | "ohne" | "für" | "jegen" )
+                       | @DIALECT[low_german] ( "up" | "bi" | "mit" | "ahn" | "för" | "tegen" )
+                       | @DIALECT[berlin] ( "uff" | "bei" | "mit" | "ohne" | "für" | "jegen" )
+
+/* Topicalization patterns */
+<topicalized-sentence> ::= <topicalized-object> <opt-whitespace> <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>?
+                        | <topicalized-adverbial> <opt-whitespace> <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>?
+                        | <topicalized-pp> <opt-whitespace> <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>?
+
+<topicalized-object> ::= <noun-phrase>
+
+<topicalized-adverbial> ::= <adverb>
+
+<topicalized-pp> ::= <prepositional-phrase>
+
+/* Complex verb constructions */
+<complex-verb-construction> ::= <double-infinitive>
+                             | <modal-perfect>
+                             | <future-perfect>
+
+<double-infinitive> ::= <modal-verb> <opt-whitespace> <verb-infinitive> <opt-whitespace> <auxiliary-infinitive>
+
+<auxiliary-infinitive> ::= "haben" | "sein" | "werden"
+
+<modal-perfect> ::= <modal-verb> <opt-whitespace> <past-participle> <opt-whitespace> "haben"
+
+<future-perfect> ::= <future-auxiliary> <opt-whitespace> <past-participle> <opt-whitespace> "haben"
+
+/* Extraposition */
+<extraposed-sentence> ::= <main-clause> <opt-whitespace> <extraposed-clause>
+
+<extraposed-clause> ::= <subordinate-clause>
+                     | <infinitive-clause>
+                     | <relative-clause>
+
+/* Inversion patterns */
+<inverted-sentence> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <adverbial>? <opt-whitespace> <verb-complement>?
+
+/* Comparative constructions */
+<comparative-construction> ::= <comparative-clause>
+                            | <equative-clause>
+                            | <superlative-clause>
+
+<comparative-clause> ::= <adjective-comparative> <opt-whitespace> "als" <opt-whitespace> <noun-phrase>
+
+<equative-clause> ::= "so" <opt-whitespace> <adjective> <opt-whitespace> "wie" <opt-whitespace> <noun-phrase>
+
+<superlative-clause> ::= <article> <opt-whitespace> <adjective-superlative> <opt-whitespace> <noun>
+
+/* Conditional constructions */
+<conditional-construction> ::= <real-conditional>
+                            | <unreal-conditional>
+                            | <past-conditional>
+
+<real-conditional> ::= "wenn" <opt-whitespace> <subordinate-content> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<unreal-conditional> ::= "wenn" <opt-whitespace> <subjunctive-clause> <opt-whitespace> "," <opt-whitespace> <conditional-main-clause>
+
+<subjunctive-clause> ::= <subject> <opt-whitespace> <subjunctive-verb> <opt-whitespace> <verb-complement>?
+
+<subjunctive-verb> ::= "hätte" | "wäre" | "würde" | "könnte" | "müsste" | "sollte" | "dürfte" | "möchte"
+
+<conditional-main-clause> ::= <subject> <opt-whitespace> <subjunctive-verb> <opt-whitespace> <verb-complement>
+
+<past-conditional> ::= "wenn" <opt-whitespace> <past-subjunctive-clause> <opt-whitespace> "," <opt-whitespace> <past-conditional-main>
+
+<past-subjunctive-clause> ::= <subject> <opt-whitespace> <subjunctive-auxiliary> <opt-whitespace> <past-participle>
+
+<past-conditional-main> ::= <subject> <opt-whitespace> <subjunctive-auxiliary> <opt-whitespace> <past-participle>
+
+/* Relative clause types */
+<restrictive-relative> ::= <relative-pronoun> <opt-whitespace> <relative-content>
+
+<non-restrictive-relative> ::= "," <opt-whitespace> <relative-pronoun> <opt-whitespace> <relative-content> <opt-whitespace> ","
+
+<relative-content> ::= <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>?
+
+/* Participial constructions */
+<participial-construction> ::= <present-participial>
+                            | <past-participial>
+
+<present-participial> ::= <present-participle> <opt-whitespace> <noun-phrase>
+
+<past-participial> ::= <past-participle> <opt-whitespace> <noun-phrase>
+
+/* Nominal style constructions */
+<nominal-construction> ::= <nominalization>
+                        | <extended-adjective-phrase>
+
+<nominalization> ::= <article> <opt-whitespace> <verb-infinitive>
+
+<extended-adjective-phrase> ::= <article> <opt-whitespace> <adjective> <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <noun>
+
+/* Complex noun phrases with multiple modifiers */
+<complex-noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>+ <opt-whitespace> <noun> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>? <opt-whitespace> <apposition>?
+
+<quantifier> ::= <numeral>
+              | <indefinite-quantifier>
+
+<numeral> ::= <cardinal-number> | <ordinal-number> | <dialect-numeral>
+
+<cardinal-number> ::= "ein" | "zwei" | "drei" | "vier" | "fünf" | "sechs" | "sieben" | "acht" | "neun" | "zehn" | "elf" | "zwölf" | "zwanzig" | "hundert" | "tausend" | "million" | /[0-9]+/
+
+<ordinal-number> ::= "erste" | "zweite" | "dritte" | "vierte" | "fünfte" | /[0-9]+\./ "."
+
+<indefinite-quantifier> ::= "viele" | "wenige" | "mehrere" | "einige" | "alle" | "manche" | "etliche"
+
+<apposition> ::= "," <opt-whitespace> <noun-phrase>
+
+/* Vocative constructions */
+<vocative> ::= <proper-noun> | <noun-phrase>
+
+<vocative-sentence> ::= <vocative> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Exclamatory constructions */
+<exclamatory-construction> ::= <exclamative-clause>
+                            | <wish-clause>
+
+<wish-clause> ::= "wenn" <opt-whitespace> <subjunctive-clause> <opt-whitespace> "doch" <opt-whitespace> "!"
+
+/* Extended question types */
+<alternative-question> ::= <yes-no-question-part> <opt-whitespace> "oder" <opt-whitespace> <yes-no-question-part>
+
+<yes-no-question-part> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <verb-complement>?
+
+<rhetorical-question> ::= <wh-question>
+
+/* Echo questions */
+<echo-question> ::= <statement> <opt-whitespace> "?"
+
+<statement> ::= <declarative-clause>
+
+/* Confirmation requests */
+<confirmation-request> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <confirmation-particle> "?"
+
+<confirmation-particle> ::= "oder" | "nicht" <opt-whitespace> "wahr" | "stimmt's" | "gell" | "ne" | "wa"
+
+/* Extended context rules for dialectal features */
+@CONTEXT_RULE[dialect-consistency]:
+    IF <sentence> CONTAINS @DIALECT[bavarian]
+    THEN ALL_DIALECT_ELEMENTS SHOULD_USE @DIALECT[bavarian]
+    ELSE WARNING "Mixing dialects within a sentence may be confusing"
+
+@CONTEXT_RULE[modal-particle-position]:
+    IF <modal-particle> IN <middle-field>
+    THEN VALID
+    ELSE WARNING "Modal particles typically appear in middle field"
+
+@CONTEXT_RULE[double-infinitive]:
+    IF <modal-perfect> CONTAINS <double-infinitive>
+    THEN AUXILIARY_MUST_BE "haben"
+    ELSE ERROR "Double infinitive construction requires 'haben' as auxiliary"
+
+@CONTEXT_RULE[topicalization-v2]:
+    IF <topicalized-sentence> HAS_FRONTED_ELEMENT
+    THEN <finite-verb> MUST_BE AT_POSITION 2
+    ELSE ERROR "V2 constraint violated in topicalization"
+
+@CONTEXT_RULE[subordinate-conjunction-agreement]:
+    IF <subordinate-clause> USES <temporal-conjunction>
+    THEN <verb-tense> SHOULD_AGREE_WITH_TEMPORAL_MEANING
+    ELSE WARNING "Tense should align with temporal conjunction meaning"
+
+/* Extended dialectal past tense forms */
+<dialect-past-tense> ::= @DIALECT[bavarian] ( <bavarian-past> )
+                      | @DIALECT[swabian] ( <swabian-past> )
+                      | @DIALECT[saxon] ( <saxon-past> )
+                      | @DIALECT[low_german] ( <low-german-past> )
+                      | @DIALECT[berlin] ( <berlin-past> )
+
+<bavarian-past> ::= "war" | "hot" <opt-whitespace> "ghobt" | "is" <opt-whitespace> "gwen"
+
+<swabian-past> ::= "war" | "hot" <opt-whitespace> "ghet" | "isch" <opt-whitespace> "gsi"
+
+<saxon-past> ::= "war" | "hatte" | "is" <opt-whitespace> "gewesn"
+
+<low-german-past> ::= "weer" | "harr" | "is" <opt-whitespace> "west"
+
+<berlin-past> ::= "war" | "hatte" | "is" <opt-whitespace> "jewesn"
+
+/* Dialectal perfect tense constructions */
+<dialect-perfect> ::= @DIALECT[bavarian] ( "hob" <opt-whitespace> <bavarian-participle> | "bin" <opt-whitespace> <bavarian-participle> )
+                   | @DIALECT[swabian] ( "hon" <opt-whitespace> <swabian-participle> | "bin" <opt-whitespace> <swabian-participle> )
+                   | @DIALECT[saxon] ( "habb" <opt-whitespace> <saxon-participle> | "bin" <opt-whitespace> <saxon-participle> )
+                   | @DIALECT[low_german] ( "hebb" <opt-whitespace> <low-german-participle> | "bün" <opt-whitespace> <low-german-participle> )
+                   | @DIALECT[berlin] ( "hab" <opt-whitespace> <berlin-participle> | "bin" <opt-whitespace> <berlin-participle> )
+
+<bavarian-participle> ::= "gmacht" | "gwen" | "ghobt" | "ganga" | "kemma"
+
+<swabian-participle> ::= "gmacht" | "gsi" | "ghet" | "gangä" | "kommä"
+
+<saxon-participle> ::= "jemacht" | "jewesn" | "jehabt" | "jegangn" | "jekommn"
+
+<low-german-participle> ::= "maakt" | "west" | "harrt" | "gahn" | "kamen"
+
+<berlin-participle> ::= "jemacht" | "jewesn" | "jehabt" | "jegangn" | "jekommn"
+
+/* Dialectal modal verb forms */
+<dialect-modal> ::= @DIALECT[bavarian] ( "ko" | "konnst" | "ko" | "kenna" | "kennts" | "kenna" )
+                 | @DIALECT[swabian] ( "ka" | "kasch" | "ka" | "kenned" | "kenned" | "kenned" )
+                 | @DIALECT[saxon] ( "kann" | "kannst" | "kann" | "könn" | "könnt" | "könn" )
+                 | @DIALECT[low_german] ( "kann" | "kannst" | "kann" | "köönt" | "köönt" | "köönt" )
+                 | @DIALECT[berlin] ( "kann" | "kannst" | "kann" | "könn" | "könnt" | "könn" )
+
+/* Complex coordinat subordinate structures */
+<multi-level-coordination> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause> ){2,}
+
+/* Discourse connectives and transitions */
+<discourse-connective> ::= <adversative-connective>
+                        | <consequential-connective>
+                        | <sequential-connective>
+                        | <elaborative-connective>
+
+<adversative-connective> ::= "jedoch" | "allerdings" | "dennoch" | "trotzdem" | "andererseits" | "hingegen" | "dagegen"
+
+<consequential-connective> ::= "deshalb" | "deswegen" | "darum" | "daher" | "folglich" | "somit" | "infolgedessen"
+
+<sequential-connective> ::= "zuerst" | "zunächst" | "dann" | "danach" | "anschließend" | "daraufhin" | "schließlich" | "zuletzt"
+
+<elaborative-connective> ::= "nämlich" | "beispielsweise" | "insbesondere" | "vor" <opt-whitespace> "allem" | "das" <opt-whitespace> "heißt"
+
+/* Dialectal word order variations */
+<dialect-word-order> ::= @DIALECT[bavarian] ( <bavarian-word-order> )
+                      | @DIALECT[swabian] ( <swabian-word-order> )
+                      | @DIALECT[low_german] ( <low-german-word-order> )
+
+<bavarian-word-order> ::= <subject> <opt-whitespace> <object> <opt-whitespace> <finite-verb>
+
+<swabian-word-order> ::= <subject> <opt-whitespace> <adverbial> <opt-whitespace> <finite-verb>
+
+<low-german-word-order> ::= <adverbial> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>
+
+/* Dialectal diminutive forms */
+<dialect-diminutive> ::= @DIALECT[bavarian] ( <noun-stem> "l" | <noun-stem> "erl" )
+                      | @DIALECT[swabian] ( <noun-stem> "le" | <noun-stem> "la" )
+                      | @DIALECT[rhine_franconian] ( <noun-stem> "che" | <noun-stem> "el" )
+                      | @DIALECT[low_german] ( <noun-stem> "je" | <noun-stem> "ken" )
+                      | @DIALECT[berlin] ( <noun-stem> "chen" )
+
+/* Extended relative clause constructions */
+<free-relative-clause> ::= "wer" <opt-whitespace> <subordinate-content>
+                        | "was" <opt-whitespace> <subordinate-content>
+                        | "wo" <opt-whitespace> <subordinate-content>
+
+/* Comparative correlatives */
+<comparative-correlative> ::= "je" <opt-whitespace> <comparative-clause> <opt-whitespace> "," <opt-whitespace> "desto" <opt-whitespace> <comparative-clause>
+                           | "je" <opt-whitespace> <comparative-clause> <opt-whitespace> "," <opt-whitespace> "umso" <opt-whitespace> <comparative-clause>
+
+/* Concessive constructions */
+<concessive-construction> ::= "auch" <opt-whitespace> "wenn" <opt-whitespace> <subordinate-content>
+                           | "selbst" <opt-whitespace> "wenn" <opt-whitespace> <subordinate-content>
+                           | "wenngleich" <opt-whitespace> <subordinate-content>
+
+/* Resultative constructions */
+<resultative-construction> ::= "so" <opt-whitespace> <adjective> <opt-whitespace> "," <opt-whitespace> "dass" <opt-whitespace> <subordinate-content>
+
+/* Purpose clauses */
+<purpose-clause> ::= "um" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+                  | "damit" <opt-whitespace> <subordinate-content>
+
+/* Manner clauses */
+<manner-clause> ::= "indem" <opt-whitespace> <subordinate-content>
+                 | "dadurch" <opt-whitespace> "," <opt-whitespace> "dass" <opt-whitespace> <subordinate-content>
+
+/* Extent clauses */
+<extent-clause> ::= "insofern" <opt-whitespace> <subordinate-content>
+                 | "insoweit" <opt-whitespace> <subordinate-content>
+
+/* Temporal clause types */
+<simultaneous-clause> ::= "während" <opt-whitespace> <subordinate-content>
+                       | "solange" <opt-whitespace> <subordinate-content>
+
+<anterior-clause> ::= "bevor" <opt-whitespace> <subordinate-content>
+                   | "ehe" <opt-whitespace> <subordinate-content>
+
+<posterior-clause> ::= "nachdem" <opt-whitespace> <subordinate-content>
+                    | "sobald" <opt-whitespace> <subordinate-content>
+
+/* Proportional clauses */
+<proportional-clause> ::= "je" <opt-whitespace> <comparative-phrase> <opt-whitespace> "," <opt-whitespace> "desto" <opt-whitespace> <comparative-phrase>
+
+<comparative-phrase> ::= <adjective-comparative> <opt-whitespace> <noun-phrase>
+
+/* Exceptive constructions */
+<exceptive-construction> ::= "außer" <opt-whitespace> "dass" <opt-whitespace> <subordinate-content>
+                          | "nur" <opt-whitespace> "dass" <opt-whitespace> <subordinate-content>
+
+/* Instrumental constructions */
+<instrumental-construction> ::= "mit" <opt-whitespace> <noun-phrase>
+                             | "durch" <opt-whitespace> <noun-phrase>
+
+/* Benefactive constructions */
+<benefactive-construction> ::= "für" <opt-whitespace> <noun-phrase>
+                            | "zugunsten" <opt-whitespace> <genitive-modifier>
+
+/* Comitative constructions */
+<comitative-construction> ::= "mit" <opt-whitespace> <noun-phrase>
+                           | "zusammen" <opt-whitespace> "mit" <opt-whitespace> <noun-phrase>
+
+/* Ablative constructions */
+<ablative-construction> ::= "von" <opt-whitespace> <noun-phrase>
+                         | "aus" <opt-whitespace> <noun-phrase>
+
+/* Extended number agreement patterns */
+<plural-formation> ::= <regular-plural>
+                    | <irregular-plural>
+                    | <umlaut-plural>
+                    | <foreign-plural>
+
+<regular-plural> ::= <noun-stem> "e"
+                  | <noun-stem> "en"
+                  | <noun-stem> "er"
+                  | <noun-stem> "s"
+
+<irregular-plural> ::= <noun-stem> /* no change */
+
+<umlaut-plural> ::= <noun-stem-with-umlaut> "e"
+                 | <noun-stem-with-umlaut> "er"
+
+<noun-stem-with-umlaut> ::= /[A-ZÄÖÜ][a-zäöüß]*/
+
+<foreign-plural> ::= <noun-stem> "s" | <noun-stem> "i" | <noun-stem> "en"
+
+/* Extended genitive constructions */
+<genitive-construction> ::= <possessive-genitive>
+                         | <partitive-genitive>
+                         | <objective-genitive>
+                         | <subjective-genitive>
+
+<possessive-genitive> ::= <genitive-modifier> <opt-whitespace> <noun>
+
+<partitive-genitive> ::= <quantifier> <opt-whitespace> <genitive-modifier>
+
+<objective-genitive> ::= <noun> <opt-whitespace> <genitive-modifier>
+
+<subjective-genitive> ::= <genitive-modifier> <opt-whitespace> <noun>
+
+/* Dative constructions */
+<dative-construction> ::= <dative-of-interest>
+                       | <ethical-dative>
+                       | <possessive-dative>
+
+<dative-of-interest> ::= <personal-pronoun-dative> <opt-whitespace> <verb-phrase>
+
+<ethical-dative> ::= <personal-pronoun-dative> <opt-whitespace> <modal-particle> <opt-whitespace> <verb-phrase>
+
+<possessive-dative> ::= <personal-pronoun-dative> <opt-whitespace> <article> <opt-whitespace> <noun>
+
+/* Negation scope variations */
+<sentence-negation> ::= <negation> <opt-whitespace> <verb-phrase>
+
+<constituent-negation> ::= <negation> <opt-whitespace> <constituent>
+
+<constituent> ::= <noun-phrase>
+               | <adjective-phrase>
+               | <adverb-phrase>
+               | <prepositional-phrase>
+
+/* Multiple negation (non-standard but dialectal) */
+<multiple-negation> ::= @DIALECT[bavarian|swabian|saxon] <negation> <opt-whitespace> <verb-phrase> <opt-whitespace> <negation>
+
+/* Emphatic constructions */
+<emphatic-construction> ::= <cleft-sentence>
+                         | <fronted-focus>
+                         | <right-dislocation>
+
+<fronted-focus> ::= <focused-constituent> <opt-whitespace> <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <verb-complement>?
+
+<right-dislocation> ::= <main-clause> <opt-whitespace> "," <opt-whitespace> <pronoun> <opt-whitespace> <noun-phrase>
+
+/* Information structure */
+<topic-comment-structure> ::= <topic> <opt-whitespace> "," <opt-whitespace> <comment>
+
+<topic> ::= <noun-phrase>
+
+<comment> ::= <predicate>
+
+<focus-background-structure> ::= <background> <opt-whitespace> <focus>
+
+<background> ::= <subordinate-clause>
+
+<focus> ::= <main-clause>
+
+/* Extended pronominal reference */
+<anaphoric-reference> ::= <personal-pronoun>
+                       | <demonstrative-pronoun>
+
+<cataphoric-reference> ::= <demonstrative-pronoun> <opt-whitespace> <subordinate-clause>
+
+/* Reciprocal constructions */
+<reciprocal-construction> ::= <reciprocal-pronoun> <opt-whitespace> <verb-phrase>
+
+<reciprocal-pronoun> ::= "einander"
+                      | "gegenseitig"
+                      | "sich" <opt-whitespace> "gegenseitig"
+
+/* Intensive pronouns */
+<intensive-pronoun> ::= <reflexive-pronoun> <opt-whitespace> "selbst"
+                     | <reflexive-pronoun> <opt-whitespace> "selber"
+
+/* Distributive constructions */
+<distributive-construction> ::= "je" <opt-whitespace> <numeral>
+                             | "jeweils" <opt-whitespace> <numeral>
+
+/* Collective constructions */
+<collective-construction> ::= <collective-noun> <opt-whitespace> <plural-verb>
+
+<collective-noun> ::= "Familie" | "Gruppe" | "Team" | "Regierung" | "Volk"
+
+<plural-verb> ::= <verb-present> /* plural form */
+
+/* Extended aspect markers */
+<progressive-aspect> ::= "gerade" <opt-whitespace> <verb-present>
+                      | "dabei" <opt-whitespace> "sein" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+
+<habitual-aspect> ::= "pflegen" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+                   | <adverb-of-frequency> <opt-whitespace> <verb-present>
+
+<adverb-of-frequency> ::= "immer" | "oft" | "manchmal" | "selten" | "nie" | "stets" | "regelmäßig"
+
+<inchoative-aspect> ::= "anfangen" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+                     | "beginnen" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+
+<terminative-aspect> ::= "aufhören" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+                      | "beenden" <opt-whitespace> <verb-infinitive>
+
+/* Causative constructions */
+<causative-construction> ::= "lassen" <opt-whitespace> <verb-infinitive>
+                          | "machen" <opt-whitespace> "dass" <opt-whitespace> <subordinate-content>
+
+/* Permissive constructions */
+<permissive-construction> ::= "lassen" <opt-whitespace> <object> <opt-whitespace> <verb-infinitive>
+
+/* Extended dialectal expressions */
+<dialect-expression> ::= @DIALECT[bavarian] ( <bavarian-expression> )
+                      | @DIALECT[swabian] ( <swabian-expression> )
+                      | @DIALECT[saxon] ( <saxon-expression> )
+                      | @DIALECT[rhine_franconian] ( <rhine_franconian-expression> )
+                      | @DIALECT[low_german] ( <low_german-expression> )
+                      | @DIALECT[berlin] ( <berlin-expression> )
+
+<bavarian-expression> ::= "basst" <opt-whitespace> "scho" | "pfiat" <opt-whitespace> "di" | "griaß" <opt-whitespace> "di"
+
+<swabian-expression> ::= "passt" <opt-whitespace> "scho" | "läuft" | "no" <opt-whitespace> "guat"
+
+<saxon-expression> ::= "nu" <opt-whitespace> "gudd" | "passt" <opt-whitespace> "scho"
+
+<rhine_franconian-expression> ::= "geht" <opt-whitespace> "klar" | "alles" <opt-whitespace> "paletti"
+
+<low_german-expression> ::= "moin" | "dat" <opt-whitespace> "geiht"
+
+<berlin-expression> ::= "dit" <opt-whitespace> "is" <opt-whitespace> "dufte" | "keen" <opt-whitespace> "Problem"
+
+/* Additional context-sensitive validation rules */
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@NUMBER == <finite-verb>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Subject and finite verb must agree in number"
+
+@CONTEXT_RULE[gender-pronoun-antecedent]:
+    IF <pronoun>.@GENDER == <antecedent>.@GENDER
+    THEN VALID
+    ELSE WARNING "Pronoun gender should match antecedent"
+
+@CONTEXT_RULE[case-verb-governance]:
+    IF <verb> GOVERNS <object>.@CASE
+    THEN VALID
+    ELSE ERROR "Verb case governance violated"
+
+@CONTEXT_RULE[auxiliary-selection]:
+    IF <perfect-auxiliary> MATCHES <main-verb> CHARACTERISTICS
+    THEN VALID
+    ELSE ERROR "Auxiliary selection must match verb characteristics (motion/change of state)"
+
+@CONTEXT_RULE[separable-prefix-position]:
+    IF <separable-prefix> IN <final-position>
+    THEN VALID
+    ELSE WARNING "Separable prefix should be in final position in main clauses"
+
+@CONTEXT_RULE[modal-infinitive-agreement]:
+    IF <modal-verb> REQUIRES <infinitive-without-zu>
+    THEN VALID
+    ELSE ERROR "Modal verbs require bare infinitive (without zu)"
+
+@CONTEXT_RULE[passive-agent]:
+    IF <passive-voice> HAS_AGENT
+    THEN AGENT_MARKED_WITH "von" OR "durch"
+    ELSE VALID
+
+@CONTEXT_RULE[comparative-than]:
+    IF <comparative-adjective> PRESENT
+    THEN "als" REQUIRED_FOR_COMPARISON
+    ELSE WARNING "Comparatives typically require 'als' to introduce comparison"
+
+@CONTEXT_RULE[superlative-definiteness]:
+    IF <superlative-adjective> PRESENT
+    THEN REQUIRES <definite-article>
+    ELSE WARNING "Superlatives typically require definite article"
+
+@CONTEXT_RULE[genitive-preposition-case]:
+    IF <genitive-preposition> PRESENT
+    THEN <noun-phrase>.@CASE == genitive
+    ELSE ERROR "Genitive prepositions require genitive case"
+
+@CONTEXT_RULE[dative-verb-objects]:
+    IF <verb> REQUIRES_DATIVE
+    THEN <indirect-object>.@CASE == dative
+    ELSE ERROR "Dative verbs require dative objects"
+
+@CONTEXT_RULE[reflexive-verb-pronoun]:
+    IF <verb> IS_REFLEXIVE
+    THEN <reflexive-pronoun> REQUIRED
+    ELSE VALID
+
+@CONTEXT_RULE[question-inversion]:
+    IF <yes-no-question> PRESENT
+    THEN <finite-verb> AT_POSITION 1
+    ELSE ERROR "Yes/no questions require verb-first position"
+
+@CONTEXT_RULE[wh-question-word]:
+    IF <wh-question> PRESENT
+    THEN <question-word> AT_POSITION 1
+    ELSE ERROR "Wh-questions require question word in first position"
+
+@CONTEXT_RULE[conditional-subjunctive]:
+    IF <unreal-conditional> PRESENT
+    THEN <subjunctive-verb> REQUIRED
+    ELSE WARNING "Unreal conditionals should use subjunctive mood"
