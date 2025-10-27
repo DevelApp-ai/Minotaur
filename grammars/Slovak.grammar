@@ -1,0 +1,103 @@
+Grammar: Slovak
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Slovak Natural Language Grammar - Comprehensive Edition
+ * 
+ * Six grammatical cases with aspectual verb system and rhythmic law.
+ */
+
+Keywords: a, ale, alebo, či, že, ktorý, ktorá, ktoré, kto, čo, kedy, kde, ako, prečo, ak, keby, to, tak, nie, ani, nikdy, nič, nikto, na, v, z, do, od, pre, cez, o, po, pred, za, nad, pod, bez, vedľa, pri, okolo, ten, tá, to, tí, tých, môj, moja, moje, tvoj, tvoja, tvoje, jeho, jej, náš, naša, naše, váš, vaša, vaše, ich, ja, ty, on, ona, ono, my, vy, oni, ony, ma, ťa, ho, ju, nás, vás, ich
+
+<sentence> ::= <main-clause> | <subordinate-clause> | <compound-sentence> | <complex-sentence>
+
+<main-clause> ::= <declarative-clause> | <interrogative-clause> | <imperative-clause>
+
+<declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+<subject> ::= <pronoun-subject> | <noun-phrase> | <proper-noun>
+
+<pronoun-subject> ::= @CASE[nominative] ( "ja" | "ty" | "on" | "ona" | "ono" | "my" | "vy" | "oni" | "ony" )
+
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective>* <opt-whitespace> <noun> <opt-whitespace> <relative-clause>?
+
+<determiner> ::= "ten" | "tá" | "to" | "tí" | "môj" | "moja" | "tvoj" | "tvoja"
+
+<noun> ::= <noun-stem> <case-ending>?
+
+<noun-stem> ::= /[a-záäčďéíĺľňóôŕšťúýž]+/
+
+<case-ending> ::= "a" | "u" | "y" | "e" | "i" | "ou" | "ovi" | "om" | "och" | "ami" | "ách"
+
+<adjective> ::= <adj-stem> ( "ý" | "á" | "é" | "í" | "ší" | "šia" | "šie" )
+
+<adj-stem> ::= /[a-záäčďéíĺľňóôŕšťúýž]+/
+
+<verb-phrase> ::= <finite-verb> | <modal-verb> <opt-whitespace> <infinitive>
+
+<finite-verb> ::= <verb-present> | <verb-past> | <verb-future>
+
+<verb-present> ::= @TENSE[present] <verb-stem> ( "iem" | "ieš" | "ie" | "iete" | "ia" )
+
+<verb-past> ::= @TENSE[past] <verb-stem> "l" ( "" | "a" | "o" | "i" | "y" )
+
+<verb-future> ::= @TENSE[future] ( "budem" | "budeš" | "bude" ) <opt-whitespace> <infinitive>
+
+<infinitive> ::= <verb-stem> ( "ť" | "ať" | "ieť" )
+
+<modal-verb> ::= "môžem" | "môžeš" | "môže" | "chcem" | "chceš" | "chce" | "musím" | "musíš" | "musí"
+
+<verb-stem> ::= /[a-záäčďéíĺľňóôŕšťúýž]+/
+
+<object> ::= <noun-phrase> | <pronoun-object>
+
+<pronoun-object> ::= "ma" | "ťa" | "ho" | "ju" | "nás" | "vás" | "ich"
+
+<adverbial> ::= <adverb> | <prepositional-phrase>
+
+<adverb> ::= "dobre" | "zle" | "rýchlo" | "pomaly" | "teraz" | "včera" | "dnes" | "zajtra"
+
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "v" | "na" | "z" | "do" | "od" | "pre" | "cez" | "o" | "po" | "nad" | "pod"
+
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
+
+<subordinating-conjunction> ::= "že" | "ak" | "keby" | "keď" | "lebo" | "hoci"
+
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase>
+
+<relative-pronoun> ::= "ktorý" | "ktorá" | "ktoré" | "kto" | "čo"
+
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "a" | "ale" | "alebo" | "či" | "ani"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<interrogative-clause> ::= <declarative-clause> "?" | <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? "?"
+
+<question-word> ::= "kto" | "čo" | "kedy" | "kde" | "ako" | "prečo"
+
+<imperative-clause> ::= <verb-stem> ( "" | "te" ) <opt-whitespace> <object>?
+
+<proper-noun> ::= /[A-ZÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ][a-záäčďéíĺľňóôŕšťúýž]*/
+
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+@CONTEXT_RULE[rhythmic-law]:
+    IF <word> CONTAINS two-consecutive-long-syllables
+    THEN SHORTEN second-syllable
+    ELSE VALID
+
+@CONTEXT_RULE[case-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.@CASE == <noun>.@CASE
+    ELSE ERROR "Case must agree"
