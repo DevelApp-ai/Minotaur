@@ -2,11 +2,33 @@
 
 This document provides a comprehensive overview of all implemented UI pages in the Minotaur web application, focusing on the web deployment.
 
-**Generated:** 2025-10-27 03:21:00 UTC
+**Generated:** 2025-10-27 03:21:00 UTC  
+**Updated:** 2025-10-27 05:23:00 UTC
 
 ## Overview
 
 Minotaur is a powerful compiler-compiler platform with a comprehensive web-based UI built using Blazor. The application provides an intuitive interface for grammar development, code analysis, and project management.
+
+## Current Visualization Status
+
+### ✅ Implemented Features
+- Syntax highlighting in grammar editor
+- Code analysis metrics and statistics
+- Project structure browsing
+- Step-by-step parsing visualization
+- Symbol tables and dependency views
+- Git integration with visual diff indicators
+
+### 🚧 Planned IDE Enhancements
+The following visualization features are planned for future releases:
+
+- **Railroad Diagrams**: Visual representation of grammar rules as railroad diagrams for easier understanding of language syntax
+- **Full Project Loading**: Complete project parsing and visualization (currently showing mockup data for demonstration)
+- **Interactive Cognitive Graph Editor**: Visual graph manipulation for code transformation
+- **Advanced Grammar Visualization**: Interactive syntax tree visualization with zoom and navigation
+- **Real-time Collaboration**: Live multi-user editing with presence indicators
+
+> **Note**: The current screenshots show the UI framework and design. Some features display sample/mockup data to demonstrate the intended user experience. Full backend integration for grammar parsing, railroad diagram generation, and complete project loading is under active development.
 
 ## Table of Contents
 
@@ -55,6 +77,13 @@ Minotaur is a powerful compiler-compiler platform with a comprehensive web-based
 - Actions: New, Open, Save, Marketplace integration, Detect Shifts, Parse
 - Tabbed interface for Rules, Analysis, and Errors
 - Pre-populated with sample grammar for demonstration
+
+**Analysis Features:**
+- **Rules Tab**: Lists all parser and lexer rules with references and alternatives count
+- **Analysis Tab**: Displays grammar metrics (total rules, terminal/non-terminal rules, cyclomatic complexity)
+- **Errors Tab**: Shows parsing errors with line/column information and context
+
+> **Planned Enhancement**: Railroad diagram visualization for grammar rules. This will provide a graphical representation of each rule's syntax structure, making it easier to understand and validate grammar patterns at a glance. Users will be able to click on any rule to see its railroad diagram representation.
 
 **Screenshot:**
 
@@ -157,6 +186,19 @@ Minotaur is a powerful compiler-compiler platform with a comprehensive web-based
 - Analysis results panel for detailed project analysis
 - Actions: Open Project, New Project, Refresh
 
+**Current Implementation:**
+The Project Manager currently displays a UI framework with sample projects. When fully integrated with the backend:
+
+**Planned Full Project Loading Features:**
+- **Complete Project Parsing**: Load entire codebases and parse all files at once
+- **Project-wide Analysis**: Analyze relationships, dependencies, and architecture across the entire project
+- **Batch Grammar Application**: Apply grammar rules to multiple files simultaneously
+- **Project Statistics**: Display comprehensive metrics (total files, lines of code, complexity scores)
+- **Visual Project Graph**: Interactive visualization of project structure and dependencies
+- **Incremental Parsing**: Efficiently re-parse only changed files during development
+
+> **Note**: The current view shows the UI design and intended workflow. Full backend integration for complete project loading and parsing is in development. This will enable users to load entire projects and view comprehensive analysis results without stepping through files individually.
+
 **Screenshot:**
 
 ![Project Manager](https://github.com/user-attachments/assets/2b6ece7b-4b99-4e32-974d-c881fde525d9)
@@ -181,11 +223,18 @@ Minotaur is a powerful compiler-compiler platform with a comprehensive web-based
   - Method Implementation
   - Algorithm Example
 - Tabbed results interface:
-  - Overview
-  - Symbol Table
-  - Dependencies
-  - Cognitive Graph
+  - **Overview**: Key metrics (total symbols, complexity score, dependencies, quality score)
+  - **Symbol Table**: Hierarchical view of all symbols in the code
+  - **Dependencies**: Dependency graph showing relationships between components
+  - **Cognitive Graph**: Visual representation of code structure
 - Actions: Start Analysis, Clear, Export
+
+**Visualization Capabilities:**
+- Symbol distribution charts showing the breakdown of different symbol types
+- Dependency graphs for understanding component relationships
+- Quality metrics with progress bars
+
+> **Enhanced Visualization Planned**: The Cognitive Graph tab will feature an interactive, zoomable graph view showing the complete AST (Abstract Syntax Tree) with node selection, highlighting, and real-time editing capabilities. This will complement the text-based symbol table with a visual representation of code structure.
 
 **Screenshot:**
 
@@ -363,6 +412,52 @@ The navigation menu also includes authentication-aware features:
    - Browse the Marketplace for pre-built grammar templates
    - Use the StepParser Integration to analyze code
    - Manage your projects with the Project Manager
+
+---
+
+## Visualization Roadmap
+
+The Minotaur development team is actively working on enhanced visualization features to make the IDE more intuitive and powerful for grammar development and code analysis:
+
+### Phase 1: Grammar Visualization (Planned Q1)
+- **Railroad Diagrams**: Interactive railroad diagram generation for all grammar rules
+  - Automatic generation from ANTLR/EBNF grammar definitions
+  - Click-to-navigate between related rules
+  - Export diagrams as SVG/PNG for documentation
+  - Real-time diagram updates as grammar is edited
+  
+- **Syntax Tree Visualization**: Visual representation of parse trees
+  - Collapsible/expandable tree nodes
+  - Highlight matching rules when selecting nodes
+  - Export to GraphML for external tools
+
+### Phase 2: Full Project Analysis (Planned Q2)
+- **Bulk Project Loading**: Load and parse entire projects at once
+  - Multi-threaded parsing for performance
+  - Progress indicators for large codebases
+  - File filtering and exclusion patterns
+  
+- **Project-wide Metrics Dashboard**: Comprehensive analytics across entire codebase
+  - Code coverage by grammar rules
+  - Complexity heatmaps
+  - Dependency visualization with interactive graphs
+  - Quality trends over time
+
+### Phase 3: Advanced IDE Features (Planned Q3)
+- **Interactive Cognitive Graph Editor**: Visual graph manipulation interface
+  - Drag-and-drop node editing
+  - Real-time code generation from graph changes
+  - Undo/redo support
+  - Multi-user collaboration
+  
+- **Enhanced StepParser Visualization**: 
+  - Animated parsing process
+  - Token highlighting during parsing
+  - Error recovery visualization
+  - Performance profiling overlay
+
+### Contributing to Visualization
+If you're interested in contributing to visualization features, see the [Contributing Guide](../../CONTRIBUTING.md) or open an issue tagged with `visualization` or `ui-enhancement`.
 
 ---
 
