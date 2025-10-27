@@ -213,18 +213,30 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 <infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
 
-/* Noun phrases with full declension */
-<noun-phrase-nominative> ::= <adjective-nominative>* <opt-whitespace> <noun-nominative> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <relative-clause>?
+/* Noun phrases with full declension, quantifiers, and modifiers */
+<noun-phrase-nominative> ::= <quantifier>? <opt-whitespace> <adjective-nominative>* <opt-whitespace> <noun-nominative> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <relative-clause>?
 
-<noun-phrase-genitive> ::= <adjective-genitive>* <opt-whitespace> <noun-genitive>
+<noun-phrase-genitive> ::= <quantifier>? <opt-whitespace> <adjective-genitive>* <opt-whitespace> <noun-genitive>
 
-<noun-phrase-dative> ::= <adjective-dative>* <opt-whitespace> <noun-dative>
+<noun-phrase-dative> ::= <quantifier>? <opt-whitespace> <adjective-dative>* <opt-whitespace> <noun-dative>
 
-<noun-phrase-accusative> ::= <adjective-accusative>* <opt-whitespace> <noun-accusative> <opt-whitespace> <genitive-modifier>?
+<noun-phrase-accusative> ::= <quantifier>? <opt-whitespace> <adjective-accusative>* <opt-whitespace> <noun-accusative> <opt-whitespace> <genitive-modifier>?
 
-<noun-phrase-ablative> ::= <adjective-ablative>* <opt-whitespace> <noun-ablative>
+<noun-phrase-ablative> ::= <quantifier>? <opt-whitespace> <adjective-ablative>* <opt-whitespace> <noun-ablative>
 
 <genitive-modifier> ::= <noun-phrase-genitive>
+
+/* Quantifiers and numerals */
+<quantifier> ::= <numeral>
+              | <indefinite-quantifier>
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "unus" | "una" | "unum" | "duo" | "duae" | "duo" | "tres" | "tria" | "quattuor" | "quinque" | "sex" | "septem" | "octo" | "novem" | "decem" | "undecim" | "duodecim" | "tredecim" | "quattuordecim" | "quindecim" | "sedecim" | "septendecim" | "duodeviginti" | "undeviginti" | "viginti" | "triginta" | "quadraginta" | "quinquaginta" | "sexaginta" | "septuaginta" | "octoginta" | "nonaginta" | "centum" | "ducenti" | "trecenti" | "quadringenti" | "quingenti" | "sescenti" | "septingenti" | "octingenti" | "nongenti" | "mille" | "decem" <opt-whitespace> "milia" | /[IVXLCDM]+/
+
+<ordinal-number> ::= "primus" | "prima" | "primum" | "secundus" | "secunda" | "secundum" | "tertius" | "tertia" | "tertium" | "quartus" | "quarta" | "quartum" | "quintus" | "sextu" | "septimus" | "octavus" | "nonus" | "decimus" | "undecimus" | "duodecimus" | "vicesimus" | "tricesimus" | "quadragesimus" | "quinquagesimus" | "sexagesimus" | "septuagesimus" | "octogesimus" | "nonagesimus" | "centesimus" | "millesimus"
+
+<indefinite-quantifier> ::= "multi" | "multae" | "multa" | "pauci" | "paucae" | "pauca" | "plures" | "plura" | "plurimi" | "plurimae" | "plurima" | "omnes" | "omnia" | "nullus" | "nulla" | "nullum" | "nemo" | "nihil" | "aliqui" | "aliqua" | "aliquod" | "quidam" | "quaedam" | "quoddam" | "quisque" | "quaeque" | "quidque"
 
 /* Nouns - Five declensions with six cases */
 /* First declension (mostly feminine) - puella, puellae */
@@ -366,6 +378,26 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 <pronoun-accusative> ::= @CASE[accusative] ( "me" | "te" | "nos" | "vos" | "se" | "eum" | "eam" | "id" | "eos" | "eas" | "ea" )
 
+/* Pronoun declensions - expanded */
+<pronoun-genitive> ::= @CASE[genitive] ( "mei" | "tui" | "nostri" | "vestri" | "sui" | "eius" | "eorum" | "earum" )
+
+<pronoun-dative> ::= @CASE[dative] ( "mihi" | "tibi" | "nobis" | "vobis" | "sibi" | "ei" | "eis" )
+
+<pronoun-ablative> ::= @CASE[ablative] ( "me" | "te" | "nobis" | "vobis" | "se" | "eo" | "ea" | "eo" | "eis" )
+
+/* Demonstrative pronoun forms - expanded */
+<demonstrative-hic> ::= "hic" | "haec" | "hoc" | "huius" | "huic" | "hunc" | "hanc" | "hoc" | "hoc" | "hac" | "hoc" | "hi" | "hae" | "haec" | "horum" | "harum" | "horum" | "his" | "hos" | "has" | "haec" | "his"
+
+<demonstrative-ille> ::= "ille" | "illa" | "illud" | "illius" | "illi" | "illum" | "illam" | "illud" | "illo" | "illa" | "illo" | "illi" | "illae" | "illa" | "illorum" | "illarum" | "illorum" | "illis" | "illos" | "illas" | "illa" | "illis"
+
+<demonstrative-is> ::= "is" | "ea" | "id" | "eius" | "ei" | "eum" | "eam" | "id" | "eo" | "ea" | "eo" | "ei" | "eae" | "ea" | "eorum" | "earum" | "eorum" | "eis" | "eos" | "eas" | "ea" | "eis"
+
+/* Intensifying pronouns */
+<intensive-pronoun> ::= "ipse" | "ipsa" | "ipsum" | "ipsius" | "ipsi" | "ipsum" | "ipsam" | "ipsum" | "ipso" | "ipsa" | "ipso"
+
+/* Indefinite pronouns - expanded */
+<indefinite-pronoun> ::= "aliquis" | "aliqua" | "aliquod" | "quidam" | "quaedam" | "quoddam" | "quisque" | "quaeque" | "quidque" | "quisquam" | "quicquam" | "ullus" | "ulla" | "ullum" | "alter" | "altera" | "alterum" | "alius" | "alia" | "aliud"
+
 <infinitive-phrase> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
 
 /* Adjectives with three genders and comparison */
@@ -458,13 +490,37 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 <adj-stem> ::= /[a-z]+/
 
-/* Verbs - Four conjugations */
-<verb> ::= <verb-present>
-        | <verb-imperfect>
-        | <verb-future>
-        | <verb-perfect>
-        | <verb-pluperfect>
-        | <verb-future-perfect>
+/* Verbs - Four conjugations with modal auxiliaries */
+<verb> ::= <simple-verb>
+        | <modal-verb-phrase>
+        | <passive-verb>
+
+<simple-verb> ::= <verb-present>
+               | <verb-imperfect>
+               | <verb-future>
+               | <verb-perfect>
+               | <verb-pluperfect>
+               | <verb-future-perfect>
+
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <verb-infinitive>
+
+<modal-verb> ::= <possum> | <debeo> | <volo> | <nolo> | <malo>
+
+<possum> ::= "possum" | "potes" | "potest" | "possumus" | "potestis" | "possunt" | "potui" | "potuisti" | "potuit"
+
+<debeo> ::= "debeo" | "debes" | "debet" | "debemus" | "debetis" | "debent" | "debui" | "debuisti" | "debuit"
+
+<volo> ::= "volo" | "vis" | "vult" | "volumus" | "vultis" | "volunt" | "volui" | "voluisti" | "voluit"
+
+<nolo> ::= "nolo" | "non" <opt-whitespace> "vis" | "non" <opt-whitespace> "vult" | "nolumus" | "non" <opt-whitespace> "vultis" | "nolunt"
+
+<malo> ::= "malo" | "mavis" | "mavult" | "malumus" | "mavultis" | "malunt"
+
+<passive-verb> ::= <passive-present> | <passive-perfect>
+
+<passive-present> ::= @VOICE[passive] <verb-stem> ( "or" | "ris" | "tur" | "mur" | "mini" | "ntur" )
+
+<passive-perfect> ::= @VOICE[passive] <past-participle> <opt-whitespace> ( "sum" | "es" | "est" | "sumus" | "estis" | "sunt" )
 
 /* Present tense - active voice */
 <verb-present> ::= @TENSE[present] @VOICE[active] @MOOD[indicative] ( <first-conj-present> | <second-conj-present> | <third-conj-present> | <fourth-conj-present> | <irregular-present> )
@@ -542,6 +598,39 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 <future-infinitive> ::= @TENSE[future] @VOICE[active] <participle-stem> "urus" <opt-whitespace> "esse"
 
+/* Gerund forms */
+<gerund> ::= <gerund-genitive> | <gerund-dative> | <gerund-accusative> | <gerund-ablative>
+
+<gerund-genitive> ::= @CASE[genitive] <verb-stem> "ndi"
+
+<gerund-dative> ::= @CASE[dative] <verb-stem> "ndo"
+
+<gerund-accusative> ::= @CASE[accusative] "ad" <opt-whitespace> <verb-stem> "ndum"
+
+<gerund-ablative> ::= @CASE[ablative] <verb-stem> "ndo"
+
+/* Gerundive (passive necessity) */
+<gerundive> ::= <gerundive-nominative> | <gerundive-genitive> | <gerundive-dative> | <gerundive-accusative> | <gerundive-ablative>
+
+<gerundive-nominative> ::= @GENDER[masculine] @NUMBER[singular] <verb-stem> "ndus"
+                        | @GENDER[feminine] @NUMBER[singular] <verb-stem> "nda"
+                        | @GENDER[neuter] @NUMBER[singular] <verb-stem> "ndum"
+
+<gerundive-genitive> ::= <verb-stem> "ndi" | <verb-stem> "ndae" | <verb-stem> "ndi"
+
+<gerundive-dative> ::= <verb-stem> "ndo" | <verb-stem> "ndae" | <verb-stem> "ndo"
+
+<gerundive-accusative> ::= <verb-stem> "ndum" | <verb-stem> "ndam" | <verb-stem> "ndum"
+
+<gerundive-ablative> ::= <verb-stem> "ndo" | <verb-stem> "nda" | <verb-stem> "ndo"
+
+/* Supine forms */
+<supine> ::= <supine-accusative> | <supine-ablative>
+
+<supine-accusative> ::= @CASE[accusative] <verb-stem> "tum"
+
+<supine-ablative> ::= @CASE[ablative] <verb-stem> "tu"
+
 /* Participles */
 <participle> ::= <present-participle> | <perfect-participle> | <future-participle>
 
@@ -565,11 +654,21 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 <perfect-stem> ::= /[a-z]+/
 <participle-stem> ::= /[a-z]+/
 
-/* Adverbials */
+/* Adverbials with phrases */
 <adverbial> ::= <adverb>
+             | <adverb-phrase>
              | <prepositional-phrase>
 
-<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb>
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb> | <modal-adverb>
+
+<adverb-phrase> ::= <degree-modifier> <opt-whitespace> <adverb>
+                 | <adverb> <opt-whitespace> <comparison-particle> <opt-whitespace> <noun-phrase-ablative>
+
+<degree-modifier> ::= "valde" | "maxime" | "satis" | "parum" | "nimis"
+
+<comparison-particle> ::= "quam" | "ac" | "atque"
+
+<modal-adverb> ::= "fortasse" | "forsitan" | "forte" | "certe" | "profecto" | "scilicet" | "nempe" | "videlicet" | "utique"
 
 <time-adverb> ::= "nunc" | "tunc" | "hodie" | "heri" | "cras" | "semper" | "numquam" | "saepe" | "raro" | "mox" | "iam" | "adhuc" | "statim" | "postea" | "antea" | "olim" | "quondam" | "aliquando"
 
@@ -586,6 +685,43 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 <preposition-accusative> ::= @GOVERNS[accusative] ( "ad" | "ante" | "apud" | "circum" | "contra" | "extra" | "in" | "inter" | "intra" | "ob" | "per" | "post" | "praeter" | "prope" | "propter" | "super" | "trans" | "ultra" )
 
 <preposition-ablative> ::= @GOVERNS[ablative] ( "a" | "ab" | "abs" | "cum" | "de" | "e" | "ex" | "in" | "pro" | "sine" | "sub" )
+
+/* Compound and complex prepositions */
+<compound-preposition> ::= "propter" <opt-whitespace> "quod"
+                        | "ob" <opt-whitespace> "rem"
+                        | "in" <opt-whitespace> "causa"
+                        | "ex" <opt-whitespace> "parte"
+                        | "de" <opt-whitespace> "industria"
+                        | "a" <opt-whitespace> "tergo"
+                        | "in" <opt-whitespace> "medio"
+                        | "ad" <opt-whitespace> "extremum"
+
+<complex-preposition> ::= <compound-preposition>
+
+/* Temporal expressions */
+<temporal-expression> ::= <time-adverb>
+                       | <temporal-phrase>
+                       | <temporal-clause>
+
+<temporal-phrase> ::= <temporal-preposition> <opt-whitespace> <noun-phrase-ablative>
+
+<temporal-preposition> ::= "ante" | "post" | "per" | "in" | "ab" | "ex"
+
+/* Spatial expressions */
+<spatial-expression> ::= <place-adverb>
+                      | <spatial-phrase>
+
+<spatial-phrase> ::= <spatial-preposition> <opt-whitespace> <noun-phrase-accusative>
+                  | <spatial-preposition-abl> <opt-whitespace> <noun-phrase-ablative>
+
+<spatial-preposition> ::= "ad" | "in" | "trans" | "per" | "ante" | "post" | "inter" | "circum"
+
+<spatial-preposition-abl> ::= "in" | "ab" | "ex" | "de" | "sub" | "pro"
+
+/* Phrasal verb constructions */
+<phrasal-verb> ::= <verb> <opt-whitespace> <particle>
+
+<particle> ::= "super" | "circum" | "praeter" | "contra"
 
 /* Ablative absolute construction with variations */
 <ablative-absolute> ::= <simple-ablative-absolute>

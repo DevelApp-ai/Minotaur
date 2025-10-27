@@ -252,7 +252,19 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 <interrogative-pronoun> ::= "qui" | "que" | "quoi" | "lequel" | "laquelle" | "lesquels" | "lesquelles"
 
 /* Noun phrases with gender agreement */
-<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <adjective-phrase>* <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+<noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <adjective-phrase>* <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+
+/* Quantifiers and numerals */
+<quantifier> ::= <numeral>
+              | <indefinite-quantifier>
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "un" | "une" | "deux" | "trois" | "quatre" | "cinq" | "six" | "sept" | "huit" | "neuf" | "dix" | "onze" | "douze" | "treize" | "quatorze" | "quinze" | "seize" | "vingt" | "trente" | "quarante" | "cinquante" | "soixante" | "soixante-dix" | "quatre-vingts" | "quatre-vingt-dix" | "cent" | "mille" | "million" | "milliard" | /[0-9]+/
+
+<ordinal-number> ::= "premier" | "première" | "deuxième" | "second" | "seconde" | "troisième" | "quatrième" | "cinquième" | "sixième" | "septième" | "huitième" | "neuvième" | "dixième" | "onzième" | "douzième" | "vingtième" | "trentième" | "centième" | "millième"
+
+<indefinite-quantifier> ::= "beaucoup" <opt-whitespace> "de" | "peu" <opt-whitespace> "de" | "trop" <opt-whitespace> "de" | "assez" <opt-whitespace> "de" | "plusieurs" | "quelques" | "certains" | "certaines" | "tous" | "toutes" | "chaque" | "aucun" | "aucune" | "la" <opt-whitespace> "plupart" <opt-whitespace> "de" | "nombre" <opt-whitespace> "de" | "tant" <opt-whitespace> "de"
 
 <determiner> ::= <article>
               | <demonstrative-determiner>
@@ -343,12 +355,27 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 <verb-phrase> ::= <simple-verb-phrase>
                | <compound-verb-phrase>
                | <pronominal-verb-phrase>
+               | <modal-verb-phrase>
 
 <simple-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <verb> ( <opt-whitespace> <adverb> )?
 
 <compound-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <past-participle>
 
 <pronominal-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <verb>
+
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <verb-infinitive>
+
+<modal-verb> ::= <pouvoir> | <devoir> | <vouloir> | <savoir> | <falloir>
+
+<pouvoir> ::= "peux" | "peut" | "pouvons" | "pouvez" | "peuvent" | "pouvais" | "pouvait" | "pouvions" | "pourrai" | "pourras" | "pourra" | "pourrions" | "pu"
+
+<devoir> ::= "dois" | "doit" | "devons" | "devez" | "doivent" | "devais" | "devait" | "devions" | "devrai" | "devras" | "devra" | "devrions" | "dû"
+
+<vouloir> ::= "veux" | "veut" | "voulons" | "voulez" | "veulent" | "voulais" | "voulait" | "voulions" | "voudrai" | "voudras" | "voudra" | "voudrions" | "voulu"
+
+<savoir> ::= "sais" | "sait" | "savons" | "savez" | "savent" | "savais" | "savait" | "savions" | "saurai" | "sauras" | "saura" | "saurions" | "su"
+
+<falloir> ::= "faut" | "fallait" | "faudra" | "faudrait" | "fallu"
 
 <object-pronoun> ::= <personal-pronoun-object> | <personal-pronoun-indirect>
 
@@ -359,9 +386,19 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
         | <verb-conditional>
         | <verb-subjunctive>
         | <verb-imperative>
+        | <verb-passe-simple>
+        | <verb-plus-que-parfait>
 
 /* Present tense - three groups */
 <verb-present> ::= @TENSE[present] @MOOD[indicative] ( <first-group-present> | <second-group-present> | <third-group-present> | <irregular-present> )
+
+/* Passé simple (literary past tense) */
+<verb-passe-simple> ::= @TENSE[passe-simple] @MOOD[indicative] <verb-stem> ( "ai" | "as" | "a" | "âmes" | "âtes" | "èrent" | "is" | "is" | "it" | "îmes" | "îtes" | "irent" | "us" | "us" | "ut" | "ûmes" | "ûtes" | "urent" )
+
+/* Plus-que-parfait */
+<verb-plus-que-parfait> ::= @TENSE[pluperfect] @MOOD[indicative] <auxiliary-imperfect> <opt-whitespace> <past-participle>
+
+<auxiliary-imperfect> ::= "avais" | "avais" | "avait" | "avions" | "aviez" | "avaient" | "étais" | "étais" | "était" | "étions" | "étiez" | "étaient"
 
 /* First group (-er verbs) - parler */
 <first-group-present> ::= @GROUP[1] @PERSON[1] @NUMBER[singular] <first-group-stem> "e"
@@ -472,11 +509,39 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 
 <infinitive-phrase> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
 
-/* Adverbials */
+/* Adverbials with phrases and complex structures */
 <adverbial> ::= <adverb>
+             | <adverb-phrase>
              | <prepositional-phrase>
+             | <temporal-expression>
+             | <spatial-expression>
 
-<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb> | <frequency-adverb>
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb> | <frequency-adverb> | <modal-adverb>
+
+<adverb-phrase> ::= <degree-modifier> <opt-whitespace> <adverb>
+                 | <adverb> <opt-whitespace> <comparison-particle> <opt-whitespace> <noun-phrase>
+
+<degree-modifier> ::= "très" | "vraiment" | "extrêmement" | "absolument" | "complètement"
+
+<comparison-particle> ::= "que" | "comme"
+
+<modal-adverb> ::= "peut-être" | "probablement" | "certainement" | "sûrement" | "évidemment" | "naturellement" | "heureusement" | "malheureusement" | "apparemment"
+
+/* Temporal expressions */
+<temporal-expression> ::= <time-adverb>
+                       | <temporal-phrase>
+
+<temporal-phrase> ::= <temporal-preposition> <opt-whitespace> <noun-phrase>
+
+<temporal-preposition> ::= "avant" | "après" | "pendant" | "depuis" | "durant" | "jusqu'à" | "dès"
+
+/* Spatial expressions */
+<spatial-expression> ::= <place-adverb>
+                      | <spatial-phrase>
+
+<spatial-phrase> ::= <spatial-preposition> <opt-whitespace> <noun-phrase>
+
+<spatial-preposition> ::= "dans" | "sur" | "sous" | "devant" | "derrière" | "entre" | "parmi" | "chez" | "vers" | "à" <opt-whitespace> "côté" <opt-whitespace> "de" | "au-dessus" <opt-whitespace> "de" | "au-dessous" <opt-whitespace> "de"
 
 <time-adverb> ::= "maintenant" | "hier" | "aujourd'hui" | "demain" | "avant" | "après" | "tôt" | "tard" | "toujours" | "souvent" | "parfois" | "jamais" | "déjà" | "encore" | "bientôt" | "longtemps" | "autrefois"
 
@@ -493,7 +558,23 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
                         | <preposition> <opt-whitespace> <pronoun>
                         | <preposition> <opt-whitespace> <verb-infinitive>
 
-<preposition> ::= "à" | "de" | "en" | "dans" | "sur" | "sous" | "avec" | "sans" | "pour" | "par" | "entre" | "chez" | "vers" | "pendant" | "avant" | "après" | "depuis" | "devant" | "derrière" | "contre" | "parmi" | "selon" | "durant" | "malgré"
+<preposition> ::= "à" | "de" | "en" | "dans" | "sur" | "sous" | "avec" | "sans" | "pour" | "par" | "entre" | "chez" | "vers" | "pendant" | "avant" | "après" | "depuis" | "devant" | "derrière" | "contre" | "parmi" | "selon" | "durant" | "malgré" | <compound-preposition>
+
+/* Compound prepositions */
+<compound-preposition> ::= "à" <opt-whitespace> "cause" <opt-whitespace> "de"
+                        | "grâce" <opt-whitespace> "à"
+                        | "à" <opt-whitespace> "travers"
+                        | "au" <opt-whitespace> "lieu" <opt-whitespace> "de"
+                        | "en" <opt-whitespace> "face" <opt-whitespace> "de"
+                        | "à" <opt-whitespace> "côté" <opt-whitespace> "de"
+                        | "au-dessus" <opt-whitespace> "de"
+                        | "au-dessous" <opt-whitespace> "de"
+                        | "autour" <opt-whitespace> "de"
+                        | "près" <opt-whitespace> "de"
+                        | "loin" <opt-whitespace> "de"
+                        | "jusqu'à"
+                        | "quant" <opt-whitespace> "à"
+                        | "par" <opt-whitespace> "rapport" <opt-whitespace> "à"
 
 /* Negation patterns */
 <negation-part1> ::= "ne" | "n'"

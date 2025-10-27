@@ -241,7 +241,19 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
 <interrogative-pronoun> ::= "chi" | "che" | "cosa" | "che" <opt-whitespace> "cosa" | "quale" | "quali"
 
 /* Noun phrases with gender agreement */
-<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <adjective-phrase>* <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+<noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <adjective-phrase>* <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+
+/* Quantifiers and numerals */
+<quantifier> ::= <numeral>
+              | <indefinite-quantifier>
+
+<numeral> ::= <cardinal-number> | <ordinal-number>
+
+<cardinal-number> ::= "uno" | "una" | "due" | "tre" | "quattro" | "cinque" | "sei" | "sette" | "otto" | "nove" | "dieci" | "undici" | "dodici" | "tredici" | "quattordici" | "quindici" | "sedici" | "diciassette" | "diciotto" | "diciannove" | "venti" | "trenta" | "quaranta" | "cinquanta" | "sessanta" | "settanta" | "ottanta" | "novanta" | "cento" | "mille" | "milione" | "miliardo" | /[0-9]+/
+
+<ordinal-number> ::= "primo" | "prima" | "secondo" | "seconda" | "terzo" | "terza" | "quarto" | "quarta" | "quinto" | "quinta" | "sesto" | "settimo" | "ottavo" | "nono" | "decimo" | "undicesimo" | "ventesimo" | "trentesimo" | "centesimo" | "millesimo"
+
+<indefinite-quantifier> ::= "molto" | "molta" | "molti" | "molte" | "poco" | "poca" | "pochi" | "poche" | "troppo" | "troppa" | "troppi" | "troppe" | "abbastanza" | "parecchio" | "parecchi" | "alcuni" | "alcune" | "diversi" | "diverse" | "vari" | "varie" | "tutto" | "tutta" | "tutti" | "tutte" | "ogni" | "qualche" | "nessuno" | "nessuna" | "ciascuno" | "ciascuna" | "la" <opt-whitespace> "maggior" <opt-whitespace> "parte" <opt-whitespace> "di"
 
 <determiner> ::= <article>
               | <demonstrative-determiner>
@@ -333,12 +345,25 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
 <verb-phrase> ::= <simple-verb-phrase>
                | <compound-verb-phrase>
                | <pronominal-verb-phrase>
+               | <modal-verb-phrase>
 
 <simple-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <verb> ( <opt-whitespace> <adverb> )?
 
 <compound-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <past-participle>
 
 <pronominal-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <verb>
+
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <verb-infinitive>
+
+<modal-verb> ::= <potere> | <dovere> | <volere> | <sapere>
+
+<potere> ::= "posso" | "puoi" | "può" | "possiamo" | "potete" | "possono" | "potevo" | "poteva" | "potrò" | "potrai" | "potrà" | "potuto"
+
+<dovere> ::= "devo" | "devi" | "deve" | "dobbiamo" | "dovete" | "devono" | "dovevo" | "doveva" | "dovrò" | "dovrai" | "dovrà" | "dovuto"
+
+<volere> ::= "voglio" | "vuoi" | "vuole" | "vogliamo" | "volete" | "vogliono" | "volevo" | "voleva" | "vorrò" | "vorrai" | "vorrà" | "voluto"
+
+<sapere> ::= "so" | "sai" | "sa" | "sappiamo" | "sapete" | "sanno" | "sapevo" | "sapeva" | "saprò" | "saprai" | "saprà" | "saputo"
 
 <object-pronoun> ::= <personal-pronoun-object> | <personal-pronoun-indirect>
 
@@ -349,9 +374,19 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
         | <verb-conditional>
         | <verb-subjunctive>
         | <verb-imperative>
+        | <verb-passato-remoto>
+        | <verb-trapassato-prossimo>
 
 /* Present tense - three groups */
 <verb-present> ::= @TENSE[present] @MOOD[indicative] ( <first-group-present> | <second-group-present> | <third-group-present> | <irregular-present> )
+
+/* Passato remoto (remote past tense) */
+<verb-passato-remoto> ::= @TENSE[passato-remoto] @MOOD[indicative] <verb-stem> ( "ai" | "asti" | "ò" | "ammo" | "aste" | "arono" | "ei" | "esti" | "é" | "emmo" | "este" | "erono" | "ii" | "isti" | "ì" | "immo" | "iste" | "irono" )
+
+/* Trapassato prossimo (pluperfect) */
+<verb-trapassato-prossimo> ::= @TENSE[pluperfect] @MOOD[indicative] <auxiliary-imperfect> <opt-whitespace> <past-participle>
+
+<auxiliary-imperfect> ::= "avevo" | "avevi" | "aveva" | "avevamo" | "avevate" | "avevano" | "ero" | "eri" | "era" | "eravamo" | "eravate" | "erano"
 
 /* First group (-are verbs) - parlare */
 <first-group-present> ::= @GROUP[1] @PERSON[1] @NUMBER[singular] <first-group-stem> "o"
@@ -476,11 +511,39 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
 
 <infinitive-phrase> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
 
-/* Adverbials */
+/* Adverbials with phrases and complex structures */
 <adverbial> ::= <adverb>
+             | <adverb-phrase>
              | <prepositional-phrase>
+             | <temporal-expression>
+             | <spatial-expression>
 
-<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb> | <frequency-adverb>
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb> | <frequency-adverb> | <modal-adverb>
+
+<adverb-phrase> ::= <degree-modifier> <opt-whitespace> <adverb>
+                 | <adverb> <opt-whitespace> <comparison-particle> <opt-whitespace> <noun-phrase>
+
+<degree-modifier> ::= "molto" | "davvero" | "assolutamente" | "completamente" | "estremamente"
+
+<comparison-particle> ::= "di" | "come" | "quanto"
+
+<modal-adverb> ::= "forse" | "probabilmente" | "certamente" | "sicuramente" | "evidentemente" | "naturalmente" | "fortunatamente" | "sfortunatamente" | "apparentemente" | "ovviamente"
+
+/* Temporal expressions */
+<temporal-expression> ::= <time-adverb>
+                       | <temporal-phrase>
+
+<temporal-phrase> ::= <temporal-preposition> <opt-whitespace> <noun-phrase>
+
+<temporal-preposition> ::= "prima" | "dopo" | "durante" | "da" | "fino" <opt-whitespace> "a" | "per"
+
+/* Spatial expressions */
+<spatial-expression> ::= <place-adverb>
+                      | <spatial-phrase>
+
+<spatial-phrase> ::= <spatial-preposition> <opt-whitespace> <noun-phrase>
+
+<spatial-preposition> ::= "in" | "su" | "sotto" | "davanti" | "dietro" | "tra" | "fra" | "verso" | "presso" | "accanto" <opt-whitespace> "a" | "vicino" <opt-whitespace> "a" | "lontano" <opt-whitespace> "da"
 
 <time-adverb> ::= "ora" | "adesso" | "ieri" | "oggi" | "domani" | "prima" | "dopo" | "presto" | "tardi" | "sempre" | "mai" | "spesso" | "già" | "ancora" | "poi" | "subito" | "allora"
 
@@ -497,7 +560,24 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
                         | <preposition> <opt-whitespace> <pronoun>
                         | <preposition> <opt-whitespace> <verb-infinitive>
 
-<preposition> ::= "a" | "di" | "da" | "in" | "con" | "su" | "per" | "tra" | "fra" | "sopra" | "sotto" | "davanti" | "dietro" | "verso" | "durante" | "prima" | "dopo" | "senza" | "contro" | "secondo" | "mediante"
+<preposition> ::= "a" | "di" | "da" | "in" | "con" | "su" | "per" | "tra" | "fra" | "sopra" | "sotto" | "davanti" | "dietro" | "verso" | "durante" | "prima" | "dopo" | "senza" | "contro" | "secondo" | "mediante" | <compound-preposition>
+
+/* Compound prepositions */
+<compound-preposition> ::= "a" <opt-whitespace> "causa" <opt-whitespace> "di"
+                        | "grazie" <opt-whitespace> "a"
+                        | "invece" <opt-whitespace> "di"
+                        | "riguardo" <opt-whitespace> "a"
+                        | "rispetto" <opt-whitespace> "a"
+                        | "accanto" <opt-whitespace> "a"
+                        | "vicino" <opt-whitespace> "a"
+                        | "lontano" <opt-whitespace> "da"
+                        | "di" <opt-whitespace> "fronte" <opt-whitespace> "a"
+                        | "in" <opt-whitespace> "mezzo" <opt-whitespace> "a"
+                        | "intorno" <opt-whitespace> "a"
+                        | "fino" <opt-whitespace> "a"
+                        | "assieme" <opt-whitespace> "a"
+                        | "insieme" <opt-whitespace> "a"
+                        | "al" <opt-whitespace> "di" <opt-whitespace> "là" <opt-whitespace> "di"
 
 /* Prepositional articles (contractions) */
 <prepositional-article> ::= "al" | "allo" | "alla" | "ai" | "agli" | "alle"
