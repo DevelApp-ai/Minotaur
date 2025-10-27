@@ -1,0 +1,348 @@
+Grammar: Dutch
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Dutch Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Dutch language structures including:
+ * - Regular and irregular verb conjugations
+ * - Strong and weak verbs
+ * - Context-sensitive agreement rules (gender, number)
+ * - Common and neuter gender agreement
+ * - Definite and indefinite articles
+ * - Multiple tenses (present, past, perfect, pluperfect, future)
+ * - V2 word order (verb-second) in main clauses
+ * - SOV word order in subordinate clauses
+ * - Separable and inseparable prefix verbs
+ * - Relative clauses and subordinate structures
+ * - Comparative and superlative adjectives
+ * - Diminutives (unique Dutch feature)
+ * - Multi-embedded sentence structures
+ */
+
+Keywords: en, of, maar, want, dus, omdat, dat, die, wat, wie, wanneer, waar, hoe, waarom, als, dan, voor, met, zonder, in, op, aan, van, de, het, een, deze, dit, die, dat, mijn, mij, jouw, jou, zijn, haar, ons, onze, jullie, hun, ik, jij, je, u, hij, zij, ze, wij, we, jullie, zij, ze, me, je, hem, haar, ons, jullie, hen, ze, niet, geen, nooit, niemand, niets
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause with V2 word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+
+/* V2 declarative: TopicField + FiniteVerb + MiddleField + VerbComplement */
+<declarative-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <opt-whitespace> <punctuation>?
+
+<topic-field> ::= <subject>
+               | <adverbial>
+               | <object>
+
+<middle-field> ::= <middle-field-element> ( <opt-whitespace> <middle-field-element> )*
+
+<middle-field-element> ::= <subject>
+                        | <negation>
+                        | <adverb>
+                        | <object>
+
+<verb-complement> ::= <infinitive>
+                   | <past-participle>
+                   | <separable-prefix>
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+                   | <indefinite-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( "ik" | "jij" | "je" | "u" | "hij" | "zij" | "ze" | "het" | "wij" | "we" | "jullie" | "zij" | "ze" )
+
+/* Object pronouns */
+<object-pronoun> ::= @CASE[accusative] ( "mij" | "me" | "jou" | "je" | "u" | "hem" | "'m" | "haar" | "'r" | "het" | "'t" | "ons" | "jullie" | "hen" | "hun" | "ze" )
+
+/* Possessive pronouns with gender agreement */
+<possessive-pronoun> ::= @GENDER[common] ( "mijn" | "jouw" | "je" | "uw" | "zijn" | "'n" | "haar" | "ons" | "jullie" | "hun" )
+                      | @GENDER[neuter] ( "mijn" | "jouw" | "je" | "uw" | "zijn" | "'n" | "haar" | "ons" | "jullie" | "hun" )
+
+<demonstrative-pronoun> ::= @GENDER[common] @NUMBER[singular] ( "deze" | "die" )
+                         | @GENDER[neuter] @NUMBER[singular] ( "dit" | "dat" )
+                         | @NUMBER[plural] ( "deze" | "die" )
+
+<relative-pronoun> ::= "die" | "dat" | "wie" | "wat" | "waar" | "waarvan" | "waarmee" | "waarin"
+
+<indefinite-pronoun> ::= "iemand" | "niemand" | "iets" | "niets" | "alles" | "sommige" | "enkele" | "veel" | "weinig"
+
+/* Noun phrase with gender agreement */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <article> | <demonstrative-determiner> | <possessive-determiner>
+
+<article> ::= <definite-article> | <indefinite-article>
+
+/* Definite articles with gender */
+<definite-article> ::= @GENDER[common] "de"
+                    | @GENDER[neuter] "het"
+                    | @NUMBER[plural] "de"
+
+/* Indefinite article */
+<indefinite-article> ::= @NUMBER[singular] "een"
+
+<demonstrative-determiner> ::= <demonstrative-pronoun>
+
+<possessive-determiner> ::= <possessive-pronoun>
+
+/* Nouns with gender and number */
+<noun> ::= <simple-noun> | <diminutive-noun>
+
+<simple-noun> ::= <noun-common-singular>
+               | <noun-neuter-singular>
+               | <noun-plural>
+
+<noun-common-singular> ::= @GENDER[common] @NUMBER[singular] <noun-stem>
+
+<noun-neuter-singular> ::= @GENDER[neuter] @NUMBER[singular] <noun-stem>
+
+<noun-plural> ::= @NUMBER[plural] <noun-stem> <plural-suffix>
+
+<plural-suffix> ::= "en" | "s" | "'s"
+
+/* Diminutives (unique Dutch feature) */
+<diminutive-noun> ::= @GENDER[neuter] <noun-stem> <diminutive-suffix>
+
+<diminutive-suffix> ::= "je" | "tje" | "pje" | "kje" | "etje"
+
+<noun-stem> ::= /[a-zäëïöü]+/
+
+<proper-noun> ::= /[A-ZÄËÏÖÜ][a-zäëïöü]*/
+
+/* Adjectives with agreement */
+<adjective-phrase> ::= <adjective>
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+<adjective-positive> ::= @DEGREE[positive] ( <adjective-inflected> | <adjective-uninflected> )
+
+<adjective-inflected> ::= <adjective-stem> "e"
+
+<adjective-uninflected> ::= <adjective-stem>
+
+<adjective-comparative> ::= @DEGREE[comparative] ( <adjective-stem> "er" | "meer" <opt-whitespace> <adjective-stem> )
+
+<adjective-superlative> ::= @DEGREE[superlative] ( <adjective-stem> "st" | "meest" <opt-whitespace> <adjective-stem> )
+
+<adjective-stem> ::= /[a-zäëïöü]+/
+
+/* Verb phrases */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <separable-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb>
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+
+/* Present tense */
+<verb-present> ::= @TENSE[present] ( <regular-present> | <irregular-present> )
+
+<regular-present> ::= <verb-stem> | <verb-stem> "t" | <verb-stem> "en"
+
+/* Past tense - strong and weak verbs */
+<verb-past> ::= @TENSE[past] ( <weak-past> | <strong-past> )
+
+<weak-past> ::= <verb-stem> "te" | <verb-stem> "de" | <verb-stem> "ten" | <verb-stem> "den"
+
+<strong-past> ::= @IRREGULAR <irregular-past-form>
+
+<irregular-past-form> ::= /[a-zäëïöü]+/
+
+/* Compound tenses with hebben/zijn */
+<compound-verb-phrase> ::= <auxiliary-verb> <opt-whitespace> <past-participle>
+
+<auxiliary-verb> ::= <hebben-form> | <zijn-form>
+
+<hebben-form> ::= "heb" | "hebt" | "heeft" | "hebben" | "had" | "hadden"
+
+<zijn-form> ::= "ben" | "bent" | "is" | "zijn" | "was" | "waren"
+
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle>
+
+<regular-past-participle> ::= "ge" <verb-stem> "t" | "ge" <verb-stem> "d"
+
+<irregular-past-participle> ::= @IRREGULAR "ge" <verb-stem> "en" | <irregular-participle-form>
+
+<irregular-participle-form> ::= /[a-zäëïöü]+/
+
+/* Separable prefix verbs (unique feature) */
+<separable-verb-phrase> ::= <finite-verb> <opt-whitespace> <middle-field>? <opt-whitespace> <separable-prefix>
+
+<separable-prefix> ::= "aan" | "af" | "bij" | "in" | "mee" | "na" | "om" | "op" | "over" | "toe" | "uit" | "voor"
+
+<infinitive> ::= <verb-stem> "en" | "te" <opt-whitespace> <verb-stem> "en"
+
+/* Irregular verbs */
+<irregular-present> ::= @IRREGULAR ( "ben" | "bent" | "is" | "zijn" /* zijn */
+                    | "heb" | "hebt" | "heeft" | "hebben" /* hebben */
+                    | "kan" | "kunt" | "kan" | "kunnen" /* kunnen */
+                    | "mag" | "mag" | "mogen" /* mogen */
+                    | "moet" | "moeten" /* moeten */
+                    | "wil" | "wilt" | "wil" | "willen" /* willen */
+                    | "zal" | "zult" | "zal" | "zullen" /* zullen */
+                    | "ga" | "gaat" | "gaan" /* gaan */
+                    | "kom" | "komt" | "komen" /* komen */
+                    | "doe" | "doet" | "doen" /* doen */
+                    | "zie" | "ziet" | "zien" /* zien */
+                    | "geef" | "geeft" | "geven" ) /* geven */
+
+<verb-stem> ::= /[a-zäëïöü]+/
+
+/* Object */
+<object> ::= <direct-object> | <indirect-object>
+
+<direct-object> ::= <noun-phrase>
+                 | <object-pronoun>
+                 | <clause-object>
+
+<indirect-object> ::= "aan" <opt-whitespace> <noun-phrase>
+                   | <object-pronoun>
+
+<clause-object> ::= <that-clause> | <wh-clause>
+
+<that-clause> ::= "dat" <opt-whitespace> <subordinate-content>
+
+<wh-clause> ::= <interrogative-clause-embedded>
+
+<interrogative-clause-embedded> ::= <question-word> <opt-whitespace> <subordinate-content>
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+             | <adverb-clause>
+
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb>
+
+<time-adverb> ::= "nu" | "vandaag" | "gisteren" | "morgen" | "altijd" | "nooit" | "soms" | "vaak" | "vroeg" | "laat"
+
+<place-adverb> ::= "hier" | "daar" | "overal" | "nergens" | "thuis" | "binnen" | "buiten" | "boven" | "beneden"
+
+<manner-adverb> ::= "goed" | "slecht" | "snel" | "langzaam" | "gemakkelijk" | "moeilijk"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+
+<preposition> ::= "aan" | "achter" | "bij" | "binnen" | "buiten" | "door" | "in" | "met" | "na" | "naar" | "om" | "onder" | "op" | "over" | "tegen" | "tot" | "uit" | "van" | "voor" | "zonder"
+
+/* Adverb clauses */
+<adverb-clause> ::= <temporal-clause>
+                 | <causal-clause>
+                 | <conditional-clause>
+
+<temporal-clause> ::= <temporal-conjunction> <opt-whitespace> <subordinate-content>
+
+<temporal-conjunction> ::= "wanneer" | "toen" | "als" | "terwijl" | "nadat" | "voordat" | "totdat"
+
+<causal-clause> ::= <causal-conjunction> <opt-whitespace> <subordinate-content>
+
+<causal-conjunction> ::= "omdat" | "want" | "aangezien" | "doordat"
+
+<conditional-clause> ::= <conditional-conjunction> <opt-whitespace> <subordinate-content>
+
+<conditional-conjunction> ::= "als" | "indien" | "tenzij"
+
+/* Subordinate clauses with SOV word order */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<subordinating-conjunction> ::= <temporal-conjunction>
+                             | <causal-conjunction>
+                             | <conditional-conjunction>
+                             | "dat"
+
+<subordinate-content> ::= <subject>? <opt-whitespace> <middle-field>? <opt-whitespace> <verb-phrase-subordinate>
+
+<verb-phrase-subordinate> ::= ( <adverb>? <opt-whitespace> )* <finite-verb>
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "en" | "of" | "maar" | "want" | "dus"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <yes-no-question> | <wh-question>
+
+<yes-no-question> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <object>? "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+<question-word> ::= "wie" | "wat" | "waar" | "wanneer" | "waarom" | "hoe" | "welke" | "hoeveel"
+
+/* Imperative clauses */
+<imperative-clause> ::= <verb-stem> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+/* Negation */
+<negation> ::= "niet" | "geen" | "nooit" | "niemand" | "niets"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER
+    THEN VALID
+    ELSE ERROR "Article and noun must agree in gender"
+
+@CONTEXT_RULE[adjective-inflection]:
+    IF <noun>.@DEFINITENESS == definite OR <noun>.@NUMBER == plural
+    THEN <adjective> MUST BE <adjective-inflected>
+    ELSE <adjective> MUST BE <adjective-uninflected>
+
+@CONTEXT_RULE[v2-word-order]:
+    IF <main-clause> CONTAINS <finite-verb> AT_POSITION 2
+    THEN VALID
+    ELSE WARNING "Main clause should have verb in second position (V2)"
+
+@CONTEXT_RULE[sov-subordinate]:
+    IF <subordinate-clause>
+    THEN <finite-verb> MUST BE FINAL
+    ELSE WARNING "Subordinate clause should have verb-final order (SOV)"
+
+@CONTEXT_RULE[diminutive-gender]:
+    IF <noun> IS <diminutive-noun>
+    THEN <noun>.@GENDER MUST BE neuter
+    ELSE VALID
+
+@CONTEXT_RULE[separable-prefix-position]:
+    IF <verb> HAS <separable-prefix>
+    THEN <separable-prefix> MUST BE sentence-final IN <main-clause>
+    ELSE VALID
+
+@CONTEXT_RULE[auxiliary-selection]:
+    IF <verb> IS intransitive-motion OR <verb> IS state-change
+    THEN <auxiliary-verb> SHOULD BE "zijn"
+    ELSE <auxiliary-verb> SHOULD BE "hebben"
+
+@CONTEXT_RULE[past-participle-prefix]:
+    IF <verb> HAS inseparable-prefix
+    THEN <past-participle> NO "ge-" PREFIX
+    ELSE <past-participle> HAS "ge-" PREFIX

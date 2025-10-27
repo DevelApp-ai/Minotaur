@@ -1,0 +1,121 @@
+# Dutch Language Example Sentences
+
+## Present Tense
+
+Ik werk.
+Jij werkt.
+Hij werkt.
+Zij werkt.
+Wij werken.
+Jullie werken.
+Zij werken.
+
+## Past Tense - Weak Verbs
+
+Ik werkte.
+Jij werkte.
+Hij werkte.
+Wij werkten.
+Jullie werkten.
+Zij werkten.
+
+## Past Tense - Strong Verbs
+
+Ik kwam.
+Jij kwam.
+Hij kwam.
+Wij kwamen.
+Jullie kwamen.
+Zij kwamen.
+
+## Perfect Tense
+
+Ik heb gewerkt.
+Jij hebt gewerkt.
+Hij heeft gewerkt.
+Wij hebben gewerkt.
+Jullie hebben gewerkt.
+Zij hebben gewerkt.
+
+## Irregular Verb: zijn (to be)
+
+Ik ben.
+Jij bent.
+Hij is.
+Wij zijn.
+Jullie zijn.
+Zij zijn.
+
+Ik was.
+Jij was.
+Hij was.
+Wij waren.
+Jullie waren.
+Zij waren.
+
+## Irregular Verb: hebben (to have)
+
+Ik heb.
+Jij hebt.
+Hij heeft.
+Wij hebben.
+Jullie hebben.
+Zij hebben.
+
+## V2 Word Order
+
+Ik werk vandaag.
+Vandaag werk ik.
+Hij komt morgen.
+Morgen komt hij.
+
+## SOV in Subordinate Clauses
+
+Ik denk dat hij komt.
+Ik weet dat zij werkt.
+omdat ik ziek ben
+als hij morgen komt
+
+## Separable Prefix Verbs
+
+Ik bel je op.
+Hij komt mee.
+Zij gaat uit.
+Wij staan op.
+
+## Diminutives
+
+het boek → het boekje
+de tafel → het tafeltje
+het huis → het huisje
+de kat → het katje
+
+## Articles - Common Gender
+
+de man
+de vrouw
+de tafel
+de kat
+
+## Articles - Neuter Gender
+
+het huis
+het kind
+het boek
+het water
+
+## Questions
+
+Werk je?
+Komt hij?
+Werkt zij?
+Gaan jullie mee?
+
+## Wh-Questions
+
+Wie ben je?
+Wat doe je?
+Waar woon je?
+Wanneer kom je?
+Waarom werk je?
+Hoe heet je?
