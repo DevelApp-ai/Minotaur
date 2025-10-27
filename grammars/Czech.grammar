@@ -27,11 +27,46 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
             | <subordinate-clause>
             | <compound-sentence>
             | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <split-complex-sentence>
+            | <passive-sentence>
 
 /* Main clause with flexible word order */
 <main-clause> ::= <declarative-clause>
                | <interrogative-clause>
                | <imperative-clause>
+               | <exclamative-clause>
+
+/* Multi-embedded and complex structures */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> <opt-whitespace> <subordinate-clause>
+
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+/* Passive voice constructions */
+<passive-sentence> ::= <passive-clause> <opt-whitespace> <agent-phrase>? <opt-whitespace> <punctuation>?
+
+<passive-clause> ::= <subject> <opt-whitespace> <passive-verb-phrase> <opt-whitespace> <adverbial>*
+
+<passive-verb-phrase> ::= <být-auxiliary> <opt-whitespace> <past-participle>
+                       | <reflexive-passive>
+
+<být-auxiliary> ::= "je" | "byl" | "byla" | "bylo" | "jsou" | "byli" | "byly" | "bude" | "budou"
+
+<past-participle> ::= <participle-stem> <participle-ending>
+
+<participle-stem> ::= <verb-stem>
+
+<participle-ending> ::= @GENDER[masculine] @NUMBER[singular] ( "" | "ý" )
+                     | @GENDER[feminine] @NUMBER[singular] "á"
+                     | @GENDER[neuter] @NUMBER[singular] "é"
+                     | @NUMBER[plural] ( "é" | "í" )
+
+<reflexive-passive> ::= <verb-phrase> <opt-whitespace> "se"
+
+<agent-phrase> ::= @CASE[instrumental] <noun-phrase>
+
+<exclamative-clause> ::= "jak" <opt-whitespace> <adjective> <opt-whitespace> <subject>? "!"
+                      | "co" <opt-whitespace> "za" <opt-whitespace> <noun-phrase> "!"
 
 <declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
                       | <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
@@ -142,6 +177,12 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
                      | "vím" | "víš" | "ví" | "víme" | "víte" | "vědí" /* vědět */
                      | "dám" | "dáš" | "dá" | "dáme" | "dáte" | "dají" /* dát */
                      | "vezmu" | "vezmeš" | "vezme" | "vezmeme" | "vezmete" | "vezmou" /* vzít */
+                     | "jím" | "jíš" | "jí" | "jíme" | "jíte" | "jedí" /* jíst */
+                     | "jdu" | "jdeš" | "jde" | "jdeme" | "jdete" | "jdou" /* jít */
+                     | "píšu" | "píšeš" | "píše" | "píšeme" | "píšete" | "píšou" /* psát */
+                     | "čtu" | "čteš" | "čte" | "čteme" | "čtete" | "čtou" /* číst */
+                     | "dělám" | "děláš" | "dělá" | "děláme" | "děláte" | "dělají" /* dělat */
+                     | "mluvím" | "mluvíš" | "mluví" | "mluvíme" | "mluvíte" | "mluví" /* mluvit */
 
 /* Past tense with gender agreement */
 <verb-past> ::= @TENSE[past] <past-conjugation>
@@ -175,13 +216,34 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
 
 /* Compound verb phrases */
 <compound-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+                        | <aspectual-periphrastic>
+
+/* Aspectual periphrastic constructions */
+<aspectual-periphrastic> ::= <ingressive-construction>
+                          | <continuative-construction>
+                          | <terminative-construction>
+
+<ingressive-construction> ::= ( "začít" | "začínat" | "zahájit" ) <opt-whitespace> <infinitive>
+
+<continuative-construction> ::= ( "pokračovat" | "dál" ) <opt-whitespace> <infinitive>
+
+<terminative-construction> ::= ( "skončit" | "přestat" | "ukončit" ) <opt-whitespace> <infinitive>
 
 <modal-verb> ::= "mohu" | "můžeš" | "může" | "můžeme" | "můžete" | "mohou"
               | "chci" | "chceš" | "chce" | "chceme" | "chcete" | "chtějí"
               | "musím" | "musíš" | "musí" | "musíme" | "musíte" | "musí"
               | "smím" | "smíš" | "smí" | "smíme" | "smíte" | "smějí"
+              | "mám" | "máš" | "má" | "máme" | "máte" | "mají"
 
 <modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+
+/* Conditional sentences */
+<conditional-sentence> ::= <simple-conditional>
+                        | <contrary-to-fact-conditional>
+
+<simple-conditional> ::= "jestli" <opt-whitespace> <declarative-clause> <opt-whitespace> "," <opt-whitespace> <declarative-clause>
+
+<contrary-to-fact-conditional> ::= "kdyby" <opt-whitespace> <verb-past> <opt-whitespace> "," <opt-whitespace> <verb-conditional> <opt-whitespace> <object>?
 
 <verb-stem> ::= /[a-záčďéěíňóřšťúůýž]+/
 
@@ -325,3 +387,30 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
     IF <vowel> IS short OR <vowel> IS long
     THEN AFFECTS <word-stress> AND <syllable-weight>
     ELSE VALID /* á vs a, é vs e, í vs i, ó vs o, ú/ů vs u, ý vs y */
+
+@CONTEXT_RULE[passive-agent-case]:
+    IF <passive-sentence> CONTAINS <agent-phrase>
+    THEN <agent-phrase>.@CASE MUST BE instrumental
+    ELSE VALID
+
+@CONTEXT_RULE[reflexive-passive-no-agent]:
+    IF <passive-verb-phrase> IS <reflexive-passive>
+    THEN <sentence> SHOULD_NOT_CONTAIN <agent-phrase>
+    ELSE VALID
+
+@CONTEXT_RULE[participle-agreement]:
+    IF <passive-verb-phrase> CONTAINS <past-participle>
+    THEN <past-participle>.@GENDER == <subject>.@GENDER AND <past-participle>.@NUMBER == <subject>.@NUMBER
+    ELSE VALID
+
+@CONTEXT_RULE[conditional-tense-agreement]:
+    IF <sentence> IS <contrary-to-fact-conditional>
+    THEN <protasis> USES past-tense AND <apodosis> USES conditional
+    ELSE VALID
+
+@CONTEXT_RULE[aspectual-verb-selection]:
+    IF <aspectual-periphrastic> IS <ingressive-construction>
+    THEN <infinitive> SHOULD_BE imperfective
+    ELSE IF <aspectual-periphrastic> IS <terminative-construction>
+    THEN <infinitive> CAN_BE perfective OR imperfective
+    ELSE VALID

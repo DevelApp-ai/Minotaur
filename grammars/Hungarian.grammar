@@ -25,11 +25,37 @@ Keywords: és, vagy, de, hanem, hogy, aki, ami, amely, amelyik, ki, mi, mikor, h
             | <subordinate-clause>
             | <compound-sentence>
             | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <split-complex-sentence>
+            | <passive-sentence>
 
 /* Main clause - Topic-Comment structure */
 <main-clause> ::= <declarative-clause>
                | <interrogative-clause>
                | <imperative-clause>
+               | <exclamative-clause>
+
+/* Multi-embedded and complex structures */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> <opt-whitespace> <subordinate-clause>
+
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+/* Passive voice constructions */
+<passive-sentence> ::= <passive-clause> <opt-whitespace> <agent-phrase>? <opt-whitespace> <punctuation>?
+
+<passive-clause> ::= <subject> <opt-whitespace> <passive-verb-phrase> <opt-whitespace> <adverbial>*
+
+<passive-verb-phrase> ::= <verb-phrase> <opt-whitespace> ( "-ik" | "-odik" | "-edik" | "-ödik" )
+                       | <participle-construction>
+
+<participle-construction> ::= "van" <opt-whitespace> <past-participle>
+
+<past-participle> ::= <verb-stem> ( "t" | "tt" | "ott" | "ett" | "ött" )
+
+<agent-phrase> ::= @CASE[ablative] <noun-phrase-with-suffix> /* "által" postposition or ablative case */
+
+<exclamative-clause> ::= "milyen" <opt-whitespace> <adjective> <opt-whitespace> <subject>? "!"
+                      | "micsoda" <opt-whitespace> <noun-phrase> "!"
 
 <declarative-clause> ::= <topic>? <opt-whitespace> <subject>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <verb-phrase> <opt-whitespace> <punctuation>?
 
@@ -212,6 +238,10 @@ Keywords: és, vagy, de, hanem, hogy, aki, ami, amely, amelyik, ki, mi, mikor, h
 <irregular-present> ::= "vagyok" | "vagy" | "van" | "vagyunk" | "vagytok" | "vannak" /* lenni */
                      | "megyek" | "mész" | "megy" | "megyünk" | "mentek" | "mennek" /* menni */
                      | "jövök" | "jössz" | "jön" | "jövünk" | "jöttök" | "jönnek" /* jönni */
+                     | "eszem" | "eszel" | "eszik" | "eszünk" | "esztek" | "esznek" /* enni */
+                     | "iszom" | "iszol" | "iszik" | "iszunk" | "isztok" | "isznak" /* inni */
+                     | "veszek" | "veszel" | "vesz" | "veszünk" | "vesztek" | "vesznek" /* venni */
+                     | "teszek" | "teszel" | "tesz" | "teszünk" | "tesztek" | "tesznek" /* tenni */
 
 /* Past tense */
 <verb-past> ::= @TENSE[past] <past-conjugation>
@@ -236,8 +266,28 @@ Keywords: és, vagy, de, hanem, hogy, aki, ami, amely, amelyik, ki, mi, mikor, h
 
 /* Compound verb phrases */
 <compound-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+                        | <aspectual-periphrastic>
 
-<modal-verb> ::= "akar" | "tud" | "kell" | "szabad" | "lehet"
+/* Aspectual periphrastic constructions */
+<aspectual-periphrastic> ::= <ingressive-construction>
+                          | <continuative-construction>
+                          | <terminative-construction>
+
+<ingressive-construction> ::= ( "kezd" | "elkezd" ) <opt-whitespace> <infinitive>
+
+<continuative-construction> ::= ( "folytat" | "tovább" ) <opt-whitespace> <infinitive>
+
+<terminative-construction> ::= ( "befejez" | "abbahagy" ) <opt-whitespace> <infinitive>
+
+<modal-verb> ::= "akar" | "tud" | "kell" | "szabad" | "lehet" | "mer" | "szokott"
+
+/* Conditional sentences */
+<conditional-sentence> ::= <simple-conditional>
+                        | <contrary-to-fact-conditional>
+
+<simple-conditional> ::= "ha" <opt-whitespace> <declarative-clause> <opt-whitespace> "," <opt-whitespace> <declarative-clause>
+
+<contrary-to-fact-conditional> ::= "ha" <opt-whitespace> <verb-past> <opt-whitespace> "volna" <opt-whitespace> "," <opt-whitespace> <verb-conditional>
 
 <verb-stem> ::= /[a-záéíóöőúüű]+/
 
@@ -360,4 +410,29 @@ Keywords: és, vagy, de, hanem, hogy, aki, ami, amely, amelyik, ki, mi, mikor, h
 @CONTEXT_RULE[agglutination-phonetic]:
     IF <suffix> ATTACHES_TO <stem>
     THEN APPLY <vowel-harmony> AND <consonant-assimilation>
+    ELSE VALID
+
+@CONTEXT_RULE[passive-participle]:
+    IF <passive-verb-phrase> IS <participle-construction>
+    THEN USES "van" + <past-participle>
+    ELSE VALID
+
+@CONTEXT_RULE[passive-suffix]:
+    IF <passive-verb-phrase> CONTAINS suffix
+    THEN USES "-ik" OR "-odik" OR "-edik" OR "-ödik" WITH <vowel-harmony>
+    ELSE VALID
+
+@CONTEXT_RULE[conditional-volna]:
+    IF <sentence> IS <contrary-to-fact-conditional>
+    THEN <protasis> USES "volna" AND <apodosis> USES conditional
+    ELSE VALID
+
+@CONTEXT_RULE[aspectual-infinitive]:
+    IF <aspectual-periphrastic> PRESENT
+    THEN REQUIRES <infinitive>
+    ELSE VALID
+
+@CONTEXT_RULE[modal-infinitive]:
+    IF <modal-verb> PRESENT
+    THEN REQUIRES <infinitive>
     ELSE VALID
