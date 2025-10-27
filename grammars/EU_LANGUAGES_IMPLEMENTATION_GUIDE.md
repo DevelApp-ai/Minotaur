@@ -21,7 +21,7 @@ This document provides a comprehensive guide for implementing the remaining 13 E
 | **Dutch** | **348** | Germanic | ✅ **NEW - Complete** |
 | Swedish | 269+ | Germanic | ✅ Complete |
 
-### 📋 Remaining Languages (14/24)
+### 📋 Remaining Languages (13/24)
 
 | Language | Country | Family | Unique Features | Est. Lines |
 |----------|---------|--------|-----------------|------------|
@@ -38,9 +38,8 @@ This document provides a comprehensive guide for implementing the remaining 13 E
 | Estonian | Estonia | Uralic (Finnic) | 14 cases, no grammatical gender, gradation | 1,000-1,200 |
 | Irish (Gaelic) | Ireland | Celtic | VSO word order, initial mutations, two genders | 800-1,000 |
 | Maltese | Malta | Semitic | Triconsonantal roots, VSO, Arabic + Romance | 800-1,000 |
-| English | Ireland, Malta | Germanic | Already widely documented | N/A |
 
-**Note**: English is already extensively documented and does not require a custom grammar for this project.
+**Note**: English is also an official EU language (Ireland, Malta) but is already extensively documented globally and does not require a custom grammar for this project. Total EU official languages: 24. After excluding English: 23 languages, with 10 complete and 13 remaining.
 
 ## Implementation Pattern
 
@@ -335,4 +334,5 @@ All grammar files are part of the Minotaur project and licensed under AGPL-3.0.
 
 **Document Version**: 1.0  
 **Last Updated**: 2025-10-27  
-**Status**: 10/24 EU languages complete, 13 remaining (English excluded as well-documented)
+**Status**: 10 of 23 implementation-required EU languages complete (43%), 13 remaining  
+**Note**: English is the 24th official EU language but is excluded from this implementation as it is already extensively documented worldwide
