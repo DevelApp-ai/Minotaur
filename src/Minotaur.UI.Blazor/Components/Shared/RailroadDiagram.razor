@@ -1,4 +1,6 @@
 @* Railroad Diagram Component for Grammar Visualization *@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
 
 <div class="railroad-diagram-container">
     @if (!string.IsNullOrEmpty(RuleName) && !string.IsNullOrEmpty(RuleDefinition))
@@ -17,7 +19,7 @@
         
         <div class="diagram-canvas" @ref="diagramRef">
             @* SVG Railroad Diagram will be rendered here *@
-            <svg width="100%" height="@(DiagramHeight)px" class="railroad-svg">
+            <svg id="railroad-diagram-svg" width="100%" height="@(DiagramHeight)px" class="railroad-svg">
                 @((MarkupString)GenerateSVGDiagram())
             </svg>
         </div>
@@ -220,16 +222,33 @@
     
     private async Task ExportSVG()
     {
-        // Export functionality - can be implemented with JS interop
-        await Task.CompletedTask;
-        // TODO: Implement SVG export
+        // Export SVG by downloading the SVG content
+        var svgContent = GenerateCompleteSVG();
+        var fileName = $"{RuleName}_railroad_diagram.svg";
+        
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "image/svg+xml", svgContent);
     }
     
     private async Task ExportPNG()
     {
-        // Export functionality - can be implemented with JS interop
-        await Task.CompletedTask;
-        // TODO: Implement PNG export
+        // Export PNG by converting SVG to PNG using canvas
+        var fileName = $"{RuleName}_railroad_diagram.png";
+        await JSRuntime.InvokeVoidAsync("exportSvgToPng", "railroad-diagram-svg", fileName);
+    }
+    
+    private string GenerateCompleteSVG()
+    {
+        // Generate a complete standalone SVG file with XML declaration and proper dimensions
+        var svgContent = GenerateSVGDiagram();
+        
+        return $@"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?>
+<svg xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" 
+     width=""100%"" height=""{DiagramHeight}px"" viewBox=""0 0 800 {DiagramHeight}"">
+  <title>Railroad Diagram: {System.Web.HttpUtility.HtmlEncode(RuleName)}</title>
+  <desc>Railroad diagram for grammar rule: {System.Web.HttpUtility.HtmlEncode(RuleName)}</desc>
+  <rect width=""100%"" height=""100%"" fill=""#f8f9fa""/>
+  {svgContent}
+</svg>";
     }
     
     private class DiagramComponent

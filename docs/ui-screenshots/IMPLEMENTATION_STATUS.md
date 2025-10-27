@@ -7,7 +7,7 @@ This document tracks the implementation progress of the three-phase visualizatio
 ## Phase 1: Grammar Visualization (Q1)
 
 ### Railroad Diagrams
-**Status:** 🟡 In Progress (60% Complete)  
+**Status:** 🟡 In Progress (75% Complete)  
 **Target:** Q1 2025  
 **Priority:** High
 
@@ -15,43 +15,49 @@ This document tracks the implementation progress of the three-phase visualizatio
 - [x] Basic SVG railroad diagram generation
 - [x] Integration into Grammar Editor UI (new "Diagram" tab)
 - [x] RailroadDiagram.razor component created
-- [x] **NEW**: Enhanced parser with support for ?, *, + modifiers
-- [x] **NEW**: Visual representation of optional elements (?)
-- [x] **NEW**: Visual representation of repetition elements (*, +)
-- [x] **NEW**: Hover effects on non-terminal references
+- [x] Enhanced parser with support for ?, *, + modifiers
+- [x] Visual representation of optional elements (?)
+- [x] Visual representation of repetition elements (*, +)
+- [x] Hover effects on non-terminal references
+- [x] **NEW**: SVG export functionality (download SVG files)
+- [x] **NEW**: PNG export functionality (download PNG images)
 - [ ] ANTLR/EBNF grammar parser (using enhanced simple parser for now)
 - [ ] Click-to-navigate between related rules
 - [ ] Real-time diagram updates on grammar edit
-- [x] Export button UI (backend not yet implemented)
 
 **Completed:**
 - ✅ Created `Components/Shared/RailroadDiagram.razor` component
 - ✅ Added "Diagram" tab to Grammar Editor
 - ✅ Basic SVG generation for terminals and non-terminals
 - ✅ Visual distinction between terminals (blue) and non-terminals (orange)
-- ✅ Export button placeholders (SVG/PNG)
-- ✅ **NEW**: Support for optional elements with bypass paths
-- ✅ **NEW**: Support for repetition with loop-back visualization
-- ✅ **NEW**: Enhanced parser recognizing ?, *, + modifiers
-- ✅ **NEW**: Different visual styles for optional (purple) and repeat (green) elements
-- ✅ **NEW**: Hover effects for better UX
+- ✅ Support for optional elements with bypass paths
+- ✅ Support for repetition with loop-back visualization
+- ✅ Enhanced parser recognizing ?, *, + modifiers
+- ✅ Different visual styles for optional (purple) and repeat (green) elements
+- ✅ Hover effects for better UX
+- ✅ **NEW**: JavaScript interop for file downloads
+- ✅ **NEW**: SVG export with proper XML structure
+- ✅ **NEW**: PNG export using canvas conversion
+- ✅ **NEW**: railroad-diagram.js utility functions
 
 **Implementation Plan:**
 1. ✅ Create RailroadDiagram.razor component
 2. ✅ Add diagram panel to Grammar Editor
 3. ✅ Enhance grammar parser (improved with modifier support)
-4. ⏳ Implement click-to-navigate between rules
-5. ⏳ Implement export functionality (SVG/PNG download)
+4. ✅ Implement export functionality (SVG/PNG download)
+5. ⏳ Implement click-to-navigate between rules
 6. ⏳ Add real-time diagram updates
 
 **Dependencies:**
 - Grammar parsing library (enhanced implementation working)
 - SVG generation library (native C# implementation working)
 - UI component integration (✅ completed)
+- JavaScript interop (✅ completed)
 
 **Screenshots:**
 ![Railroad Diagram Implementation](12_Grammar_Editor_Railroad_Diagram.png)
 ![Enhanced Railroad Diagram with Modifiers](13_Enhanced_Railroad_Diagram.png)
+![Railroad Diagram Export Functionality](14_Railroad_Diagram_Export.png)
 
 ---
 
@@ -218,7 +224,7 @@ This document tracks the implementation progress of the three-phase visualizatio
 
 | Phase | Status | Progress | Target | Notes |
 |-------|--------|----------|--------|-------|
-| Phase 1 | 🟡 In Progress | 30% | Q1 2025 | Railroad diagrams 60%, Syntax tree 0% |
+| Phase 1 | 🟡 In Progress | 38% | Q1 2025 | Railroad diagrams 75%, Syntax tree 0% |
 | Phase 2 | 🟡 Partial | 20% | Q2 2025 | UI framework only |
 | Phase 3 | 🔴 Not Started | 5% | Q3 2025 | Basic UI only |
 
