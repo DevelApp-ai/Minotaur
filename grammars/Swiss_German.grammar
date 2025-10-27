@@ -491,3 +491,895 @@ Keywords: und, oder, aber, wenn, weil, dass, als, ob, wie, der, die, das, ein, e
     IF <verb-tense> == "preterite" AND <context> == "spoken"
     THEN WARNING "Swiss German strongly prefers perfect tense over preterite in spoken language"
     ELSE VALID
+
+/* Extended Swiss regional variations (Zurich, Bern, Basel, St. Gallen, Graubünden, Ticino influences) */
+@SWISS[zurich]            /* Züritüütsch */
+@SWISS[bern]              /* Bärndütsch */
+@SWISS[basel]             /* Baseldütsch */
+@SWISS[st_gallen]         /* St. Galler Deutsch */
+@SWISS[graubunden]        /* Bündnerdeutsch */
+@SWISS[ticino_influenced] /* Ticino German (Italian influence) */
+
+/* Extended Swiss negation with regional variations */
+<swiss-negation> ::= <standard-negation> | <swiss-dialect-negation>
+
+<swiss-dialect-negation> ::= @SWISS[zurich] ( "nöd" | "nüd" | "nie" | "niemer" | "nüüt" )
+                          | @SWISS[bern] ( "nid" | "nie" | "niemer" | "nüt" )
+                          | @SWISS[basel] ( "nid" | "nie" | "niemer" | "nyt" )
+                          | @SWISS[st_gallen] ( "nöd" | "nie" | "niemer" | "nüüt" )
+                          | @SWISS[graubunden] ( "nid" | "nie" | "niemer" | "nit" )
+
+/* Extended Swiss pronouns with regional variations */
+<swiss-pronoun-nominative> ::= @SWISS[zurich] ( "ich" | "du" | "er" | "si" | "es" | "mir" | "ihr" | "si" )
+                            | @SWISS[bern] ( "i" | "du" | "er" | "si" | "es" | "mir" | "dir" | "si" )
+                            | @SWISS[basel] ( "i" | "du" | "är" | "si" | "es" | "mir" | "ihr" | "si" )
+                            | @SWISS[st_gallen] ( "ich" | "du" | "er" | "si" | "es" | "mir" | "ihr" | "si" )
+
+<swiss-pronoun-accusative> ::= @SWISS[zurich] ( "mich" | "dich" | "ihn" | "si" | "es" | "üüs" | "euch" | "si" )
+                            | @SWISS[bern] ( "mi" | "di" | "ihn" | "si" | "es" | "üs" | "öi" | "si" )
+                            | @SWISS[basel] ( "mi" | "di" | "ihn" | "si" | "es" | "ys" | "euch" | "si" )
+
+<swiss-pronoun-dative> ::= @SWISS[zurich] ( "mir" | "dir" | "ihm" | "ihre" | "ihm" | "üüs" | "euch" | "ihne" )
+                        | @SWISS[bern] ( "mir" | "dir" | "ihm" | "ihre" | "ihm" | "üs" | "öi" | "ne" )
+                        | @SWISS[basel] ( "mir" | "dir" | "em" | "r" | "em" | "ys" | "euch" | "ne" )
+
+/* Extended Swiss verbs with regional variations */
+<swiss-verb-haben> ::= @SWISS[zurich] ( "han" | "häsch" | "hät" | "händ" | "händ" | "händ" )
+                    | @SWISS[bern] ( "ha" | "häsch" | "hät" | "hei" | "heit" | "hei" )
+                    | @SWISS[basel] ( "ha" | "häsch" | "het" | "hän" | "hän" | "hän" )
+                    | @SWISS[st_gallen] ( "han" | "häsch" | "hät" | "händ" | "händ" | "händ" )
+
+<swiss-verb-sein> ::= @SWISS[zurich] ( "bin" | "bisch" | "isch" | "sind" | "sind" | "sind" )
+                   | @SWISS[bern] ( "bi" | "bisch" | "isch" | "si" | "seid" | "si" )
+                   | @SWISS[basel] ( "bi" | "bisch" | "isch" | "si" | "si" | "si" )
+                   | @SWISS[st_gallen] ( "bin" | "bisch" | "isch" | "sind" | "sind" | "sind" )
+
+<swiss-verb-werden> ::= @SWISS[zurich] ( "wird" | "wirsch" | "wird" | "werded" | "werded" | "werded" )
+                     | @SWISS[bern] ( "wirde" | "wirsch" | "wird" | "werded" | "werded" | "werded" )
+                     | @SWISS[basel] ( "wärde" | "wirsch" | "wird" | "wärded" | "wärded" | "wärded" )
+
+<swiss-verb-gehen> ::= @SWISS[zurich] ( "gang" | "gaasch" | "gaat" | "gönd" | "gönd" | "gönd" )
+                    | @SWISS[bern] ( "gange" | "gasch" | "geit" | "gö" | "göit" | "gö" )
+                    | @SWISS[basel] ( "gang" | "gaisch" | "gait" | "göhn" | "göhn" | "göhn" )
+
+<swiss-verb-kommen> ::= @SWISS[zurich] ( "chumm" | "chunnsch" | "chunnt" | "chömed" | "chömed" | "chömed" )
+                     | @SWISS[bern] ( "chumme" | "chunsch" | "chunnt" | "chöme" | "chömet" | "chöme" )
+                     | @SWISS[basel] ( "kumm" | "kunnsch" | "kunnt" | "kömmed" | "kömmed" | "kömmed" )
+
+<swiss-verb-machen> ::= @SWISS[zurich] ( "mach" | "machsch" | "macht" | "mached" | "mached" | "mached" )
+                     | @SWISS[bern] ( "mache" | "machsch" | "macht" | "mache" | "machet" | "mache" )
+                     | @SWISS[basel] ( "mach" | "machsch" | "macht" | "mached" | "mached" | "mached" )
+
+/* Swiss perfect tense constructions (strongly preferred) */
+<swiss-perfect-extended> ::= <swiss-verb-haben> <opt-whitespace> <swiss-participle>
+                          | <swiss-verb-sein> <opt-whitespace> <swiss-participle>
+
+<swiss-participle> ::= @SWISS[zurich] ( "gmacht" | "gsi" | "gha" | "ggange" | "cho" )
+                    | @SWISS[bern] ( "gmacht" | "gsi" | "gha" | "gange" | "cho" )
+                    | @SWISS[basel] ( "gmacht" | "gsi" | "kha" | "gangä" | "ko" )
+
+/* Extended Swiss vocabulary - Transportation */
+<swiss-transport-extended> ::= @SWISS[vocabulary] ( "Velo" | "Töff" | "Töffli" | "Tram" | "Tramli" | "Bus" | "Postauto" | "SBB" | "Bahn" | "Zügli" | "Schiff" | "Fähre" | "Gondelbahn" | "Seilbahn" | "Bergbahn" )
+
+/* Extended Swiss vocabulary - Food and Dining */
+<swiss-food-extended> ::= @SWISS[vocabulary] ( "Rösti" | "Fondue" | "Raclette" | "Älplermagronen" | "Birchermüesli" | "Müesli" | "Zopf" | "Weggli" | "Brötli" | "Gipfeli" | "Rüebli" | "Rüeblitorte" | "Chuchichäschtli" | "Anken" | "Zückerli" | "Guetzli" | "Schoggi" | "Schokolade" | "Nussgipfel" | "Mandelgipfel" | "Buttergipfel" )
+
+/* Extended Swiss vocabulary - Beverages */
+<swiss-beverage-extended> ::= @SWISS[vocabulary] ( "Kaffee" | "Schümli" | "Kafi" <opt-whitespace> "Crème" | "Kafi" <opt-whitespace> "Lutz" | "Milchkaffee" | "Espresso" | "Rivella" | "Ovomaltine" | "Ovo" | "Most" | "Apfelmost" | "Cidre" | "Weisswein" | "Rotwein" | "Bier" | "Stange" | "Herrgöttli" )
+
+/* Extended Swiss vocabulary - Daily Life */
+<swiss-daily-life> ::= @SWISS[vocabulary] ( "Natel" | "Handy" | "Estrich" | "Dachboden" | "Chuchichäschtli" | "Trottoir" | "Gehsteig" | "Perron" | "Bahnsteig" | "Billett" | "Billette" | "Fahrkarte" | "Coiffeur" | "Coiffeuse" | "Friseur" | "Camion" | "Lastwagen" | "Occasion" | "Gebrauchtwagen" | "Portemonnaie" | "Geldbörse" )
+
+/* Extended Swiss greetings with regional variations */
+<swiss-greeting-regional> ::= @SWISS[zurich] ( "Grüezi" | "Grüessech" | "Hoi" | "Salü" | "Adieu" | "Uf" <opt-whitespace> "Widerluege" | "Tschau" | "Ciao" )
+                           | @SWISS[bern] ( "Grüessech" | "Guete" <opt-whitespace> "Tag" | "Adieu" | "Ade" | "Tschau" )
+                           | @SWISS[basel] ( "Grüezi" | "Sali" | "Adieu" | "Ade" | "Tschau" )
+                           | @SWISS[st_gallen] ( "Grüezi" | "Hoi" | "Adieu" | "Tschau" )
+
+/* Extended Swiss modal particles */
+<swiss-modal-particle-extended> ::= @SWISS[vocabulary] ( "halt" | "ebe" | "äbe" | "eifach" | "scho" | "grad" | "nume" | "gäu" | "gäll" | "ou" | "au" | "no" | "scho" <opt-whitespace> "no" )
+
+/* Extended Swiss demonstratives */
+<swiss-demonstrative-regional> ::= @SWISS[zurich] ( "dää" | "die" | "daas" | "die" )
+                                | @SWISS[bern] ( "dä" | "di" | "ds" | "di" )
+                                | @SWISS[basel] ( "dää" | "die" | "daas" | "die" )
+
+/* Extended Swiss possessives */
+<swiss-possessive-regional> ::= @SWISS[zurich] ( "min" | "din" | "sin" | "ihren" | "üüse" | "euere" )
+                             | @SWISS[bern] ( "mi" | "di" | "si" | "ihre" | "üse" | "öie" )
+                             | @SWISS[basel] ( "min" | "din" | "sin" | "ihre" | "yse" | "eieri" )
+
+/* Extended Swiss adjectives */
+<swiss-adjective-regional> ::= @SWISS[zurich] ( "schöön" | "guet" | "grooss" | "chlii" | "nöi" )
+                            | @SWISS[bern] ( "schön" | "guet" | "gross" | "chly" | "nöi" )
+                            | @SWISS[basel] | ( "schöön" | "guet" | "gross" | "chly" | "nöi" )
+
+/* Extended Swiss numbers */
+<swiss-number-regional> ::= @SWISS[zurich] ( "eis" | "zwäi" | "drüü" | "vier" | "föif" | "sächs" | "sibe" | "acht" | "nüün" | "zää" )
+                         | @SWISS[bern] ( "eis" | "zwei" | "drü" | "vier" | "füf" | "sächs" | "sibe" | "acht" | "nün" | "zäh" )
+                         | @SWISS[basel] ( "eis" | "zwäi" | "drüü" | "vier" | "föif" | "sächs" | "sibe" | "acht" | "nüün" | "zää" )
+
+/* Extended Swiss question words */
+<swiss-question-word-regional> ::= @SWISS[zurich] ( "waas" | "wäär" | "woo" | "wiä" | "wänn" | "wärum" | "wiivil" )
+                                | @SWISS[bern] ( "was" | "wär" | "wo" | "wiä" | "wänn" | "wärum" | "wiuviu" )
+                                | @SWISS[basel] ( "was" | "wär" | "wo" | "wiä" | "wänn" | "wärum" | "wiivil" )
+
+/* Extended Swiss temporal expressions */
+<swiss-temporal-extended> ::= @SWISS[vocabulary] ( "hüt" | "hütte" | "geschter" | "morn" | "morne" | "übermorn" | "vorgester" | "grad" | "grad" <opt-whitespace> "äbe" | "jetz" | "jetzt" | "immer" | "nie" | "mängisch" | "oft" | "sälte" )
+
+/* Extended Swiss time of day */
+<swiss-time-of-day> ::= @SWISS[vocabulary] ( "am" <opt-whitespace> "Morge" | "am" <opt-whitespace> "Mittag" | "am" <opt-whitespace> "Namittag" | "am" <opt-whitespace> "Aabig" | "i" <opt-whitespace> "de" <opt-whitespace> "Nacht" )
+
+/* Extended Swiss place adverbs */
+<swiss-place-adverb-regional> ::= @SWISS[zurich] ( "da" | "deet" | "obe" | "unde" | "use" | "ine" )
+                               | @SWISS[bern] ( "da" | "det" | "obe" | "unde" | "use" | "ine" )
+                               | @SWISS[basel] ( "do" | "deet" | "obe" | "unde" | "use" | "ine" )
+
+/* Extended Swiss manner adverbs */
+<swiss-manner-adverb> ::= @SWISS[vocabulary] ( "guet" | "schlecht" | "schnäll" | "langsam" | "gärn" | "gärne" | "eso" | "anders" | "zäme" | "elei" | "eifach" | "schwirig" | "liecht" )
+
+/* Extended Swiss degree adverbs */
+<swiss-degree-adverb> ::= @SWISS[vocabulary] ( "ganz" | "sehr" | "äuä" | "zimli" | "rächt" | "chli" | "fasch" | "öppe" )
+
+/* Swiss cities and places */
+<swiss-city-extended> ::= @SWISS[vocabulary] ( "Zürich" | "Genf" | "Basel" | "Bern" | "Lausanne" | "Winterthur" | "Luzern" | "St." <opt-whitespace> "Gallen" | "Lugano" | "Biel" | "Thun" | "Köniz" | "La" <opt-whitespace> "Chaux-de-Fonds" | "Fribourg" | "Schaffhausen" | "Chur" | "Vernier" | "Neuenburg" | "Uster" | "Sion" | "Zug" | "Emmen" | "Kriens" | "Rapperswil" | "Locarno" | "Bellinzona" )
+
+/* Swiss cantons */
+<swiss-canton> ::= @SWISS[administrative] ( "Zürich" | "Bern" | "Luzern" | "Uri" | "Schwyz" | "Obwalden" | "Nidwalden" | "Glarus" | "Zug" | "Fribourg" | "Solothurn" | "Basel-Stadt" | "Basel-Landschaft" | "Schaffhausen" | "Appenzell" <opt-whitespace> "Ausserrhoden" | "Appenzell" <opt-whitespace> "Innerrhoden" | "St." <opt-whitespace> "Gallen" | "Graubünden" | "Aargau" | "Thurgau" | "Ticino" | "Tessin" | "Vaud" | "Waadt" | "Valais" | "Wallis" | "Neuchâtel" | "Neuenburg" | "Genève" | "Genf" | "Jura" )
+
+/* Swiss administrative terms */
+<swiss-admin-extended> ::= @SWISS[administrative] ( "Kanton" | "Kantone" | "Gemeinde" | "Bezirk" | "Bundesrat" | "Nationalrat" | "Ständerat" | "Landsgemeinde" | "Referendum" | "Initiative" | "Abstimmung" | "Maturität" | "Gymnasium" )
+
+/* Extended Swiss education */
+<swiss-education> ::= @SWISS[administrative] ( "Primarschule" | "Sekundarschule" | "Gymnasium" | "Kantonsschule" | "Berufsschule" | "Fachhochschule" | "ETH" | "Universität" | "Uni" | "Matura" | "Maturität" | "Lehre" | "Berufslehre" )
+
+/* Swiss monetary expressions */
+<swiss-currency> ::= @SWISS[vocabulary] ( "Franken" | "Rappen" | "CHF" | "Fränkli" | "Stutz" | "Batze" )
+
+/* Extended Swiss nature and landscape */
+<swiss-nature> ::= @SWISS[vocabulary] ( "Alpen" | "Berg" | "Gletscher" | "See" | "Fluss" | "Rhein" | "Aare" | "Reuss" | "Limmat" | "Rhone" | "Bodensee" | "Genfersee" | "Vierwaldstättersee" | "Zürichsee" | "Matterhorn" | "Jungfrau" | "Eiger" | "Mönch" )
+
+/* Extended Swiss weather */
+<swiss-weather-extended> ::= @SWISS[vocabulary] ( "Föhn" | "Wätter" | "Räge" | "Schnee" | "Sunne" | "Wulke" | "Wind" | "Sturm" | "Gwitter" | "Nebel" )
+
+/* Extended Swiss sports and activities */
+<swiss-sports> ::= @SWISS[vocabulary] ( "Schifahre" | "Skifahren" | "Schliittle" | "Schlitteln" | "Schlittschue" | "laufe" | "Eishockey" | "Fussball" | "Schwümme" | "Wandere" | "Bergsteige" | "Chlettre" )
+
+/* Multi-embedded sentences with Swiss vocabulary */
+<swiss-multi-embedded> ::= <main-clause> <opt-whitespace> <swiss-subordinate> ( <opt-whitespace> <swiss-subordinate> )+
+
+<swiss-subordinate> ::= <subordinating-conjunction> <opt-whitespace> <swiss-content>
+
+<swiss-content> ::= <subject> <opt-whitespace> <swiss-middle-field>? <opt-whitespace> <verb-phrase-subordinate>
+
+<swiss-middle-field> ::= ( <swiss-modal-particle-extended> | <object> | <adverb> )+
+
+/* Coordinated complex sentences Swiss style */
+<swiss-coordinated-complex> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <swiss-complex-sentence>
+
+<swiss-complex-sentence> ::= <main-clause> <opt-whitespace> <swiss-subordinate>
+
+/* Parenthetical clauses Swiss style */
+<swiss-parenthetical> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> "," <opt-whitespace> <swiss-modal-particle-extended>+ <opt-whitespace> "," <opt-whitespace> <middle-field>? <punctuation>?
+
+/* Cleft sentences Swiss style */
+<swiss-cleft> ::= "es" <opt-whitespace> "isch" <opt-whitespace> <swiss-focused> <opt-whitespace> <relative-clause>
+
+<swiss-focused> ::= <swiss-noun>
+                 | <swiss-transport-extended>
+                 | <swiss-food-extended>
+
+/* Tag questions Swiss style */
+<swiss-tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <swiss-question-tag> "?"
+
+<swiss-question-tag> ::= "oder" | "gäll" | "gäu" | "nöd" <opt-whitespace> "waar" | "oder" <opt-whitespace> "nöd"
+
+/* Elliptical structures Swiss */
+<swiss-elliptical> ::= <swiss-modal-particle-extended>+
+                    | <swiss-greeting-regional>
+                    | <swiss-noun>
+
+/* Reported speech Swiss style */
+<swiss-reported-speech> ::= <swiss-reporting-verb> <opt-whitespace> "," <opt-whitespace> <reported-clause>
+
+<swiss-reporting-verb> ::= "seit" | "sait" | "meint" | "denkt" | "verzellt"
+
+/* Free indirect speech */
+<swiss-free-indirect> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Correlative constructions */
+<swiss-correlative> ::= <correlative-pair> <opt-whitespace> <swiss-clause-sequence>
+
+<swiss-clause-sequence> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Discourse markers Swiss style */
+<swiss-discourse-marker> ::= @SWISS[vocabulary] ( "also" | "äso" | "drum" | "darum" | "dänn" | "denn" | "scho" | "ebe" | "äbe" )
+
+/* Temporal discourse Swiss */
+<swiss-temporal-discourse> ::= "zersch" | "zerscht" | "dänn" | "denn" | "dänached" | "danach" | "zum" <opt-whitespace> "Schluss" | "zletscht"
+
+/* Causal discourse Swiss */
+<swiss-causal-discourse> ::= "drum" | "därum" | "darum" | "wäge" <opt-whitespace> "däm" | "us" <opt-whitespace> "däm" <opt-whitespace> "Grund"
+
+/* Contrastive discourse Swiss */
+<swiss-contrastive-discourse> ::= "aber" | "trotzdem" | "dänk" | "allerdings"
+
+/* Additive discourse Swiss */
+<swiss-additive-discourse> ::= "usserdem" | "derzue" | "derzue" <opt-whitespace> "no"
+
+/* Swiss comparative constructions */
+<swiss-comparative-construction> ::= <swiss-comparative-clause>
+                                  | <swiss-equative-clause>
+                                  | <swiss-superlative-clause>
+
+<swiss-comparative-clause> ::= <adjective-comparative> <opt-whitespace> "als" <opt-whitespace> <swiss-noun>
+
+<swiss-equative-clause> ::= "eso" <opt-whitespace> <adjective> <opt-whitespace> "wie" <opt-whitespace> <swiss-noun>
+
+<swiss-superlative-clause> ::= "de" <opt-whitespace> <adjective-superlative> <opt-whitespace> <swiss-noun>
+
+/* Swiss conditional constructions */
+<swiss-conditional> ::= "wänn" <opt-whitespace> <swiss-content> <opt-whitespace> "," <opt-whitespace> "dänn" <opt-whitespace> <main-clause>
+
+/* Purpose clauses Swiss style */
+<swiss-purpose> ::= "damit" <opt-whitespace> <swiss-content>
+                 | "zum" <opt-whitespace> <verb-infinitive>
+
+/* Concessive constructions Swiss style */
+<swiss-concessive> ::= "obwohl" <opt-whitespace> <swiss-content>
+                    | "trotzdem" <opt-whitespace> "dass" <opt-whitespace> <swiss-content>
+
+/* Result clauses Swiss style */
+<swiss-result> ::= "so" <opt-whitespace> <adjective> <opt-whitespace> "," <opt-whitespace> "dass" <opt-whitespace> <swiss-content>
+
+/* Manner clauses Swiss style */
+<swiss-manner> ::= "indem" <opt-whitespace> <swiss-content>
+
+/* Instrumental constructions with Swiss vocabulary */
+<swiss-instrumental> ::= "mit" <opt-whitespace> <swiss-noun>
+
+/* Benefactive constructions */
+<swiss-benefactive> ::= "für" <opt-whitespace> <swiss-noun>
+
+/* Comitative constructions */
+<swiss-comitative> ::= "mit" <opt-whitespace> <swiss-noun>
+                    | "zämme" <opt-whitespace> "mit" <opt-whitespace> <swiss-noun>
+
+/* Swiss number expressions extended */
+<swiss-numeral-expression> ::= <swiss-cardinal-number>
+                            | <swiss-ordinal-number>
+
+<swiss-cardinal-number> ::= <swiss-number-regional>
+                         | "ölfi" | "zwölfi" | "zwänzg" | "dryssg" | "hundert" | "tuusig"
+
+<swiss-ordinal-number> ::= "erscht" | "zweit" | "dritt" | "viert" | "föift"
+
+/* Extended genitive constructions with Swiss nouns */
+<swiss-genitive> ::= <swiss-noun> <opt-whitespace> "vo" <opt-whitespace> <swiss-noun>
+                  | "vom" <opt-whitespace> <swiss-noun> <opt-whitespace> <swiss-noun>
+
+/* Dative constructions with Swiss verbs */
+<swiss-dative> ::= <personal-pronoun-dative> <opt-whitespace> <swiss-verb>
+
+<swiss-verb> ::= "gfalle" | "hälfe" | "schmöcke" | "ghöre" | "passe"
+
+/* Accusative constructions with Swiss objects */
+<swiss-accusative> ::= <swiss-transitive-verb> <opt-whitespace> <swiss-noun>
+
+<swiss-transitive-verb> ::= "ässe" | "trinke" | "chaufe" | "mache" | "gseh"
+
+/* Reflexive constructions with Swiss vocabulary */
+<swiss-reflexive> ::= <reflexive-pronoun> <opt-whitespace> <swiss-reflexive-verb>
+
+<swiss-reflexive-verb> ::= "freue" | "ärgere" | "wundere" | "interessiere" | "erinnere"
+
+/* Reciprocal constructions */
+<swiss-reciprocal> ::= "enand" | "enander" <opt-whitespace> <verb-infinitive>
+
+/* Intensive pronouns Swiss style */
+<swiss-intensive> ::= <reflexive-pronoun> <opt-whitespace> "sälber"
+                   | <reflexive-pronoun> <opt-whitespace> "sälbscht"
+
+/* Progressive aspect in Swiss */
+<swiss-progressive> ::= "grad" <opt-whitespace> <verb-present>
+                     | "am" <opt-whitespace> <verb-infinitive>
+
+/* Habitual aspect in Swiss */
+<swiss-habitual> ::= "immer" <opt-whitespace> <verb-present>
+                  | "normalerwiis" <opt-whitespace> <verb-present>
+
+/* Inchoative aspect */
+<swiss-inchoative> ::= "aafange" <opt-whitespace> <verb-infinitive>
+
+/* Terminative aspect */
+<swiss-terminative> ::= "ufhöre" <opt-whitespace> <verb-infinitive>
+
+/* Causative constructions */
+<swiss-causative> ::= "laa" | "lasse" <opt-whitespace> <verb-infinitive>
+
+/* Additional context rules for Swiss German */
+@CONTEXT_RULE[swiss-regional-consistency]:
+    IF <sentence> CONTAINS @SWISS[zurich]
+    THEN PREFER_ZURICH_FORMS
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-perfect-tense-strong-preference]:
+    IF <past-event> DESCRIBED
+    THEN STRONGLY_PREFER <swiss-perfect-extended> OVER <preterite>
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-modal-particle-position]:
+    IF <swiss-modal-particle-extended> PRESENT
+    THEN POSITION_IN <swiss-middle-field>
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-greeting-appropriateness]:
+    IF <swiss-greeting-regional> PRESENT
+    THEN MATCH_REGIONAL_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-velo-usage]:
+    IF "Velo" PRESENT
+    THEN SWISS_CONTEXT_CONFIRMED
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-trottoir-usage]:
+    IF "Trottoir" PRESENT
+    THEN FRENCH_LOANWORD_ACCEPTED
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-rüebli-carrot]:
+    IF "Rüebli" PRESENT
+    THEN SWISS_CULINARY_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-natel-mobile]:
+    IF "Natel" PRESENT
+    THEN SWISS_SPECIFIC_TERM
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-canton-context]:
+    IF <swiss-canton> PRESENT
+    THEN ADMINISTRATIVE_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-french-loanword]:
+    IF @SWISS[french_loan] PRESENT
+    THEN MULTILINGUAL_SWITZERLAND_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-italian-loanword]:
+    IF @SWISS[italian_loan] PRESENT
+    THEN TICINO_OR_SOUTHERN_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-diminutive-li]:
+    IF <swiss-noun> ENDS_WITH "li"
+    THEN DIMINUTIVE_FORM
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-preterite-avoidance]:
+    IF <preterite> USED IN_SPOKEN_CONTEXT
+    THEN WARNING "Swiss German strongly avoids preterite in speech"
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-dialect-mixing]:
+    IF MULTIPLE @SWISS[regional] MARKERS
+    THEN WARNING "Mixing Swiss dialects may be confusing"
+    ELSE VALID
+
+/* Extended Swiss verb forms with perfect preference */
+<swiss-verb-regular-perfect> ::= <swiss-verb-haben> <opt-whitespace> "g" <verb-stem> "t"
+                              | <swiss-verb-sein> <opt-whitespace> "g" <verb-stem> "t"
+
+<swiss-verb-irregular-perfect> ::= <swiss-verb-haben> <opt-whitespace> <swiss-irregular-participle>
+                                | <swiss-verb-sein> <opt-whitespace> <swiss-irregular-participle>
+
+<swiss-irregular-participle> ::= @SWISS[zurich] ( "gsi" | "gha" | "ggange" | "cho" | "gseh" | "gässe" | "troffe" | "gschribe" | "gläse" | "gschwume" )
+                              | @SWISS[bern] ( "gsi" | "gha" | "gange" | "cho" | "gseh" | "gässe" | "troffe" | "gschribe" | "gläse" | "gschwumme" )
+
+/* Extended Swiss adjectives with regional forms */
+<swiss-adjective-schön> ::= @SWISS[zurich] "schöön"
+                         | @SWISS[bern] "schön"
+                         | @SWISS[basel] "schöön"
+
+<swiss-adjective-gross> ::= @SWISS[zurich] "grooss"
+                         | @SWISS[bern] "gross"
+                         | @SWISS[basel] "gross"
+
+<swiss-adjective-klein> ::= @SWISS[zurich] "chlii"
+                         | @SWISS[bern] "chly"
+                         | @SWISS[basel] "chly"
+
+<swiss-adjective-neu> ::= @SWISS[zurich] "nöi"
+                       | @SWISS[bern] "nöi"
+                       | @SWISS[basel] "nöi"
+
+/* Extended Swiss cuisine vocabulary */
+<swiss-cheese> ::= @SWISS[culinary] ( "Emmentaler" | "Gruyère" | "Appenzeller" | "Sbrinz" | "Raclette-Chäs" | "Fondue-Chäs" | "Alpkäse" | "Bergkäse" | "Tête" <opt-whitespace> "de" <opt-whitespace> "Moine" )
+
+<swiss-meat> ::= @SWISS[culinary] ( "Cervelat" | "Wienerli" | "Bratwurst" | "Schüblig" | "Kalbsbratwurst" | "Landjäger" | "Bündnerfleisch" | "Mostbröckli" | "Salsiz" )
+
+<swiss-dessert> ::= @SWISS[culinary] ( "Meringue" | "Nidlechueche" | "Nusstorte" | "Bündner" <opt-whitespace> "Nusstorte" | "Zuger" <opt-whitespace> "Kirschtorte" | "Basler" <opt-whitespace> "Läckerli" | "Tirggel" | "Magenbrot" )
+
+/* Extended Swiss bread and baking */
+<swiss-bread> ::= @SWISS[culinary] ( "Zopf" | "Weggli" | "Brötli" | "Gipfeli" | "Buttergipfel" | "Nussgipfel" | "Mandelgipfel" | "Schoggi gipfel" | "Bürli" | "Mutschli" | "Ruchbrot" | "Hausbrot" | "Tessinerbrot" )
+
+/* Swiss chocolate vocabulary */
+<swiss-chocolate> ::= @SWISS[culinary] ( "Schoggi" | "Schokolade" | "Toblerone" | "Lindt" | "Frey" | "Cailler" | "Ragusa" | "Ovomaltine-Täfeli" )
+
+/* Extended Swiss drinks */
+<swiss-alcoholic-beverage> ::= @SWISS[vocabulary] ( "Schnaps" | "Kirsch" | "Williamine" | "Pflümli" | "Apfelschnaps" | "Birnenschnaps" | "Absinth" | "Träsch" )
+
+/* Swiss coffee culture */
+<swiss-coffee-culture> ::= @SWISS[vocabulary] ( "Kafi" | "Schale" | "Schümli" | "Café" <opt-whitespace> "crème" | "Kafi" <opt-whitespace> "Lutz" | "Kafi" <opt-whitespace> "fertig" )
+
+/* Extended Swiss household vocabulary */
+<swiss-household> ::= @SWISS[vocabulary] ( "Chuchichäschtli" | "Schublade" | "Chuchitisch" | "Stuhl" | "Tisch" | "Bett" | "Schrank" | "Buffet" | "Ablage" | "Gestell" )
+
+/* Swiss work and profession vocabulary */
+<swiss-profession-extended> ::= @SWISS[vocabulary] ( "Lehrling" | "Stift" | "Meister" | "Chef" | "Gschäftsmann" | "Gschäftsfrau" | "Verkäufer" | "Verkäuferin" | "Serviertochter" | "Serviceangestellte" )
+
+/* Extended Swiss family terms */
+<swiss-family-terms> ::= @SWISS[vocabulary] ( "Grossvater" | "Grosspapa" | "Grossmutter" | "Grossmama" | "Grosi" | "Opa" | "Muetter" | "Vater" | "Gschwüschterti" | "Brüeder" | "Schwöschter" )
+
+/* Extended Swiss body parts */
+<swiss-body> ::= @SWISS[vocabulary] ( "Chopf" | "Gsicht" | "Ohr" | "Auge" | "Nase" | "Muul" | "Zunge" | "Zänd" | "Hals" | "Arm" | "Bei" | "Füess" | "Händ" )
+
+/* Extended Swiss clothing */
+<swiss-clothing> ::= @SWISS[vocabulary] ( "Chleider" | "Hose" | "Rock" | "Hemli" | "Pulli" | "Jacke" | "Mantel" | "Schue" | "Socke" | "Strumpf" )
+
+/* Extended Swiss animals */
+<swiss-animal-extended> ::= @SWISS[vocabulary] ( "Chue" | "Geiss" | "Schaf" | "Säuli" | "Hung" | "Chatz" | "Müsli" | "Vogel" | "Fisch" | "Schnägg" | "Bieli" | "Chafer" )
+
+/* Extended Swiss plants */
+<swiss-plant-extended> ::= @SWISS[vocabulary] ( "Blume" | "Baum" | "Gras" | "Moos" | "Pilz" | "Edelwys" | "Enzian" | "Alperose" )
+
+/* Extended Swiss colors */
+<swiss-color> ::= @SWISS[vocabulary] ( "rot" | "blau" | "grüen" | "gääl" | "schwarz" | "wyss" | "grau" | "orange" | "violett" | "bruun" )
+
+/* Swiss building and architecture */
+<swiss-building-extended> ::= @SWISS[vocabulary] ( "Huus" | "Wohnig" | "Chalet" | "Scheune" | "Stall" | "Turm" | "Chilche" | "Kapälle" | "Schloss" | "Museeum" )
+
+/* Extended Swiss landscape features */
+<swiss-landscape-extended> ::= @SWISS[vocabulary] ( "Berg" | "Tal" | "Bärg" | "Täler" | "Hügel" | "Wiese" | "Wald" | "Fluss" | "Bach" | "See" | "Gletscher" | "Fels" | "Schlucht" )
+
+/* Extended Swiss seasons */
+<swiss-season> ::= @SWISS[vocabulary] ( "Früelig" | "Früehlig" | "Sumer" | "Summr" | "Herbscht" | "Winter" )
+
+/* Extended Swiss months (all months) */
+<swiss-month> ::= @SWISS[vocabulary] ( "Januar" | "Jänner" | "Februar" | "Feber" | "März" | "Merz" | "April" | "Mai" | "Juni" | "Juli" | "August" | "September" | "Oktober" | "November" | "Dezember" )
+
+/* Extended Swiss days of week */
+<swiss-day-of-week> ::= @SWISS[vocabulary] ( "Mäntig" | "Ziischtig" | "Mittwuch" | "Dunschtig" | "Friitig" | "Samschtig" | "Sunntig" )
+
+/* Swiss festivals and celebrations */
+<swiss-festival> ::= @SWISS[vocabulary] ( "Fasnacht" | "Sechseläute" | "Bundesfeiertag" | "1." <opt-whitespace> "August" | "Bechtelistag" | "Wiehnachte" | "Silveschter" | "Nöijaar" )
+
+/* Extended Swiss exclamations and expressions */
+<swiss-exclamation-extended> ::= @SWISS[vocabulary] ( "Gopfertami" | "Gopfridschtutz" | "Heregott" | "Jä" <opt-whitespace> "nu" | "Jeminä" | "Sackerlot" | "Pfrungel" | "Oha" | "Oje" | "Wow" | "Huere" )
+
+/* Swiss affirmations */
+<swiss-affirmation> ::= @SWISS[vocabulary] ( "jo" | "ja" | "gäng" | "äbe" | "genau" | "sicher" | "scho" | "absolut" )
+
+/* Swiss negations extended */
+<swiss-negation-extended> ::= @SWISS[vocabulary] ( "nei" | "nein" | "nöd" | "nüd" | "nid" | "gar" <opt-whitespace> "nöd" | "überhaupt" <opt-whitespace> "nöd" )
+
+/* Swiss politeness formulas extended */
+<swiss-politeness-extended> ::= @SWISS[vocabulary] ( "Danke" | "Merci" | "Merci" <opt-whitespace> "vielmal" | "Bitte" | "Bitte" <opt-whitespace> "gern" | "Excusé" | "Entschuldigung" | "Pardon" | "Gsundheit" | "En" <opt-whitespace> "Guete" | "Zum" <opt-whitespace> "Wohl" | "Proscht" | "Prost" )
+
+/* Extended Swiss intensifiers */
+<swiss-intensifier-extended> ::= @SWISS[vocabulary] ( "ganz" | "total" | "vollständig" | "richtig" | "echt" | "wohr" | "huere" | "saumäässig" | "ur" )
+
+/* Extended Swiss questions and interrogatives */
+<swiss-interrogative-extended> ::= @SWISS[vocabulary] ( "waas" | "wäär" | "wäm" | "wänn" | "wo" | "wohi" | "woher" | "worum" | "wiä" | "wiivil" | "wiä" <opt-whitespace> "lang" | "wiä" <opt-whitespace> "vill" )
+
+/* Complex verb constructions Swiss style */
+<swiss-complex-verb-extended> ::= <swiss-double-infinitive>
+                               | <swiss-modal-perfect>
+                               | <swiss-future-construction>
+
+<swiss-double-infinitive> ::= <modal-verb> <opt-whitespace> <verb-infinitive> <opt-whitespace> <swiss-auxiliary-infinitive>
+
+<swiss-auxiliary-infinitive> ::= "ha" | "han" | "si" | "sii"
+
+<swiss-modal-perfect> ::= <modal-verb> <opt-whitespace> <swiss-participle> <opt-whitespace> "ha"
+
+<swiss-future-construction> ::= <werden-verb> <opt-whitespace> <verb-infinitive>
+                             | "gang" | "gaa" <opt-whitespace> <verb-infinitive>
+
+/* Topicalization patterns Swiss style */
+<swiss-topicalized> ::= <swiss-topicalized-object> <opt-whitespace> <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>?
+
+<swiss-topicalized-object> ::= <swiss-noun>
+
+/* Inversion patterns Swiss */
+<swiss-inverted> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <swiss-middle-field>? <opt-whitespace> <adverbial>? <opt-whitespace> <verb-complement>?
+
+/* Nested subordinate clauses Swiss style */
+<swiss-nested-subordinate> ::= <subordinating-conjunction> <opt-whitespace> <swiss-nested-content>
+
+<swiss-nested-content> ::= <subject> <opt-whitespace> <swiss-middle-field>? <opt-whitespace> <verb-phrase-subordinate> <opt-whitespace> <swiss-nested-final>
+
+<swiss-nested-final> ::= <subordinate-clause>
+                      | <relative-clause>
+                      | <swiss-subordinate>
+
+/* Split complex sentences Swiss style */
+<swiss-split-complex> ::= <swiss-subordinate> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <swiss-subordinate>
+
+/* Embedded clause sequences */
+<swiss-embedded-sequence> ::= <swiss-subordinate> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <swiss-subordinate> )+
+
+/* Fronted subordinate sentences */
+<swiss-fronted-subordinate> ::= <swiss-subordinate> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Extraposition Swiss style */
+<swiss-extraposed> ::= <main-clause> <opt-whitespace> <swiss-extraposed-clause>
+
+<swiss-extraposed-clause> ::= <swiss-subordinate>
+                           | <infinitive-clause>
+
+/* Relative clause types with Swiss vocabulary */
+<swiss-restrictive-relative> ::= <relative-pronoun> <opt-whitespace> <swiss-relative-content>
+
+<swiss-non-restrictive-relative> ::= "," <opt-whitespace> <relative-pronoun> <opt-whitespace> <swiss-relative-content> <opt-whitespace> ","
+
+<swiss-relative-content> ::= <subject>? <opt-whitespace> <swiss-middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>?
+
+/* Participial constructions Swiss style */
+<swiss-participial> ::= <swiss-present-participial>
+                     | <swiss-past-participial>
+
+<swiss-present-participial> ::= <present-participle> <opt-whitespace> <swiss-noun>
+
+<swiss-past-participial> ::= <swiss-participle> <opt-whitespace> <swiss-noun>
+
+/* Nominal style constructions */
+<swiss-nominal> ::= <swiss-nominalization>
+                 | <swiss-extended-adjective-phrase>
+
+<swiss-nominalization> ::= <article> <opt-whitespace> <verb-infinitive>
+
+<swiss-extended-adjective-phrase> ::= <article> <opt-whitespace> <adjective> <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <swiss-noun>
+
+/* Complex noun phrases Swiss style */
+<swiss-complex-noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>+ <opt-whitespace> <swiss-noun> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>? <opt-whitespace> <apposition>?
+
+/* Vocative constructions Swiss style */
+<swiss-vocative> ::= <proper-noun> | <swiss-noun>
+
+<swiss-vocative-sentence> ::= <swiss-vocative> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Exclamatory constructions Swiss style */
+<swiss-exclamatory-extended> ::= <exclamative-clause>
+                              | <swiss-wish-clause>
+                              | <swiss-exclamation-extended>
+
+<swiss-wish-clause> ::= "wänn" <opt-whitespace> <subjunctive-clause> <opt-whitespace> "doch" <opt-whitespace> "!"
+
+/* Extended question types Swiss style */
+<swiss-alternative-question> ::= <yes-no-question-part> <opt-whitespace> "oder" <opt-whitespace> <yes-no-question-part>
+
+<swiss-rhetorical-question> ::= <wh-question>
+
+/* Echo questions Swiss style */
+<swiss-echo-question> ::= <statement> <opt-whitespace> "?"
+
+/* Confirmation requests Swiss style */
+<swiss-confirmation-request> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <swiss-confirmation-particle> "?"
+
+<swiss-confirmation-particle> ::= "oder" | "gäll" | "gäu" | "nöd" <opt-whitespace> "waar"
+
+/* Information structure Swiss style */
+<swiss-topic-comment> ::= <topic> <opt-whitespace> "," <opt-whitespace> <swiss-comment>
+
+<swiss-comment> ::= <predicate> <opt-whitespace> <swiss-modal-particle-extended>?
+
+/* Anaphoric and cataphoric reference */
+<swiss-anaphoric> ::= <personal-pronoun> | <demonstrative-pronoun>
+
+<swiss-cataphoric> ::= <demonstrative-pronoun> <opt-whitespace> <swiss-subordinate>
+
+/* Extended context rules for comprehensive coverage */
+@CONTEXT_RULE[swiss-verb-regional-agreement]:
+    IF @SWISS[zurich] <swiss-verb> PRESENT
+    THEN OTHER_ZURICH_FORMS_PREFERRED
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-adjective-declension]:
+    IF <swiss-adjective-regional> PRESENT
+    THEN CORRECT_REGIONAL_DECLENSION
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-cheese-context]:
+    IF <swiss-cheese> PRESENT
+    THEN CULINARY_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-chocolate-context]:
+    IF <swiss-chocolate> PRESENT
+    THEN SWISS_CHOCOLATE_INDUSTRY_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-festival-timing]:
+    IF <swiss-festival> PRESENT
+    THEN APPROPRIATE_TIME_OF_YEAR
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-dialect-food-match]:
+    IF <swiss-food-extended> AND @SWISS[regional]
+    THEN REGIONAL_FOOD_TERMS_MATCH
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-french-loanword-article]:
+    IF @SWISS[french_loan] PRESENT
+    THEN CORRECT_GENDER_FROM_FRENCH
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-natel-modernity]:
+    IF "Natel" PRESENT
+    THEN MODERN_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-velo-transportation]:
+    IF "Velo" PRESENT
+    THEN TRANSPORTATION_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-trottoir-urban]:
+    IF "Trottoir" PRESENT
+    THEN URBAN_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-perron-train]:
+    IF "Perron" PRESENT
+    THEN TRAIN_STATION_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-diminutive-li-affection]:
+    IF <swiss-noun> ENDS_WITH "li"
+    THEN DIMINUTIVE_OR_AFFECTIONATE
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-modal-particle-frequency]:
+    IF TOO_MANY <swiss-modal-particle-extended>
+    THEN WARNING "Overuse of modal particles may reduce clarity"
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-perfect-vs-preterite]:
+    IF <narrative> IN_SPOKEN_LANGUAGE
+    THEN USE <swiss-perfect-extended> NOT <preterite>
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-greeting-time-match]:
+    IF <swiss-greeting-regional> PRESENT
+    THEN MATCH_TIME_OF_DAY
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-regional-dialect-consistency]:
+    IF MULTIPLE @SWISS[regional] IN_SENTENCE
+    THEN ALL_SHOULD_MATCH
+    ELSE WARNING "Mixing Swiss regional dialects within sentence"
+
+@CONTEXT_RULE[swiss-verb-auxiliary-motion]:
+    IF <verb> INDICATES_MOTION_OR_CHANGE
+    THEN USE <swiss-verb-sein> AS_AUXILIARY
+    ELSE USE <swiss-verb-haben>
+
+@CONTEXT_RULE[swiss-compound-noun-meaning]:
+    IF <swiss-compound-noun> PRESENT
+    THEN COMPOUND_MEANING_CLEAR
+    ELSE VALID
+
+/* Extended Swiss verb forms for common irregular verbs */
+<swiss-verb-essen> ::= @SWISS[zurich] ( "iss" | "issisch" | "isst" | "ässed" | "ässed" | "ässed" )
+                    | @SWISS[bern] ( "ässe" | "ässisch" | "ässt" | "ässi" | "ässit" | "ässi" )
+
+<swiss-verb-trinken> ::= @SWISS[zurich] ( "trink" | "trinksch" | "trinkt" | "trinked" | "trinked" | "trinked" )
+                      | @SWISS[bern] ( "trinke" | "trinksch" | "trinkt" | "trinke" | "trinket" | "trinke" )
+
+<swiss-verb-fahren> ::= @SWISS[zurich] ( "fahr" | "faarsch" | "faart" | "faared" | "faared" | "faared" )
+                     | @SWISS[bern] ( "fahre" | "fahrsch" | "fahrt" | "fahre" | "fahret" | "fahre" )
+
+<swiss-verb-lesen> ::= @SWISS[zurich] ( "lies" | "liisch" | "liist" | "läsed" | "läsed" | "läsed" )
+                    | @SWISS[bern] ( "läse" | "läsisch" | "läst" | "läse" | "läset" | "läse" )
+
+<swiss-verb-schreiben> ::= @SWISS[zurich] ( "schriib" | "schriibsch" | "schriibt" | "schriibed" | "schriibed" | "schriibed" )
+                        | @SWISS[bern] ( "schriibe" | "schriibsch" | "schriibt" | "schriibe" | "schriibet" | "schriibe" )
+
+<swiss-verb-sprechen> ::= @SWISS[zurich] ( "rede" | "redsch" | "redt" | "reded" | "reded" | "reded" )
+                       | @SWISS[bern] ( "rede" | "redsch" | "redt" | "rede" | "redet" | "rede" )
+
+<swiss-verb-sehen> ::= @SWISS[zurich] ( "gsee" | "gseesch" | "gseht" | "gseed" | "gseed" | "gseed" )
+                    | @SWISS[bern] ( "gseh" | "gsehsch" | "gseht" | "gseh" | "gseht" | "gseh" )
+
+<swiss-verb-nehmen> ::= @SWISS[zurich] ( "nimm" | "nimmsch" | "nimmt" | "näämed" | "näämed" | "näämed" )
+                     | @SWISS[bern] ( "näh" | "nimmsch" | "nimmt" | "näh" | "näht" | "näh" )
+
+<swiss-verb-geben> ::= @SWISS[zurich] ( "gib" | "gisch" | "git" | "gääbed" | "gääbed" | "gääbed" )
+                    | @SWISS[bern] ( "gä" | "gisch" | "git" | "gä" | "gät" | "gä" )
+
+/* Extended Swiss conjunctions */
+<swiss-conjunction-extended> ::= @SWISS[vocabulary] ( "und" | "oder" | "aber" | "denn" | "wil" | "wüu" | "dass" | "wänn" | "als" | "wie" )
+
+/* Extended Swiss prepositions with regional forms */
+<swiss-preposition-extended> ::= @SWISS[zurich] ( "uf" | "bi" | "mit" | "vo" | "zu" | "nach" | "i" | "a" | "über" | "under" )
+                              | @SWISS[bern] ( "uf" | "bi" | "mit" | "vo" | "zu" | "nache" | "i" | "a" | "über" | "unger" )
+
+/* Swiss formal and informal address */
+<swiss-formal-address> ::= @SWISS[formality] ( "Sie" | "Ihnen" | "Ihr" | "Ihre" )
+
+<swiss-informal-address> ::= @SWISS[formality] ( "du" | "dir" | "dii" | "diin" | "diini" )
+
+/* Extended Swiss numbers up to 100 */
+<swiss-number-extended> ::= <swiss-number-regional>
+                         | "zwänzg" | "dryssg" | "vierzg" | "föifzg" | "sächzg" | "sibezg" | "achtzg" | "nünzg" | "hundert"
+
+/* Swiss time expressions */
+<swiss-time-expression-extended> ::= @SWISS[temporal] ( "am" <opt-whitespace> <numeral> | "um" <opt-whitespace> <numeral> | "halbi" <opt-whitespace> <numeral> | "viertel" <opt-whitespace> "ab" <opt-whitespace> <numeral> | "viertel" <opt-whitespace> "vor" <opt-whitespace> <numeral> )
+
+/* Extended Swiss directions */
+<swiss-direction> ::= @SWISS[vocabulary] ( "links" | "rächts" | "gradus" | "gerade" <opt-whitespace> "us" | "zrügg" | "vorwärts" | "obe" | "unde" | "use" | "ine" )
+
+/* Extended Swiss size and measurement */
+<swiss-measurement> ::= @SWISS[vocabulary] ( "Meter" | "Zentimeter" | "Kilometer" | "Gramm" | "Kilogramm" | "Liter" | "Deziliter" )
+
+/* Swiss commercial and shopping */
+<swiss-shopping-extended> ::= @SWISS[vocabulary] ( "Migros" | "Coop" | "Denner" | "Aldi" | "Lidl" | "Manor" | "Globus" | "Markt" | "Lädeli" | "Gschäft" )
+
+/* Swiss public transport specific */
+<swiss-public-transport> ::= @SWISS[vocabulary] ( "SBB" | "CFF" | "FFS" | "Postauto" | "Tram" | "Bus" | "Trolleybus" | "Bergbahn" | "Standseilbahn" | "Luftseilbahn" | "Schiff" | "Fähre" )
+
+/* Swiss postal and communication */
+<swiss-postal> ::= @SWISS[vocabulary] ( "Post" | "Brief" | "Päckli" | "Paket" | "Poschtcharte" | "Postkarte" | "Briefmarke" | "Poschtkascht" | "Briefkascht" )
+
+/* Swiss education extended */
+<swiss-school-types> ::= @SWISS[administrative] ( "Chindergarte" | "Kindergarten" | "Primarschuel" | "Sekundarschuel" | "Real schuel" | "Bezirksschuel" | "Kantonsschuel" | "Gymnasium" | "Berufsschuel" | "Lehre" | "Universität" | "ETH" | "Fachhochschuel" )
+
+/* Swiss weather phenomena */
+<swiss-weather-phenomena> ::= @SWISS[vocabulary] ( "Föhn" | "Bise" | "Schneesturm" | "Lawine" | "Hagel" | "Gwitter" | "Donner" | "Blitz" | "Regäboge" | "Iisnebel" )
+
+/* Swiss alpine vocabulary */
+<swiss-alpine-terms> ::= @SWISS[vocabulary] ( "Alp" | "Älplä" | "Bergbach" | "Wasserfall" | "Grat" | "Gipfel" | "Sattel" | "Pass" | "Schteil" | "Hütte" | "SAC-Hütte" )
+
+/* Swiss farming and agriculture */
+<swiss-farming> ::= @SWISS[vocabulary] ( "Buure" | "Buurehof" | "Chue" | "Chuestall" | "Schwiin" | "Säuli" | "Geiss" | "Schaf" | "Heu" | "Gmies" | "Obst" | "Äpfel" | "Birne" )
+
+/* Swiss music and instruments */
+<swiss-music> ::= @SWISS[vocabulary] ( "Ländlermusig" | "Jodel" | "Jodellied" | "Alphorn" | "Schwyzerörgeli" | "Akkordeon" | "Geige" | "Hackbrett" )
+
+/* Swiss traditional clothing extended */
+<swiss-traditional-clothing> ::= @SWISS[vocabulary] ( "Tracht" | "Sennehemli" | "Edelweisshemli" | "Älplerhose" | "Gugel" | "Filzhut" | "Bollehut" )
+
+/* Swiss traditions and customs */
+<swiss-tradition> ::= @SWISS[vocabulary] ( "Fasnacht" | "Sechseläute" | "Älplerchilbi" | "Chästeilet" | "Älplerabtrieb" | "Alpufzug" | "Schwingfest" | "Hornusse" | "Steinstossen" )
+
+/* Swiss tools and equipment */
+<swiss-tools> ::= @SWISS[vocabulary] ( "Sackmesser" | "Victorinox" | "Wenger" | "Werkzüüg" | "Hammer" | "Schrube nzieher" | "Säge" | "Beil" )
+
+/* Extended multi-level nesting */
+<swiss-three-level-nesting> ::= <main-clause> <opt-whitespace> <swiss-subordinate> <opt-whitespace> <swiss-subordinate> <opt-whitespace> <swiss-subordinate>
+
+<swiss-multiple-coordination-extended> ::= <swiss-subordinate> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <swiss-subordinate> ){3,}
+
+/* Extended passive constructions Swiss */
+<swiss-passive-extended> ::= <werden-verb> <opt-whitespace> <swiss-participle>
+                          | "wird" | "werded" <opt-whitespace> <swiss-participle>
+
+/* Extended causative Swiss */
+<swiss-causative-complex> ::= "laa" | "lasse" <opt-whitespace> <object> <opt-whitespace> <verb-infinitive>
+
+/* Extended permissive Swiss */
+<swiss-permissive-complex> ::= "erlaube" <opt-whitespace> <object> <opt-whitespace> <infinitive-clause>
+
+/* Extended aspectual constructions */
+<swiss-progressive-complex> ::= "am" <opt-whitespace> <verb-infinitive>
+                             | "grad" <opt-whitespace> "debii" <opt-whitespace> <verb-infinitive>
+
+<swiss-habitual-complex> ::= "immer" <opt-whitespace> "wider" <opt-whitespace> <verb-present>
+
+<swiss-inchoative-complex> ::= "aafange" <opt-whitespace> "mit" <opt-whitespace> <verb-infinitive>
+
+<swiss-terminative-complex> ::= "ufhöre" <opt-whitespace> "mit" <opt-whitespace> <verb-infinitive>
+
+/* Additional comprehensive context rules */
+@CONTEXT_RULE[swiss-grüezi-formality]:
+    IF "Grüezi" USED
+    THEN FORMAL_OR_NEUTRAL_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-hoi-informality]:
+    IF "Hoi" USED
+    THEN INFORMAL_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-sali-basel]:
+    IF "Sali" USED
+    THEN BASEL_REGION_PREFERRED
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-food-diminutive]:
+    IF <swiss-food-extended> WITH_DIMINUTIVE
+    THEN AFFECTIONATE_OR_SMALL_PORTION
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-alpine-context]:
+    IF <swiss-alpine-terms> PRESENT
+    THEN MOUNTAIN_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-farming-rural]:
+    IF <swiss-farming> PRESENT
+    THEN RURAL_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-tradition-seasonal]:
+    IF <swiss-tradition> PRESENT
+    THEN APPROPRIATE_SEASON
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-transport-modality]:
+    IF <swiss-transport-extended> PRESENT
+    THEN APPROPRIATE_TRANSPORTATION_MODE
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-canton-preposition]:
+    IF <swiss-canton> PRESENT
+    THEN CORRECT_PREPOSITION_FOR_CANTON
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-weather-föhn-bise]:
+    IF "Föhn" OR "Bise" PRESENT
+    THEN SWISS_SPECIFIC_WEATHER_PATTERN
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-chocolate-quality]:
+    IF <swiss-chocolate> PRESENT
+    THEN QUALITY_CONTEXT_APPROPRIATE
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-cheese-variety]:
+    IF <swiss-cheese> PRESENT
+    THEN CORRECT_CHEESE_TYPE_FOR_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-perfect-tense-dominance]:
+    IF <spoken-language> CONTEXT
+    THEN ALMOST_ALWAYS_USE <swiss-perfect-extended>
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-formal-informal-mixing]:
+    IF <swiss-formal-address> AND <swiss-informal-address> IN_SAME_CONVERSATION
+    THEN ERROR "Do not mix Sie and du in same conversation"
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-regional-pronunciation]:
+    IF @SWISS[zurich] FORMS_USED
+    THEN CONSISTENT_ZURICH_PRONUNCIATION
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-compound-noun-creation]:
+    IF <swiss-compound-noun> CREATED
+    THEN BOTH_PARTS_SWISS_COMPATIBLE
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-french-german-boundary]:
+    IF @SWISS[french_loan] FREQUENT
+    THEN NEAR_FRENCH_SPEAKING_REGION
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-italian-german-boundary]:
+    IF @SWISS[italian_loan] FREQUENT
+    THEN TICINO_OR_GRAUBUNDEN_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-diminutive-overuse]:
+    IF TOO_MANY_DIMINUTIVES
+    THEN WARNING "Excessive diminutives may sound childish"
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-modal-particle-appropriateness]:
+    IF <swiss-modal-particle-extended> IN_FORMAL_CONTEXT
+    THEN WARNING "Modal particles typically informal"
+    ELSE VALID

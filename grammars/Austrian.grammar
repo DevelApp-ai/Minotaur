@@ -504,3 +504,768 @@ Keywords: und, oder, aber, wenn, weil, dass, als, ob, wie, der, die, das, ein, e
     IF <preposition>.@CASE == <noun-phrase>.@CASE
     THEN VALID
     ELSE ERROR "Preposition governs specific case"
+
+/* Extended Austrian regional variations (Vienna, Styria, Tyrol, Vorarlberg, Carinthia, Salzburg) */
+@AUSTRIAN[viennese]          /* Wienerisch */
+@AUSTRIAN[styrian]           /* Steirisch */
+@AUSTRIAN[tyrolean]          /* Tirolerisch */
+@AUSTRIAN[vorarlberg]        /* Vorarlbergerisch */
+@AUSTRIAN[carinthian]        /* Kärnterisch */
+@AUSTRIAN[salzburg]          /* Salzburgisch */
+
+/* Regional Austrian negation */
+<austrian-negation> ::= <standard-negation> | <austrian-dialect-negation>
+
+<austrian-dialect-negation> ::= @AUSTRIAN[viennese] ( "ned" | "net" | "nit" | "nia" | "kana" )
+                             | @AUSTRIAN[styrian] ( "net" | "nit" | "nia" | "koa" )
+                             | @AUSTRIAN[tyrolean] ( "nit" | "nia" | "koa" )
+                             | @AUSTRIAN[vorarlberg] ( "nöd" | "nüt" | "kei" )
+                             | @AUSTRIAN[carinthian] ( "net" | "nit" | "koa" )
+                             | @AUSTRIAN[salzburg] ( "ned" | "net" | "nia" | "koa" )
+
+/* Extended Austrian pronouns with regional variations */
+<austrian-pronoun-nominative> ::= @AUSTRIAN[viennese] ( "i" | "du" | "er" | "se" | "des" | "mia" | "es" | "se" )
+                               | @AUSTRIAN[styrian] ( "i" | "du" | "er" | "se" | "des" | "mir" | "enk" | "se" )
+                               | @AUSTRIAN[tyrolean] ( "i" | "du" | "er" | "se" | "es" | "miar" | "enk" | "se" )
+                               | @AUSTRIAN[vorarlberg] ( "i" | "du" | "är" | "si" | "äs" | "mir" | "iar" | "si" )
+                               | @AUSTRIAN[carinthian] ( "i" | "du" | "er" | "se" | "des" | "mir" | "enk" | "se" )
+
+<austrian-pronoun-accusative> ::= @AUSTRIAN[viennese] ( "mi" | "di" | "eam" | "se" | "des" | "uns" | "eich" | "se" )
+                               | @AUSTRIAN[styrian] ( "mi" | "di" | "eam" | "se" | "des" | "uns" | "enk" | "se" )
+                               | @AUSTRIAN[tyrolean] ( "mi" | "di" | "eam" | "se" | "es" | "ins" | "enk" | "se" )
+
+<austrian-pronoun-dative> ::= @AUSTRIAN[viennese] ( "mia" | "dia" | "eam" | "ia" | "dem" | "uns" | "eich" | "eana" )
+                           | @AUSTRIAN[styrian] ( "mir" | "dir" | "eam" | "ia" | "dem" | "uns" | "enk" | "eana" )
+                           | @AUSTRIAN[tyrolean] ( "mir" | "dir" | "eam" | "ia" | "dem" | "ins" | "enk" | "eana" )
+
+/* Extended Austrian verbs */
+<austrian-verb-haben> ::= @AUSTRIAN[viennese] ( "hob" | "host" | "hot" | "hom" | "hobts" | "hom" )
+                       | @AUSTRIAN[styrian] ( "hob" | "hosd" | "hot" | "homma" | "hobts" | "hom" )
+                       | @AUSTRIAN[tyrolean] ( "hon" | "hosch" | "hot" | "hond" | "hond" | "hond" )
+                       | @AUSTRIAN[vorarlberg] ( "hon" | "hosch" | "hot" | "hond" | "hond" | "hond" )
+
+<austrian-verb-sein> ::= @AUSTRIAN[viennese] ( "bin" | "bist" | "is" | "san" | "seids" | "san" )
+                      | @AUSTRIAN[styrian] ( "bin" | "bist" | "is" | "san" | "sats" | "san" )
+                      | @AUSTRIAN[tyrolean] ( "bin" | "bisch" | "isch" | "sein" | "sein" | "sein" )
+                      | @AUSTRIAN[vorarlberg] ( "bin" | "bisch" | "isch" | "send" | "send" | "send" )
+
+<austrian-verb-werden> ::= @AUSTRIAN[viennese] ( "wer" | "wirst" | "wird" | "wern" | "werts" | "wern" )
+                        | @AUSTRIAN[styrian] ( "wer" | "wirst" | "wird" | "werdn" | "werdts" | "werdn" )
+                        | @AUSTRIAN[tyrolean] ( "wirr" | "wirrsch" | "wirrt" | "werdn" | "werdn" | "werdn" )
+
+/* Austrian perfect tense constructions */
+<austrian-perfect> ::= <austrian-verb-haben> <opt-whitespace> <austrian-participle>
+                    | <austrian-verb-sein> <opt-whitespace> <austrian-participle>
+
+<austrian-participle> ::= @AUSTRIAN[culinary] ( "g'essn" | "trunka" | "kocht" | "bockn" )
+                       | @AUSTRIAN[general] ( "gmacht" | "gwen" | "ghobt" | "ganga" | "kemma" )
+
+/* Extended Austrian culinary terms */
+<extended-austrian-culinary> ::= @AUSTRIAN[culinary] ( "Nockerl" | "Knödel" | "Schnitzel" | "Strudel" | "Apfelstrudel" | "Kaiserschmarrn" | "Marillenknödel" | "Sachertorte" | "Linzertorte" | "Manner" | "Mozartkugel" | "Punschkrapfen" | "Vanillekipferl" | "Lebkuchen" | "Striezel" | "Buchteln" | "Zwetschkenröster" | "Grammelknödel" | "Leberknödel" | "Speckknödel" | "Kasnocken" | "Kaspressknödel" )
+
+/* Austrian meal times and food culture */
+<austrian-meal> ::= @AUSTRIAN[culinary] ( "Frühstück" | "Gabelfrühstück" | "Jause" | "Brettljause" | "Mittagessen" | "Abendessen" | "Nachtmahl" )
+
+/* Extended Austrian beverages */
+<austrian-beverage> ::= @AUSTRIAN[culinary] ( "Kaffee" | "Melange" | "Verlängerter" | "Einspänner" | "Kapuziner" | "Großer" <opt-whitespace> "Brauner" | "Kleiner" <opt-whitespace> "Brauner" | "Schwarzer" | "Franziskaner" | "Mokka" | "Almdudler" | "Most" | "Sturm" | "Spritzer" | "G'spritzter" | "Achterl" | "Viertel" | "Krügerl" | "Seidel" | "Pfiff" )
+
+/* Austrian modal particles with Viennese flair */
+<austrian-modal-particle> ::= @AUSTRIAN[vocabulary] ( "halt" | "eh" | "fei" | "gell" | "gel" | "scho" | "jo" | "na" | "ah" | "oiso" | "hoid" )
+
+/* Extended Austrian greetings by time and formality */
+<extended-austrian-greeting> ::= @AUSTRIAN[vocabulary] ( "Grüß" <opt-whitespace> "Gott" | "Servus" | "Pfiat" <opt-whitespace> "di" | "Pfiat" <opt-whitespace> "eich" | "Baba" | "Bussi" | "Bussi" <opt-whitespace> "Baba" | "Habedere" | "Habe" <opt-whitespace> "die" <opt-whitespace> "Ehre" | "Küss" <opt-whitespace> "die" <opt-whitespace> "Hand" | "Mahlzeit" | "Prost" | "Zum" <opt-whitespace> "Wohl" )
+
+/* Austrian place-specific vocabulary */
+<austrian-place-vocab> ::= @AUSTRIAN[vocabulary] ( "Beisl" | "Heuriger" | "Buschenschank" | "Würstelstand" | "Konditorei" | "Kaffeehaus" | "Schani garten" | "Wurstelprater" )
+
+/* Austrian household and living terms */
+<austrian-household> ::= @AUSTRIAN[vocabulary] ( "Vorzimmer" | "Gangsterl" | "Pawlatsche" | "Bassena" | "Gemeindebau" | "Altbau" | "Zinshaus" | "Kabinett" | "Vorhaus" )
+
+/* Extended Austrian temporal expressions */
+<austrian-temporal-extended> ::= @AUSTRIAN[temporal] ( "heuer" | "heurig" | "herige" | "voriges" <opt-whitespace> "Jahr" | "nächstes" <opt-whitespace> "Jahr" | "vergangenes" <opt-whitespace> "Jahr" | "Jänner" | "Feber" | "im" <opt-whitespace> "Jänner" | "im" <opt-whitespace> "Feber" | "Anfang" <opt-whitespace> "Jänner" | "Ende" <opt-whitespace> "Feber" )
+
+/* Austrian seasons and weather */
+<austrian-season> ::= @AUSTRIAN[vocabulary] ( "Frühling" | "Sommer" | "Herbst" | "Winter" | "Föhn" | "Schneefall" | "Regen" )
+
+/* Austrian administrative system */
+<austrian-admin-extended> ::= @AUSTRIAN[administrative] ( "Matura" | "Maturazeugnis" | "Bezirk" | "Bezirkshauptmannschaft" | "Magistrat" | "Rathaus" | "Gemeindeamt" | "Bundesland" | "Länder" | "Gemeinde" | "Ortsgemeinde" | "Stadtgemeinde" | "Marktgemeinde" | "Wien" | "Niederösterreich" | "Oberösterreich" | "Steiermark" | "Kärnten" | "Salzburg" | "Tirol" | "Vorarlberg" | "Burgenland" )
+
+/* Austrian education terms */
+<austrian-education> ::= @AUSTRIAN[administrative] ( "Volksschule" | "Hauptschule" | "Gymnasium" | "HTL" | "HAK" | "HLW" | "Universität" | "Fachhochschule" | "Studienberechtigungsprüfung" )
+
+/* Austrian titles and forms of address */
+<austrian-title> ::= @AUSTRIAN[vocabulary] ( "Herr" | "Frau" | "Hofrat" | "Hofrätin" | "Magister" | "Magistra" | "Doktor" | "Doktorin" | "Professor" | "Professorin" | "Direktor" | "Direktorin" )
+
+/* Multi-embedded sentences with Austrian vocabulary */
+<austrian-multi-embedded> ::= <main-clause> <opt-whitespace> <austrian-subordinate> ( <opt-whitespace> <austrian-subordinate> )+
+
+<austrian-subordinate> ::= <subordinating-conjunction> <opt-whitespace> <austrian-content>
+
+<austrian-content> ::= <subject> <opt-whitespace> <austrian-middle-field>? <opt-whitespace> <verb-phrase-subordinate>
+
+<austrian-middle-field> ::= ( <austrian-modal-particle> | <object> | <adverb> )
+
++
+/* Coordinated complex sentences with Austrian features */
+<austrian-coordinated-complex> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <austrian-complex-sentence>
+
+<austrian-complex-sentence> ::= <main-clause> <opt-whitespace> <austrian-subordinate>
+
+/* Parenthetical clauses with Austrian expressions */
+<austrian-parenthetical> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> "," <opt-whitespace> <austrian-modal-particle>+ <opt-whitespace> "," <opt-whitespace> <middle-field>? <punctuation>?
+
+/* Cleft sentences with Austrian vocabulary */
+<austrian-cleft> ::= "es" <opt-whitespace> "ist" <opt-whitespace> <austrian-focused> <opt-whitespace> <relative-clause>
+
+<austrian-focused> ::= <austrian-noun>
+                    | <austrian-temporal-phrase>
+
+/* Tag questions Austrian style */
+<austrian-tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <austrian-question-tag> "?"
+
+<austrian-question-tag> ::= "oder" | "gell" | "gel" | "nicht" <opt-whitespace> "wahr" | "stimmt's" | "eh"
+
+/* Elliptical structures with Austrian particles */
+<austrian-elliptical> ::= <austrian-modal-particle>+
+                       | <austrian-greeting>
+                       | <austrian-noun>
+
+/* Reported speech with Austrian verbs */
+<austrian-reported-speech> ::= <austrian-reporting-verb> <opt-whitespace> "," <opt-whitespace> <reported-clause>
+
+<austrian-reporting-verb> ::= "sagt" | "moant" | "glaubt" | "erzählt"
+
+/* Free indirect speech */
+<austrian-free-indirect> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Correlative constructions */
+<austrian-correlative> ::= <correlative-pair> <opt-whitespace> <austrian-clause-sequence>
+
+<austrian-clause-sequence> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Discourse markers with Austrian flavor */
+<austrian-discourse-marker> ::= @AUSTRIAN[vocabulary] ( "oiso" | "na" <opt-whitespace> "jo" | "jo" <opt-whitespace> "eh" | "eh" <opt-whitespace> "klar" | "sowieso" | "logisch" )
+
+/* Temporal discourse in Austrian */
+<austrian-temporal-discourse> ::= "zuerst" | "dann" | "danach" | "schließlich" | "zum" <opt-whitespace> "Schluss" | "endlich"
+
+/* Causal discourse in Austrian */
+<austrian-causal-discourse> ::= "deshalb" | "deswegen" | "darum" | "drum" | "daher"
+
+/* Contrastive discourse in Austrian */
+<austrian-contrastive-discourse> ::= "aber" | "jedoch" | "allerdings" | "trotzdem" | "dennoch"
+
+/* Additive discourse in Austrian */
+<austrian-additive-discourse> ::= "außerdem" | "zudem" | "überdies" | "darüber" <opt-whitespace> "hinaus"
+
+/* Austrian comparative constructions */
+<austrian-comparative> ::= <adjective-comparative> <opt-whitespace> "als" <opt-whitespace> <austrian-noun>
+
+/* Austrian superlative constructions */
+<austrian-superlative> ::= "der" <opt-whitespace> <adjective-superlative> <opt-whitespace> <austrian-noun>
+
+/* Austrian conditional constructions */
+<austrian-conditional> ::= "wenn" <opt-whitespace> <austrian-content> <opt-whitespace> "," <opt-whitespace> "dann" <opt-whitespace> <main-clause>
+
+/* Purpose clauses Austrian style */
+<austrian-purpose> ::= "damit" <opt-whitespace> <austrian-content>
+                    | "um" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+
+/* Concessive constructions Austrian style */
+<austrian-concessive> ::= "obwohl" <opt-whitespace> <austrian-content>
+                       | "trotzdem" <opt-whitespace> "dass" <opt-whitespace> <austrian-content>
+
+/* Result clauses Austrian style */
+<austrian-result> ::= "so" <opt-whitespace> <adjective> <opt-whitespace> "," <opt-whitespace> "dass" <opt-whitespace> <austrian-content>
+
+/* Manner clauses Austrian style */
+<austrian-manner> ::= "indem" <opt-whitespace> <austrian-content>
+
+/* Instrumental constructions with Austrian vocabulary */
+<austrian-instrumental> ::= "mit" <opt-whitespace> <austrian-noun>
+
+/* Benefactive constructions */
+<austrian-benefactive> ::= "für" <opt-whitespace> <austrian-noun>
+
+/* Comitative constructions */
+<austrian-comitative> ::= "mit" <opt-whitespace> <austrian-noun>
+                       | "zusammen" <opt-whitespace> "mit" <opt-whitespace> <austrian-noun>
+
+/* Austrian number expressions */
+<austrian-numeral-expression> ::= <austrian-cardinal>
+                               | <austrian-ordinal>
+
+<austrian-cardinal> ::= "eins" | "zwei" | "drei" | "vier" | "fünf" | "sechs" | "sieben" | "acht" | "neun" | "zehn"
+
+<austrian-ordinal> ::= "erste" | "zweite" | "dritte" | "vierte" | "fünfte"
+
+/* Extended genitive constructions with Austrian nouns */
+<austrian-genitive> ::= <austrian-noun> <opt-whitespace> "des" <opt-whitespace> <austrian-noun>
+                     | "des" <opt-whitespace> <austrian-noun> <opt-whitespace> <austrian-noun>
+
+/* Dative constructions with Austrian verbs */
+<austrian-dative> ::= <personal-pronoun-dative> <opt-whitespace> <austrian-verb>
+
+<austrian-verb> ::= "gefallen" | "helfen" | "schmecken" | "gehören" | "passen"
+
+/* Accusative constructions with Austrian objects */
+<austrian-accusative> ::= <austrian-transitive-verb> <opt-whitespace> <austrian-noun>
+
+<austrian-transitive-verb> ::= "essen" | "trinken" | "kaufen" | "machen" | "sehen"
+
+/* Reflexive constructions with Austrian vocabulary */
+<austrian-reflexive> ::= <reflexive-pronoun> <opt-whitespace> <austrian-reflexive-verb>
+
+<austrian-reflexive-verb> ::= "freuen" | "ärgern" | "wundern" | "interessieren" | "erinnern"
+
+/* Reciprocal constructions */
+<austrian-reciprocal> ::= "einander" <opt-whitespace> <verb-infinitive>
+
+/* Intensive pronouns Austrian style */
+<austrian-intensive> ::= <reflexive-pronoun> <opt-whitespace> "selbst"
+                      | <reflexive-pronoun> <opt-whitespace> "selber"
+
+/* Progressive aspect in Austrian */
+<austrian-progressive> ::= "gerade" <opt-whitespace> <verb-present>
+                        | "grad" <opt-whitespace> <verb-present>
+
+/* Habitual aspect in Austrian */
+<austrian-habitual> ::= "immer" <opt-whitespace> <verb-present>
+                     | "normalerweise" <opt-whitespace> <verb-present>
+
+/* Inchoative aspect */
+<austrian-inchoative> ::= "anfangen" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+
+/* Terminative aspect */
+<austrian-terminative> ::= "aufhören" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+
+/* Causative constructions */
+<austrian-causative> ::= "lassen" <opt-whitespace> <verb-infinitive>
+
+/* Austrian place names extended */
+<austrian-city> ::= @AUSTRIAN[vocabulary] ( "Wien" | "Graz" | "Linz" | "Salzburg" | "Innsbruck" | "Klagenfurt" | "Villach" | "Wels" | "Sankt" <opt-whitespace> "Pölten" | "Dornbirn" | "Wiener" <opt-whitespace> "Neustadt" | "Steyr" | "Feldkirch" | "Bregenz" | "Leonding" | "Klosterneuburg" | "Baden" | "Wolfsberg" | "Leoben" | "Krems" )
+
+/* Austrian districts of Vienna */
+<viennese-district> ::= @AUSTRIAN[viennese] ( "Innere" <opt-whitespace> "Stadt" | "Leopoldstadt" | "Landstraße" | "Wieden" | "Margareten" | "Mariahilf" | "Neubau" | "Josefstadt" | "Alsergrund" | "Favoriten" | "Simmering" | "Meidling" | "Hietzing" | "Penzing" | "Rudolfsheim-Fünfhaus" | "Ottakring" | "Hernals" | "Währing" | "Döbling" | "Brigittenau" | "Floridsdorf" | "Donaustadt" | "Liesing" )
+
+/* Additional context rules for Austrian grammar */
+@CONTEXT_RULE[austrian-vocabulary-consistency]:
+    IF <sentence> CONTAINS @AUSTRIAN[vocabulary]
+    THEN PREFER_AUSTRIAN_FORMS
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-temporal-jänner-feber]:
+    IF <month> IN <sentence>
+    THEN USE "Jänner" OR "Feber" FOR_AUSTRIA
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-modal-particle-position]:
+    IF <austrian-modal-particle> PRESENT
+    THEN POSITION_IN <middle-field>
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-greeting-context]:
+    IF <austrian-greeting> PRESENT
+    THEN APPROPRIATE_FOR_FORMALITY_LEVEL
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-culinary-article]:
+    IF <austrian-culinary-noun> PRESENT
+    THEN CORRECT_GENDER_ARTICLE
+    ELSE WARNING "Austrian food terms have specific genders"
+
+@CONTEXT_RULE[heuer-temporal-agreement]:
+    IF "heuer" PRESENT
+    THEN <verb-tense> SHOULD_BE present OR future
+    ELSE WARNING "'heuer' typically refers to current or future year"
+
+@CONTEXT_RULE[austrian-perfect-preference]:
+    IF <past-event> DESCRIBED
+    THEN PREFER <perfect-tense> OVER <preterite>
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-dialect-mixing]:
+    IF MULTIPLE @AUSTRIAN[regional] MARKERS
+    THEN WARNING "Mixing Austrian regional dialects may be confusing"
+    ELSE VALID
+
+/* Nested subordinate clauses with Austrian vocabulary */
+<austrian-nested-subordinate> ::= <subordinating-conjunction> <opt-whitespace> <austrian-nested-content>
+
+<austrian-nested-content> ::= <subject> <opt-whitespace> <austrian-middle-field>? <opt-whitespace> <verb-phrase-subordinate> <opt-whitespace> <austrian-nested-final>
+
+<austrian-nested-final> ::= <subordinate-clause>
+                         | <relative-clause>
+                         | <austrian-subordinate>
+
+/* Split complex sentences Austrian style */
+<austrian-split-complex> ::= <austrian-subordinate> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <austrian-subordinate>
+
+/* Embedded clause sequences */
+<austrian-embedded-sequence> ::= <austrian-subordinate> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <austrian-subordinate> )+
+
+/* Fronted subordinate sentences */
+<austrian-fronted-subordinate> ::= <austrian-subordinate> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Extraposition with Austrian vocabulary */
+<austrian-extraposed> ::= <main-clause> <opt-whitespace> <austrian-extraposed-clause>
+
+<austrian-extraposed-clause> ::= <austrian-subordinate>
+                              | <infinitive-clause>
+
+/* Austrian diminutive patterns (Viennese style) */
+<austrian-diminutive-extended> ::= @AUSTRIAN[viennese] ( <noun-stem> "erl" | <noun-stem> "l" | <noun-stem> "i" )
+                                | @AUSTRIAN[styrian] ( <noun-stem> "erl" | <noun-stem> "l" )
+                                | @AUSTRIAN[tyrolean] ( <noun-stem> "le" | <noun-stem> "l" )
+
+/* Austrian compound nouns with culinary elements */
+<austrian-compound-culinary> ::= <austrian-culinary-noun> <opt-whitespace> <austrian-culinary-noun>
+                              | <austrian-culinary-noun> <opt-whitespace> <noun>
+
+/* Extended Austrian meal vocabulary */
+<austrian-meal-extended> ::= @AUSTRIAN[culinary] ( "Brettljause" | "Jausenbrot" | "Wurstsemmel" | "Käsekrainer" | "Bosna" | "Leberkäse" | "Leberkässemmel" | "Extrawurstsemmel" | "Eierschwammerl" | "Schwammerl" | "Eierschwammerlgulasch" )
+
+/* Austrian coffee house culture vocabulary */
+<austrian-coffee-extended> ::= @AUSTRIAN[culinary] ( "Kaffeehaus" | "Kaffeesieder" | "Melange" | "Verlängerter" | "Verlängerter" <opt-whitespace> "Brauner" | "Großer" <opt-whitespace> "Schwarzer" | "Kleiner" <opt-whitespace> "Schwarzer" | "Einspänner" | "Franziskaner" | "Kapuziner" | "Pharisäer" | "Maria" <opt-whitespace> "Theresia" | "Türkischer" | "Konsul" | "Mazagran" )
+
+/* Austrian pastry vocabulary */
+<austrian-pastry> ::= @AUSTRIAN[culinary] ( "Sachertorte" | "Dobostorte" | "Esterhazytorte" | "Malakofftorte" | "Punschkrapfen" | "Indianerkrapfen" | "Faschingskrapfen" | "Vanillekipferl" | "Linzeraugen" | "Ischler" <opt-whitespace> "Törtchen" | "Mozartkugel" | "Mozarttaler" | "Manner" <opt-whitespace> "Schnitten" | "Dragee" <opt-whitespace> "Keksi" )
+
+/* Extended Austrian temporal phrases */
+<austrian-time-expression> ::= @AUSTRIAN[temporal] ( "um" <opt-whitespace> <clock-time> | "gegen" <opt-whitespace> <clock-time> | "circa" <opt-whitespace> <clock-time> | "Viertel" <opt-whitespace> <numeral> | "dreiviertel" <opt-whitespace> <numeral> | "halb" <opt-whitespace> <numeral> )
+
+<clock-time> ::= <numeral> <opt-whitespace> "Uhr" ( <opt-whitespace> <numeral> )?
+
+/* Austrian day parts */
+<austrian-day-part> ::= @AUSTRIAN[temporal] ( "in" <opt-whitespace> "der" <opt-whitespace> "Früh" | "am" <opt-whitespace> "Vormittag" | "zu" <opt-whitespace> "Mittag" | "am" <opt-whitespace> "Nachmittag" | "am" <opt-whitespace> "Abend" | "in" <opt-whitespace> "der" <opt-whitespace> "Nacht" )
+
+/* Austrian shopping and commerce vocabulary */
+<austrian-commerce> ::= @AUSTRIAN[vocabulary] ( "Greißler" | "Greißlerei" | "Trafik" | "Bäcker" | "Fleischhauer" | "Fleischhauerei" | "Würstelstand" | "Maronibrater" | "Standler" | "Hofer" | "Billa" | "Spar" | "Merkur" )
+
+/* Austrian traffic and transport */
+<austrian-transport> ::= @AUSTRIAN[vocabulary] ( "Straßenbahn" | "Bim" | "U-Bahn" | "Ubahn" | "Schnellbahn" | "S-Bahn" | "Autobus" | "Bus" | "Badner" <opt-whitespace> "Bahn" | "Bummelbahn" | "Westbahn" | "ÖBB" | "Wiener" <opt-whitespace> "Linien" )
+
+/* Austrian clothing vocabulary */
+<austrian-clothing> ::= @AUSTRIAN[vocabulary] ( "Leiberl" | "Janker" | "Dirndl" | "Lederhose" | "Tracht" | "Lodenmantel" | "Loden" | "Stutzen" | "Trachtenhut" | "Gamsbarthut" )
+
+/* Austrian weather expressions */
+<austrian-weather> ::= @AUSTRIAN[vocabulary] ( "Föhn" | "Schnürlregen" | "Schauerwetter" | "Kaiserwetter" | "Hundewetter" | "Sauwetter" )
+
+/* Extended Austrian exclamations */
+<austrian-exclamation> ::= @AUSTRIAN[vocabulary] ( "Oida" | "Hawara" | "Beidl" | "Zipf" | "Tschapperl" | "Trottel" | "Depp" | "Schas" | "Bledsinn" | "Schmäh" | "leiwand" | "ur" | "voll" | "ur" <opt-whitespace> "leiwand" | "ur" <opt-whitespace> "cool" )
+
+/* Austrian intensifiers */
+<austrian-intensifier> ::= @AUSTRIAN[vocabulary] ( "ur" | "voll" | "ur" <opt-whitespace> "voll" | "total" | "ganz" | "echt" )
+
+/* Austrian affirmation and negation expressions */
+<austrian-affirmation> ::= @AUSTRIAN[vocabulary] ( "jo" | "eh" | "eh" <opt-whitespace> "klar" | "sicher" | "scho" | "genau" | "fix" | "auf" <opt-whitespace> "jeden" <opt-whitespace> "Fall" )
+
+<austrian-negation-expression> ::= @AUSTRIAN[vocabulary] ( "na" | "naa" | "na" <opt-whitespace> "geh" | "i" <opt-whitespace> "wo" | "nie" <opt-whitespace> "im" <opt-whitespace> "Leben" )
+
+/* Austrian politeness formulas */
+<austrian-politeness> ::= @AUSTRIAN[vocabulary] ( "Bitte" <opt-whitespace> "schön" | "Danke" <opt-whitespace> "schön" | "Vergelt's" <opt-whitespace> "Gott" | "Gesundheit" | "Mahlzeit" | "Wohl" <opt-whitespace> "bekomm's" | "Prost" | "Zum" <opt-whitespace> "Wohl" )
+
+/* Extended Austrian family and relationship terms */
+<austrian-family> ::= @AUSTRIAN[vocabulary] ( "Opa" | "Oma" | "Vater" | "Mutter" | "Papa" | "Mama" | "Bruder" | "Schwester" | "Onkel" | "Tante" | "Nichte" | "Neffe" | "Cousin" | "Cousine" | "Schwager" | "Schwägerin" | "Schwiegermutter" | "Schwiegervater" )
+
+/* Austrian occupations and professions */
+<austrian-profession> ::= @AUSTRIAN[vocabulary] ( "Kellner" | "Kellnerin" | "Ober" | "Herr" <opt-whitespace> "Ober" | "Fräulein" | "Verkäufer" | "Verkäuferin" | "Angestellter" | "Angestellte" | "Beamter" | "Beamtin" | "Lehrer" | "Lehrerin" | "Professor" | "Professorin" | "Arzt" | "Ärztin" | "Doktor" | "Doktorin" )
+
+/* Extended Austrian body parts (some regional) */
+<austrian-body-part> ::= @AUSTRIAN[vocabulary] ( "Kopf" | "Schädel" | "Hirn" | "Gsicht" | "Goschn" | "Haxn" | "Wadln" | "Bauch" | "Wampen" )
+
+/* Austrian quantities and measures */
+<austrian-quantity> ::= @AUSTRIAN[vocabulary] ( "Kilo" | "Deka" | "Gramm" | "Liter" | "Becher" | "Packerl" | "Sackerl" | "Tüte" | "Stück" | "Paar" )
+
+/* Austrian currency expressions (historical and current) */
+<austrian-currency> ::= @AUSTRIAN[vocabulary] ( "Euro" | "Cent" | "Schilling" | "Groschen" )
+
+/* Complex verb constructions Austrian style */
+<austrian-complex-verb> ::= <austrian-double-infinitive>
+                         | <austrian-modal-perfect>
+                         | <austrian-future-perfect>
+
+<austrian-double-infinitive> ::= <modal-verb> <opt-whitespace> <verb-infinitive> <opt-whitespace> <austrian-auxiliary-infinitive>
+
+<austrian-auxiliary-infinitive> ::= "haben" | "sein" | "werden"
+
+<austrian-modal-perfect> ::= <modal-verb> <opt-whitespace> <austrian-participle> <opt-whitespace> "haben"
+
+<austrian-future-perfect> ::= <future-auxiliary> <opt-whitespace> <austrian-participle> <opt-whitespace> "haben"
+
+/* Topicalization patterns Austrian style */
+<austrian-topicalized> ::= <austrian-topicalized-object> <opt-whitespace> <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>?
+
+<austrian-topicalized-object> ::= <austrian-noun>
+
+/* Inversion patterns */
+<austrian-inverted> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <austrian-middle-field>? <opt-whitespace> <adverbial>? <opt-whitespace> <verb-complement>?
+
+/* Comparative constructions Austrian style */
+<austrian-comparative-construction> ::= <austrian-comparative-clause>
+                                     | <austrian-equative-clause>
+                                     | <austrian-superlative-clause>
+
+<austrian-comparative-clause> ::= <adjective-comparative> <opt-whitespace> "als" <opt-whitespace> <austrian-noun>
+
+<austrian-equative-clause> ::= "so" <opt-whitespace> <adjective> <opt-whitespace> "wie" <opt-whitespace> <austrian-noun>
+
+<austrian-superlative-clause> ::= <article> <opt-whitespace> <adjective-superlative> <opt-whitespace> <austrian-noun>
+
+/* Conditional constructions Austrian style */
+<austrian-conditional-construction> ::= <austrian-real-conditional>
+                                     | <austrian-unreal-conditional>
+                                     | <austrian-past-conditional>
+
+<austrian-real-conditional> ::= "wenn" <opt-whitespace> <austrian-content> <opt-whitespace> "," <opt-whitespace> "dann" <opt-whitespace> <main-clause>
+
+<austrian-unreal-conditional> ::= "wenn" <opt-whitespace> <subjunctive-clause> <opt-whitespace> "," <opt-whitespace> <conditional-main-clause>
+
+<austrian-past-conditional> ::= "wenn" <opt-whitespace> <past-subjunctive-clause> <opt-whitespace> "," <opt-whitespace> <past-conditional-main>
+
+/* Relative clause types with Austrian vocabulary */
+<austrian-restrictive-relative> ::= <relative-pronoun> <opt-whitespace> <austrian-relative-content>
+
+<austrian-non-restrictive-relative> ::= "," <opt-whitespace> <relative-pronoun> <opt-whitespace> <austrian-relative-content> <opt-whitespace> ","
+
+<austrian-relative-content> ::= <subject>? <opt-whitespace> <austrian-middle-field>? <opt-whitespace> <finite-verb> <opt-whitespace> <verb-complement>?
+
+/* Participial constructions Austrian style */
+<austrian-participial> ::= <austrian-present-participial>
+                        | <austrian-past-participial>
+
+<austrian-present-participial> ::= <present-participle> <opt-whitespace> <austrian-noun>
+
+<austrian-past-participial> ::= <austrian-participle> <opt-whitespace> <austrian-noun>
+
+/* Nominal style constructions */
+<austrian-nominal> ::= <austrian-nominalization>
+                    | <austrian-extended-adjective-phrase>
+
+<austrian-nominalization> ::= <article> <opt-whitespace> <verb-infinitive>
+
+<austrian-extended-adjective-phrase> ::= <article> <opt-whitespace> <adjective> <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <austrian-noun>
+
+/* Complex noun phrases Austrian style */
+<austrian-complex-noun-phrase> ::= <determiner>? <opt-whitespace> <quantifier>? <opt-whitespace> <adjective-phrase>+ <opt-whitespace> <austrian-noun> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>? <opt-whitespace> <apposition>?
+
+/* Vocative constructions Austrian style */
+<austrian-vocative> ::= <proper-noun> | <austrian-noun> | <austrian-title>
+
+<austrian-vocative-sentence> ::= <austrian-vocative> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Exclamatory constructions Austrian style */
+<austrian-exclamatory> ::= <exclamative-clause>
+                        | <austrian-wish-clause>
+                        | <austrian-exclamation>
+
+<austrian-wish-clause> ::= "wenn" <opt-whitespace> <subjunctive-clause> <opt-whitespace> "doch" <opt-whitespace> "!"
+
+/* Extended question types Austrian style */
+<austrian-alternative-question> ::= <yes-no-question-part> <opt-whitespace> "oder" <opt-whitespace> <yes-no-question-part>
+
+<austrian-rhetorical-question> ::= <wh-question>
+
+/* Echo questions Austrian style */
+<austrian-echo-question> ::= <statement> <opt-whitespace> "?"
+
+/* Confirmation requests Austrian style */
+<austrian-confirmation-request> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <austrian-confirmation-particle> "?"
+
+<austrian-confirmation-particle> ::= "oder" | "gell" | "gel" | "nicht" <opt-whitespace> "wahr" | "stimmt's" | "eh"
+
+/* Information structure Austrian style */
+<austrian-topic-comment> ::= <topic> <opt-whitespace> "," <opt-whitespace> <austrian-comment>
+
+<austrian-comment> ::= <predicate> <opt-whitespace> <austrian-modal-particle>?
+
+/* Anaphoric and cataphoric reference */
+<austrian-anaphoric> ::= <personal-pronoun> | <demonstrative-pronoun>
+
+<austrian-cataphoric> ::= <demonstrative-pronoun> <opt-whitespace> <austrian-subordinate>
+
+/* Extended context rules for Austrian grammar */
+@CONTEXT_RULE[austrian-regional-consistency]:
+    IF <sentence> CONTAINS @AUSTRIAN[viennese]
+    THEN ALL_VIENNESE_FORMS_PREFERRED
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-culinary-gender]:
+    IF <austrian-culinary-noun> PRESENT
+    THEN VERIFY_CORRECT_GENDER
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-beverage-context]:
+    IF <austrian-beverage> PRESENT
+    THEN COFFEE_HOUSE_CONTEXT_APPROPRIATE
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-diminutive-usage]:
+    IF <austrian-diminutive-extended> PRESENT
+    THEN AFFECTIONATE_OR_SMALL_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-modal-particle-frequency]:
+    IF @AUSTRIAN[vocabulary] <austrian-modal-particle> OVERUSED
+    THEN WARNING "Too many modal particles may reduce clarity"
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-greeting-time]:
+    IF <austrian-greeting> PRESENT
+    THEN MATCH_TIME_OF_DAY
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-formality-level]:
+    IF <austrian-title> PRESENT
+    THEN USE_FORMAL_ADDRESS
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-district-article]:
+    IF <viennese-district> PRESENT
+    THEN CORRECT_ARTICLE_FOR_DISTRICT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-temporal-heuer]:
+    IF "heuer" PRESENT
+    THEN <verb>.@TENSE IN {present, future}
+    ELSE WARNING "'heuer' refers to current year"
+
+@CONTEXT_RULE[austrian-jänner-feber-spelling]:
+    IF <month> IN {1, 2}
+    THEN USE "Jänner" OR "Feber"
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-perfect-tense-preference]:
+    IF <narrative> ABOUT_PAST
+    THEN PREFER <austrian-perfect> OVER <preterite>
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-matura-context]:
+    IF "Matura" PRESENT
+    THEN EDUCATIONAL_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-place-preposition]:
+    IF <austrian-city> PRESENT
+    THEN CORRECT_PREPOSITION FOR_LOCATION
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-exclamation-appropriateness]:
+    IF <austrian-exclamation> PRESENT
+    THEN INFORMAL_CONTEXT_APPROPRIATE
+    ELSE WARNING "Informal exclamations may not suit formal contexts"
+
+@CONTEXT_RULE[austrian-intensifier-position]:
+    IF <austrian-intensifier> PRESENT
+    THEN POSITION_BEFORE <adjective> OR <adverb>
+    ELSE VALID
+
+/* Extended Austrian verb forms with regional variations */
+<austrian-verb-gehen> ::= @AUSTRIAN[viennese] ( "geh" | "gehst" | "geht" | "genga" | "gehts" | "genga" )
+                       | @AUSTRIAN[styrian] ( "geh" | "gehst" | "geht" | "genga" | "gehts" | "genga" )
+                       | @AUSTRIAN[tyrolean] ( "gian" | "giasch" | "giat" | "giengen" | "giengen" | "giengen" )
+
+<austrian-verb-kommen> ::= @AUSTRIAN[viennese] ( "kumm" | "kummst" | "kummt" | "kemma" | "kummts" | "kemma" )
+                        | @AUSTRIAN[styrian] ( "kumm" | "kummst" | "kummt" | "kemma" | "kummts" | "kemma" )
+                        | @AUSTRIAN[tyrolean] ( "kimm" | "kimmsch" | "kimmt" | "kemmen" | "kemmen" | "kemmen" )
+
+<austrian-verb-machen> ::= @AUSTRIAN[viennese] ( "mach" | "machst" | "macht" | "macha" | "machts" | "macha" )
+                        | @AUSTRIAN[styrian] ( "mach" | "machst" | "macht" | "macha" | "machts" | "macha" )
+
+<austrian-verb-sagen> ::= @AUSTRIAN[viennese] ( "sog" | "sogst" | "sogt" | "sogn" | "sogts" | "sogn" )
+                       | @AUSTRIAN[styrian] ( "sog" | "sogst" | "sogt" | "sogn" | "sogts" | "sogn" )
+
+/* Extended Austrian adjectives with regional forms */
+<austrian-adjective-schön> ::= @AUSTRIAN[viennese] "schee"
+                            | @AUSTRIAN[styrian] "schian"
+                            | @AUSTRIAN[tyrolean] "schian"
+
+<austrian-adjective-groß> ::= @AUSTRIAN[viennese] "grouß"
+                           | @AUSTRIAN[styrian] "groaß"
+                           | @AUSTRIAN[tyrolean] "groaß"
+
+<austrian-adjective-klein> ::= @AUSTRIAN[viennese] "kloa"
+                            | @AUSTRIAN[styrian] "kloan"
+                            | @AUSTRIAN[tyrolean] "kloan"
+
+<austrian-adjective-gut> ::= @AUSTRIAN[viennese] "guat"
+                          | @AUSTRIAN[styrian] "guad"
+                          | @AUSTRIAN[tyrolean] "guad"
+
+/* Extended Austrian question words regional */
+<austrian-question-word-regional> ::= @AUSTRIAN[viennese] ( "wos" | "wea" | "wo" | "wia" | "wonn" | "woarum" )
+                                   | @AUSTRIAN[styrian] ( "wos" | "wer" | "wo" | "wia" | "wonn" | "woarum" )
+                                   | @AUSTRIAN[tyrolean] ( "wos" | "wer" | "wo" | "wia" | "wenn" | "woarum" )
+
+/* Austrian demonstratives regional */
+<austrian-demonstrative-regional> ::= @AUSTRIAN[viennese] ( "dea" | "de" | "des" | "de" )
+                                   | @AUSTRIAN[styrian] ( "der" | "de" | "des" | "de" )
+                                   | @AUSTRIAN[tyrolean] ( "dear" | "de" | "des" | "de" )
+
+/* Extended Austrian possessives regional */
+<austrian-possessive-regional> ::= @AUSTRIAN[viennese] ( "mein" | "dein" | "sein" | "eana" | "unsa" | "enka" )
+                                | @AUSTRIAN[styrian] ( "mei" | "dei" | "sei" | "eana" | "unsa" | "enka" )
+                                | @AUSTRIAN[tyrolean] ( "mein" | "dein" | "sein" | "iara" | "insra" | "enka" )
+
+/* Extended Austrian numbers regional */
+<austrian-number-regional> ::= @AUSTRIAN[viennese] ( "oans" | "zwoa" | "drei" | "via" | "fünf" )
+                            | @AUSTRIAN[styrian] ( "oans" | "zwoa" | "drei" | "viere" | "fünf" )
+                            | @AUSTRIAN[tyrolean] ( "oans" | "zwoa" | "drei" | "viere" | "fünf" )
+
+/* Extended Austrian prepositions */
+<austrian-preposition-regional> ::= @AUSTRIAN[viennese] ( "auf" | "bei" | "mit" | "von" | "zu" )
+                                 | @AUSTRIAN[styrian] ( "auf" | "bei" | "mit" | "von" | "zu" )
+                                 | @AUSTRIAN[tyrolean] ( "auf" | "bei" | "mit" | "von" | "zu" )
+
+/* Extended Austrian time adverbs */
+<austrian-time-adverb-regional> ::= @AUSTRIAN[viennese] ( "jetzt" | "heit" | "gestan" | "moagn" )
+                                 | @AUSTRIAN[styrian] ( "jetzt" | "heint" | "gestan" | "moagn" )
+                                 | @AUSTRIAN[tyrolean] ( "itz" | "heit" | "gestan" | "moing" )
+
+/* Extended Austrian place adverbs */
+<austrian-place-adverb-regional> ::= @AUSTRIAN[viennese] ( "do" | "duat" | "herinnen" | "außi" )
+                                  | @AUSTRIAN[styrian] ( "do" | "durt" | "herobn" | "außi" )
+                                  | @AUSTRIAN[tyrolean] ( "do" | "dert" | "herobn" | "auße" )
+
+/* Extended Austrian manner adverbs */
+<austrian-manner-adverb> ::= @AUSTRIAN[vocabulary] ( "gach" | "hoit" | "langsam" | "gschwind" | "leise" | "laut" )
+
+/* Extended Austrian degree adverbs */
+<austrian-degree-adverb> ::= @AUSTRIAN[vocabulary] ( "sehr" | "voi" | "ur" | "gaunz" | "zimli" )
+
+/* Extended Austrian conjunctions */
+<austrian-conjunction> ::= "und" | "oder" | "ober" | "sondern" | "denn" | "weil" | "wonn" | "dass"
+
+/* Extended Austrian seasons and holidays */
+<austrian-holiday> ::= @AUSTRIAN[vocabulary] ( "Weihnachten" | "Christkindl" | "Ostern" | "Pfingsten" | "Allerheiligen" | "Allerseelen" | "Mariä" <opt-whitespace> "Himmelfahrt" | "Fronleichnam" | "Stefanitag" | "Dreikönigstag" | "Fasching" | "Faschingsdienstag" | "Aschermittwoch" )
+
+/* Extended Austrian church and religion vocabulary */
+<austrian-religion> ::= @AUSTRIAN[vocabulary] ( "Kirche" | "Stephansdom" | "Pfarrkirche" | "Wallfahrt" | "Prozession" | "Messe" | "Gottesdienst" | "Beichte" | "Kommunion" | "Firmung" | "Taufe" )
+
+/* Extended Austrian sports and recreation */
+<austrian-sports> ::= @AUSTRIAN[vocabulary] ( "Fußball" | "Schifahren" | "Skifahren" | "Langlaufen" | "Eislaufen" | "Schwimmen" | "Wandern" | "Bergsteigen" | "Klettern" )
+
+/* Extended Austrian music and culture */
+<austrian-culture> ::= @AUSTRIAN[vocabulary] ( "Walzer" | "Schuhplattler" | "Jodeln" | "Heuriger" <opt-whitespace> "Musik" | "Wienerli ed" | "Oper" | "Staatsoper" | "Volksoper" | "Musikverein" | "Konzerthaus" )
+
+/* Extended Austrian animals and nature */
+<austrian-animal> ::= @AUSTRIAN[vocabulary] ( "Gams" | "Gemse" | "Murmeltier" | "Steinbock" | "Adler" | "Hirsch" | "Reh" )
+
+/* Extended Austrian plants and trees */
+<austrian-plant> ::= @AUSTRIAN[vocabulary] ( "Edelweiß" | "Enzian" | "Alpenrose" | "Lärche" | "Zirbe" | "Fichte" | "Tanne" )
+
+/* Extended Austrian landscape features */
+<austrian-landscape> ::= @AUSTRIAN[vocabulary] ( "Berg" | "Alm" | "Tal" | "See" | "Fluss" | "Donau" | "Inn" | "Salzach" | "Mur" | "Drau" )
+
+/* Extended Austrian buildings and architecture */
+<austrian-building> ::= @AUSTRIAN[vocabulary] ( "Schloss" | "Burg" | "Palais" | "Hofburg" | "Schönbrunn" | "Belvedere" | "Stift" | "Kloster" | "Rathaus" )
+
+/* Extended Austrian music instruments */
+<austrian-instrument> ::= @AUSTRIAN[vocabulary] ( "Zither" | "Hackbrett" | "Steirische" <opt-whitespace> "Harmonika" | "Alphorn" )
+
+/* Extended Austrian folk costume */
+<austrian-costume> ::= @AUSTRIAN[vocabulary] ( "Dirndl" | "Lederhose" | "Tracht" | "Schürze" | "Janker" | "Trachtenhut" | "Charivari" )
+
+/* Additional complex sentence structures */
+<austrian-nested-three-level> ::= <main-clause> <opt-whitespace> <austrian-subordinate> <opt-whitespace> <austrian-subordinate> <opt-whitespace> <austrian-subordinate>
+
+<austrian-multiple-coordination> ::= <austrian-subordinate> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <austrian-subordinate> ){2,}
+
+/* Extended Austrian passive constructions */
+<austrian-passive> ::= <werden-verb> <opt-whitespace> <austrian-participle>
+
+/* Extended Austrian causative constructions */
+<austrian-causative-extended> ::= "lassen" <opt-whitespace> <object> <opt-whitespace> <verb-infinitive>
+
+/* Extended Austrian permissive constructions */
+<austrian-permissive-extended> ::= "erlauben" <opt-whitespace> <object> <opt-whitespace> <infinitive-clause>
+
+/* Extended Austrian reciprocal constructions */
+<austrian-reciprocal-extended> ::= "einander" <opt-whitespace> <verb-infinitive>
+
+/* Extended Austrian aspectual constructions */
+<austrian-progressive-extended> ::= "gerade" <opt-whitespace> "dabei" <opt-whitespace> "sein" <opt-whitespace> <infinitive-clause>
+
+<austrian-habitual-extended> ::= "pflegen" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+
+<austrian-inchoative-extended> ::= "anfangen" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+                                | "beginnen" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+
+<austrian-terminative-extended> ::= "aufhören" <opt-whitespace> "zu" <opt-whitespace> <verb-infinitive>
+                                 | "beenden" <opt-whitespace> <verb-infinitive>
+
+/* Additional context rules for comprehensive coverage */
+@CONTEXT_RULE[austrian-verb-regional-agreement]:
+    IF @AUSTRIAN[viennese] <austrian-verb> PRESENT
+    THEN OTHER_VIENNESE_FORMS_PREFERRED
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-adjective-declension]:
+    IF <austrian-adjective> PRESENT
+    THEN CORRECT_DECLENSION_PATTERN
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-compound-culinary]:
+    IF <austrian-compound-culinary> PRESENT
+    THEN BOTH_PARTS_CULINARY
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-coffee-order]:
+    IF <austrian-coffee-extended> PRESENT
+    THEN COFFEE_HOUSE_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-pastry-article]:
+    IF <austrian-pastry> PRESENT
+    THEN CORRECT_GENDER_ARTICLE
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-transport-context]:
+    IF <austrian-transport> PRESENT
+    THEN VIENNA_OR_AUSTRIA_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-weather-föhn]:
+    IF "Föhn" PRESENT
+    THEN ALPINE_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-holiday-context]:
+    IF <austrian-holiday> PRESENT
+    THEN TEMPORAL_CONTEXT_APPROPRIATE
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-dialect-food-match]:
+    IF <austrian-culinary-noun> AND @AUSTRIAN[regional]
+    THEN REGIONAL_FOOD_TERMS_MATCH
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-exclamation-register]:
+    IF <austrian-exclamation> PRESENT
+    THEN INFORMAL_REGISTER
+    ELSE WARNING "Exclamations are informal"
+
+@CONTEXT_RULE[austrian-intensifier-gradability]:
+    IF <austrian-intensifier> MODIFIES <adjective>
+    THEN <adjective> MUST_BE_GRADABLE
+    ELSE ERROR "Cannot intensify non-gradable adjectives"
+
+@CONTEXT_RULE[austrian-diminutive-affection]:
+    IF <austrian-diminutive-extended> PRESENT
+    THEN AFFECTIONATE_OR_DIMINUTIVE_MEANING
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-negation-double]:
+    IF <austrian-dialect-negation> PRESENT
+    THEN AVOID_DOUBLE_NEGATION
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-modal-particle-stacking]:
+    IF MULTIPLE <austrian-modal-particle> IN_SEQUENCE
+    THEN WARNING "Too many modal particles can be confusing"
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-verb-perfect-motion]:
+    IF <verb> INDICATES_MOTION
+    THEN USE <sein-verb> AS_AUXILIARY
+    ELSE USE <haben-verb>
