@@ -21,21 +21,32 @@ SymbolTableSharing: hierarchical
  * - Comparative and superlative adjectives
  * - Negation patterns
  * - Clitic pronouns and their placement
+ * - Multi-embedded sentence structures
+ * - Nested subordinate and relative clauses
+ * - Discourse markers and connectives
+ * - Parenthetical insertions
+ * - Cleft sentences (è...che/chi)
+ * - Elliptical structures
+ * - Tag questions (vero? non è vero?)
+ * - Reported speech with tense concordance
  */
 
 Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come, se, mentre, perciò, con, senza, in, su, sotto, di, del, dello, della, dei, degli, delle, a, al, allo, alla, ai, agli, alle, il, lo, la, i, gli, le, un, uno, una, questo, questa, questi, queste, mio, mia, miei, mie, tuo, tua, tuoi, tue, suo, sua, suoi, sue, nostro, nostra, nostri, nostre, vostro, vostra, vostri, vostre, loro, non, mai, niente, nulla, nessuno, io, tu, lui, lei, noi, voi, loro, mi, ti, si, ci, vi, ne
 
-/* Top-level sentence structure */
+/* Top-level sentence structure with advanced embedding */
 <sentence> ::= <main-clause>
             | <subordinate-clause>
             | <compound-sentence>
             | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
 
 /* Main clause with SVO word order */
 <main-clause> ::= <declarative-clause>
                | <interrogative-clause>
                | <imperative-clause>
                | <exclamative-clause>
+               | <parenthetical-clause>
 
 /* SVO declarative: Subject + Verb + Object/Complement */
 <declarative-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
@@ -52,8 +63,35 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
 
 <exclamative-word> ::= "Che" | "Come" | "Quanto" | "Quanta" | "Quanti" | "Quante"
 
-/* Subordinate clauses */
-<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+/* Parenthetical clause (inserted remark) */
+<parenthetical-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <object>? <punctuation>?
+
+<parenthetical-insertion> ::= <adverb>
+                           | <comment-phrase>
+                           | "penso"
+                           | "credo"
+                           | "secondo" <opt-whitespace> "me"
+                           | "a" <opt-whitespace> "mio" <opt-whitespace> "parere"
+
+<comment-phrase> ::= <adverb> ( <opt-whitespace> <adverb> )*
+
+/* Subordinate clauses with nesting */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+                      | <coordinated-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+/* Nested subordinate clause */
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <nested-final-field>?
+
+<nested-final-field> ::= <subordinate-clause>
+                      | <relative-clause>
+
+/* Coordinated subordinate clauses */
+<coordinated-subordinate-clause> ::= <subordinate-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause>
 
 <subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
 
@@ -74,18 +112,93 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
 
 <purpose-conjunction> ::= "perché" | "affinché" | "così" <opt-whitespace> "che" | "in" <opt-whitespace> "modo" <opt-whitespace> "che"
 
-/* Relative clauses */
-<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+/* Relative clauses with nesting */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Nested relative clause (contains subordinate clause) */
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <subordinate-clause>
 
 <relative-pronoun> ::= "che" | "cui" | "il" <opt-whitespace> "quale" | "la" <opt-whitespace> "quale" | "i" <opt-whitespace> "quali" | "le" <opt-whitespace> "quali" | "chi"
 
-/* Compound and complex sentences */
-<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+/* Compound and complex sentences with advanced patterns */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+/* Multiple coordinated main clauses */
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
 
 <coordinating-conjunction> ::= "e" | "ed" | "o" | "oppure" | "ma" | "però" | "anzi" | "dunque" | "quindi" | "perciò" | "infatti" | "cioè"
 
-<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
-                    | <subordinate-clause> <opt-whitespace> <main-clause>
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Multi-embedded sentence (multiple levels of embedding) */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated complex sentence */
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+                                | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
+
+/* Discourse markers and connectives */
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+
+<temporal-discourse> ::= "prima" | "poi" | "dopo" | "infine" | "alla" <opt-whitespace> "fine" | "nel" <opt-whitespace> "frattempo" | "intanto" | "mentre"
+
+<causal-discourse> ::= "quindi" | "perciò" | "dunque" | "pertanto" | "di" <opt-whitespace> "conseguenza" | "per" <opt-whitespace> "questo"
+
+<contrastive-discourse> ::= "ma" | "però" | "tuttavia" | "eppure" | "invece" | "al" <opt-whitespace> "contrario" | "d'altra" <opt-whitespace> "parte"
+
+<additive-discourse> ::= "e" | "anche" | "inoltre" | "in" <opt-whitespace> "più" | "oltretutto" | "per" <opt-whitespace> "di" <opt-whitespace> "più" | "anzi"
+
+<conclusive-discourse> ::= "infine" | "alla" <opt-whitespace> "fine" | "in" <opt-whitespace> "conclusione" | "insomma" | "in" <opt-whitespace> "breve"
+
+/* Cleft sentences (è...che/chi) */
+<cleft-sentence> ::= <it-cleft> | <pseudo-cleft>
+
+<it-cleft> ::= "è" <opt-whitespace> <noun-phrase> <opt-whitespace> <cleft-relative-pronoun> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<cleft-relative-pronoun> ::= "che" | "chi" | "cui"
+
+<pseudo-cleft> ::= "quello" <opt-whitespace> "che" <opt-whitespace> <verb-phrase> <opt-whitespace> "è" <opt-whitespace> <noun-phrase>
+                | "ciò" <opt-whitespace> "che" <opt-whitespace> <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> "è" <opt-whitespace> <noun-phrase>
+
+/* Reported speech (discorso indiretto) */
+<reported-speech> ::= <reporting-verb> <opt-whitespace> "che" <opt-whitespace> <indirect-statement>
+
+<reporting-verb> ::= "dice" | "ha" <opt-whitespace> "detto" | "pensa" | "crede" | "afferma" | "dichiara" | "risponde" | "chiede"
+
+<indirect-statement> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Tag questions */
+<tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <tag>
+
+<tag> ::= "vero" "?"
+       | "non" <opt-whitespace> "è" <opt-whitespace> "vero" "?"
+       | "no" "?"
+       | "giusto" "?"
+
+/* Elliptical structures */
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+
+<elliptical-response> ::= "sì" | "no" | <adverb>
+
+<elliptical-coordination> ::= <main-clause> <opt-whitespace> "," <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <noun-phrase>
+                           | <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object> <opt-whitespace> "," <opt-whitespace> <subject> <opt-whitespace> <object>
 
 /* Subject */
 <subject> ::= <pronoun-subject>
@@ -450,6 +563,42 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
     IF <auxiliary-verb> == "essere" THEN <past-participle>.@GENDER == <subject>.@GENDER AND <past-participle>.@NUMBER == <subject>.@NUMBER
     ELSE VALID
 
+/* Nested clause depth validation */
+@CONTEXT_RULE[nested-clause-depth]:
+    IF <nested-subordinate-clause> DEPTH <= 3
+    THEN VALID
+    ELSE WARNING "Deep nesting (>3 levels) may reduce readability"
+
+/* Cleft sentence structure */
+@CONTEXT_RULE[cleft-structure]:
+    IF <cleft-sentence> HAS_VALID_STRUCTURE
+    THEN VALID
+    ELSE ERROR "Cleft sentences require proper è...che/chi structure"
+
+/* Clause coherence */
+@CONTEXT_RULE[clause-coherence]:
+    IF <multi-embedded-sentence> HAS_COHERENT_REFERENCE_CHAIN
+    THEN VALID
+    ELSE WARNING "Complex sentences should maintain clear reference chains"
+
+/* Reported speech tense concordance */
+@CONTEXT_RULE[reported-speech-tense]:
+    IF <reported-speech> TENSE_CONSISTENT_WITH <reporting-verb>
+    THEN VALID
+    ELSE WARNING "Tense in reported speech should follow concordance of tenses"
+
+/* Subjunctive mood requirement */
+@CONTEXT_RULE[subjunctive-requirement]:
+    IF <subordinate-clause> AFTER_EXPRESSION_REQUIRING_SUBJUNCTIVE
+    THEN <verb-phrase> CONTAINS <verb-subjunctive>
+    ELSE WARNING "Expressions of desire, emotion, doubt require subjunctive"
+
+/* Tag question structure */
+@CONTEXT_RULE[tag-question-structure]:
+    IF <tag-question> HAS_PROPER_TAG
+    THEN VALID
+    ELSE ERROR "Tag questions require proper tag structure (vero, non è vero, etc.)"
+
 /* Example sentences demonstrating Italian grammar:
  *
  * SIMPLE SENTENCES:
@@ -511,4 +660,35 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
  * - "Mi lavo" (I wash myself)
  * - "Ci alziamo" (We get up)
  * - "Si parlano" (They speak to each other)
+ *
+ * NESTED SUBORDINATE CLAUSES:
+ * - "Penso che tu creda che lui venga" (I think that you believe that he is coming - 2-level)
+ * - "Dice che lei sa che noi partiamo domani" (He says that she knows that we're leaving tomorrow)
+ *
+ * CLEFT SENTENCES:
+ * - "È Marco che è venuto" (It's Marco who came)
+ * - "È la macchina che ho comprato" (It's the car that I bought)
+ * - "Quello che mi interessa è la musica" (What interests me is music)
+ *
+ * DISCOURSE MARKERS:
+ * - "Prima sono andato al negozio, poi sono tornato a casa" (First I went to the store, then I went home)
+ * - "Piove, quindi resto a casa" (It's raining, so I'm staying home)
+ * - "Lavora molto, tuttavia trova il tempo di leggere" (He/she works a lot, however finds time to read)
+ *
+ * REPORTED SPEECH:
+ * - "Dice che verrà" (He/she says that he/she will come)
+ * - "Ha detto che era stanca" (She said that she was tired - tense concordance)
+ * - "Penso che abbia ragione" (I think that he/she is right)
+ *
+ * TAG QUESTIONS:
+ * - "Vieni, vero?" (You're coming, aren't you?)
+ * - "Fa bel tempo, non è vero?" (It's nice weather, isn't it?)
+ *
+ * ELLIPTICAL STRUCTURES:
+ * - "Parto oggi, lui domani" (I'm leaving today, him tomorrow)
+ * - "Anch'io" (Me too)
+ *
+ * MULTI-EMBEDDED SENTENCES:
+ * - "Quando arrivi, se vuoi, possiamo andare al cinema" (When you arrive, if you want, we can go to the cinema)
+ * - "L'uomo che parla dice che la donna che conosce verrà" (The man who is speaking says that the woman whom he knows will come - 3-level)
  */

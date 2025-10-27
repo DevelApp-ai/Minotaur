@@ -22,21 +22,32 @@ SymbolTableSharing: hierarchical
  * - Negation patterns (ne...pas, ne...jamais, etc.)
  * - Interrogative forms
  * - Object pronouns and their placement
+ * - Multi-embedded sentence structures
+ * - Nested subordinate and relative clauses
+ * - Discourse markers and connectives
+ * - Parenthetical insertions
+ * - Cleft sentences (c'est...qui/que)
+ * - Elliptical structures
+ * - Tag questions (n'est-ce pas)
+ * - Reported speech with tense concordance
  */
 
 Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment, pourquoi, si, alors, comme, pour, avec, sans, dans, sur, sous, de, du, des, à, au, aux, le, la, les, un, une, ce, cette, ces, mon, ma, mes, ton, ta, tes, son, sa, ses, notre, nos, votre, vos, leur, leurs, ne, pas, plus, jamais, rien, personne, je, tu, il, elle, nous, vous, ils, elles, me, te, se, lui, leur, y, en
 
-/* Top-level sentence structure */
+/* Top-level sentence structure with advanced embedding */
 <sentence> ::= <main-clause>
             | <subordinate-clause>
             | <compound-sentence>
             | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
 
 /* Main clause with SVO word order */
 <main-clause> ::= <declarative-clause>
                | <interrogative-clause>
                | <imperative-clause>
                | <exclamative-clause>
+               | <parenthetical-clause>
 
 /* SVO declarative: Subject + Verb + Object/Complement */
 <declarative-clause> ::= <subject> <opt-whitespace> <negation-part1>? <opt-whitespace> <verb-phrase> <opt-whitespace> <negation-part2>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
@@ -62,8 +73,35 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 
 <exclamative-word> ::= "Quel" | "Quelle" | "Quels" | "Quelles" | "Comme"
 
-/* Subordinate clauses */
-<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+/* Parenthetical clause (inserted remark) */
+<parenthetical-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <object>? <punctuation>?
+
+<parenthetical-insertion> ::= <adverb>
+                           | <comment-phrase>
+                           | "je" <opt-whitespace> "pense"
+                           | "je" <opt-whitespace> "crois"
+                           | "semble-t-il"
+                           | "paraît-il"
+
+<comment-phrase> ::= <adverb> ( <opt-whitespace> <adverb> )*
+
+/* Subordinate clauses with nesting */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+                      | <coordinated-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+/* Nested subordinate clause */
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <nested-final-field>?
+
+<nested-final-field> ::= <subordinate-clause>
+                      | <relative-clause>
+
+/* Coordinated subordinate clauses */
+<coordinated-subordinate-clause> ::= <subordinate-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause>
 
 <subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
 
@@ -84,18 +122,93 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
 
 <purpose-conjunction> ::= "pour" <opt-whitespace> "que" | "afin" <opt-whitespace> "que" | "de" <opt-whitespace> "peur" <opt-whitespace> "que"
 
-/* Relative clauses */
-<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+/* Relative clauses with nesting */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Nested relative clause (contains subordinate clause) */
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <subordinate-clause>
 
 <relative-pronoun> ::= "qui" | "que" | "quoi" | "dont" | "où" | "lequel" | "laquelle" | "lesquels" | "lesquelles" | "auquel" | "à" <opt-whitespace> "laquelle" | "duquel" | "de" <opt-whitespace> "laquelle"
 
-/* Compound and complex sentences */
-<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+/* Compound and complex sentences with advanced patterns */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+/* Multiple coordinated main clauses */
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
 
 <coordinating-conjunction> ::= "et" | "ou" | "mais" | "donc" | "or" | "ni" | "car"
 
-<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
-                    | <subordinate-clause> <opt-whitespace> <main-clause>
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Multi-embedded sentence (multiple levels of embedding) */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated complex sentence */
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+                                | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
+
+/* Discourse markers and connectives */
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+
+<temporal-discourse> ::= "d'abord" | "ensuite" | "puis" | "alors" | "enfin" | "finalement" | "en" <opt-whitespace> "même" <opt-whitespace> "temps" | "pendant" <opt-whitespace> "ce" <opt-whitespace> "temps"
+
+<causal-discourse> ::= "donc" | "alors" | "ainsi" | "par" <opt-whitespace> "conséquent" | "en" <opt-whitespace> "conséquence" | "c'est" <opt-whitespace> "pourquoi"
+
+<contrastive-discourse> ::= "mais" | "cependant" | "pourtant" | "néanmoins" | "toutefois" | "en" <opt-whitespace> "revanche" | "par" <opt-whitespace> "contre" | "au" <opt-whitespace> "contraire"
+
+<additive-discourse> ::= "et" | "aussi" | "également" | "de" <opt-whitespace> "plus" | "en" <opt-whitespace> "outre" | "d'ailleurs" | "en" <opt-whitespace> "effet"
+
+<conclusive-discourse> ::= "enfin" | "finalement" | "en" <opt-whitespace> "conclusion" | "bref" | "en" <opt-whitespace> "somme"
+
+/* Cleft sentences (c'est...qui/que) */
+<cleft-sentence> ::= <it-cleft> | <pseudo-cleft>
+
+<it-cleft> ::= "c'est" <opt-whitespace> <noun-phrase> <opt-whitespace> <cleft-relative-pronoun> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<cleft-relative-pronoun> ::= "qui" | "que" | "dont" | "où"
+
+<pseudo-cleft> ::= "ce" <opt-whitespace> "qui" <opt-whitespace> <verb-phrase> <opt-whitespace> "c'est" <opt-whitespace> <noun-phrase>
+                | "ce" <opt-whitespace> "que" <opt-whitespace> <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> "c'est" <opt-whitespace> <noun-phrase>
+
+/* Reported speech (style indirect) */
+<reported-speech> ::= <reporting-verb> <opt-whitespace> "que" <opt-whitespace> <indirect-statement>
+
+<reporting-verb> ::= "dit" | "a" <opt-whitespace> "dit" | "pense" | "croit" | "affirme" | "déclare" | "répond" | "demande"
+
+<indirect-statement> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Tag questions */
+<tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <tag>
+
+<tag> ::= "n'est-ce" <opt-whitespace> "pas" "?"
+       | "non" "?"
+       | "hein" "?"
+       | "si" "?"
+
+/* Elliptical structures */
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+
+<elliptical-response> ::= "oui" | "non" | "si" | <adverb>
+
+<elliptical-coordination> ::= <main-clause> <opt-whitespace> "," <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <noun-phrase>
+                           | <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object> <opt-whitespace> "," <opt-whitespace> <subject> <opt-whitespace> <object>
 
 /* Subject */
 <subject> ::= <pronoun-subject>
@@ -446,6 +559,42 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
     IF <negation-part1> EXISTS THEN <negation-part2> SHOULD_EXIST
     ELSE VALID
 
+/* Nested clause depth validation */
+@CONTEXT_RULE[nested-clause-depth]:
+    IF <nested-subordinate-clause> DEPTH <= 3
+    THEN VALID
+    ELSE WARNING "Deep nesting (>3 levels) may reduce readability"
+
+/* Cleft sentence structure */
+@CONTEXT_RULE[cleft-structure]:
+    IF <cleft-sentence> HAS_VALID_STRUCTURE
+    THEN VALID
+    ELSE ERROR "Cleft sentences require proper c'est...qui/que structure"
+
+/* Clause coherence */
+@CONTEXT_RULE[clause-coherence]:
+    IF <multi-embedded-sentence> HAS_COHERENT_REFERENCE_CHAIN
+    THEN VALID
+    ELSE WARNING "Complex sentences should maintain clear reference chains"
+
+/* Reported speech tense concordance */
+@CONTEXT_RULE[reported-speech-tense]:
+    IF <reported-speech> TENSE_CONSISTENT_WITH <reporting-verb>
+    THEN VALID
+    ELSE WARNING "Tense in reported speech should follow concordance des temps"
+
+/* Subjunctive mood requirement */
+@CONTEXT_RULE[subjunctive-requirement]:
+    IF <subordinate-clause> AFTER_EXPRESSION_REQUIRING_SUBJUNCTIVE
+    THEN <verb-phrase> CONTAINS <verb-subjunctive>
+    ELSE WARNING "Expressions of desire, emotion, doubt require subjunctive"
+
+/* Tag question structure */
+@CONTEXT_RULE[tag-question-structure]:
+    IF <tag-question> HAS_PROPER_TAG
+    THEN VALID
+    ELSE ERROR "Tag questions require proper tag structure (n'est-ce pas, etc.)"
+
 /* Example sentences demonstrating French grammar:
  *
  * SIMPLE SENTENCES:
@@ -504,4 +653,35 @@ Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment,
  * - "Je me lave" (I wash myself)
  * - "Nous nous promenons" (We go for a walk)
  * - "Ils se parlent" (They speak to each other)
+ *
+ * NESTED SUBORDINATE CLAUSES:
+ * - "Je pense que tu crois qu'il vient" (I think that you believe that he is coming - 2-level)
+ * - "Il dit qu'elle sait que nous partons demain" (He says that she knows that we're leaving tomorrow)
+ *
+ * CLEFT SENTENCES:
+ * - "C'est Pierre qui est venu" (It's Pierre who came)
+ * - "C'est la voiture que j'ai achetée" (It's the car that I bought)
+ * - "Ce qui m'intéresse, c'est la musique" (What interests me is music)
+ *
+ * DISCOURSE MARKERS:
+ * - "D'abord je suis allé au magasin, ensuite je suis rentré" (First I went to the store, then I came home)
+ * - "Il pleut, donc je reste à la maison" (It's raining, so I'm staying home)
+ * - "Elle travaille beaucoup, cependant elle trouve le temps de lire" (She works a lot, however she finds time to read)
+ *
+ * REPORTED SPEECH:
+ * - "Il dit qu'il viendra" (He says that he will come)
+ * - "Elle a dit qu'elle était fatiguée" (She said that she was tired - tense concordance)
+ * - "Je pense qu'il a raison" (I think that he's right)
+ *
+ * TAG QUESTIONS:
+ * - "Tu viens, n'est-ce pas?" (You're coming, aren't you?)
+ * - "Il fait beau, non?" (It's nice weather, isn't it?)
+ *
+ * ELLIPTICAL STRUCTURES:
+ * - "Je pars aujourd'hui, lui demain" (I'm leaving today, him tomorrow)
+ * - "Moi aussi" (Me too)
+ *
+ * MULTI-EMBEDDED SENTENCES:
+ * - "Quand tu arrives, si tu veux, nous pouvons aller au cinéma" (When you arrive, if you want, we can go to the cinema)
+ * - "L'homme qui parle dit que la femme qu'il connaît viendra" (The man who is speaking says that the woman whom he knows will come - 3-level)
  */

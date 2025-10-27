@@ -18,21 +18,32 @@ SymbolTableSharing: hierarchical
  * - Gerunds and gerundives
  * - Indirect discourse patterns
  * - Participial constructions
+ * - Multi-embedded sentence structures
+ * - Nested subordinate and relative clauses
+ * - Discourse markers and connectives
+ * - Parenthetical insertions
+ * - Correlative constructions
+ * - Cleft-like focus structures
+ * - Rhetorical questions and exclamations
+ * - Complex temporal and conditional sequences
  */
 
 Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qui, quae, quod, is, ea, id, hic, haec, hoc, ille, illa, illud, ipse, ipsa, ipsum, non, neque, nec, etiam, quoque, autem, enim, nam, igitur, ergo, itaque, tamen, at, atque, ac, sum, es, est, sumus, estis, sunt
 
-/* Top-level sentence structure */
+/* Top-level sentence structure with advanced embedding */
 <sentence> ::= <main-clause>
             | <subordinate-clause>
             | <compound-sentence>
             | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
 
 /* Main clause with flexible word order */
 <main-clause> ::= <declarative-clause>
                | <interrogative-clause>
                | <imperative-clause>
                | <exclamative-clause>
+               | <parenthetical-clause>
 
 /* Default SOV order but all permutations are valid */
 <declarative-clause> ::= <subject>? <opt-whitespace> <object>? <opt-whitespace> <prepositional-phrase>* <opt-whitespace> <adverbial>* <opt-whitespace> <verb> <opt-whitespace> <punctuation>?
@@ -51,10 +62,38 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 <exclamative-word> ::= "quam" | "ut"
 
-/* Subordinate clauses with subjunctive */
-<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+/* Parenthetical clause (inserted remark) */
+<parenthetical-clause> ::= <subject>? <opt-whitespace> <parenthetical-insertion> <opt-whitespace> <verb> <opt-whitespace> <object>? <punctuation>?
 
-<subordinate-content> ::= <subject>? <opt-whitespace> <object>? <opt-whitespace> <verb-subjunctive>
+<parenthetical-insertion> ::= "," <opt-whitespace> <comment-phrase> <opt-whitespace> ","
+                           | "," <opt-whitespace> <subordinate-clause> <opt-whitespace> ","
+
+<comment-phrase> ::= <adverb> ( <opt-whitespace> <adverb> )*
+
+/* Subordinate clauses with subjunctive and nesting */
+<subordinate-clause> ::= <simple-subordinate-clause>
+                      | <nested-subordinate-clause>
+                      | <coordinated-subordinate-clause>
+
+<simple-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+/* Nested subordinate clause (subordinate within subordinate) */
+<nested-subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <nested-subordinate-content>
+
+<nested-subordinate-content> ::= <subject>? <opt-whitespace> <object>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <nested-final-field>?
+
+<nested-final-field> ::= <subordinate-clause>
+                      | <relative-clause>
+                      | <ablative-absolute>
+
+/* Coordinated subordinate clauses */
+<coordinated-subordinate-clause> ::= <subordinate-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <subordinate-clause>
+
+<subordinate-content> ::= <subject>? <opt-whitespace> <object>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <subordinate-final-field>?
+
+<subordinate-final-field> ::= <subordinate-clause>
+                           | <relative-clause>
+                           | <prepositional-phrase>
 
 <subordinating-conjunction> ::= <temporal-conjunction>
                              | <causal-conjunction>
@@ -76,8 +115,14 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 <result-conjunction> ::= "ut" | "ut non"
 
-/* Relative clauses */
-<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+/* Relative clauses with nesting support */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
+
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+/* Nested relative clause (contains subordinate clause) */
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>? <opt-whitespace> <subordinate-clause>
 
 <relative-pronoun> ::= @CASE[nominative] ( "qui" | "quae" | "quod" )
                     | @CASE[genitive] ( "cuius" )
@@ -85,13 +130,80 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
                     | @CASE[accusative] ( "quem" | "quam" | "quod" )
                     | @CASE[ablative] ( "quo" | "qua" | "quo" )
 
-/* Compound and complex sentences */
-<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+/* Compound and complex sentences with advanced patterns */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+/* Multiple coordinated main clauses (3 or more) */
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
+
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Multi-embedded sentence (multiple levels of embedding) */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+/* Coordinated complex sentence */
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+                                | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
 
 <coordinating-conjunction> ::= "et" | "atque" | "ac" | "sed" | "autem" | "enim" | "nam" | "igitur" | "ergo" | "itaque" | "tamen" | "at" | "aut" | "vel" | "neque" | "nec"
 
-<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
-                    | <subordinate-clause> <opt-whitespace> <main-clause>
+/* Discourse markers and connectives */
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+
+<temporal-discourse> ::= "primum" | "deinde" | "tum" | "denique" | "tandem" | "postremo" | "interea" | "interim"
+
+<causal-discourse> ::= "igitur" | "ergo" | "itaque" | "quare" | "quamobrem" | "propterea" | "ideo"
+
+<contrastive-discourse> ::= "at" | "autem" | "sed" | "tamen" | "attamen" | "nihilominus" | "contra"
+
+<additive-discourse> ::= "et" | "etiam" | "quoque" | "praeterea" | "insuper" | "porro"
+
+<conclusive-discourse> ::= "denique" | "tandem" | "postremo" | "breviter"
+
+/* Correlative constructions (paired conjunctions) */
+<correlative-construction> ::= <correlative-pair> <opt-whitespace> <clause-sequence>
+
+<correlative-pair> ::= "et" <opt-whitespace> "et"
+                    | "aut" <opt-whitespace> "aut"
+                    | "vel" <opt-whitespace> "vel"
+                    | "neque" <opt-whitespace> "neque"
+                    | "nec" <opt-whitespace> "nec"
+                    | "non" <opt-whitespace> "solum" <opt-whitespace> "sed" <opt-whitespace> "etiam"
+                    | "cum" <opt-whitespace> "tum"
+
+<clause-sequence> ::= <main-clause> ( <opt-whitespace> <main-clause> )+
+
+/* Cleft-like focus structures (Latin uses word order for focus) */
+<focus-structure> ::= <focused-constituent> <opt-whitespace> "est" <opt-whitespace> <relative-clause>
+
+<focused-constituent> ::= <noun-phrase-nominative>
+                       | <pronoun-nominative>
+
+/* Indirect discourse with accusative + infinitive */
+<indirect-discourse> ::= <reporting-verb> <opt-whitespace> <accusative-subject> <opt-whitespace> <infinitive-phrase>
+
+<reporting-verb> ::= "dicit" | "dixit" | "ait" | "negat" | "negavit" | "putat" | "putavit" | "credit" | "credidit" | "sperat" | "speravit" | "scit" | "scivit" | "nuntiat" | "nuntiavit"
+
+<accusative-subject> ::= <noun-phrase-accusative> | <pronoun-accusative>
+
+/* Rhetorical questions */
+<rhetorical-question> ::= "Num" <opt-whitespace> <interrogative-clause>
+                       | "Nonne" <opt-whitespace> <interrogative-clause>
+                       | "Quis" <opt-whitespace> <verb> "?"
+                       | "Quid" <opt-whitespace> <verb> "?"
 
 /* Subject with case marking */
 <subject> ::= <noun-phrase-nominative>
@@ -475,8 +587,42 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
 
 <preposition-ablative> ::= @GOVERNS[ablative] ( "a" | "ab" | "abs" | "cum" | "de" | "e" | "ex" | "in" | "pro" | "sine" | "sub" )
 
-/* Ablative absolute construction */
-<ablative-absolute> ::= <noun-phrase-ablative> <opt-whitespace> <participle>
+/* Ablative absolute construction with variations */
+<ablative-absolute> ::= <simple-ablative-absolute>
+                     | <nested-ablative-absolute>
+
+<simple-ablative-absolute> ::= <noun-phrase-ablative> <opt-whitespace> <participle>
+
+<nested-ablative-absolute> ::= <noun-phrase-ablative> <opt-whitespace> <participle> <opt-whitespace> <ablative-absolute>
+
+/* Embedded clause sequences */
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> )+
+
+/* Conditional sequences (protasis + apodosis) */
+<conditional-sequence> ::= <conditional-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<conditional-clause> ::= <simple-conditional> | <contrary-to-fact-conditional>
+
+<simple-conditional> ::= "si" <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<contrary-to-fact-conditional> ::= "si" <opt-whitespace> <subject>? <opt-whitespace> <verb-subjunctive> <opt-whitespace> <object>?
+
+/* Temporal sequences */
+<temporal-sequence> ::= <temporal-clause> <opt-whitespace> "," <opt-whitespace> <temporal-clause> ( <opt-whitespace> "," <opt-whitespace> <temporal-clause> )*
+
+<temporal-clause> ::= <temporal-conjunction> <opt-whitespace> <subordinate-content>
+
+/* Periodic sentences (complex rhetorical structures) */
+<periodic-sentence> ::= <subordinate-clause> ( <opt-whitespace> "," <opt-whitespace> <subordinate-clause> )+ <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Elliptical structures (reduced clauses) */
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+
+<elliptical-response> ::= <adverb>
+                       | <noun-phrase-nominative>
+
+<elliptical-coordination> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <noun-phrase-nominative>
 
 /* Question words */
 <question-word> ::= "quis" | "quid" | "qui" | "quae" | "quod" | "ubi" | "unde" | "quo" | "quando" | "cur" | "quomodo" | "quot"
@@ -532,6 +678,42 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
     THEN VALID
     ELSE WARNING "Subordinate clauses often require subjunctive mood"
 
+/* Nested clause depth validation */
+@CONTEXT_RULE[nested-clause-depth]:
+    IF <nested-subordinate-clause> DEPTH <= 3
+    THEN VALID
+    ELSE WARNING "Deep nesting (>3 levels) may reduce readability"
+
+/* Correlative pair matching */
+@CONTEXT_RULE[correlative-matching]:
+    IF <correlative-construction> HAS_MATCHING_PAIR
+    THEN VALID
+    ELSE ERROR "Correlative conjunction pairs must match (et...et, aut...aut, etc.)"
+
+/* Clause sequence coherence */
+@CONTEXT_RULE[clause-coherence]:
+    IF <multi-embedded-sentence> HAS_COHERENT_REFERENCE_CHAIN
+    THEN VALID
+    ELSE WARNING "Complex sentences should maintain clear reference chains"
+
+/* Indirect discourse consistency */
+@CONTEXT_RULE[indirect-discourse-consistency]:
+    IF <indirect-discourse> TENSE_CONSISTENT_WITH <reporting-verb>
+    THEN VALID
+    ELSE WARNING "Tense in indirect discourse should follow sequence of tenses"
+
+/* Ablative absolute structure */
+@CONTEXT_RULE[ablative-absolute-structure]:
+    IF <ablative-absolute> CONTAINS <noun-phrase-ablative> AND <participle>
+    THEN VALID
+    ELSE ERROR "Ablative absolute requires noun/pronoun and participle both in ablative"
+
+/* Word order flexibility validation */
+@CONTEXT_RULE[word-order-validity]:
+    IF <declarative-clause> HAS_VALID_CONSTITUENT_ORDER
+    THEN VALID
+    ELSE WARNING "While Latin word order is flexible, SOV is standard for unmarked sentences"
+
 /* Example sentences demonstrating Classical Latin grammar:
  *
  * SIMPLE SENTENCES:
@@ -565,4 +747,42 @@ Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qu
  * ABLATIVE ABSOLUTE:
  * - "Caesare duce, Romani vicerunt" (With Caesar as leader, the Romans conquered)
  * - "Urbe capta, hostes fugerunt" (The city having been captured, the enemies fled)
+ *
+ * NESTED SUBORDINATE CLAUSES:
+ * - "Scio quod dicit quod venit" (I know that he says that he comes - 2-level)
+ * - "Puto te credere eum venire" (I think that you believe that he is coming - indirect discourse)
+ *
+ * CORRELATIVE CONSTRUCTIONS:
+ * - "Et Caesar et Pompeius venient" (Both Caesar and Pompey will come)
+ * - "Aut vincemus aut moriemur" (Either we will conquer or we will die)
+ * - "Non solum venit sed etiam mansit" (Not only did he come but he also stayed)
+ *
+ * DISCOURSE MARKERS:
+ * - "Primum veni, deinde vidi, denique vici" (First I came, then I saw, finally I conquered)
+ * - "Igitur pugnare debemus" (Therefore we must fight)
+ *
+ * PERIODIC SENTENCES:
+ * - "Cum hostes advenirent, cum milites timerent, Caesar imperium tenuit"
+ *   (When the enemies were approaching, when the soldiers were afraid, Caesar held command)
+ *
+ * INDIRECT DISCOURSE:
+ * - "Dicit se venire" (He says that he is coming)
+ * - "Negavit eos pugnare" (He denied that they were fighting)
+ * - "Scimus te laborare" (We know that you are working)
+ *
+ * RHETORICAL QUESTIONS:
+ * - "Quis hoc credet?" (Who will believe this?)
+ * - "Nonne vides?" (Don't you see?)
+ * - "Num dubitas?" (You don't doubt, do you?)
+ *
+ * CONDITIONAL SEQUENCES:
+ * - "Si veneris, laetus ero" (If you come, I will be happy - simple future)
+ * - "Si venisses, laetus fuissem" (If you had come, I would have been happy - contrary to fact)
+ *
+ * ELLIPTICAL STRUCTURES:
+ * - "Marcus venit hodie, Lucius cras" (Marcus comes today, Lucius tomorrow)
+ *
+ * COMPLEX MULTI-EMBEDDING:
+ * - "Caesar, qui hostes viderat, dixit milites, qui fortes erant, debere pugnare"
+ *   (Caesar, who had seen the enemies, said that the soldiers, who were brave, ought to fight - 3-level)
  */
