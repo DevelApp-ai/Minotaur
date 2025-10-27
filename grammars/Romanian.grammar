@@ -460,3 +460,257 @@ Keywords: și, sau, dar, însă, ci, ori, că, de, dacă, când, unde, cum, care
     IF <modal-verb> IS "trebuie"
     THEN REQUIRES "să" + <subjunctive>
     ELSE OPTIONAL
+
+/* ===== COMPREHENSIVE LINGUISTIC FEATURES ===== */
+
+/* Pronoun Systems - Comprehensive */
+<demonstrative-pronoun> ::= <proximal-demonstrative> | <distal-demonstrative>
+
+<proximal-demonstrative> ::= "acesta" | "aceasta" | "aceștia" | "acestea"
+                           | "acestuia" | "acestei" | "acestora"  /* genitive-dative */
+                           | "acest" | "această" | "acești" | "aceste"  /* adjectival */
+
+<distal-demonstrative> ::= "acela" | "aceea" | "aceia" | "acelea"
+                        | "aceluia" | "acelei" | "acelor"  /* genitive-dative */
+                        | "acel" | "acea" | "acei" | "acele"  /* adjectival */
+
+<interrogative-pronoun> ::= "cine" | "cui" | "pe cine"  /* who */
+                         | "ce" | "ce fel de"  /* what */
+                         | "care" | "căruia" | "căreia" | "cărora"  /* which */
+                         | "al cui" | "a cui"  /* whose */
+                         | "cât" | "câtă" | "câți" | "câte"  /* how much/many */
+
+<indefinite-pronoun> ::= "cineva" | "ceva" | "cuiva"  /* someone, something */
+                      | "vreun" | "vreo" | "vreunul" | "vreuna"  /* some */
+                      | "câțiva" | "câteva" | "câtorva"  /* some, several */
+                      | "unii" | "unele" | "unora"  /* some */
+                      | "alții" | "altele" | "altora"  /* others */
+                      | "fiecare" | "fiecăruia" | "fiecăreia"  /* each */
+                      | "toți" | "toate" | "tuturor"  /* all */
+                      | "oricine" | "orice" | "oricui"  /* anyone, anything */
+                      | "nimeni" | "nimic" | "nimănui"  /* nobody, nothing */
+
+<reciprocal-pronoun> ::= "unul pe altul" | "una pe alta"
+                      | "unul altuia" | "una alteia"
+                      | "reciproc" | "mutual"
+
+/* Numeral System - Complete */
+<numeral> ::= <cardinal-number> | <ordinal-number> | <fraction>
+
+<cardinal-number> ::= <basic-cardinal> | <compound-cardinal>
+
+<basic-cardinal> ::= "unu" | "doi" | "două" | "trei" | "patru" | "cinci" 
+                   | "șase" | "șapte" | "opt" | "nouă" | "zece"
+                   | "unsprezece" | "doisprezece" | "treisprezece" | "paisprezece" | "cincisprezece"
+                   | "șaisprezece" | "șaptesprezece" | "optsprezece" | "nouăsprezece"
+                   | "douăzeci" | "treizeci" | "patruzeci" | "cincizeci" 
+                   | "șaizeci" | "șaptezeci" | "optzeci" | "nouăzeci"
+                   | "sută" | "două sute" | "trei sute" | "patru sute" | "cinci sute"
+                   | "șase sute" | "șapte sute" | "opt sute" | "nouă sute"
+                   | "mie" | "două mii" | "zece mii" | "o sută de mii"
+                   | "milion" | "două milioane" | "zece milioane"
+
+<compound-cardinal> ::= <basic-cardinal> <opt-whitespace> "și" <opt-whitespace> <basic-cardinal>
+
+<ordinal-number> ::= "primul" | "prima" | "primii" | "primele"
+                   | "al doilea" | "a doua" | "ai doilea" | "ale doua"
+                   | "al treilea" | "a treia" | "ai treilea" | "ale treia"
+                   | "al patrulea" | "a patra" | "al cincilea" | "a cincea"
+                   | "al șaselea" | "a șasea" | "al șaptelea" | "a șaptea"
+                   | "al optulea" | "a opta" | "al nouălea" | "a noua"
+                   | "al zecelea" | "a zecea" | "al unsprezecelea" | "a unsprezecea"
+                   | "al douăzecilea" | "a douăzecea" | "al treizecilea" | "a treizecea"
+                   | "al sutălea" | "a suta" | "al miilea" | "a mia"
+                   | "al milionulea" | "a miliona"
+
+<fraction> ::= "jumătate" | "o jumătate" | "o treime" | "două treimi"
+            | "o pătrime" | "un sfert" | "trei pătrimi" | "trei sferturi"
+            | "o cincime" | "două cincimi" | "o zecime" | "două zecimi"
+
+/* Quantifier Systems */
+<quantifier> ::= <indefinite-quantifier> | <universal-quantifier> | <negative-quantifier>
+
+<indefinite-quantifier> ::= "mult" | "multă" | "mulți" | "multe" | "multor"
+                         | "puțin" | "puțină" | "puțini" | "puține" | "puținor"
+                         | "câțiva" | "câteva" | "câtorva"
+                         | "destul" | "destulă" | "destui" | "destule"
+                         | "mai mult" | "mai puțin" | "mai mulți" | "mai multe"
+                         | "ceva" | "câtva" | "câtăva"
+
+<universal-quantifier> ::= "tot" | "toată" | "toți" | "toate" | "tuturor"
+                        | "fiecare" | "fiecărui" | "fiecărei" | "fiecăruia" | "fiecăreia"
+                        | "oricare" | "oricărui" | "oricărei" | "oricui"
+                        | "întreg" | "întreagă" | "întregi" | "întregi"
+
+<negative-quantifier> ::= "niciun" | "nicio" | "niciunui" | "niciunei"
+                       | "nimeni" | "nimănui" | "nimic"
+                       | "deloc" | "câtuși de puțin"
+
+/* Temporal Expressions - Extensive */
+<temporal-expression> ::= <time-point> | <duration> | <frequency> | <time-of-day>
+
+<time-point> ::= "ieri" | "azi" | "astăzi" | "mâine" | "alaltăieri" | "poimâine"
+              | "acum" | "atunci" | "atunci când" | "când" | "cândva"
+              | "mai devreme" | "mai târziu" | "curând" | "în curând"
+              | "recent" | "de curând" | "demult" | "de mult timp"
+              | "înainte" | "după" | "în timpul" | "în timpul acesta"
+              | "deja" | "încă" | "încă nu" | "nu încă"
+
+<duration> ::= "pentru" <opt-whitespace> <numeral> <opt-whitespace> <time-unit>
+            | "de" <opt-whitespace> <numeral> <opt-whitespace> <time-unit>
+            | "timp de" <opt-whitespace> <numeral> <opt-whitespace> <time-unit>
+
+<time-unit> ::= "secundă" | "secunde" | "minut" | "minute" | "oră" | "ore"
+             | "zi" | "zile" | "săptămână" | "săptămâni"
+             | "lună" | "luni" | "an" | "ani"
+
+<frequency> ::= "întotdeauna" | "totdeauna" | "mereu"
+             | "des" | "adesea" | "frecvent"
+             | "rar" | "rareori" | "din când în când"
+             | "uneori" | "câteodată" | "ocazional"
+             | "niciodată" | "nu niciodată"
+             | "în fiecare zi" | "zilnic" | "cotidian"
+             | "în fiecare săptămână" | "săptămânal"
+             | "în fiecare lună" | "lunar" | "mensual"
+             | "în fiecare an" | "anual"
+             | "o dată" | "de două ori" | "de trei ori"
+             | "de mai multe ori" | "de multe ori"
+
+<time-of-day> ::= "dimineața" | "dimineața devreme" | "dis-de-dimineață"
+               | "la amiază" | "la prânz" | "după-amiază"
+               | "seara" | "seara târziu"
+               | "noaptea" | "la miezul nopții" | "peste noapte"
+               | "la ora" <opt-whitespace> <numeral>
+               | "pe la ora" <opt-whitespace> <numeral>
+
+/* Spatial Expressions - Extensive */
+<spatial-expression> ::= <location> | <direction> | <distance>
+
+<location> ::= "aici" | "acolo" | "colo" | "dincolo"
+            | "pretutindeni" | "peste tot" | "oriunde"
+            | "nicăieri" | "nu nicăieri"
+            | "undeva" | "pe undeva" | "pe aicea" | "pe acolo"
+            | "aproape" | "aproape de" | "în apropiere" | "în apropiere de"
+            | "departe" | "departe de" | "la distanță"
+            | "sus" | "în sus" | "deasupra" | "mai sus"
+            | "jos" | "în jos" | "dedesubt" | "mai jos"
+            | "înăuntru" | "în interior" | "în" | "înlăuntru"
+            | "afară" | "în afară" | "la exterior" | "în exterior"
+            | "în mijloc" | "în centru" | "la mijloc" | "la centru"
+            | "lângă" | "alături" | "alături de" | "în apropiere de"
+            | "în fața" | "în față de" | "înaintea" | "în fața"
+            | "în spatele" | "în spate" | "înapoia" | "în urma"
+            | "între" | "printre" | "în mijlocul"
+            | "peste" | "dincolo de" | "de cealaltă parte"
+            | "sub" | "dedesubt" | "în subsidiar"
+
+<direction> ::= "de aici" | "de acolo" | "de unde" | "încotro" | "unde"
+             | "în sus" | "în jos" | "sus" | "jos"
+             | "la dreapta" | "spre dreapta" | "în dreapta"
+             | "la stânga" | "spre stânga" | "în stânga"
+             | "înainte" | "în față" | "spre față" | "drept înainte"
+             | "înapoi" | "în spate" | "spre spate"
+             | "dinspre" | "spre" | "înspre" | "către"
+             | "de la" | "până la" | "de la...la"
+
+<distance> ::= <numeral> <opt-whitespace> <distance-unit> <opt-whitespace> "de aici"
+            | <numeral> <opt-whitespace> <distance-unit> <opt-whitespace> "de acolo"
+            | "la" <opt-whitespace> <numeral> <opt-whitespace> <distance-unit> <opt-whitespace> "distanță"
+            | "aproape" | "departe" | "nu departe" | "foarte aproape" | "foarte departe"
+
+<distance-unit> ::= "metru" | "metri" | "kilometru" | "kilometri"
+                 | "pas" | "pași" | "stânjeni"
+
+/* Comparative Constructions */
+<comparative-construction> ::= <comparative-clause> | <equality-clause> | <superlative-clause> | <proportional-clause>
+
+<comparative-clause> ::= <adjective-comparative> <opt-whitespace> "decât" <opt-whitespace> <noun-phrase>
+                      | <adverb-comparative> <opt-whitespace> "decât" <opt-whitespace> <adverbial>
+                      | "mai" <opt-whitespace> <adjective> <opt-whitespace> "decât"
+
+<equality-clause> ::= "la fel de" <opt-whitespace> <adjective> <opt-whitespace> "ca" <opt-whitespace> <noun-phrase>
+                   | "tot atât de" <opt-whitespace> <adjective> <opt-whitespace> "ca"
+                   | "tot așa de" <opt-whitespace> <adjective> <opt-whitespace> "ca"
+
+<superlative-clause> ::= "cel mai" <opt-whitespace> <adjective>
+                      | "cea mai" <opt-whitespace> <adjective>
+                      | "cei mai" <opt-whitespace> <adjective>
+                      | "cele mai" <opt-whitespace> <adjective>
+
+<proportional-clause> ::= "cu cât" <opt-whitespace> <comparative-clause> <opt-whitespace> "," <opt-whitespace> "cu atât" <opt-whitespace> <comparative-clause>
+
+/* Enhanced Sentence Structures */
+<parenthetical-clause> ::= <main-clause> <opt-whitespace> "(" <opt-whitespace> <main-clause> <opt-whitespace> ")" <opt-whitespace> <main-clause>?
+                        | <main-clause> <opt-whitespace> "," <opt-whitespace> <adverbial> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+
+<extraposed-clause> ::= <correlative-pronoun> <opt-whitespace> <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<correlative-pronoun> ::= "cel care" | "cea care" | "cei care" | "cele care"
+                       | "ceea ce" | "cel ce" | "cea ce"
+
+<infinitive-as-subject> ::= "a" <opt-whitespace> <verb-infinitive> <opt-whitespace> <copula> <opt-whitespace> <adjective>
+                         | <article> <opt-whitespace> <verb-infinitive> <opt-whitespace> <copula> <opt-whitespace> <adjective>
+
+<clause-as-subject> ::= "că" <opt-whitespace> <declarative-clause> <opt-whitespace> <copula> <opt-whitespace> <adjective>
+                     | "dacă" <opt-whitespace> <declarative-clause> <opt-whitespace> <copula> <opt-whitespace> <adjective>
+
+/* Extended Linguistic Elements */
+<question-word> ::= "cine" | "ce" | "când" | "unde" | "cum" | "de ce" | "pentru ce"
+                 | "de unde" | "încotro" | "până când" | "de când"
+                 | "cât" | "câți" | "câte" | "câtă"
+                 | "al cui" | "a cui" | "ai cui" | "ale cui"
+                 | "care" | "căruia" | "căreia" | "cărora"
+                 | "cât de lung" | "cât de des" | "cât de departe"
+
+<subordinating-conjunction> ::= "că" | "dacă" | "deși" | "cu toate că" | "deoarece" | "fiindcă"
+                             | "pentru că" | "din cauza că" | "în timp ce" | "în vreme ce"
+                             | "când" | "înainte de a" | "după ce" | "până când" | "până să"
+                             | "de când" | "de fiecare dată când"
+                             | "să" | "pentru a" | "ca să" | "pentru ca"
+                             | "dacă" | "în cazul în care" | "în caz că"
+                             | "deși" | "cu toate că" | "măcar că"
+                             | "astfel încât" | "așa încât" | "atât de...încât"
+
+<coordinating-conjunction> ::= "și" | "sau" | "dar" | "însă" | "ci" | "ori" | "fie"
+                            | "precum și" | "nici" | "nici...nici"
+
+<sentence-adverb> ::= "desigur" | "evident" | "evident că" | "firește"
+                   | "probabil" | "poate" | "posibil"
+                   | "cu siguranță" | "sigur" | "negreșit"
+                   | "în mod clar" | "într-adevăr" | "de fapt"
+                   | "apropo" | "de altfel" | "în plus" | "mai mult decât atât"
+                   | "totuși" | "cu toate acestea" | "însă" | "dar"
+                   | "deci" | "așadar" | "prin urmare" | "de aceea"
+                   | "de exemplu" | "spre exemplu" | "de pildă"
+                   | "în general" | "în mod obișnuit" | "de obicei"
+                   | "în principiu" | "în esență" | "practic"
+
+/* Additional Context Rules */
+@CONTEXT_RULE[pronoun-case-agreement]:
+    IF <prepositional-phrase> CONTAINS <demonstrative-pronoun>
+    THEN <pronoun-case> MATCHES <preposition-governance>
+    ELSE WARNING "Check pronoun case in prepositional phrase"
+
+@CONTEXT_RULE[genitive-of-quantity]:
+    IF <quantifier> IS <indefinite-quantifier>
+    THEN <noun-phrase> USES genitive-case
+    ELSE VALID
+
+@CONTEXT_RULE[temporal-case-requirement]:
+    IF <temporal-expression> CONTAINS <preposition>
+    THEN <noun-phrase> CASE MATCHES <preposition-case-governance>
+    ELSE VALID
+
+@CONTEXT_RULE[comparative-case-government]:
+    IF <comparative-clause> USES "decât"
+    THEN <comparison-element> USES nominative OR accusative
+    ELSE VALID
+
+@CONTEXT_RULE[quantifier-agreement]:
+    IF <quantifier> MODIFIES <noun>
+    THEN <quantifier> AGREES WITH <noun> IN number
+    ELSE VALID
