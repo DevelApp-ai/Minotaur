@@ -414,3 +414,278 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
     ELSE IF <aspectual-periphrastic> IS <terminative-construction>
     THEN <infinitive> CAN_BE perfective OR imperfective
     ELSE VALID
+
+/* ===== COMPREHENSIVE PRONOUN SYSTEMS ===== */
+
+<demonstrative-pronoun> ::= <proximal-demonstrative> | <distal-demonstrative>
+
+<proximal-demonstrative> ::= "ten" | "ta" | "to" | "ti" | "ty" | "těch" | "těm" | "těmi" | "tom" | "toho" | "tomu" | "tím"
+
+<distal-demonstrative> ::= "tamten" | "tamta" | "tamto" | "tamti" | "tamty" | "tamtěch" | "tamtěm" | "tamtěmi" | "tamtom" | "tamtoho" | "tamtomu" | "tamtím"
+
+<interrogative-pronoun> ::= "kdo" | "koho" | "komu" | "kohož" | "komž" | "kým" | "kim" | "o kom" |
+                           "co" | "čeho" | "čemu" | "čím" | "o čem" |
+                           "čí" | "čího" | "čímu" | "čím" | "čí" | "čích" | "čím" |
+                           "jaký" | "jakého" | "jakému" | "jakým" | "jaké" | "jakých" | "jakými" |
+                           "který" | "kterého" | "kterému" | "kterým" | "které" | "kterých" | "kterými"
+
+<indefinite-pronoun> ::= "někdo" | "někoho" | "někomu" | "někým" |
+                        "něco" | "něčeho" | "něčemu" | "něčím" |
+                        "nějaký" | "nějakého" | "nějakému" | "nějakým" | "nějaké" | "nějakých" |
+                        "některý" | "některého" | "některému" | "některým" | "některé" | "některých" |
+                        "každý" | "každého" | "každému" | "každým" | "každé" | "každých" |
+                        "všichni" | "všech" | "všem" | "všemi" | "všechno" | "všeho" |
+                        "žádný" | "žádného" | "žádnému" | "žádným" | "žádné" | "žádných" |
+                        "nikdo" | "nikoho" | "nikomu" | "nikým" | "nic" | "ničeho" | "ničemu" | "ničím" |
+                        "kdokoli" | "kohokoli" | "komukoli" | "kýmkoli" |
+                        "cokoli" | "čehokoli" | "čemukoli" | "čímkoli"
+
+<reciprocal-pronoun> ::= "navzájem" | "vzájemně" | "jeden druhého" | "jeden druhému" | "jeden druhým"
+
+/* ===== FULL NUMERAL SYSTEM ===== */
+
+<numeral> ::= <cardinal-numeral> | <ordinal-numeral> | <fraction-numeral> | <distributive-numeral>
+
+<cardinal-numeral> ::= "jeden" | "jedna" | "jedno" | "dva" | "dvě" | "tři" | "čtyři" | "pět" | "šest" | "sedm" | "osm" | "devět" | "deset" |
+                      "jedenáct" | "dvanáct" | "třináct" | "čtrnáct" | "patnáct" | "šestnáct" | "sedmnáct" | "osmnáct" | "devatenáct" |
+                      "dvacet" | "třicet" | "čtyřicet" | "padesát" | "šedesát" | "sedmdesát" | "osmdesát" | "devadesát" |
+                      "sto" | "dvě stě" | "tři sta" | "čtyři sta" | "pět set" | "šest set" | "sedm set" | "osm set" | "devět set" |
+                      "tisíc" | "milion" | "miliarda" | "bilion"
+
+<ordinal-numeral> ::= "první" | "druhý" | "třetí" | "čtvrtý" | "pátý" | "šestý" | "sedmý" | "osmý" | "devátý" | "desátý" |
+                     "jedenáctý" | "dvanáctý" | "třináctý" | "čtrnáctý" | "patnáctý" | "šestnáctý" | "sedmnáctý" | "osmnáctý" | "devatenáctý" |
+                     "dvacátý" | "třicátý" | "čtyřicátý" | "padesátý" | "šedesátý" | "sedmdesátý" | "osmdesátý" | "devadesátý" |
+                     "stý" | "tisící" | "milióntý"
+
+<fraction-numeral> ::= "půl" | "polovina" | "třetina" | "čtvrtina" | "čtvrt" | "pětina" | "šestina" | "sedmina" | "osmina" | "devítina" | "desetina"
+
+<distributive-numeral> ::= "po jednom" | "po dvou" | "po třech" | "po čtyřech" | "po pěti"
+
+/* ===== COMPLETE QUANTIFIER SYSTEM ===== */
+
+<quantifier> ::= <indefinite-quantifier> | <universal-quantifier> | <negative-quantifier>
+
+<indefinite-quantifier> ::= "mnoho" | "hodně" | "málo" | "trochu" | "několik" | "pár" | "dost" | "víc" | "více" | "méně" | "moc"
+
+<universal-quantifier> ::= "všichni" | "všechno" | "všechny" | "každý" | "celý" | "vše" | "všeho"
+
+<negative-quantifier> ::= "žádný" | "nikdo" | "nic" | "nijak" | "nikde" | "nikdy"
+
+/* ===== EXTENSIVE TEMPORAL EXPRESSIONS ===== */
+
+<temporal-expression> ::= <time-point> | <duration> | <frequency> | <time-of-day>
+
+<time-point> ::= "včera" | "dnes" | "zítra" | "předevčírem" | "pozítří" | "nyní" | "teď" | "tehdy" | "kdysi" | "někdy" |
+                "brzy" | "později" | "zanedlouho" | "nedávno" | "dříve" | "předtím" | "potom" | "pak" | "už" | "ještě" | "stále"
+
+<duration> ::= "po dobu" <numeral> <time-unit> | "během" <numeral> <time-unit> | "za" <numeral> <time-unit>
+
+<time-unit> ::= "sekunda" | "sekundy" | "sekund" | "minuta" | "minuty" | "minut" | "hodina" | "hodiny" | "hodin" |
+               "den" | "dny" | "dnů" | "týden" | "týdny" | "týdnů" | "měsíc" | "měsíce" | "měsíců" | "rok" | "roky" | "let"
+
+<frequency> ::= "vždy" | "stále" | "pořád" | "často" | "běžně" | "občas" | "zřídka" | "někdy" | "zřídkakdy" | "nikdy" |
+               "každý den" | "každý týden" | "každý měsíc" | "každý rok" |
+               "denně" | "týdně" | "měsíčně" | "ročně" |
+               "jednou" | "dvakrát" | "třikrát" | "několikrát" | "mnohokrát"
+
+<time-of-day> ::= "ráno" | "dopoledne" | "v poledne" | "odpoledne" | "večer" | "v noci" | "o půlnoci" |
+                 "v" <numeral> "hodin" | "ve" <numeral> "hodin" | "kolem" <numeral> "hodin"
+
+/* ===== EXTENSIVE SPATIAL EXPRESSIONS ===== */
+
+<spatial-expression> ::= <location> | <direction> | <distance>
+
+<location> ::= "tady" | "zde" | "tam" | "tamhle" | "onde" | "všude" | "všudy" | "nikde" | "někde" | "kdesi" |
+              "blízko" | "blízko u" | "v blízkosti" | "daleko" | "daleko od" |
+              "nahoře" | "nahoru" | "dole" | "dolů" | "uvnitř" | "vevnitř" | "venku" | "vně" |
+              "uprostřed" | "vprostřed" | "v centru" | "v středu" |
+              "nad" | "nahoře nad" | "pod" | "dole pod" | "vedle" | "po straně" | "před" | "za" | "mezi" | "u"
+
+<direction> ::= "odsud" | "odtud" | "odtamtud" | "odkud" | "kam" | "kudy" |
+               "nahoru" | "dolů" | "doprava" | "vpravo" | "doleva" | "vlevo" | "dopředu" | "vpřed" | "dozadu" | "vzad" |
+               "směrem k" | "směrem od" | "směrem do" | "směrem z"
+
+<distance> ::= <numeral> "metrů" "odsud" | <numeral> "metrů" "odtud" |
+              <numeral> "kilometrů" "odsud" | <numeral> "kilometrů" "odtud" |
+              "blízko" | "daleko" | "nedaleko" | "velmi blízko" | "velmi daleko"
+
+/* ===== COMPARATIVE CONSTRUCTIONS ===== */
+
+<comparative-construction> ::= <comparative-than> | <comparative-from> | <equality-comparison> | <proportional-comparison>
+
+<comparative-than> ::= <adjective-comparative> "než" <noun-phrase>
+
+<comparative-from> ::= <adjective-comparative> "od" <noun-phrase-genitive>
+
+<equality-comparison> ::= "stejně" <adjective> "jako" <noun-phrase> |
+                         "tak" <adjective> "jako" <noun-phrase>
+
+<proportional-comparison> ::= "čím" <adjective-comparative> "," "tím" <adjective-comparative>
+
+/* ===== ENHANCED SENTENCE STRUCTURES ===== */
+
+<parenthetical-clause> ::= <clause> "," <clause> "," <clause>
+
+<fronted-subordinate> ::= <subordinate-clause> "," <main-clause>
+
+<coordinated-complex> ::= <clause> <coordinating-conjunction> <clause> <coordinating-conjunction> <clause>
+
+<extraposed-clause> ::= <clause> "," "to" "," "co" <relative-clause>
+
+<infinitive-as-subject> ::= <infinitive> "je" <adjective>
+
+<clause-as-subject> ::= "že" <clause> "je" <adjective>
+
+/* ===== EXTENDED LINGUISTIC ELEMENTS ===== */
+
+<question-word> ::= "kdo" | "co" | "kdy" | "kde" | "kam" | "odkud" | "kudy" | "jak" | "proč" | "nač" | "dokdy" | "odkdy" |
+                   "kolik" | "kolikrát" | "čí" | "jaký" | "který" | "jak dlouho" | "jak často" | "jak daleko"
+
+<subordinating-conjunction> ::= "že" | "jestli" | "zda" | "když" | "kdyby" | "než" | "až" | "zatímco" | "jakmile" | "dokud" | "pokud" |
+                               "aby" | "protože" | "jelikož" | "neboť" | "ačkoli" | "přestože" | "i když" |
+                               "kdyby" | "než" | "tím že" | "takže" | "aniž"
+
+<coordinating-conjunction> ::= "a" | "i" | "ani" | "nebo" | "anebo" | "či" | "ale" | "jenže" | "avšak" | "však" |
+                              "proto" | "tedy" | "takže" | "neboť" | "nebo" | "totiž"
+
+<sentence-adverb> ::= "jistě" | "určitě" | "zřejmě" | "asi" | "možná" | "pravděpodobně" | "nepochybně" | "skutečně" |
+                     "vlastně" | "totiž" | "samozřejmě" | "však" | "přece" | "jenže" | "ovšem" |
+                     "naštěstí" | "bohužel" | "snad" | "zkrátka" | "prostě"
+
+/* ===== ADDITIONAL CONTEXT RULES ===== */
+
+@CONTEXT_RULE[pronoun-case-agreement]:
+    IF <prepositional-phrase> CONTAINS <pronoun>
+    THEN <pronoun>.@CASE == <preposition>.@REQUIRED_CASE
+    ELSE WARNING "Pronoun case must agree with preposition requirement"
+
+@CONTEXT_RULE[genitive-of-quantity]:
+    IF <noun-phrase> STARTS_WITH <cardinal-numeral> AND <cardinal-numeral> > "čtyři"
+    THEN <noun>.@CASE == genitive
+    ELSE VALID
+
+@CONTEXT_RULE[temporal-case-requirement]:
+    IF <temporal-expression> CONTAINS <preposition>
+    THEN <noun>.@CASE == <preposition>.@REQUIRED_CASE
+    ELSE VALID
+
+@CONTEXT_RULE[comparative-case-government]:
+    IF <comparative-construction> USES "než"
+    THEN <noun-phrase>.@CASE == nominative
+    ELSE IF <comparative-construction> USES "od"
+    THEN <noun-phrase>.@CASE == genitive
+    ELSE VALID
+
+@CONTEXT_RULE[quantifier-agreement]:
+    IF <noun-phrase> CONTAINS <quantifier>
+    THEN <quantifier> AGREES_WITH <noun> IN @NUMBER
+    ELSE VALID
+
+/* ===== COMPREHENSIVE ADJECTIVE SYSTEM ===== */
+
+<adjective-declension> ::= <adjective-nominative> | <adjective-genitive> | <adjective-dative> |
+                          <adjective-accusative> | <adjective-vocative> | <adjective-locative> | <adjective-instrumental>
+
+<adjective-nominative> ::= <adjective> "-ý" | <adjective> "-á" | <adjective> "-é" | <adjective> "-í"
+
+<adjective-genitive> ::= <adjective> "-ého" | <adjective> "-é" | <adjective> "-ích" | <adjective> "-ího"
+
+<adjective-dative> ::= <adjective> "-ému" | <adjective> "-é" | <adjective> "-ím" | <adjective> "-ímu"
+
+<adjective-accusative> ::= <adjective> "-ý" | <adjective> "-ou" | <adjective> "-é" | <adjective> "-í"
+
+<adjective-vocative> ::= <adjective> "-ý" | <adjective> "-á" | <adjective> "-é" | <adjective> "-í"
+
+<adjective-locative> ::= <adjective> "-ém" | <adjective> "-é" | <adjective> "-ých" | <adjective> "-ím"
+
+<adjective-instrumental> ::= <adjective> "-ým" | <adjective> "-ou" | <adjective> "-ými" | <adjective> "-ím"
+
+<adjective-comparative> ::= <adjective-stem> "-ější" | <adjective-stem> "-ší" | "více" <adjective> | "méně" <adjective>
+
+<adjective-superlative> ::= "nej" <adjective-comparative>
+
+/* ===== COMPREHENSIVE PREPOSITIONAL PHRASES ===== */
+
+<prepositional-phrase> ::= <preposition-with-genitive> <noun-phrase-genitive> |
+                          <preposition-with-dative> <noun-phrase-dative> |
+                          <preposition-with-accusative> <noun-phrase-accusative> |
+                          <preposition-with-locative> <noun-phrase-locative> |
+                          <preposition-with-instrumental> <noun-phrase-instrumental>
+
+<preposition-with-genitive> ::= "bez" | "blízko" | "daleko" | "do" | "kolem" | "kromě" | "místo" | "od" | "okolo" | "u" | "vedle" | "z" | "ze" | "během" | "pomocí" | "prostřednictvím"
+
+<preposition-with-dative> ::= "k" | "ke" | "kvůli" | "díky" | "navzdory" | "naproti" | "proti"
+
+<preposition-with-accusative> ::= "na" | "o" | "po" | "pro" | "přes" | "před" | "za" | "mezi"
+
+<preposition-with-locative> ::= "na" | "o" | "po" | "při" | "v" | "ve"
+
+<preposition-with-instrumental> ::= "nad" | "pod" | "před" | "za" | "mezi" | "s" | "se"
+
+/* ===== ADVERBIAL SYSTEM ===== */
+
+<adverb> ::= <manner-adverb> | <degree-adverb> | <temporal-adverb> | <spatial-adverb>
+
+<manner-adverb> ::= "dobře" | "špatně" | "rychle" | "pomalu" | "hlasitě" | "tiše" | "hezky" | "ošklivě" | "snadno" | "těžko"
+
+<degree-adverb> ::= "velmi" | "hodně" | "moc" | "trochu" | "málo" | "dost" | "příliš" | "téměř" | "skoro" | "úplně" | "zcela"
+
+<temporal-adverb> ::= "včera" | "dnes" | "zítra" | "nyní" | "teď" | "vždy" | "nikdy" | "často" | "někdy" | "brzy" | "pozdě"
+
+<spatial-adverb> ::= "tady" | "tam" | "všude" | "nikde" | "někde" | "nahoře" | "dole" | "blízko" | "daleko" | "vpředu" | "vzadu"
+
+/* ===== COMPLEX NOUN PHRASES ===== */
+
+<complex-noun-phrase> ::= <determiner> <adjective> <noun> <genitive-modifier> |
+                         <determiner> <adjective> <adjective> <noun> |
+                         <quantifier> <adjective> <noun> |
+                         <numeral> <adjective> <noun>
+
+<genitive-modifier> ::= <noun-genitive> | <possessive-pronoun-genitive>
+
+/* ===== RELATIVE CLAUSE SYSTEM ===== */
+
+<relative-clause> ::= "který" <verb-phrase> | "která" <verb-phrase> | "které" <verb-phrase> |
+                     "jehož" <noun-phrase> | "jejíž" <noun-phrase> |
+                     "kterému" <verb-phrase> | "kterou" <verb-phrase> |
+                     "kterým" <verb-phrase> | "o kterém" <verb-phrase>
+
+<nested-relative-clause> ::= <noun-phrase> "," <relative-clause> "," <relative-clause>
+
+/* ===== CONDITIONAL STRUCTURES ===== */
+
+<simple-conditional> ::= "jestli" <clause> "," "pak" <clause> |
+                        "když" <clause> "," <clause> |
+                        "pokud" <clause> "," <clause>
+
+<contrary-to-fact-conditional> ::= "kdyby" <clause-past> "," <clause-conditional> |
+                                  "kdyby" <clause-past> "," "byl" "bych" <past-participle>
+
+/* ===== COMPOUND SENTENCES ===== */
+
+<compound-sentence> ::= <clause> <coordinating-conjunction> <clause> |
+                       <clause> "," <coordinating-conjunction> <clause> |
+                       <clause> "," <clause> "," <coordinating-conjunction> <clause>
+
+<complex-sentence> ::= <main-clause> <subordinating-conjunction> <subordinate-clause> |
+                      <subordinate-clause> "," <main-clause>
+
+/* ===== DISCOURSE MARKERS ===== */
+
+<discourse-marker> ::= "ano" | "ne" | "jo" | "dobře" | "fajn" | "prosím" | "děkuji" | "promiňte" | "pardon" |
+                      "však" | "totiž" | "vlastně" | "prostě" | "zkrátka" | "navíc" | "kromě toho" | "jinak" |
+                      "tedy" | "takže" | "proto" | "přesto" | "nicméně" | "však" | "ale" | "avšak"
+
+/* ===== EXAMPLES AND USAGE NOTES ===== */
+
+/* Example sentences demonstrating comprehensive Czech grammar:
+ * 
+ * Pronouns: Ten člověk, kterého jsem viděl včera, je můj soused.
+ * Numerals: Koupil jsem dvacet pět knih a tři časopisy.
+ * Quantifiers: Mnoho lidí přišlo na koncert.
+ * Temporal: Včera večer jsem byl v kině.
+ * Spatial: Tam nahoře je krásný výhled.
+ * Comparative: Ten dům je větší než můj.
+ * Conditional: Kdybych měl čas, přišel bych.
+ * Complex: Myslím si, že ten film, který jsi viděl, byl velmi dobrý.
+ */
