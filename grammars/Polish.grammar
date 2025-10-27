@@ -185,6 +185,25 @@ Keywords: i, a, ale, lub, czy, że, który, która, które, kto, co, kiedy, gdzi
                      | "czytam" | "czytasz" | "czyta" | "czytamy" | "czytacie" | "czytają" /* czytać */
                      | "robię" | "robisz" | "robi" | "robimy" | "robicie" | "robią" /* robić */
                      | "mówię" | "mówisz" | "mówi" | "mówimy" | "mówicie" | "mówią" /* mówić */
+                     | "piję" | "pijesz" | "pije" | "pijemy" | "pijecie" | "piją" /* pić */
+                     | "widzę" | "widzisz" | "widzi" | "widzimy" | "widzicie" | "widzą" /* widzieć */
+                     | "słyszę" | "słyszysz" | "słyszy" | "słyszymy" | "słyszycie" | "słyszą" /* słyszeć */
+                     | "lubię" | "lubisz" | "lubi" | "lubimy" | "lubicie" | "lubią" /* lubić */
+                     | "kocham" | "kochasz" | "kocha" | "kochamy" | "kochacie" | "kochają" /* kochać */
+                     | "rozumiem" | "rozumiesz" | "rozumie" | "rozumiemy" | "rozumiecie" | "rozumieją" /* rozumieć */
+                     | "myślę" | "myślisz" | "myśli" | "myślimy" | "myślicie" | "myślą" /* myśleć */
+                     | "śpię" | "śpisz" | "śpi" | "śpimy" | "śpicie" | "śpią" /* spać */
+                     | "staję" | "stajesz" | "staje" | "stajemy" | "stajecie" | "stoją" /* stać */
+                     | "siedzę" | "siedzisz" | "siedzi" | "siedzimy" | "siedzicie" | "siedzą" /* siedzieć */
+                     | "leżę" | "leżysz" | "leży" | "leżymy" | "leżycie" | "leżą" /* leżeć */
+                     | "żyję" | "żyjesz" | "żyje" | "żyjemy" | "żyjecie" | "żyją" /* żyć */
+                     | "umiem" | "umiesz" | "umie" | "umiemy" | "umiecie" | "umieją" /* umieć */
+                     | "wolę" | "wolisz" | "woli" | "wolimy" | "wolicie" | "wolą" /* woleć */
+                     | "potrzebuję" | "potrzebujesz" | "potrzebuje" | "potrzebujemy" | "potrzebujecie" | "potrzebują" /* potrzebować */
+                     | "biorę" | "bierzesz" | "bierze" | "bierzemy" | "bierzecie" | "biorą" /* brać */
+                     | "daję" | "dajesz" | "daje" | "dajemy" | "dajecie" | "dają" /* dawać */
+                     | "przychodzę" | "przychodzisz" | "przychodzi" | "przychodzimy" | "przychodzicie" | "przychodzą" /* przychodzić */
+                     | "wychodzę" | "wychodzisz" | "wychodzi" | "wychodzimy" | "wychodzicie" | "wychodzą" /* wychodzić */
 
 /* Past tense with gender agreement */
 <verb-past> ::= @TENSE[past] <past-conjugation>

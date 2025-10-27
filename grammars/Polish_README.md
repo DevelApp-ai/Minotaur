@@ -4,9 +4,10 @@ Comprehensive Polish grammar covering all major Slavic language features includi
 
 ## Grammar Size & Scope
 
-- **320 lines** of comprehensive grammar rules
+- **420+ lines** of comprehensive grammar rules
 - **7 grammatical cases**: Nominative, Genitive, Dative, Accusative, Instrumental, Locative, Vocative
 - **Aspect system**: Perfective and imperfective verb pairs
+- **33+ irregular verbs** covering most frequent Polish verbs
 - **3 genders** with masculine personal distinction
 - **Free word order** with SVO as default
 
@@ -43,8 +44,17 @@ Past tense forms agree with subject gender:
 
 ## Core Features
 
-### Irregular Verbs
-być (to be), mieć (to have), móc (can), chcieć (to want), musieć (must)
+### Irregular Verbs (33+ verbs)
+**Modal verbs**: móc (can), musieć (must), chcieć (want), umieć (know how), woleć (prefer)
+**Basic verbs**: być (be), mieć (have), wiedzieć (know), potrzebować (need)
+**Motion**: iść (go on foot), przychodzić (come), wychodzić (leave)
+**Actions**: robić (do), brać (take), dawać (give), pisać (write), czytać (read)
+**Communication**: mówić (speak), powiedzieć (say)
+**Consumption**: jeść (eat), pić (drink), spać (sleep)
+**Position**: stać (stand), siedzieć (sit), leżeć (lie)
+**Perception**: widzieć (see), słyszeć (hear)
+**Emotion**: lubić (like), kochać (love), rozumieć (understand)
+**Existence**: żyć (live)
 
 ### Preposition Case Government
 - **Genitive**: od, do, z, bez, dla, obok
