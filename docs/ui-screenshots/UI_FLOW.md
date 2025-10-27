@@ -14,6 +14,7 @@ Minotaur is a powerful compiler-compiler platform with a comprehensive web-based
 **Choose your focus:**
 
 - **📘 [Code Development Guide](CODE_DEVELOPMENT_GUIDE.md)** - Use Minotaur to analyze and work with your application code (C#, Java, Python, etc.)
+- **📊 [Implementation Status](IMPLEMENTATION_STATUS.md)** - Track progress of visualization features (Phases 1-3)
 - **📗 This Document** - UI overview and grammar development workflows
 
 ## Current Visualization Status

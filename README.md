@@ -122,6 +122,7 @@ dotnet test src/Minotaur.sln --collect:"XPlat Code Coverage"
 - [Grammar Generation Guide](./src/Minotaur/GrammarGeneration/README.md)
 - [UI Flow Documentation](./docs/ui-screenshots/UI_FLOW.md) - Comprehensive guide to all UI pages with screenshots
 - [Code Development Guide](./docs/ui-screenshots/CODE_DEVELOPMENT_GUIDE.md) - Using Minotaur for application code analysis
+- [Implementation Status](./docs/ui-screenshots/IMPLEMENTATION_STATUS.md) - Track progress of visualization features
 - [GAP Analysis](./GAP_Analysis_StepParser_Implementation.md)
 - [Technical Design Documents](./docs/)
 
