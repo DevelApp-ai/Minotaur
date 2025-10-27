@@ -1,0 +1,416 @@
+# Latin Language Example Sentences
+# Demonstrating Classical Latin Grammar
+
+## Simple Sentences
+
+Puella cantat.
+Puer legit.
+Marcus scribit.
+Romani vincunt.
+Feminae laborant.
+Milites pugnant.
+Poeta recitat.
+Discipulus studet.
+
+## Verb Conjugations - Present Tense
+
+# First Conjugation (amo, amare - to love)
+Amo.
+Amas.
+Amat.
+Amamus.
+Amatis.
+Amant.
+
+# Second Conjugation (moneo, monere - to warn)
+Moneo.
+Mones.
+Monet.
+Monemus.
+Monetis.
+Monent.
+
+# Third Conjugation (rego, regere - to rule)
+Rego.
+Regis.
+Regit.
+Regimus.
+Regitis.
+Regunt.
+
+# Fourth Conjugation (audio, audire - to hear)
+Audio.
+Audis.
+Audit.
+Audimus.
+Auditis.
+Audiunt.
+
+# Irregular Verb (sum, esse - to be)
+Sum.
+Es.
+Est.
+Sumus.
+Estis.
+Sunt.
+
+## Case Usage Examples
+
+# Nominative (Subject)
+Puella cantat.
+Marcus venit.
+Liber magnus est.
+
+# Genitive (Possession)
+Liber Marci magnus est.
+Domus puellae pulchra est.
+Gladius militis acutus est.
+
+# Dative (Indirect Object)
+Marcus puellae librum dat.
+Magister discipulo epistulam scribit.
+Poeta amicis carmen recitat.
+
+# Accusative (Direct Object)
+Puer librum legit.
+Femina aquam portat.
+Miles hostem videt.
+
+# Ablative (Various uses)
+Cum amico venio.
+In urbe habito.
+Gladio pugnat.
+
+## First Declension Examples (puella, puellae - girl)
+
+# Singular
+Puella cantat.
+Liber puellae magnus est.
+Marco puellae librum dat.
+Puer puellam videt.
+Cum puella venio.
+
+# Plural
+Puellae cantant.
+Libri puellarum magni sunt.
+Marcus puellis libros dat.
+Puer puellas videt.
+Cum puellis venio.
+
+## Second Declension Examples (dominus, domini - master)
+
+# Singular
+Dominus venit.
+Servus domini laborat.
+Servo domino cibum dat.
+Puer dominum videt.
+Cum domino venio.
+
+# Plural
+Domini veniunt.
+Servi dominorum laborant.
+Servi dominis cibum dant.
+Puer dominos videt.
+Cum dominis venio.
+
+## Second Declension Neuter (bellum, belli - war)
+
+# Singular
+Bellum est.
+Causa belli nota est.
+Duci bello milites dat.
+Miles bellum videt.
+In bello pugnant.
+
+# Plural
+Bella sunt.
+Causae bellorum notae sunt.
+Ducibus bellis milites dant.
+Miles bella videt.
+In bellis pugnant.
+
+## Third Declension Examples (rex, regis - king)
+
+# Singular
+Rex venit.
+Domus regis magna est.
+Servo regi aurum dat.
+Populus regem videt.
+Cum rege venio.
+
+# Plural
+Reges veniunt.
+Domus regum magnae sunt.
+Servi regibus aurum dant.
+Populus reges videt.
+Cum regibus venio.
+
+## Perfect Tense Examples
+
+Amavi.
+Amavisti.
+Amavit.
+Amavimus.
+Amavistis.
+Amaverunt.
+Veni vidi vici.
+Marcus librum legit.
+Puella cecidit.
+
+## Imperfect Tense Examples
+
+Amabam.
+Amabas.
+Amabat.
+Amabamus.
+Amabatis.
+Amabant.
+Puer legebat.
+Puella canebat.
+
+## Future Tense Examples
+
+Amabo.
+Amabis.
+Amabit.
+Amabimus.
+Amabitis.
+Amabunt.
+Marcus veniet.
+Puellae cantabunt.
+
+## Adjective Agreement
+
+# Positive Degree
+Magnus vir.
+Magna puella.
+Magnum bellum.
+Boni viri.
+Bonae puellae.
+Bona bella.
+
+# Comparative Degree
+Fortior vir.
+Fortior femina.
+Fortius consilium.
+
+# Superlative Degree
+Fortissimus vir.
+Fortissima femina.
+Fortissimum consilium.
+
+## Prepositional Phrases
+
+# With Accusative
+Ad urbem venit.
+Ante bellum.
+Post victoriam.
+Per viam ambulat.
+In urbem venit.
+Trans flumen.
+
+# With Ablative
+A Roma venit.
+Cum amico.
+De bello.
+E silva.
+In urbe habitat.
+Pro patria.
+Sine aqua.
+
+## Subordinate Clauses with Subjunctive
+
+# Purpose Clauses (ut + subjunctive)
+Venit ut videat.
+Laborat ut vincat.
+Studeo ut discam.
+
+# Result Clauses (ut + subjunctive)
+Tam fortis est ut vincat.
+Ita laborat ut vincat.
+
+# Cum Clauses
+Cum venisset laetus eram.
+Cum pugnaret fortis erat.
+
+# Conditional Clauses
+Si venis laetus ero.
+Si venisset laetus fuissem.
+
+## Relative Clauses
+
+Vir qui venit Romanus est.
+Puella quae cantat pulchra est.
+Bellum quod geritur difficile est.
+Liber quem legis bonus est.
+Femina cui librum dedi mater mea est.
+Vir cuius filius venit amicus meus est.
+
+## Ablative Absolute
+
+Caesare duce Romani vicerunt.
+Urbe capta hostes fugerunt.
+His rebus gestis domum rediit.
+Sole oriente laborare incipiunt.
+Hostibus victis pacem habebant.
+
+## Indirect Discourse
+
+Dicit Marcum venire.
+Scio te laborare.
+Putant nos vincere.
+Spero eum venire.
+Narrat eos pugnare.
+
+## Complex Sentences
+
+Marcus dicit quod puella cantat.
+Scio quia venit.
+Si venis laetus ero.
+Cum venisset laetus eram.
+Vir qui venit amicus meus est.
+Puella quae cantat soror mea est.
+
+## Interrogative Sentences
+
+Quis es?
+Quid facis?
+Cur venis?
+Quando venies?
+Ubi habitas?
+Quo vadis?
+Unde venis?
+Quomodo vales?
+Venisne?
+Num venit?
+Nonne venis?
+
+## Imperative Sentences
+
+Veni!
+Audi!
+Lege!
+Scribe!
+Labora!
+Pugna!
+Venite!
+Audite!
+Legite!
+
+## Commands with Object
+
+Lege librum!
+Audi magistrum!
+Da mihi aquam!
+Scribe epistulam!
+Porta gladium!
+
+## Demonstrative Pronouns
+
+Hic vir bonus est.
+Haec puella pulchra est.
+Hoc bellum difficile est.
+Ille vir fortis est.
+Illa femina sapiens est.
+Illud consilium bonum est.
+
+## Personal Pronouns
+
+Ego sum Marcus.
+Tu es discipulus.
+Nos sumus Romani.
+Vos estis amici.
+Video te.
+Audio vos.
+Dat mihi librum.
+Narrat nobis fabulam.
+
+## Participles
+
+# Present Active Participle
+Vir laborans.
+Puella canens.
+Miles pugnans.
+
+# Perfect Passive Participle
+Liber lectus.
+Epistula scripta.
+Urbs capta.
+
+# Future Active Participle
+Venturus sum.
+Victuri sumus.
+
+## Gerunds and Gerundives
+
+# Gerund
+Ars scribendi.
+Causa legendi.
+Ad vincendum.
+
+# Gerundive (expressing necessity)
+Liber legendus est.
+Epistula scribenda est.
+Urbs delenda est.
+
+## Word Order Variations
+
+# SOV (Standard)
+Marcus librum legit.
+Puella carmen canit.
+
+# OSV (Object emphasized)
+Librum Marcus legit.
+Carmen puella canit.
+
+# SVO
+Marcus legit librum.
+
+# VSO
+Legit Marcus librum.
+
+## Multiple Clauses
+
+Marcus dicit quod puella venit et librum legit.
+Si venis et mecum laboras laetus ero.
+Scio te venire et laborare.
+Cum venisset et me vidisset laetus erat.
+
+## Compound Sentences
+
+Marcus venit et puella canit.
+Puer legit sed non scribit.
+Venio aut mane aut vespere.
+Non solum venit sed etiam laborat.
+
+## Comparison
+
+Marcus maior est quam Lucius.
+Haec puella pulchrior est quam illa.
+Hoc bellum difficilius est quam illud.
+Fortissimus omnium est.
+Optimus puerorum est.
+
+## Negation
+
+Non venit.
+Numquam laborat.
+Nihil habet.
+Nemo venit.
+Neque venit neque laborat.
+
+## Passive Voice
+
+Liber legitur.
+Epistula scribitur.
+Urbs capitur.
+Amor amatus est.
+Urbs capta est.
+Miles vulneratus erat.
+
+## Different Tenses Combined
+
+Veni vidi vici.
+Venit videbit vincet.
+Venerat viderat vicerat.
+Cum venisset vidisset vicisset.
