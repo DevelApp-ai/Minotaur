@@ -3,11 +3,18 @@
 This document provides a comprehensive overview of all implemented UI pages in the Minotaur web application, focusing on the web deployment.
 
 **Generated:** 2025-10-27 03:21:00 UTC  
-**Updated:** 2025-10-27 05:23:00 UTC
+**Updated:** 2025-10-27 06:00:00 UTC
 
 ## Overview
 
 Minotaur is a powerful compiler-compiler platform with a comprehensive web-based UI built using Blazor. The application provides an intuitive interface for grammar development, code analysis, and project management.
+
+## Documentation Guides
+
+**Choose your focus:**
+
+- **📘 [Code Development Guide](CODE_DEVELOPMENT_GUIDE.md)** - Use Minotaur to analyze and work with your application code (C#, Java, Python, etc.)
+- **📗 This Document** - UI overview and grammar development workflows
 
 ## Current Visualization Status
 
