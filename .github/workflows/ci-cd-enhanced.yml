@@ -31,6 +31,7 @@ env:
   DOTNET_VERSION: '8.0.x'
   SOLUTION_PATH: 'src/Minotaur.sln'
   PROJECT_PATH: 'src/Minotaur/Minotaur.csproj'
+  TEMPLATES_PROJECT_PATH: 'src/Minotaur.Templates/Minotaur.Templates.csproj'
 
 jobs:
   calculate-version:
@@ -281,6 +282,11 @@ jobs:
       id: package
       run: |
         dotnet pack ${{ env.PROJECT_PATH }} \
+          --configuration Release \
+          --no-build \
+          --output ./packages \
+          -p:PackageVersion=${{ needs.calculate-version.outputs.full-version }}
+        dotnet pack ${{ env.TEMPLATES_PROJECT_PATH }} \
           --configuration Release \
           --no-build \
           --output ./packages \

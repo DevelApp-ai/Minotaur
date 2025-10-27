@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    
+    <!-- NuGet Package Properties -->
+    <PackageId>DevelApp.Minotaur.Templates</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Title>Minotaur Application Templates</Title>
+    <Description>Source code templates and examples for building applications on top of the DevelApp.Minotaur cognitive graph framework. Includes demo applications, Blazor UI components, and integration examples.</Description>
+    <Authors>DevelApp AI</Authors>
+    <Company>DevelApp AI</Company>
+    <Copyright>Copyright © 2024 DevelApp AI</Copyright>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>minotaur;templates;cognitive-graph;blazor;demo;examples;source</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <ContentTargetFolders>content</ContentTargetFolders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include Demo source files -->
+    <Content Include="../Minotaur.Demo/**/*.cs" Exclude="../Minotaur.Demo/obj/**;../Minotaur.Demo/bin/**" PackagePath="content/Demo/" />
+    <Content Include="../Minotaur.Demo/*.csproj" PackagePath="content/Demo/" />
+    
+    <!-- Include Blazor UI source files -->
+    <Content Include="../Minotaur.UI.Blazor/**/*.cs" Exclude="../Minotaur.UI.Blazor/obj/**;../Minotaur.UI.Blazor/bin/**" PackagePath="content/BlazorUI/" />
+    <Content Include="../Minotaur.UI.Blazor/**/*.razor" Exclude="../Minotaur.UI.Blazor/obj/**;../Minotaur.UI.Blazor/bin/**" PackagePath="content/BlazorUI/" />
+    <Content Include="../Minotaur.UI.Blazor/*.csproj" PackagePath="content/BlazorUI/" />
+    <Content Include="../Minotaur.UI.Blazor/**/*.json" Exclude="../Minotaur.UI.Blazor/obj/**;../Minotaur.UI.Blazor/bin/**" PackagePath="content/BlazorUI/" />
+    <Content Include="../Minotaur.UI.Blazor/**/*.css" Exclude="../Minotaur.UI.Blazor/obj/**;../Minotaur.UI.Blazor/bin/**" PackagePath="content/BlazorUI/" />
+    
+    <!-- Include README -->
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
