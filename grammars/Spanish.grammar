@@ -292,10 +292,12 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
 
 <haber-conditional> ::= @MOOD[conditional] ( "habría" | "habrías" | "habría" | "habríamos" | "habríais" | "habrían" )
 
-/* Periphrastic constructions */
+/* Periphrastic constructions - expanded */
 <periphrastic-verb-phrase> ::= <ir-verb> <opt-whitespace> "a" <opt-whitespace> <verb-infinitive>
                             | <estar-verb> <opt-whitespace> <gerund>
                             | <modal-verb> <opt-whitespace> <verb-infinitive>
+                            | <aspectual-periphrastic>
+                            | <inchoative-periphrastic>
 
 <ir-verb> ::= "voy" | "vas" | "va" | "vamos" | "vais" | "van"
 
@@ -304,6 +306,30 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
 <modal-verb> ::= "poder" | "puedo" | "puedes" | "puede" | "podemos" | "podéis" | "pueden"
               | "deber" | "debo" | "debes" | "debe" | "debemos" | "debéis" | "deben"
               | "querer" | "quiero" | "quieres" | "quiere" | "queremos" | "queréis" | "quieren"
+              | "soler" | "suelo" | "sueles" | "suele" | "solemos" | "soléis" | "suelen"
+              | "tener" <opt-whitespace> "que"
+              | "haber" <opt-whitespace> "de"
+              | "haber" <opt-whitespace> "que"
+
+/* Aspectual periphrastic constructions */
+<aspectual-periphrastic> ::= <progressive-aspect>
+                          | <perfective-aspect>
+                          | <ingressive-aspect>
+                          | <terminative-aspect>
+                          | <continuative-aspect>
+
+<progressive-aspect> ::= ( "estar" | "andar" | "ir" | "venir" ) <opt-whitespace> <gerund>
+
+<perfective-aspect> ::= ( "tener" | "llevar" ) <opt-whitespace> <past-participle>
+
+<ingressive-aspect> ::= ( "ponerse" | "echarse" | "romper" ) <opt-whitespace> "a" <opt-whitespace> <verb-infinitive>
+
+<terminative-aspect> ::= ( "acabar" | "terminar" | "dejar" ) <opt-whitespace> "de" <opt-whitespace> <verb-infinitive>
+
+<continuative-aspect> ::= ( "seguir" | "continuar" ) <opt-whitespace> <gerund>
+
+/* Inchoative constructions */
+<inchoative-periphrastic> ::= ( "empezar" | "comenzar" | "principiar" ) <opt-whitespace> "a" <opt-whitespace> <verb-infinitive>
 
 /* Reflexive verb phrases */
 <reflexive-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <finite-verb>
@@ -677,20 +703,82 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
 
 <multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
 
-<coordinating-conjunction> ::= "y" | "e" | "o" | "u" | "pero" | "mas" | "sino" | "sino" <opt-whitespace> "que" | "ni"
+<coordinating-conjunction> ::= "y" | "e" | "o" | "u" | "pero" | "mas" | "sino" | "sino" <opt-whitespace> "que" | "ni" | "tanto" <opt-whitespace> "como" | "así" <opt-whitespace> "como" | "no" <opt-whitespace> "solo" <opt-whitespace> "sino" <opt-whitespace> "también"
 
+/* Enhanced complex sentence structures */
 <complex-sentence> ::= <simple-complex-sentence>
                     | <fronted-subordinate-sentence>
+                    | <split-complex-sentence>
+                    | <extraposed-clause-sentence>
 
 <simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
 
 <fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
 
+/* Split complex sentence (subordinate clause interrupted by main clause) */
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+/* Extraposed clause with anticipatory pronoun */
+<extraposed-clause-sentence> ::= <correlate-element> <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+<correlate-element> ::= "eso" | "esto" | "aquello" | "lo" <opt-whitespace> "que"
+
+/* Embedded clause sequences */
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> ){2,}
+
+/* Multi-embedded sentences with 3+ levels of nesting */
 <multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
                            | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+                           | <main-clause> <opt-whitespace> <embedded-clause-sequence>
 
 <coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
                                 | <main-clause> <opt-whitespace> <coordinated-subordinate-clause>
+
+/* Passive voice constructions */
+<passive-clause> ::= <subject> <opt-whitespace> <passive-auxiliary> <opt-whitespace> <past-participle> <opt-whitespace> ( "por" <opt-whitespace> <agent> )?
+
+<passive-auxiliary> ::= "ser" <opt-whitespace> <finite-verb>
+                     | "estar" <opt-whitespace> <finite-verb>
+
+<agent> ::= <noun-phrase> | <pronoun>
+
+/* Reflexive passive (se passiva) */
+<reflexive-passive> ::= "se" <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>
+
+/* Impersonal constructions */
+<impersonal-clause> ::= <impersonal-se-clause>
+                     | <impersonal-third-plural>
+                     | <hay-clause>
+
+<impersonal-se-clause> ::= "se" <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<impersonal-third-plural> ::= <verb-third-plural> <opt-whitespace> <object>?
+
+<verb-third-plural> ::= <regular-ar-present> | <regular-er-present> | <regular-ir-present> | <irregular-present>
+
+<hay-clause> ::= "hay" <opt-whitespace> <noun-phrase>
+              | "hubo" <opt-whitespace> <noun-phrase>
+              | "habrá" <opt-whitespace> <noun-phrase>
+              | "había" <opt-whitespace> <noun-phrase>
+
+/* Conditional sentences with complex patterns */
+<conditional-sentence> ::= <simple-conditional>
+                        | <contrary-to-fact-present>
+                        | <contrary-to-fact-past>
+
+<simple-conditional> ::= "si" <opt-whitespace> <verb-present> <opt-whitespace> "," <opt-whitespace> <verb-future>
+                      | "si" <opt-whitespace> <verb-present> <opt-whitespace> "," <opt-whitespace> <verb-present>
+
+<contrary-to-fact-present> ::= "si" <opt-whitespace> <verb-imperfect-subjunctive> <opt-whitespace> "," <opt-whitespace> <verb-conditional>
+
+<contrary-to-fact-past> ::= "si" <opt-whitespace> <pluperfect-subjunctive> <opt-whitespace> "," <opt-whitespace> <conditional-perfect>
+
+<pluperfect-subjunctive> ::= <haber-imperfect-subjunctive> <opt-whitespace> <past-participle>
+
+<haber-imperfect-subjunctive> ::= "hubiera" | "hubieras" | "hubiera" | "hubiéramos" | "hubierais" | "hubieran"
+                               | "hubiese" | "hubieses" | "hubiese" | "hubiésemos" | "hubieseis" | "hubiesen"
+
+<conditional-perfect> ::= <haber-conditional> <opt-whitespace> <past-participle>
 
 /* Parenthetical clauses */
 <parenthetical-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <object>? <punctuation>?
@@ -853,3 +941,69 @@ Keywords: y, o, pero, mas, sino, porque, que, quien, cuando, donde, como, por, q
     THEN USE <seseo> /* s sound for c/z */
     ELSE IF @DIALECT[andalusian] MAY_USE <ceceo> /* th sound for s */
     ELSE USE <distinción> /* Castilian distinction */
+
+@CONTEXT_RULE[passive-agent-agreement]:
+    IF <passive-clause> CONTAINS <agent>
+    THEN <past-participle>.@GENDER == <subject>.@GENDER AND <past-participle>.@NUMBER == <subject>.@NUMBER
+    ELSE VALID
+
+@CONTEXT_RULE[aspectual-auxiliary-selection]:
+    IF <aspectual-periphrastic> CONTAINS <progressive-aspect>
+    THEN <gerund> MUST FOLLOW <auxiliary>
+    ELSE IF <aspectual-periphrastic> CONTAINS <perfective-aspect>
+    THEN <past-participle> MUST FOLLOW <auxiliary>
+    ELSE VALID
+
+@CONTEXT_RULE[conditional-sentence-tense]:
+    IF <conditional-sentence> IS <contrary-to-fact-present>
+    THEN <protasis> USES imperfect-subjunctive AND <apodosis> USES conditional
+    ELSE IF <conditional-sentence> IS <contrary-to-fact-past>
+    THEN <protasis> USES pluperfect-subjunctive AND <apodosis> USES conditional-perfect
+    ELSE VALID
+
+@CONTEXT_RULE[reflexive-passive-agreement]:
+    IF <reflexive-passive> CONTAINS <subject>
+    THEN <verb>.@NUMBER == <subject>.@NUMBER
+    ELSE WARNING "Check agreement in reflexive passive"
+
+@CONTEXT_RULE[embedded-clause-depth]:
+    IF <sentence> CONTAINS <multi-embedded-sentence>
+    THEN DEPTH <= 5 /* Maximum recommended nesting depth */
+    ELSE VALID
+
+@CONTEXT_RULE[extraposed-clause-correlate]:
+    IF <extraposed-clause-sentence> CONTAINS <correlate-element>
+    THEN <subordinate-clause> MUST FOLLOW <main-clause>
+    ELSE ERROR "Extraposed clause requires correlate and following subordinate"
+
+@CONTEXT_RULE[modal-infinitive-agreement]:
+    IF <modal-verb> PRECEDES <verb-infinitive>
+    THEN <verb-infinitive> IN base-form
+    ELSE ERROR "Modal verbs require infinitive"
+
+@CONTEXT_RULE[hay-impersonal]:
+    IF <hay-clause> PRESENT
+    THEN <noun-phrase> IS indefinite
+    ELSE WARNING "Hay typically used with indefinite noun phrases"
+
+@CONTEXT_RULE[clitic-climbing]:
+    IF <periphrastic-verb-phrase> CONTAINS <object-pronoun>
+    THEN <object-pronoun> ( BEFORE <auxiliary> OR ATTACHED_TO <infinitive> )
+    ELSE VALID
+
+@CONTEXT_RULE[dialectal-phonology-consistency]:
+    IF @DIALECT[andalusian] OR @DIALECT[caribbean]
+    THEN FINAL_CONSONANTS MAY_BE <weakened-or-deleted>
+    ELSE MAINTAIN <full-consonants>
+
+@CONTEXT_RULE[subordinate-mood-selection]:
+    IF <subordinate-clause> TRIGGERED_BY <doubt-verb> OR <emotion-verb> OR <volition-verb>
+    THEN <verb>.@MOOD MUST BE subjunctive
+    ELSE IF <subordinate-clause> TRIGGERED_BY <certainty-verb>
+    THEN <verb>.@MOOD MUST BE indicative
+    ELSE WARNING "Consider mood selection"
+
+@CONTEXT_RULE[gerund-subject-agreement]:
+    IF <gerund> HAS implicit-subject
+    THEN implicit-subject SAME_AS <main-clause-subject>
+    ELSE WARNING "Gerund subject should match main clause subject"

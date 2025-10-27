@@ -317,16 +317,84 @@ Keywords: en, of, maar, want, dus, omdat, dat, die, wat, wie, wanneer, waar, hoe
 
 <verb-phrase-subordinate> ::= ( <adverb>? <opt-whitespace> )* <finite-verb>
 
-/* Relative clauses */
-<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+/* Relative clauses - expanded */
+<relative-clause> ::= <simple-relative-clause>
+                   | <nested-relative-clause>
 
-/* Compound and complex sentences */
-<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+<simple-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
 
-<coordinating-conjunction> ::= "en" | "of" | "maar" | "want" | "dus"
+<nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <subordinate-clause>
 
-<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
-                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+/* Compound and complex sentences - expanded */
+<compound-sentence> ::= <simple-compound-sentence>
+                     | <multi-compound-sentence>
+
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
+
+<coordinating-conjunction> ::= "en" | "of" | "maar" | "want" | "dus" | "noch" | "doch" | "echter" | "daarom"
+
+/* Enhanced complex sentence structures */
+<complex-sentence> ::= <simple-complex-sentence>
+                    | <fronted-subordinate-sentence-nl>
+                    | <split-complex-sentence-nl>
+                    | <coordinated-complex-sentence-nl>
+
+<simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+
+<fronted-subordinate-sentence-nl> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<split-complex-sentence-nl> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+<coordinated-complex-sentence-nl> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+
+/* Multi-embedded sentences with nesting */
+<multi-embedded-sentence-nl> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                              | <main-clause> <opt-whitespace> <embedded-clause-sequence-nl>
+
+<embedded-clause-sequence-nl> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> ){2,}
+
+/* Passive voice constructions */
+<passive-clause-nl> ::= <subject> <opt-whitespace> <passive-auxiliary-nl> <opt-whitespace> <past-participle> <opt-whitespace> ( "door" <opt-whitespace> <agent-nl> )?
+
+<passive-auxiliary-nl> ::= "worden" <opt-whitespace> <finite-verb>
+                        | "zijn" <opt-whitespace> <finite-verb>
+
+<agent-nl> ::= <noun-phrase> | <pronoun>
+
+/* Impersonal constructions */
+<impersonal-clause-nl> ::= <impersonal-er>
+                        | <men-construction>
+
+<impersonal-er> ::= "er" <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>?
+
+<men-construction> ::= "men" <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+/* Modal verb constructions - expanded */
+<modal-construction> ::= <modal-verb> <opt-whitespace> <infinitive-phrase>
+                      | <double-infinitive-construction>
+
+<double-infinitive-construction> ::= <auxiliary-verb> <opt-whitespace> <infinitive> <opt-whitespace> <infinitive>
+
+<infinitive-phrase> ::= <infinitive> ( <opt-whitespace> <object> )?
+
+/* Separable verb - advanced patterns */
+<separable-verb-advanced> ::= <separable-verb-phrase>
+                           | <separable-in-subordinate>
+
+<separable-in-subordinate> ::= <subordinating-conjunction> <opt-whitespace> <subject> <opt-whitespace> <object>? <opt-whitespace> <separable-prefix> <verb-infinitive>
+
+/* Conditional sentences */
+<conditional-sentence-nl> ::= <simple-conditional-nl>
+                           | <contrary-to-fact-nl>
+
+<simple-conditional-nl> ::= "als" <opt-whitespace> <verb-present> <opt-whitespace> "," <opt-whitespace> <verb-present>
+                         | "als" <opt-whitespace> <verb-present> <opt-whitespace> "," <opt-whitespace> <verb-future>
+
+<contrary-to-fact-nl> ::= "als" <opt-whitespace> <verb-past> <opt-whitespace> "," <opt-whitespace> <conditional-zou>
+
+<conditional-zou> ::= "zou" | "zouden" <opt-whitespace> <infinitive>
 
 /* Interrogative clauses */
 <interrogative-clause> ::= <yes-no-question> | <wh-question>
@@ -392,3 +460,60 @@ Keywords: en, of, maar, want, dus, omdat, dat, die, wat, wie, wanneer, waar, hoe
     IF <verb> HAS inseparable-prefix
     THEN <past-participle> NO "ge-" PREFIX
     ELSE <past-participle> HAS "ge-" PREFIX
+
+@CONTEXT_RULE[passive-agent-agreement-nl]:
+    IF <passive-clause-nl> CONTAINS <agent-nl>
+    THEN <past-participle>.@GENDER == <subject>.@GENDER
+    ELSE VALID
+
+@CONTEXT_RULE[impersonal-er-position]:
+    IF <impersonal-er> PRESENT
+    THEN "er" IN topic-field OR after-verb
+    ELSE VALID
+
+@CONTEXT_RULE[double-infinitive-order]:
+    IF <double-infinitive-construction> PRESENT
+    THEN <modal-infinitive> FOLLOWS <main-infinitive>
+    ELSE VALID /* IPP: Infinitivus Pro Participio */
+
+@CONTEXT_RULE[separable-in-subordinate-unified]:
+    IF <subordinate-clause> CONTAINS <separable-verb>
+    THEN <separable-prefix> UNIFIED_WITH <verb-stem> AT clause-end
+    ELSE VALID
+
+@CONTEXT_RULE[v2-strict-ordering]:
+    IF <main-clause> PRESENT
+    THEN <finite-verb> AT position-2
+    ELSE WARNING "V2 word order violation"
+
+@CONTEXT_RULE[sov-subordinate-strict]:
+    IF <subordinate-clause> PRESENT
+    THEN <finite-verb> AT clause-final
+    ELSE WARNING "SOV order expected in subordinate clause"
+
+@CONTEXT_RULE[worden-zijn-passive]:
+    IF <passive-auxiliary-nl> IS "worden"
+    THEN INDICATES <action-passive>
+    ELSE IF <passive-auxiliary-nl> IS "zijn"
+    THEN INDICATES <state-passive>
+    ELSE VALID
+
+@CONTEXT_RULE[men-third-person]:
+    IF <men-construction> PRESENT
+    THEN <verb> MUST BE third-person-singular
+    ELSE VALID
+
+@CONTEXT_RULE[embedded-clause-depth-nl]:
+    IF <sentence> CONTAINS <multi-embedded-sentence-nl>
+    THEN DEPTH <= 5
+    ELSE VALID
+
+@CONTEXT_RULE[conditional-zou-usage]:
+    IF <contrary-to-fact-nl> PRESENT
+    THEN <apodosis> USES "zou/zouden" + <infinitive>
+    ELSE VALID
+
+@CONTEXT_RULE[te-infinitive-position]:
+    IF <infinitive> PRECEDED_BY "te"
+    THEN "te" IMMEDIATELY_BEFORE <infinitive>
+    ELSE VALID

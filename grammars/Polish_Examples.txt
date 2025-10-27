@@ -1,0 +1,89 @@
+# Polish Language Example Sentences
+
+## Present Tense
+
+Ja czytam książkę.
+Ty piszesz list.
+On studiuje matematykę.
+Ona pracuje w szkole.
+My mieszkamy w Warszawie.
+Wy macie czas.
+Oni uczą się polskiego.
+
+## Past Tense - Masculine
+
+Ja byłem w domu.
+Ty czytałeś gazetę.
+On pisał list.
+
+## Past Tense - Feminine
+
+Ja byłam w szkole.
+Ty czytałaś książkę.
+Ona pisała list.
+
+## Future Tense
+
+Ja będę czytać.
+Ty będziesz pisać.
+On przeczyta książkę.
+Ona napisze list.
+
+## Seven Cases
+
+# Nominative
+To jest książka.
+Ten dom jest duży.
+
+# Genitive
+Nie mam książki.
+To dom ojca.
+
+# Dative
+Daję książkę bratu.
+
+# Accusative
+Czytam książkę.
+Widzę dom.
+
+# Instrumental
+Piszę długopisem.
+Jestem nauczycielem.
+
+# Locative
+Myślę o domu.
+Mieszkam w Warszawie.
+
+# Vocative
+Panie profesorze!
+Marku!
+
+## Questions
+
+Czy mówisz po polsku?
+Kto to jest?
+Co robisz?
+Gdzie mieszkasz?
+Kiedy przyjdziesz?
+
+## Aspect Pairs
+
+# Imperfective
+Czytam książkę każdego dnia.
+Pisuję list.
+
+# Perfective
+Przeczytałem książkę.
+Napisałem list.
+
+## Modal Verbs
+
+Mogę mówić po polsku.
+Chcę uczyć się polskiego.
+Muszę pracować.
+
+## Complex Sentences
+
+Wiem, że on mieszka w Warszawie.
+Kiedy przyjdziesz, zadzwoń do mnie.
+Jeśli będzie padać, zostanę w domu.

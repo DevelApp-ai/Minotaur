@@ -223,11 +223,13 @@ Keywords: e, ou, mas, porém, contudo, porque, que, quem, quando, onde, como, po
 
 <ter-future> ::= @TENSE[future] ( "terei" | "terás" | "terá" | "teremos" | "tereis" | "terão" )
 
-/* Periphrastic constructions */
+/* Periphrastic constructions - expanded */
 <periphrastic-verb-phrase> ::= <ir-verb> <opt-whitespace> <verb-infinitive>
                             | <estar-verb> <opt-whitespace> "a" <opt-whitespace> <verb-infinitive>
                             | <estar-verb> <opt-whitespace> <gerund>
                             | <modal-verb> <opt-whitespace> <verb-infinitive>
+                            | <aspectual-periphrastic-pt>
+                            | <causative-construction>
 
 <ir-verb> ::= "vou" | "vais" | "vai" | "vamos" | "ides" | "vão"
 
@@ -236,6 +238,54 @@ Keywords: e, ou, mas, porém, contudo, porque, que, quem, quando, onde, como, po
 <modal-verb> ::= "poder" | "posso" | "podes" | "pode" | "podemos" | "podeis" | "podem"
               | "dever" | "devo" | "deves" | "deve" | "devemos" | "deveis" | "devem"
               | "querer" | "quero" | "queres" | "quer" | "queremos" | "quereis" | "querem"
+              | "ter" <opt-whitespace> "de"
+              | "ter" <opt-whitespace> "que"
+              | "haver" <opt-whitespace> "de"
+              | "costumar"
+
+/* Aspectual periphrastic constructions */
+<aspectual-periphrastic-pt> ::= <progressive-aspect-pt>
+                             | <perfective-aspect-pt>
+                             | <ingressive-aspect-pt>
+                             | <terminative-aspect-pt>
+                             | <continuative-aspect-pt>
+
+<progressive-aspect-pt> ::= ( "estar" | "andar" | "ir" | "vir" ) <opt-whitespace> ( "a" <opt-whitespace> )? <verb-infinitive>
+                         | ( "estar" | "andar" ) <opt-whitespace> <gerund>
+
+<perfective-aspect-pt> ::= "ter" <opt-whitespace> <past-participle>
+
+<ingressive-aspect-pt> ::= ( "começar" | "principiar" | "pôr-se" ) <opt-whitespace> "a" <opt-whitespace> <verb-infinitive>
+
+<terminative-aspect-pt> ::= ( "acabar" | "terminar" | "deixar" ) <opt-whitespace> "de" <opt-whitespace> <verb-infinitive>
+
+<continuative-aspect-pt> ::= ( "continuar" | "prosseguir" ) <opt-whitespace> "a" <opt-whitespace> <verb-infinitive>
+
+/* Causative constructions */
+<causative-construction> ::= ( "fazer" | "mandar" | "deixar" ) <opt-whitespace> <verb-infinitive>
+
+/* Passive voice constructions */
+<passive-clause-pt> ::= <subject> <opt-whitespace> <passive-auxiliary-pt> <opt-whitespace> <past-participle> <opt-whitespace> ( "por" <opt-whitespace> <agent-pt> )?
+
+<passive-auxiliary-pt> ::= "ser" <opt-whitespace> <finite-verb>
+                        | "estar" <opt-whitespace> <finite-verb>
+                        | "ficar" <opt-whitespace> <finite-verb>
+
+<agent-pt> ::= <noun-phrase> | <pronoun>
+
+/* Reflexive passive (se passiva) */
+<reflexive-passive-pt> ::= "se" <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>
+
+/* Impersonal constructions */
+<impersonal-clause-pt> ::= <impersonal-se-pt>
+                        | <haver-impersonal>
+
+<impersonal-se-pt> ::= "se" <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<haver-impersonal> ::= "há" <opt-whitespace> <noun-phrase>
+                    | "houve" <opt-whitespace> <noun-phrase>
+                    | "haverá" <opt-whitespace> <noun-phrase>
+                    | "havia" <opt-whitespace> <noun-phrase>
 
 <reflexive-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <finite-verb>
                          | <finite-verb> "-" <reflexive-pronoun> /* enclisis */
@@ -552,18 +602,67 @@ Keywords: e, ou, mas, porém, contudo, porque, que, quem, quando, onde, como, po
 <nested-relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <subordinate-clause>
 
 /* Compound and complex sentences */
-<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+<compound-sentence> ::= <simple-compound-sentence>
+                    | <multi-compound-sentence>
 
-<coordinating-conjunction> ::= "e" | "ou" | "mas" | "porém" | "contudo" | "todavia" | "nem" | "portanto"
+<simple-compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
 
+<multi-compound-sentence> ::= <main-clause> ( <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause> ){2,}
+
+<coordinating-conjunction> ::= "e" | "ou" | "mas" | "porém" | "contudo" | "todavia" | "nem" | "portanto" | "logo" | "pois" | "assim"
+
+/* Enhanced complex sentence structures */
 <complex-sentence> ::= <simple-complex-sentence>
                     | <fronted-subordinate-sentence>
+                    | <split-complex-sentence-pt>
+                    | <extraposed-clause-sentence-pt>
+                    | <coordinated-complex-sentence-pt>
 
 <simple-complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
 
 <fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
 
+/* Split complex sentence (subordinate interrupted by main) */
+<split-complex-sentence-pt> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+/* Extraposed clause with anticipatory element */
+<extraposed-clause-sentence-pt> ::= <correlate-element-pt> <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+
+<correlate-element-pt> ::= "isso" | "isto" | "aquilo" | "o" <opt-whitespace> "que"
+
+<coordinated-complex-sentence-pt> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+
+/* Embedded clause sequences */
+<embedded-clause-sequence-pt> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> ){2,}
+
+/* Multi-embedded sentences with 3+ levels of nesting */
 <multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> ( <opt-whitespace> <subordinate-clause> )+
+                           | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> <subordinate-clause>
+                           | <main-clause> <opt-whitespace> <embedded-clause-sequence-pt>
+
+/* Conditional sentences with complex patterns */
+<conditional-sentence-pt> ::= <simple-conditional-pt>
+                           | <contrary-to-fact-present-pt>
+                           | <contrary-to-fact-past-pt>
+                           | <future-conditional-pt>
+
+<simple-conditional-pt> ::= "se" <opt-whitespace> <verb-present> <opt-whitespace> "," <opt-whitespace> <verb-future>
+                         | "se" <opt-whitespace> <verb-present> <opt-whitespace> "," <opt-whitespace> <verb-present>
+
+<contrary-to-fact-present-pt> ::= "se" <opt-whitespace> <verb-imperfect-subjunctive> <opt-whitespace> "," <opt-whitespace> <verb-conditional>
+
+<contrary-to-fact-past-pt> ::= "se" <opt-whitespace> <pluperfect-subjunctive-pt> <opt-whitespace> "," <opt-whitespace> <conditional-perfect-pt>
+
+/* Future conditional with future subjunctive (unique to Portuguese) */
+<future-conditional-pt> ::= "se" <opt-whitespace> <verb-future-subjunctive> <opt-whitespace> "," <opt-whitespace> <verb-future>
+
+<pluperfect-subjunctive-pt> ::= <ter-imperfect-subjunctive> <opt-whitespace> <past-participle>
+
+<ter-imperfect-subjunctive> ::= "tivesse" | "tivesses" | "tivesse" | "tivéssemos" | "tivésseis" | "tivessem"
+
+<conditional-perfect-pt> ::= <ter-conditional> <opt-whitespace> <past-participle>
+
+<ter-conditional> ::= "teria" | "terias" | "teria" | "teríamos" | "teríeis" | "teriam"
 
 /* Interrogative clauses */
 <interrogative-clause> ::= <yes-no-question> | <wh-question>
@@ -647,3 +746,68 @@ Keywords: e, ou, mas, porém, contudo, porque, que, quem, quando, onde, como, po
     IF <main-clause>.@TENSE == <subordinate-clause>.@TENSE
     THEN VALID
     ELSE WARNING "Consider tense concordance"
+
+@CONTEXT_RULE[passive-agent-agreement-pt]:
+    IF <passive-clause-pt> CONTAINS <agent-pt>
+    THEN <past-participle>.@GENDER == <subject>.@GENDER AND <past-participle>.@NUMBER == <subject>.@NUMBER
+    ELSE VALID
+
+@CONTEXT_RULE[personal-infinitive-context]:
+    IF <infinitive> HAS explicit-subject OR <preposition> PRECEDES <infinitive>
+    THEN MAY_USE <personal-infinitive>
+    ELSE USE <impersonal-infinitive>
+
+@CONTEXT_RULE[future-conditional-uniqueness]:
+    IF <conditional-sentence-pt> IS <future-conditional-pt>
+    THEN <protasis> USES future-subjunctive AND <apodosis> USES future-indicative
+    ELSE VALID /* Unique Portuguese feature */
+
+@CONTEXT_RULE[estar-a-vs-gerund]:
+    IF @DIALECT[european]
+    THEN PREFER "estar" <opt-whitespace> "a" <opt-whitespace> <infinitive>
+    ELSE IF @DIALECT[brazilian]
+    THEN PREFER "estar" <opt-whitespace> <gerund>
+    ELSE VALID
+
+@CONTEXT_RULE[clitic-position-dialect]:
+    IF @DIALECT[european]
+    THEN <object-pronoun> AFTER <verb> IN declarative
+    ELSE IF @DIALECT[brazilian]
+    THEN <object-pronoun> BEFORE <verb> OR USE subject-pronoun
+    ELSE VALID
+
+@CONTEXT_RULE[mesoclisis-context]:
+    IF <verb>.@TENSE == future OR <verb>.@MOOD == conditional
+    THEN MAY_USE <mesoclisis>
+    ELSE USE <proclisis> OR <enclisis>
+
+@CONTEXT_RULE[causative-infinitive]:
+    IF <causative-construction> PRESENT
+    THEN <infinitive> MUST FOLLOW <causative-verb>
+    ELSE VALID
+
+@CONTEXT_RULE[haver-impersonal-invariable]:
+    IF <haver-impersonal> PRESENT
+    THEN <haver> REMAINS third-person-singular
+    ELSE VALID
+
+@CONTEXT_RULE[ser-estar-ficar-context]:
+    IF <copula> IS "ser"
+    THEN REQUIRES <permanent-or-essential>
+    ELSE IF <copula> IS "estar"
+    THEN REQUIRES <temporary-or-location>
+    ELSE IF <copula> IS "ficar"
+    THEN REQUIRES <change-or-location>
+    ELSE VALID
+
+@CONTEXT_RULE[aspectual-auxiliary-selection-pt]:
+    IF <aspectual-periphrastic-pt> CONTAINS <progressive-aspect-pt>
+    THEN REQUIRES <infinitive> OR <gerund>
+    ELSE IF <aspectual-periphrastic-pt> CONTAINS <perfective-aspect-pt>
+    THEN REQUIRES <past-participle>
+    ELSE VALID
+
+@CONTEXT_RULE[embedded-clause-depth-pt]:
+    IF <sentence> CONTAINS <multi-embedded-sentence>
+    THEN DEPTH <= 5 /* Maximum recommended nesting */
+    ELSE VALID
