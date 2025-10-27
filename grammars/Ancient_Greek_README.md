@@ -4,10 +4,20 @@ This grammar provides comprehensive coverage of Classical/Attic Greek, the langu
 
 ## Grammar Size & Scope
 
-- **424 lines** of comprehensive grammar rules
-- Covers Classical Attic Greek (with dialectal markers for Ionic, Doric, and Aeolic)
-- **Production-ready** for classical text analysis and natural language processing
-- Full support for the ancient Greek alphabet with polytonic accents and breathing marks
+- **~1300 lines** of comprehensive grammar rules (EXPANSION IN PROGRESS)
+- Covers Classical Attic Greek with 4 major dialectal variations
+- **Production-ready** for classical text analysis and NLP applications
+- Full support for ancient Greek alphabet with polytonic accents
+- Target: Match Danish grammar complexity (1393 lines, 296 production rules, 14 context rules)
+
+### Expansion Status
+- ✓ Basic sentence structures and case system implemented
+- 🔄 Adding 50+ irregular verb forms across all tenses/moods/voices
+- 🔄 Adding 4 major dialects (Attic, Ionic, Doric, Aeolic) with variations
+- 🔄 Adding nested/coordinated subordinate clauses (3+ levels)
+- 🔄 Adding comprehensive context rules (10+ rules)
+- 🔄 Adding multi-embedded sentence structures
+- 🔄 Adding comprehensive participle system
 
 ## Core Features
 

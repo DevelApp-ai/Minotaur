@@ -8,38 +8,64 @@ SymbolTableSharing: hierarchical
  * Modern Greek (Νέα Ελληνικά) Natural Language Grammar - Comprehensive Edition
  * 
  * This grammar provides extensive coverage of Modern Greek language structures including:
- * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Regular and irregular verb conjugations (all tenses and moods, 50+ irregular verbs)
  * - Full noun declension system (4 cases: nominative, genitive, accusative, vocative)
  * - Three genders (masculine, feminine, neuter)
  * - Context-sensitive agreement rules (gender, number, case, definiteness)
  * - Full regular expression support for morphological patterns
- * - Definite and indefinite articles
- * - Multiple tenses (present, past, future, perfect, pluperfect)
+ * - Definite and indefinite articles with full declension
+ * - Multiple tenses (present, imperfect, future, aorist, perfect, pluperfect)
  * - Subjunctive and imperative moods
- * - Active and passive voices
- * - Relative clauses and subordinate structures
+ * - Active, middle, and passive voices
+ * - Nested and coordinated subordinate clauses
+ * - Multi-embedded sentence structures
+ * - Relative clauses with nesting support
  * - Comparative and superlative adjectives
  * - Negation patterns
- * - Clitic pronouns and word order variations
+ * - Clitic pronouns with position rules
  * - Participles and gerunds
+ * - Regional dialectal variations (6 major dialects)
+ * - Conditional sentences (real, unreal, mixed)
+ * - Reported speech and indirect discourse
+ * - Parenthetical clauses
  */
 
-Keywords: και, ή, ο, όχι, αλλά, αν, όταν, επειδή, ότι, που, με, για, από, σε, εγώ, εσύ, αυτός, αυτή, αυτό, εμείς, εσείς, αυτοί, αυτές, αυτά, μου, σου, του, της, μας, σας, τους, ναι, να, θα, δεν, μη, μην, πολύ, λίγο, πάντα, ποτέ, εδώ, εκεί, τώρα, τότε
+Keywords: και, ή, ο, όχι, αλλά, αν, όταν, επειδή, ότι, που, με, για, από, σε, εγώ, εσύ, αυτός, αυτή, αυτό, εμείς, εσείς, αυτοί, αυτές, αυτά, μου, σου, του, της, μας, σας, τους, ναι, να, θα, δεν, μη, μην, πολύ, λίγο, πάντα, ποτέ, εδώ, εκεί, τώρα, τότε, ίσως, μήπως, ας, είθε, τάχα
 
-/* Top-level sentence structure */
+/* Dialect markers for Modern Greek regional varieties */
+@DIALECT[standard]      /* Standard Modern Greek (Demotic) */
+@DIALECT[pontic]        /* Pontic Greek (Ποντιακά) */
+@DIALECT[cypriot]       /* Cypriot Greek (Κυπριακά) */
+@DIALECT[cretan]        /* Cretan Greek (Κρητικά) */
+@DIALECT[tsakonian]     /* Tsakonian Greek (Τσακωνικά) - archaic */
+@DIALECT[cappadocian]   /* Cappadocian Greek (Καππαδοκικά) */
+
+/* Top-level sentence structure with nesting */
 <sentence> ::= <main-clause>
             | <subordinate-clause>
             | <compound-sentence>
             | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <coordinated-complex-sentence>
 
 /* Main clause */
 <main-clause> ::= <declarative-clause>
                | <interrogative-clause>
                | <imperative-clause>
                | <exclamative-clause>
+               | <parenthetical-clause>
 
-/* Declarative clause with flexible word order */
-<declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+/* Declarative clause with flexible word order and optional constituents */
+<declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <indirect-object>? <opt-whitespace> <adverbial>* <opt-whitespace> <final-field>? <opt-whitespace> <punctuation>?
+
+/* Final field for heavy constituents */
+<final-field> ::= <subordinate-clause>
+               | <relative-clause>
+               | <embedded-clause-sequence>
+               | <prepositional-phrase>
+
+/* Embedded clause sequence (multiple subordinate clauses) */
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> )+
 
 /* Interrogative clause */
 <interrogative-clause> ::= <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? <opt-whitespace> ";"

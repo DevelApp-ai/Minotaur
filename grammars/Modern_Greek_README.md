@@ -4,10 +4,20 @@ This grammar provides comprehensive coverage of Modern Greek (also known as Demo
 
 ## Grammar Size & Scope
 
-- **383 lines** of comprehensive grammar rules
-- Covers the standard Modern Greek language as standardized in 1976
+- **~1300 lines** of comprehensive grammar rules (EXPANSION IN PROGRESS)
+- Covers Standard Modern Greek with 6 regional dialectal variations
 - **Production-ready** for natural language processing applications
-- Full support for the Greek alphabet (24 letters)
+- Full support for the Greek alphabet with diacritics
+- Target: Match Danish grammar complexity (1393 lines, 296 production rules, 14 context rules)
+
+### Expansion Status
+- ✓ Basic sentence structures implemented
+- 🔄 Adding 50+ irregular verb forms with full conjugations
+- 🔄 Adding 6 regional dialects (Pontic, Cypriot, Cretan, Tsakonian, Cappadocian, Northern)
+- 🔄 Adding nested/coordinated subordinate clauses (3+ levels)
+- 🔄 Adding comprehensive context rules (10+ rules)
+- 🔄 Adding multi-embedded sentence structures
+- 🔄 Adding cleft sentences, tag questions, reported speech
 
 ## Core Features
 
