@@ -35,7 +35,7 @@ The preterite is used mainly in formal writing and for modal verbs and haben/sei
 - **Rüebli** (carrot) vs. German *Karotte/Möhre*
 - **Weggli** (bread roll) vs. German *Brötchen*
 - **Brötli** (small bread roll) - diminutive
-- **Gipfeli** (croissant) vs. German *Croissant*/Hörnchen*
+- **Gipfeli** (croissant) vs. German *Croissant/Hörnchen*
 - **Anken** (butter) vs. German *Butter*
 - **Zückerli** (candy) vs. German *Bonbon*
 - **Guetzli** (cookie) vs. German *Keks*
