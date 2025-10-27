@@ -425,7 +425,7 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
 
 <interrogative-pronoun> ::= "kdo" | "koho" | "komu" | "kohož" | "komž" | "kým" | "kim" | "o kom" |
                            "co" | "čeho" | "čemu" | "čím" | "o čem" |
-                           "čí" | "čího" | "čímu" | "čím" | "čí" | "čích" | "čím" |
+                           "čí" | "čího" | "čímu" | "čích" |
                            "jaký" | "jakého" | "jakému" | "jakým" | "jaké" | "jakých" | "jakými" |
                            "který" | "kterého" | "kterému" | "kterým" | "které" | "kterých" | "kterými"
 
@@ -546,7 +546,7 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
                                "kdyby" | "než" | "tím že" | "takže" | "aniž"
 
 <coordinating-conjunction> ::= "a" | "i" | "ani" | "nebo" | "anebo" | "či" | "ale" | "jenže" | "avšak" | "však" |
-                              "proto" | "tedy" | "takže" | "neboť" | "nebo" | "totiž"
+                              "proto" | "tedy" | "takže" | "neboť" | "totiž"
 
 <sentence-adverb> ::= "jistě" | "určitě" | "zřejmě" | "asi" | "možná" | "pravděpodobně" | "nepochybně" | "skutečně" |
                      "vlastně" | "totiž" | "samozřejmě" | "však" | "přece" | "jenže" | "ovšem" |
@@ -674,7 +674,7 @@ Keywords: a, ale, nebo, anebo, či, že, který, která, které, kdo, co, kdy, k
 
 <discourse-marker> ::= "ano" | "ne" | "jo" | "dobře" | "fajn" | "prosím" | "děkuji" | "promiňte" | "pardon" |
                       "však" | "totiž" | "vlastně" | "prostě" | "zkrátka" | "navíc" | "kromě toho" | "jinak" |
-                      "tedy" | "takže" | "proto" | "přesto" | "nicméně" | "však" | "ale" | "avšak"
+                      "tedy" | "takže" | "proto" | "přesto" | "nicméně" | "ale" | "avšak"
 
 /* ===== EXAMPLES AND USAGE NOTES ===== */
 
