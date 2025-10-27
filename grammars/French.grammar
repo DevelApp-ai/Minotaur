@@ -1,0 +1,507 @@
+Grammar: French
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * French Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of French language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Three verb groups (-er, -ir, -re verbs)
+ * - Pronominal (reflexive) verbs
+ * - Context-sensitive agreement rules (gender, number, person)
+ * - Masculine and feminine gender agreement
+ * - Definite, indefinite, and partitive articles
+ * - Multiple tenses (present, passé composé, imparfait, futur, etc.)
+ * - Conditional and subjunctive moods
+ * - SVO word order with variations
+ * - Relative clauses and subordinate structures
+ * - Comparative and superlative adjectives
+ * - Negation patterns (ne...pas, ne...jamais, etc.)
+ * - Interrogative forms
+ * - Object pronouns and their placement
+ */
+
+Keywords: et, ou, mais, donc, or, ni, car, parce, que, qui, quand, où, comment, pourquoi, si, alors, comme, pour, avec, sans, dans, sur, sous, de, du, des, à, au, aux, le, la, les, un, une, ce, cette, ces, mon, ma, mes, ton, ta, tes, son, sa, ses, notre, nos, votre, vos, leur, leurs, ne, pas, plus, jamais, rien, personne, je, tu, il, elle, nous, vous, ils, elles, me, te, se, lui, leur, y, en
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause with SVO word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+
+/* SVO declarative: Subject + Verb + Object/Complement */
+<declarative-clause> ::= <subject> <opt-whitespace> <negation-part1>? <opt-whitespace> <verb-phrase> <opt-whitespace> <negation-part2>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <yes-no-question>
+                        | <wh-question>
+                        | <inversion-question>
+
+<yes-no-question> ::= <declarative-clause> "?"
+                   | "Est-ce" <opt-whitespace> "que" <opt-whitespace> <declarative-clause> "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <verb> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+               | <question-word> <opt-whitespace> "est-ce" <opt-whitespace> "que" <opt-whitespace> <declarative-clause> "?"
+
+<inversion-question> ::= <verb> "-" <subject-pronoun> <opt-whitespace> <object>? "?"
+
+/* Imperative mood */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
+
+<exclamative-word> ::= "Quel" | "Quelle" | "Quels" | "Quelles" | "Comme"
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<subordinating-conjunction> ::= <temporal-conjunction>
+                             | <causal-conjunction>
+                             | <conditional-conjunction>
+                             | <concessive-conjunction>
+                             | <purpose-conjunction>
+                             | "que" | "parce" <opt-whitespace> "que" | "puisque" | "comme" | "si"
+
+<temporal-conjunction> ::= "quand" | "lorsque" | "pendant" <opt-whitespace> "que" | "tandis" <opt-whitespace> "que" | "depuis" <opt-whitespace> "que" | "avant" <opt-whitespace> "que" | "après" <opt-whitespace> "que" | "dès" <opt-whitespace> "que"
+
+<causal-conjunction> ::= "parce" <opt-whitespace> "que" | "puisque" | "comme" | "car" | "étant" <opt-whitespace> "donné" <opt-whitespace> "que"
+
+<conditional-conjunction> ::= "si" | "au" <opt-whitespace> "cas" <opt-whitespace> "où" | "à" <opt-whitespace> "condition" <opt-whitespace> "que" | "pourvu" <opt-whitespace> "que"
+
+<concessive-conjunction> ::= "bien" <opt-whitespace> "que" | "quoique" | "même" <opt-whitespace> "si" | "malgré" <opt-whitespace> "que"
+
+<purpose-conjunction> ::= "pour" <opt-whitespace> "que" | "afin" <opt-whitespace> "que" | "de" <opt-whitespace> "peur" <opt-whitespace> "que"
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<relative-pronoun> ::= "qui" | "que" | "quoi" | "dont" | "où" | "lequel" | "laquelle" | "lesquels" | "lesquelles" | "auquel" | "à" <opt-whitespace> "laquelle" | "duquel" | "de" <opt-whitespace> "laquelle"
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "et" | "ou" | "mais" | "donc" | "or" | "ni" | "car"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> <main-clause>
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+           | <infinitive-as-subject>
+
+<infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+/* Pronouns */
+<pronoun-subject> ::= <personal-pronoun-subject>
+                   | <demonstrative-pronoun>
+                   | <indefinite-pronoun>
+                   | "ce" | "c'"
+
+<subject-pronoun> ::= "je" | "tu" | "il" | "elle" | "on" | "nous" | "vous" | "ils" | "elles"
+
+<personal-pronoun-subject> ::= @CASE[nominative] ( "je" | "j'" | "tu" | "il" | "elle" | "on" | "nous" | "vous" | "ils" | "elles" )
+
+<personal-pronoun-object> ::= @CASE[accusative] ( "me" | "m'" | "te" | "t'" | "le" | "la" | "l'" | "nous" | "vous" | "les" )
+
+<personal-pronoun-indirect> ::= @CASE[dative] ( "me" | "m'" | "te" | "t'" | "lui" | "nous" | "vous" | "leur" )
+
+<reflexive-pronoun> ::= @REFLEXIVE ( "me" | "m'" | "te" | "t'" | "se" | "s'" | "nous" | "vous" | "se" | "s'" )
+
+<adverbial-pronoun> ::= "y" | "en"
+
+<demonstrative-pronoun> ::= @GENDER[masculine] @NUMBER[singular] ( "celui" | "celui-ci" | "celui-là" )
+                         | @GENDER[feminine] @NUMBER[singular] ( "celle" | "celle-ci" | "celle-là" )
+                         | @GENDER[masculine] @NUMBER[plural] ( "ceux" | "ceux-ci" | "ceux-là" )
+                         | @GENDER[feminine] @NUMBER[plural] ( "celles" | "celles-ci" | "celles-là" )
+                         | "ce" | "c'" | "ceci" | "cela" | "ça"
+
+<possessive-pronoun> ::= @GENDER[masculine] @NUMBER[singular] ( "le" <opt-whitespace> "mien" | "le" <opt-whitespace> "tien" | "le" <opt-whitespace> "sien" | "le" <opt-whitespace> "nôtre" | "le" <opt-whitespace> "vôtre" | "le" <opt-whitespace> "leur" )
+                      | @GENDER[feminine] @NUMBER[singular] ( "la" <opt-whitespace> "mienne" | "la" <opt-whitespace> "tienne" | "la" <opt-whitespace> "sienne" | "la" <opt-whitespace> "nôtre" | "la" <opt-whitespace> "vôtre" | "la" <opt-whitespace> "leur" )
+                      | @GENDER[masculine] @NUMBER[plural] ( "les" <opt-whitespace> "miens" | "les" <opt-whitespace> "tiens" | "les" <opt-whitespace> "siens" | "les" <opt-whitespace> "nôtres" | "les" <opt-whitespace> "vôtres" | "les" <opt-whitespace> "leurs" )
+                      | @GENDER[feminine] @NUMBER[plural] ( "les" <opt-whitespace> "miennes" | "les" <opt-whitespace> "tiennes" | "les" <opt-whitespace> "siennes" | "les" <opt-whitespace> "nôtres" | "les" <opt-whitespace> "vôtres" | "les" <opt-whitespace> "leurs" )
+
+<indefinite-pronoun> ::= "on" | "quelqu'un" | "quelque" <opt-whitespace> "chose" | "personne" | "rien" | "tout" | "tous" | "toutes" | "chacun" | "chacune" | "plusieurs" | "certains" | "certaines" | "aucun" | "aucune"
+
+<interrogative-pronoun> ::= "qui" | "que" | "quoi" | "lequel" | "laquelle" | "lesquels" | "lesquelles"
+
+/* Noun phrases with gender agreement */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <adjective-phrase>* <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <article>
+              | <demonstrative-determiner>
+              | <possessive-determiner>
+              | <quantifying-determiner>
+
+/* Articles with gender and number */
+<article> ::= <definite-article> | <indefinite-article> | <partitive-article>
+
+<definite-article> ::= @GENDER[masculine] @NUMBER[singular] ( "le" | "l'" )
+                    | @GENDER[feminine] @NUMBER[singular] ( "la" | "l'" )
+                    | @NUMBER[plural] ( "les" )
+
+<indefinite-article> ::= @GENDER[masculine] @NUMBER[singular] "un"
+                      | @GENDER[feminine] @NUMBER[singular] "une"
+                      | @NUMBER[plural] "des"
+
+<partitive-article> ::= @GENDER[masculine] @NUMBER[singular] ( "du" | "de" <opt-whitespace> "l'" )
+                     | @GENDER[feminine] @NUMBER[singular] ( "de" <opt-whitespace> "la" | "de" <opt-whitespace> "l'" )
+                     | @NUMBER[plural] "des"
+                     | "de" | "d'"
+
+<demonstrative-determiner> ::= @GENDER[masculine] @NUMBER[singular] ( "ce" | "cet" )
+                            | @GENDER[feminine] @NUMBER[singular] "cette"
+                            | @NUMBER[plural] "ces"
+
+<possessive-determiner> ::= @GENDER[masculine] @NUMBER[singular] ( "mon" | "ton" | "son" | "notre" | "votre" | "leur" )
+                         | @GENDER[feminine] @NUMBER[singular] ( "ma" | "ta" | "sa" | "notre" | "votre" | "leur" )
+                         | @NUMBER[plural] ( "mes" | "tes" | "ses" | "nos" | "vos" | "leurs" )
+
+<quantifying-determiner> ::= "tout" | "toute" | "tous" | "toutes" | "chaque" | "plusieurs" | "quelques" | "certains" | "certaines" | "aucun" | "aucune"
+
+/* Nouns with gender and number */
+<noun> ::= <noun-masculine-singular>
+        | <noun-feminine-singular>
+        | <noun-plural>
+
+<noun-masculine-singular> ::= @GENDER[masculine] @NUMBER[singular] <noun-stem>
+
+<noun-feminine-singular> ::= @GENDER[feminine] @NUMBER[singular] ( <noun-stem> | <noun-stem> "e" )
+
+<noun-plural> ::= @NUMBER[plural] ( <noun-stem> "s" | <noun-stem> "x" | <noun-stem> "aux" )
+
+<noun-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+
+<proper-noun> ::= /[A-ZÀÂÄÉÈÊËÏÎÔÙÛÜŸÆŒÇ][a-zàâäéèêëïîôùûüÿæœç]*/
+
+/* Adjectives with agreement and comparison */
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "très" | "vraiment" | "extrêmement" | "assez" | "plutôt" | "trop" | "peu" | "si" | "tellement"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree with agreement */
+<adjective-positive> ::= <adjective-masculine-singular>
+                      | <adjective-feminine-singular>
+                      | <adjective-plural>
+
+<adjective-masculine-singular> ::= @AGREEMENT[masculine] @NUMBER[singular] @DEGREE[positive] <adjective-stem>
+
+<adjective-feminine-singular> ::= @AGREEMENT[feminine] @NUMBER[singular] @DEGREE[positive] ( <adjective-stem> "e" | <adjective-stem> )
+
+<adjective-plural> ::= @AGREEMENT[plural] @DEGREE[positive] ( <adjective-stem> "s" | <adjective-stem> "es" | <adjective-stem> "x" )
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] ( <regular-comparative> | <irregular-comparative> )
+
+<regular-comparative> ::= "plus" <opt-whitespace> <adjective-stem> ( "e" | "es" | "s" )?
+                       | "moins" <opt-whitespace> <adjective-stem> ( "e" | "es" | "s" )?
+                       | "aussi" <opt-whitespace> <adjective-stem> ( "e" | "es" | "s" )?
+
+<irregular-comparative> ::= "meilleur" | "meilleure" | "meilleurs" | "meilleures" | "pire" | "pires"
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] ( <regular-superlative> | <irregular-superlative> )
+
+<regular-superlative> ::= <definite-article> <opt-whitespace> "plus" <opt-whitespace> <adjective-stem> ( "e" | "es" | "s" )?
+                       | <definite-article> <opt-whitespace> "moins" <opt-whitespace> <adjective-stem> ( "e" | "es" | "s" )?
+
+<irregular-superlative> ::= <definite-article> <opt-whitespace> ( "meilleur" | "meilleure" | "meilleurs" | "meilleures" | "pire" | "pires" )
+
+<adjective-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+
+/* Verb phrases */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <pronominal-verb-phrase>
+
+<simple-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <verb> ( <opt-whitespace> <adverb> )?
+
+<compound-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <past-participle>
+
+<pronominal-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <verb>
+
+<object-pronoun> ::= <personal-pronoun-object> | <personal-pronoun-indirect>
+
+/* Verbs - Three groups */
+<verb> ::= <verb-present>
+        | <verb-imperfect>
+        | <verb-future>
+        | <verb-conditional>
+        | <verb-subjunctive>
+        | <verb-imperative>
+
+/* Present tense - three groups */
+<verb-present> ::= @TENSE[present] @MOOD[indicative] ( <first-group-present> | <second-group-present> | <third-group-present> | <irregular-present> )
+
+/* First group (-er verbs) - parler */
+<first-group-present> ::= @GROUP[1] @PERSON[1] @NUMBER[singular] <first-group-stem> "e"
+                       | @GROUP[1] @PERSON[2] @NUMBER[singular] <first-group-stem> "es"
+                       | @GROUP[1] @PERSON[3] @NUMBER[singular] <first-group-stem> "e"
+                       | @GROUP[1] @PERSON[1] @NUMBER[plural] <first-group-stem> "ons"
+                       | @GROUP[1] @PERSON[2] @NUMBER[plural] <first-group-stem> "ez"
+                       | @GROUP[1] @PERSON[3] @NUMBER[plural] <first-group-stem> "ent"
+
+/* Second group (-ir verbs) - finir */
+<second-group-present> ::= @GROUP[2] @PERSON[1] @NUMBER[singular] <second-group-stem> "is"
+                        | @GROUP[2] @PERSON[2] @NUMBER[singular] <second-group-stem> "is"
+                        | @GROUP[2] @PERSON[3] @NUMBER[singular] <second-group-stem> "it"
+                        | @GROUP[2] @PERSON[1] @NUMBER[plural] <second-group-stem> "issons"
+                        | @GROUP[2] @PERSON[2] @NUMBER[plural] <second-group-stem> "issez"
+                        | @GROUP[2] @PERSON[3] @NUMBER[plural] <second-group-stem> "issent"
+
+/* Third group (irregular -re, -oir verbs) */
+<third-group-present> ::= @GROUP[3] <verb-stem> ( "s" | "t" | "ons" | "ez" | "ent" )
+
+/* Common irregular verbs */
+<irregular-present> ::= @IRREGULAR ( <etre-present> | <avoir-present> | <aller-present> | <faire-present> | <venir-present> | <pouvoir-present> | <vouloir-present> | <devoir-present> | <savoir-present> )
+
+<etre-present> ::= "suis" | "es" | "est" | "sommes" | "êtes" | "sont"
+
+<avoir-present> ::= "ai" | "as" | "a" | "avons" | "avez" | "ont"
+
+<aller-present> ::= "vais" | "vas" | "va" | "allons" | "allez" | "vont"
+
+<faire-present> ::= "fais" | "fais" | "fait" | "faisons" | "faites" | "font"
+
+<venir-present> ::= "viens" | "viens" | "vient" | "venons" | "venez" | "viennent"
+
+<pouvoir-present> ::= "peux" | "peux" | "peut" | "pouvons" | "pouvez" | "peuvent"
+
+<vouloir-present> ::= "veux" | "veux" | "veut" | "voulons" | "voulez" | "veulent"
+
+<devoir-present> ::= "dois" | "dois" | "doit" | "devons" | "devez" | "doivent"
+
+<savoir-present> ::= "sais" | "sais" | "sait" | "savons" | "savez" | "savent"
+
+/* Imperfect tense */
+<verb-imperfect> ::= @TENSE[imperfect] @MOOD[indicative] <verb-stem> ( "ais" | "ais" | "ait" | "ions" | "iez" | "aient" )
+
+/* Future tense */
+<verb-future> ::= @TENSE[future] @MOOD[indicative] <future-stem> ( "ai" | "as" | "a" | "ons" | "ez" | "ont" )
+
+<future-stem> ::= <verb-infinitive> | <irregular-future-stem>
+
+<irregular-future-stem> ::= "ser" | "aur" | "ir" | "fer" | "viendr" | "pourr" | "voudr" | "devr" | "saur"
+
+/* Conditional mood */
+<verb-conditional> ::= @TENSE[present] @MOOD[conditional] <future-stem> ( "ais" | "ais" | "ait" | "ions" | "iez" | "aient" )
+
+/* Subjunctive mood */
+<verb-subjunctive> ::= @MOOD[subjunctive] <subjunctive-present> | <subjunctive-imperfect>
+
+<subjunctive-present> ::= @TENSE[present] <verb-stem> ( "e" | "es" | "e" | "ions" | "iez" | "ent" )
+
+<subjunctive-imperfect> ::= @TENSE[imperfect] <verb-stem> ( "asse" | "asses" | "ât" | "assions" | "assiez" | "assent" )
+
+/* Imperative mood */
+<verb-imperative> ::= @MOOD[imperative] ( <first-group-imperative> | <second-group-imperative> | <irregular-imperative> )
+
+<first-group-imperative> ::= <first-group-stem> ( "e" | "ons" | "ez" )
+
+<second-group-imperative> ::= <second-group-stem> ( "is" | "issons" | "issez" )
+
+<irregular-imperative> ::= "sois" | "soyons" | "soyez" | "aie" | "ayons" | "ayez" | "va" | "allons" | "allez"
+
+/* Infinitive */
+<verb-infinitive> ::= <first-group-infinitive> | <second-group-infinitive> | <third-group-infinitive>
+
+<first-group-infinitive> ::= @GROUP[1] <first-group-stem> "er"
+
+<second-group-infinitive> ::= @GROUP[2] <second-group-stem> "ir"
+
+<third-group-infinitive> ::= @GROUP[3] ( <verb-stem> "re" | <verb-stem> "oir" | <verb-stem> "ir" )
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= <avoir-present> | <etre-present>
+
+/* Past participle */
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle>
+
+<regular-past-participle> ::= <first-group-stem> "é"
+                           | <second-group-stem> "i"
+                           | <verb-stem> "u"
+
+<irregular-past-participle> ::= @IRREGULAR ( "été" | "eu" | "fait" | "dit" | "mis" | "pris" | "vu" | "su" | "pu" | "voulu" | "dû" | "venu" | "allé" | "mort" | "né" | "ouvert" | "offert" | "écrit" | "lu" | "bu" | "couru" | "reçu" )
+
+/* Verb stems */
+<verb-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+<first-group-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+<second-group-stem> ::= /[a-zàâäéèêëïîôùûüÿæœç]+/
+
+/* Object */
+<object> ::= <direct-object>
+          | <indirect-object>
+
+<direct-object> ::= <noun-phrase>
+                 | <personal-pronoun-object>
+                 | <infinitive-phrase>
+
+<indirect-object> ::= "à" <opt-whitespace> <noun-phrase>
+                   | "à" <opt-whitespace> <personal-pronoun-indirect>
+                   | <personal-pronoun-indirect>
+
+<infinitive-phrase> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb> | <frequency-adverb>
+
+<time-adverb> ::= "maintenant" | "hier" | "aujourd'hui" | "demain" | "avant" | "après" | "tôt" | "tard" | "toujours" | "souvent" | "parfois" | "jamais" | "déjà" | "encore" | "bientôt" | "longtemps" | "autrefois"
+
+<place-adverb> ::= "ici" | "là" | "là-bas" | "partout" | "ailleurs" | "dehors" | "dedans" | "dessus" | "dessous" | "devant" | "derrière" | "près" | "loin"
+
+<manner-adverb> ::= "bien" | "mal" | "vite" | "lentement" | "facilement" | "difficilement" | "ensemble" | "seul" | "ainsi" | "comment"
+
+<degree-adverb> ::= "très" | "trop" | "peu" | "assez" | "beaucoup" | "plus" | "moins" | "autant" | "tant" | "si" | "tellement" | "presque"
+
+<frequency-adverb> ::= "toujours" | "souvent" | "parfois" | "rarement" | "jamais" | "quelquefois"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+                        | <preposition> <opt-whitespace> <pronoun>
+                        | <preposition> <opt-whitespace> <verb-infinitive>
+
+<preposition> ::= "à" | "de" | "en" | "dans" | "sur" | "sous" | "avec" | "sans" | "pour" | "par" | "entre" | "chez" | "vers" | "pendant" | "avant" | "après" | "depuis" | "devant" | "derrière" | "contre" | "parmi" | "selon" | "durant" | "malgré"
+
+/* Negation patterns */
+<negation-part1> ::= "ne" | "n'"
+
+<negation-part2> ::= "pas" | "plus" | "jamais" | "rien" | "personne" | "aucun" | "aucune" | "guère" | "nullement"
+
+/* Question words */
+<question-word> ::= "qui" | "que" | "quoi" | "où" | "quand" | "comment" | "pourquoi" | "combien" | "quel" | "quelle" | "quels" | "quelles" | "lequel" | "laquelle" | "lesquels" | "lesquelles"
+
+/* Punctuation */
+<punctuation> ::= "." | "?" | "!" | "," | ";" | ":" | "..." | "-"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive validation rules */
+
+/* Article-noun gender agreement */
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER
+    THEN VALID
+    ELSE ERROR "Article and noun gender must agree"
+
+/* Article-noun number agreement */
+@CONTEXT_RULE[article-noun-number-agreement]:
+    IF <article>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Article and noun number must agree"
+
+/* Adjective-noun gender agreement */
+@CONTEXT_RULE[adjective-noun-gender-agreement]:
+    IF <adjective>.@AGREEMENT == <noun>.@GENDER OR <noun>.@NUMBER == "plural"
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun in gender"
+
+/* Adjective-noun number agreement */
+@CONTEXT_RULE[adjective-noun-number-agreement]:
+    IF <adjective>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun in number"
+
+/* Subject-verb number agreement */
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@NUMBER == <verb>.@NUMBER
+    THEN VALID
+    ELSE WARNING "Subject and verb number should agree"
+
+/* Subject-verb person agreement */
+@CONTEXT_RULE[subject-verb-person-agreement]:
+    IF <subject>.@PERSON == <verb>.@PERSON
+    THEN VALID
+    ELSE WARNING "Subject and verb person should agree"
+
+/* Past participle agreement with être */
+@CONTEXT_RULE[participle-etre-agreement]:
+    IF <auxiliary-verb> == "être" THEN <past-participle>.@GENDER == <subject>.@GENDER AND <past-participle>.@NUMBER == <subject>.@NUMBER
+    ELSE VALID
+
+/* Negation structure */
+@CONTEXT_RULE[negation-completeness]:
+    IF <negation-part1> EXISTS THEN <negation-part2> SHOULD_EXIST
+    ELSE VALID
+
+/* Example sentences demonstrating French grammar:
+ *
+ * SIMPLE SENTENCES:
+ * - "Je parle français" (I speak French)
+ * - "Elle mange une pomme" (She eats an apple)
+ * - "Nous habitons à Paris" (We live in Paris)
+ *
+ * VERB CONJUGATIONS:
+ * - "Je parle, tu parles, il parle" (I speak, you speak, he speaks - 1st group)
+ * - "Je finis, tu finis, il finit" (I finish, you finish, he finishes - 2nd group)
+ * - "Je vends, tu vends, il vend" (I sell, you sell, he sells - 3rd group)
+ *
+ * IRREGULAR VERBS:
+ * - "Je suis, tu es, il est" (I am, you are, he is - être)
+ * - "J'ai, tu as, il a" (I have, you have, he has - avoir)
+ * - "Je vais, tu vas, il va" (I go, you go, he goes - aller)
+ *
+ * PASSÉ COMPOSÉ:
+ * - "J'ai parlé" (I spoke/have spoken - with avoir)
+ * - "Je suis allé" (I went/have gone - with être)
+ * - "Elle est venue" (She came/has come - agreement)
+ *
+ * GENDER AGREEMENT:
+ * - "Un grand homme" (A tall man - masculine)
+ * - "Une grande femme" (A tall woman - feminine)
+ * - "Le livre rouge" (The red book - masculine)
+ * - "La table rouge" (The red table - feminine)
+ *
+ * NEGATION:
+ * - "Je ne parle pas" (I don't speak)
+ * - "Elle ne vient jamais" (She never comes)
+ * - "Nous n'avons rien" (We have nothing)
+ *
+ * OBJECT PRONOUNS:
+ * - "Je le vois" (I see him/it)
+ * - "Elle lui parle" (She speaks to him/her)
+ * - "Nous les aimons" (We love them)
+ *
+ * INTERROGATIVE:
+ * - "Parlez-vous français?" (Do you speak French? - inversion)
+ * - "Est-ce que tu viens?" (Are you coming? - est-ce que)
+ * - "Où habites-tu?" (Where do you live? - wh-question)
+ *
+ * SUBJUNCTIVE:
+ * - "Il faut que je parte" (I must leave)
+ * - "Je veux qu'il vienne" (I want him to come)
+ * - "Bien qu'il soit tard" (Although it is late)
+ *
+ * COMPARATIVE/SUPERLATIVE:
+ * - "Plus grand que" (Taller than)
+ * - "Le plus grand" (The tallest)
+ * - "Meilleur que" (Better than)
+ * - "Le meilleur" (The best)
+ *
+ * PRONOMINAL VERBS:
+ * - "Je me lave" (I wash myself)
+ * - "Nous nous promenons" (We go for a walk)
+ * - "Ils se parlent" (They speak to each other)
+ */

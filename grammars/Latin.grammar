@@ -1,0 +1,568 @@
+Grammar: Latin
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Latin Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Classical Latin language structures including:
+ * - Five declensions for nouns with six cases (nominative, genitive, dative, accusative, ablative, vocative)
+ * - Four conjugations for verbs with all tenses, voices, and moods
+ * - Adjective declensions with three genders and comparison
+ * - Complex case agreement rules
+ * - Flexible word order (SOV default but highly flexible)
+ * - Subordinate clauses with subjunctive mood
+ * - Ablative absolute constructions
+ * - Gerunds and gerundives
+ * - Indirect discourse patterns
+ * - Participial constructions
+ */
+
+Keywords: et, sed, aut, vel, si, nisi, cum, quod, quia, dum, ut, ne, an, num, qui, quae, quod, is, ea, id, hic, haec, hoc, ille, illa, illud, ipse, ipsa, ipsum, non, neque, nec, etiam, quoque, autem, enim, nam, igitur, ergo, itaque, tamen, at, atque, ac, sum, es, est, sumus, estis, sunt
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause with flexible word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+
+/* Default SOV order but all permutations are valid */
+<declarative-clause> ::= <subject>? <opt-whitespace> <object>? <opt-whitespace> <prepositional-phrase>* <opt-whitespace> <adverbial>* <opt-whitespace> <verb> <opt-whitespace> <punctuation>?
+
+/* Interrogative sentences */
+<interrogative-clause> ::= <interrogative-particle>? <opt-whitespace> <subject>? <opt-whitespace> <object>? <opt-whitespace> <verb> <punctuation>?
+                        | <question-word> <opt-whitespace> <subject>? <opt-whitespace> <verb> <punctuation>?
+
+<interrogative-particle> ::= "-ne" | "num" | "nonne"
+
+/* Imperative mood */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? "!"
+
+<exclamative-word> ::= "quam" | "ut"
+
+/* Subordinate clauses with subjunctive */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<subordinate-content> ::= <subject>? <opt-whitespace> <object>? <opt-whitespace> <verb-subjunctive>
+
+<subordinating-conjunction> ::= <temporal-conjunction>
+                             | <causal-conjunction>
+                             | <conditional-conjunction>
+                             | <concessive-conjunction>
+                             | <purpose-conjunction>
+                             | <result-conjunction>
+                             | "ut" | "ne" | "cum" | "quod" | "quia" | "quoniam"
+
+<temporal-conjunction> ::= "cum" | "dum" | "postquam" | "antequam" | "priusquam" | "simulac" | "ubi" | "ut"
+
+<causal-conjunction> ::= "quod" | "quia" | "quoniam" | "quando" | "cum"
+
+<conditional-conjunction> ::= "si" | "nisi" | "sin" | "sive" | "seu"
+
+<concessive-conjunction> ::= "etsi" | "tametsi" | "quamquam" | "quamvis" | "licet" | "ut"
+
+<purpose-conjunction> ::= "ut" | "ne" | "quo"
+
+<result-conjunction> ::= "ut" | "ut non"
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>?
+
+<relative-pronoun> ::= @CASE[nominative] ( "qui" | "quae" | "quod" )
+                    | @CASE[genitive] ( "cuius" )
+                    | @CASE[dative] ( "cui" )
+                    | @CASE[accusative] ( "quem" | "quam" | "quod" )
+                    | @CASE[ablative] ( "quo" | "qua" | "quo" )
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "et" | "atque" | "ac" | "sed" | "autem" | "enim" | "nam" | "igitur" | "ergo" | "itaque" | "tamen" | "at" | "aut" | "vel" | "neque" | "nec"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> <main-clause>
+
+/* Subject with case marking */
+<subject> ::= <noun-phrase-nominative>
+           | <pronoun-nominative>
+           | <proper-noun-nominative>
+           | <infinitive-as-subject>
+
+<infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+/* Noun phrases with full declension */
+<noun-phrase-nominative> ::= <adjective-nominative>* <opt-whitespace> <noun-nominative> <opt-whitespace> <genitive-modifier>? <opt-whitespace> <relative-clause>?
+
+<noun-phrase-genitive> ::= <adjective-genitive>* <opt-whitespace> <noun-genitive>
+
+<noun-phrase-dative> ::= <adjective-dative>* <opt-whitespace> <noun-dative>
+
+<noun-phrase-accusative> ::= <adjective-accusative>* <opt-whitespace> <noun-accusative> <opt-whitespace> <genitive-modifier>?
+
+<noun-phrase-ablative> ::= <adjective-ablative>* <opt-whitespace> <noun-ablative>
+
+<genitive-modifier> ::= <noun-phrase-genitive>
+
+/* Nouns - Five declensions with six cases */
+/* First declension (mostly feminine) - puella, puellae */
+<noun-nominative> ::= @DECLENSION[1] @GENDER[feminine] @NUMBER[singular] @CASE[nominative] <first-decl-stem> "a"
+                   | @DECLENSION[1] @GENDER[feminine] @NUMBER[plural] @CASE[nominative] <first-decl-stem> "ae"
+                   | <second-decl-nominative>
+                   | <third-decl-nominative>
+                   | <fourth-decl-nominative>
+                   | <fifth-decl-nominative>
+
+<noun-genitive> ::= @DECLENSION[1] @GENDER[feminine] @NUMBER[singular] @CASE[genitive] <first-decl-stem> "ae"
+                 | @DECLENSION[1] @GENDER[feminine] @NUMBER[plural] @CASE[genitive] <first-decl-stem> "arum"
+                 | <second-decl-genitive>
+                 | <third-decl-genitive>
+                 | <fourth-decl-genitive>
+                 | <fifth-decl-genitive>
+
+<noun-dative> ::= @DECLENSION[1] @GENDER[feminine] @NUMBER[singular] @CASE[dative] <first-decl-stem> "ae"
+               | @DECLENSION[1] @GENDER[feminine] @NUMBER[plural] @CASE[dative] <first-decl-stem> "is"
+               | <second-decl-dative>
+               | <third-decl-dative>
+               | <fourth-decl-dative>
+               | <fifth-decl-dative>
+
+<noun-accusative> ::= @DECLENSION[1] @GENDER[feminine] @NUMBER[singular] @CASE[accusative] <first-decl-stem> "am"
+                   | @DECLENSION[1] @GENDER[feminine] @NUMBER[plural] @CASE[accusative] <first-decl-stem> "as"
+                   | <second-decl-accusative>
+                   | <third-decl-accusative>
+                   | <fourth-decl-accusative>
+                   | <fifth-decl-accusative>
+
+<noun-ablative> ::= @DECLENSION[1] @GENDER[feminine] @NUMBER[singular] @CASE[ablative] <first-decl-stem> "a"
+                 | @DECLENSION[1] @GENDER[feminine] @NUMBER[plural] @CASE[ablative] <first-decl-stem> "is"
+                 | <second-decl-ablative>
+                 | <third-decl-ablative>
+                 | <fourth-decl-ablative>
+                 | <fifth-decl-ablative>
+
+/* Second declension (masculine/neuter) - dominus, domini / bellum, belli */
+<second-decl-nominative> ::= @DECLENSION[2] @GENDER[masculine] @NUMBER[singular] @CASE[nominative] <second-decl-stem> ( "us" | "er" | "ir" )
+                          | @DECLENSION[2] @GENDER[masculine] @NUMBER[plural] @CASE[nominative] <second-decl-stem> "i"
+                          | @DECLENSION[2] @GENDER[neuter] @NUMBER[singular] @CASE[nominative] <second-decl-stem> "um"
+                          | @DECLENSION[2] @GENDER[neuter] @NUMBER[plural] @CASE[nominative] <second-decl-stem> "a"
+
+<second-decl-genitive> ::= @DECLENSION[2] @NUMBER[singular] @CASE[genitive] <second-decl-stem> "i"
+                        | @DECLENSION[2] @NUMBER[plural] @CASE[genitive] <second-decl-stem> "orum"
+
+<second-decl-dative> ::= @DECLENSION[2] @NUMBER[singular] @CASE[dative] <second-decl-stem> "o"
+                      | @DECLENSION[2] @NUMBER[plural] @CASE[dative] <second-decl-stem> "is"
+
+<second-decl-accusative> ::= @DECLENSION[2] @GENDER[masculine] @NUMBER[singular] @CASE[accusative] <second-decl-stem> "um"
+                          | @DECLENSION[2] @GENDER[masculine] @NUMBER[plural] @CASE[accusative] <second-decl-stem> "os"
+                          | @DECLENSION[2] @GENDER[neuter] @NUMBER[singular] @CASE[accusative] <second-decl-stem> "um"
+                          | @DECLENSION[2] @GENDER[neuter] @NUMBER[plural] @CASE[accusative] <second-decl-stem> "a"
+
+<second-decl-ablative> ::= @DECLENSION[2] @NUMBER[singular] @CASE[ablative] <second-decl-stem> "o"
+                        | @DECLENSION[2] @NUMBER[plural] @CASE[ablative] <second-decl-stem> "is"
+
+/* Third declension (all genders) - rex, regis / corpus, corporis */
+<third-decl-nominative> ::= @DECLENSION[3] @NUMBER[singular] @CASE[nominative] <third-decl-stem>
+                         | @DECLENSION[3] @NUMBER[plural] @CASE[nominative] <third-decl-stem> "es"
+                         | @DECLENSION[3] @GENDER[neuter] @NUMBER[plural] @CASE[nominative] <third-decl-stem> "a"
+
+<third-decl-genitive> ::= @DECLENSION[3] @NUMBER[singular] @CASE[genitive] <third-decl-stem> "is"
+                       | @DECLENSION[3] @NUMBER[plural] @CASE[genitive] <third-decl-stem> ( "um" | "ium" )
+
+<third-decl-dative> ::= @DECLENSION[3] @NUMBER[singular] @CASE[dative] <third-decl-stem> "i"
+                     | @DECLENSION[3] @NUMBER[plural] @CASE[dative] <third-decl-stem> "ibus"
+
+<third-decl-accusative> ::= @DECLENSION[3] @NUMBER[singular] @CASE[accusative] <third-decl-stem> "em"
+                         | @DECLENSION[3] @NUMBER[plural] @CASE[accusative] <third-decl-stem> "es"
+                         | @DECLENSION[3] @GENDER[neuter] @NUMBER[singular] @CASE[accusative] <third-decl-stem>
+                         | @DECLENSION[3] @GENDER[neuter] @NUMBER[plural] @CASE[accusative] <third-decl-stem> "a"
+
+<third-decl-ablative> ::= @DECLENSION[3] @NUMBER[singular] @CASE[ablative] <third-decl-stem> "e"
+                       | @DECLENSION[3] @NUMBER[plural] @CASE[ablative] <third-decl-stem> "ibus"
+
+/* Fourth declension (mostly masculine) - manus, manus */
+<fourth-decl-nominative> ::= @DECLENSION[4] @NUMBER[singular] @CASE[nominative] <fourth-decl-stem> "us"
+                          | @DECLENSION[4] @NUMBER[plural] @CASE[nominative] <fourth-decl-stem> "us"
+                          | @DECLENSION[4] @GENDER[neuter] @NUMBER[singular] @CASE[nominative] <fourth-decl-stem> "u"
+                          | @DECLENSION[4] @GENDER[neuter] @NUMBER[plural] @CASE[nominative] <fourth-decl-stem> "ua"
+
+<fourth-decl-genitive> ::= @DECLENSION[4] @NUMBER[singular] @CASE[genitive] <fourth-decl-stem> "us"
+                        | @DECLENSION[4] @NUMBER[plural] @CASE[genitive] <fourth-decl-stem> "uum"
+
+<fourth-decl-dative> ::= @DECLENSION[4] @NUMBER[singular] @CASE[dative] <fourth-decl-stem> "ui"
+                      | @DECLENSION[4] @NUMBER[plural] @CASE[dative] <fourth-decl-stem> "ibus"
+
+<fourth-decl-accusative> ::= @DECLENSION[4] @NUMBER[singular] @CASE[accusative] <fourth-decl-stem> "um"
+                          | @DECLENSION[4] @NUMBER[plural] @CASE[accusative] <fourth-decl-stem> "us"
+                          | @DECLENSION[4] @GENDER[neuter] @NUMBER[singular] @CASE[accusative] <fourth-decl-stem> "u"
+                          | @DECLENSION[4] @GENDER[neuter] @NUMBER[plural] @CASE[accusative] <fourth-decl-stem> "ua"
+
+<fourth-decl-ablative> ::= @DECLENSION[4] @NUMBER[singular] @CASE[ablative] <fourth-decl-stem> "u"
+                        | @DECLENSION[4] @NUMBER[plural] @CASE[ablative] <fourth-decl-stem> "ibus"
+
+/* Fifth declension (feminine) - res, rei */
+<fifth-decl-nominative> ::= @DECLENSION[5] @GENDER[feminine] @NUMBER[singular] @CASE[nominative] <fifth-decl-stem> "es"
+                         | @DECLENSION[5] @GENDER[feminine] @NUMBER[plural] @CASE[nominative] <fifth-decl-stem> "es"
+
+<fifth-decl-genitive> ::= @DECLENSION[5] @GENDER[feminine] @NUMBER[singular] @CASE[genitive] <fifth-decl-stem> "ei"
+                       | @DECLENSION[5] @GENDER[feminine] @NUMBER[plural] @CASE[genitive] <fifth-decl-stem> "erum"
+
+<fifth-decl-dative> ::= @DECLENSION[5] @GENDER[feminine] @NUMBER[singular] @CASE[dative] <fifth-decl-stem> "ei"
+                     | @DECLENSION[5] @GENDER[feminine] @NUMBER[plural] @CASE[dative] <fifth-decl-stem> "ebus"
+
+<fifth-decl-accusative> ::= @DECLENSION[5] @GENDER[feminine] @NUMBER[singular] @CASE[accusative] <fifth-decl-stem> "em"
+                         | @DECLENSION[5] @GENDER[feminine] @NUMBER[plural] @CASE[accusative] <fifth-decl-stem> "es"
+
+<fifth-decl-ablative> ::= @DECLENSION[5] @GENDER[feminine] @NUMBER[singular] @CASE[ablative] <fifth-decl-stem> "e"
+                       | @DECLENSION[5] @GENDER[feminine] @NUMBER[plural] @CASE[ablative] <fifth-decl-stem> "ebus"
+
+/* Noun stems */
+<first-decl-stem> ::= /[a-z]+/
+<second-decl-stem> ::= /[a-z]+/
+<third-decl-stem> ::= /[a-z]+/
+<fourth-decl-stem> ::= /[a-z]+/
+<fifth-decl-stem> ::= /[a-z]+/
+
+/* Proper nouns */
+<proper-noun-nominative> ::= /[A-Z][a-z]*/
+
+/* Pronouns */
+<pronoun-nominative> ::= <personal-pronoun-nominative>
+                      | <demonstrative-pronoun-nominative>
+                      | <reflexive-pronoun-nominative>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( "ego" | "tu" | "nos" | "vos" )
+
+<demonstrative-pronoun-nominative> ::= @CASE[nominative] ( "hic" | "haec" | "hoc" | "ille" | "illa" | "illud" | "is" | "ea" | "id" | "ipse" | "ipsa" | "ipsum" )
+
+<reflexive-pronoun-nominative> ::= @CASE[nominative] @REFLEXIVE "se"
+
+/* Object (accusative case) */
+<object> ::= <noun-phrase-accusative>
+          | <pronoun-accusative>
+          | <infinitive-phrase>
+
+<pronoun-accusative> ::= @CASE[accusative] ( "me" | "te" | "nos" | "vos" | "se" | "eum" | "eam" | "id" | "eos" | "eas" | "ea" )
+
+<infinitive-phrase> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+/* Adjectives with three genders and comparison */
+<adjective-nominative> ::= <adjective-positive-nominative> | <adjective-comparative-nominative> | <adjective-superlative-nominative>
+
+<adjective-genitive> ::= <adjective-positive-genitive> | <adjective-comparative-genitive> | <adjective-superlative-genitive>
+
+<adjective-dative> ::= <adjective-positive-dative> | <adjective-comparative-dative> | <adjective-superlative-dative>
+
+<adjective-accusative> ::= <adjective-positive-accusative> | <adjective-comparative-accusative> | <adjective-superlative-accusative>
+
+<adjective-ablative> ::= <adjective-positive-ablative> | <adjective-comparative-ablative> | <adjective-superlative-ablative>
+
+/* Positive degree adjectives (1st/2nd declension pattern) - bonus, bona, bonum */
+<adjective-positive-nominative> ::= @DEGREE[positive] @GENDER[masculine] @NUMBER[singular] <adj-stem> "us"
+                                 | @DEGREE[positive] @GENDER[feminine] @NUMBER[singular] <adj-stem> "a"
+                                 | @DEGREE[positive] @GENDER[neuter] @NUMBER[singular] <adj-stem> "um"
+                                 | @DEGREE[positive] @GENDER[masculine] @NUMBER[plural] <adj-stem> "i"
+                                 | @DEGREE[positive] @GENDER[feminine] @NUMBER[plural] <adj-stem> "ae"
+                                 | @DEGREE[positive] @GENDER[neuter] @NUMBER[plural] <adj-stem> "a"
+
+<adjective-positive-genitive> ::= @DEGREE[positive] @NUMBER[singular] <adj-stem> "i"
+                               | @DEGREE[positive] @GENDER[feminine] @NUMBER[singular] <adj-stem> "ae"
+                               | @DEGREE[positive] @NUMBER[plural] <adj-stem> "orum"
+                               | @DEGREE[positive] @GENDER[feminine] @NUMBER[plural] <adj-stem> "arum"
+
+<adjective-positive-dative> ::= @DEGREE[positive] @NUMBER[singular] <adj-stem> "o"
+                             | @DEGREE[positive] @GENDER[feminine] @NUMBER[singular] <adj-stem> "ae"
+                             | @DEGREE[positive] @NUMBER[plural] <adj-stem> "is"
+
+<adjective-positive-accusative> ::= @DEGREE[positive] @GENDER[masculine] @NUMBER[singular] <adj-stem> "um"
+                                 | @DEGREE[positive] @GENDER[feminine] @NUMBER[singular] <adj-stem> "am"
+                                 | @DEGREE[positive] @GENDER[neuter] @NUMBER[singular] <adj-stem> "um"
+                                 | @DEGREE[positive] @GENDER[masculine] @NUMBER[plural] <adj-stem> "os"
+                                 | @DEGREE[positive] @GENDER[feminine] @NUMBER[plural] <adj-stem> "as"
+                                 | @DEGREE[positive] @GENDER[neuter] @NUMBER[plural] <adj-stem> "a"
+
+<adjective-positive-ablative> ::= @DEGREE[positive] @NUMBER[singular] <adj-stem> "o"
+                               | @DEGREE[positive] @GENDER[feminine] @NUMBER[singular] <adj-stem> "a"
+                               | @DEGREE[positive] @NUMBER[plural] <adj-stem> "is"
+
+/* Comparative degree - fortior, fortius */
+<adjective-comparative-nominative> ::= @DEGREE[comparative] @GENDER[masculine] @NUMBER[singular] <adj-stem> "ior"
+                                    | @DEGREE[comparative] @GENDER[feminine] @NUMBER[singular] <adj-stem> "ior"
+                                    | @DEGREE[comparative] @GENDER[neuter] @NUMBER[singular] <adj-stem> "ius"
+                                    | @DEGREE[comparative] @NUMBER[plural] <adj-stem> "iores"
+                                    | @DEGREE[comparative] @GENDER[neuter] @NUMBER[plural] <adj-stem> "iora"
+
+<adjective-comparative-genitive> ::= @DEGREE[comparative] @NUMBER[singular] <adj-stem> "ioris"
+                                  | @DEGREE[comparative] @NUMBER[plural] <adj-stem> "iorum"
+
+<adjective-comparative-dative> ::= @DEGREE[comparative] @NUMBER[singular] <adj-stem> "iori"
+                                | @DEGREE[comparative] @NUMBER[plural] <adj-stem> "ioribus"
+
+<adjective-comparative-accusative> ::= @DEGREE[comparative] @NUMBER[singular] <adj-stem> "iorem"
+                                    | @DEGREE[comparative] @GENDER[neuter] @NUMBER[singular] <adj-stem> "ius"
+                                    | @DEGREE[comparative] @NUMBER[plural] <adj-stem> "iores"
+                                    | @DEGREE[comparative] @GENDER[neuter] @NUMBER[plural] <adj-stem> "iora"
+
+<adjective-comparative-ablative> ::= @DEGREE[comparative] @NUMBER[singular] <adj-stem> "iore"
+                                  | @DEGREE[comparative] @NUMBER[plural] <adj-stem> "ioribus"
+
+/* Superlative degree - fortissimus, fortissima, fortissimum */
+<adjective-superlative-nominative> ::= @DEGREE[superlative] @GENDER[masculine] @NUMBER[singular] <adj-stem> "issimus"
+                                    | @DEGREE[superlative] @GENDER[feminine] @NUMBER[singular] <adj-stem> "issima"
+                                    | @DEGREE[superlative] @GENDER[neuter] @NUMBER[singular] <adj-stem> "issimum"
+                                    | @DEGREE[superlative] @NUMBER[plural] <adj-stem> "issimi"
+                                    | @DEGREE[superlative] @GENDER[feminine] @NUMBER[plural] <adj-stem> "issimae"
+                                    | @DEGREE[superlative] @GENDER[neuter] @NUMBER[plural] <adj-stem> "issima"
+
+<adjective-superlative-genitive> ::= @DEGREE[superlative] @NUMBER[singular] <adj-stem> "issimi"
+                                  | @DEGREE[superlative] @GENDER[feminine] @NUMBER[singular] <adj-stem> "issimae"
+                                  | @DEGREE[superlative] @NUMBER[plural] <adj-stem> "issimorum"
+                                  | @DEGREE[superlative] @GENDER[feminine] @NUMBER[plural] <adj-stem> "issimarum"
+
+<adjective-superlative-dative> ::= @DEGREE[superlative] @NUMBER[singular] <adj-stem> "issimo"
+                                | @DEGREE[superlative] @GENDER[feminine] @NUMBER[singular] <adj-stem> "issimae"
+                                | @DEGREE[superlative] @NUMBER[plural] <adj-stem> "issimis"
+
+<adjective-superlative-accusative> ::= @DEGREE[superlative] @GENDER[masculine] @NUMBER[singular] <adj-stem> "issimum"
+                                    | @DEGREE[superlative] @GENDER[feminine] @NUMBER[singular] <adj-stem> "issimam"
+                                    | @DEGREE[superlative] @GENDER[neuter] @NUMBER[singular] <adj-stem> "issimum"
+                                    | @DEGREE[superlative] @NUMBER[plural] <adj-stem> "issimos"
+                                    | @DEGREE[superlative] @GENDER[feminine] @NUMBER[plural] <adj-stem> "issimas"
+                                    | @DEGREE[superlative] @GENDER[neuter] @NUMBER[plural] <adj-stem> "issima"
+
+<adjective-superlative-ablative> ::= @DEGREE[superlative] @NUMBER[singular] <adj-stem> "issimo"
+                                  | @DEGREE[superlative] @GENDER[feminine] @NUMBER[singular] <adj-stem> "issima"
+                                  | @DEGREE[superlative] @NUMBER[plural] <adj-stem> "issimis"
+
+<adj-stem> ::= /[a-z]+/
+
+/* Verbs - Four conjugations */
+<verb> ::= <verb-present>
+        | <verb-imperfect>
+        | <verb-future>
+        | <verb-perfect>
+        | <verb-pluperfect>
+        | <verb-future-perfect>
+
+/* Present tense - active voice */
+<verb-present> ::= @TENSE[present] @VOICE[active] @MOOD[indicative] ( <first-conj-present> | <second-conj-present> | <third-conj-present> | <fourth-conj-present> | <irregular-present> )
+
+/* First conjugation - amo, amare */
+<first-conj-present> ::= @CONJUGATION[1] @PERSON[1] @NUMBER[singular] <first-conj-stem> "o"
+                      | @CONJUGATION[1] @PERSON[2] @NUMBER[singular] <first-conj-stem> "as"
+                      | @CONJUGATION[1] @PERSON[3] @NUMBER[singular] <first-conj-stem> "at"
+                      | @CONJUGATION[1] @PERSON[1] @NUMBER[plural] <first-conj-stem> "amus"
+                      | @CONJUGATION[1] @PERSON[2] @NUMBER[plural] <first-conj-stem> "atis"
+                      | @CONJUGATION[1] @PERSON[3] @NUMBER[plural] <first-conj-stem> "ant"
+
+/* Second conjugation - moneo, monere */
+<second-conj-present> ::= @CONJUGATION[2] @PERSON[1] @NUMBER[singular] <second-conj-stem> "eo"
+                       | @CONJUGATION[2] @PERSON[2] @NUMBER[singular] <second-conj-stem> "es"
+                       | @CONJUGATION[2] @PERSON[3] @NUMBER[singular] <second-conj-stem> "et"
+                       | @CONJUGATION[2] @PERSON[1] @NUMBER[plural] <second-conj-stem> "emus"
+                       | @CONJUGATION[2] @PERSON[2] @NUMBER[plural] <second-conj-stem> "etis"
+                       | @CONJUGATION[2] @PERSON[3] @NUMBER[plural] <second-conj-stem> "ent"
+
+/* Third conjugation - rego, regere */
+<third-conj-present> ::= @CONJUGATION[3] @PERSON[1] @NUMBER[singular] <third-conj-stem> "o"
+                      | @CONJUGATION[3] @PERSON[2] @NUMBER[singular] <third-conj-stem> "is"
+                      | @CONJUGATION[3] @PERSON[3] @NUMBER[singular] <third-conj-stem> "it"
+                      | @CONJUGATION[3] @PERSON[1] @NUMBER[plural] <third-conj-stem> "imus"
+                      | @CONJUGATION[3] @PERSON[2] @NUMBER[plural] <third-conj-stem> "itis"
+                      | @CONJUGATION[3] @PERSON[3] @NUMBER[plural] <third-conj-stem> "unt"
+
+/* Fourth conjugation - audio, audire */
+<fourth-conj-present> ::= @CONJUGATION[4] @PERSON[1] @NUMBER[singular] <fourth-conj-stem> "io"
+                       | @CONJUGATION[4] @PERSON[2] @NUMBER[singular] <fourth-conj-stem> "is"
+                       | @CONJUGATION[4] @PERSON[3] @NUMBER[singular] <fourth-conj-stem> "it"
+                       | @CONJUGATION[4] @PERSON[1] @NUMBER[plural] <fourth-conj-stem> "imus"
+                       | @CONJUGATION[4] @PERSON[2] @NUMBER[plural] <fourth-conj-stem> "itis"
+                       | @CONJUGATION[4] @PERSON[3] @NUMBER[plural] <fourth-conj-stem> "iunt"
+
+/* Irregular verb - sum, esse (to be) */
+<irregular-present> ::= @IRREGULAR "sum" | "es" | "est" | "sumus" | "estis" | "sunt"
+
+/* Imperfect tense */
+<verb-imperfect> ::= @TENSE[imperfect] @VOICE[active] @MOOD[indicative] <verb-stem> ( "bam" | "bas" | "bat" | "bamus" | "batis" | "bant" )
+
+/* Future tense */
+<verb-future> ::= @TENSE[future] @VOICE[active] @MOOD[indicative] <verb-stem> ( "bo" | "bis" | "bit" | "bimus" | "bitis" | "bunt" | "am" | "es" | "et" | "emus" | "etis" | "ent" )
+
+/* Perfect tense */
+<verb-perfect> ::= @TENSE[perfect] @VOICE[active] @MOOD[indicative] <perfect-stem> ( "i" | "isti" | "it" | "imus" | "istis" | "erunt" )
+
+/* Pluperfect tense */
+<verb-pluperfect> ::= @TENSE[pluperfect] @VOICE[active] @MOOD[indicative] <perfect-stem> ( "eram" | "eras" | "erat" | "eramus" | "eratis" | "erant" )
+
+/* Future perfect tense */
+<verb-future-perfect> ::= @TENSE[future-perfect] @VOICE[active] @MOOD[indicative] <perfect-stem> ( "ero" | "eris" | "erit" | "erimus" | "eritis" | "erint" )
+
+/* Subjunctive mood */
+<verb-subjunctive> ::= <subjunctive-present> | <subjunctive-imperfect> | <subjunctive-perfect> | <subjunctive-pluperfect>
+
+<subjunctive-present> ::= @MOOD[subjunctive] @TENSE[present] <verb-stem> ( "em" | "es" | "et" | "emus" | "etis" | "ent" | "am" | "as" | "at" | "amus" | "atis" | "ant" )
+
+<subjunctive-imperfect> ::= @MOOD[subjunctive] @TENSE[imperfect] <verb-stem> ( "rem" | "res" | "ret" | "remus" | "retis" | "rent" )
+
+<subjunctive-perfect> ::= @MOOD[subjunctive] @TENSE[perfect] <perfect-stem> ( "erim" | "eris" | "erit" | "erimus" | "eritis" | "erint" )
+
+<subjunctive-pluperfect> ::= @MOOD[subjunctive] @TENSE[pluperfect] <perfect-stem> ( "issem" | "isses" | "isset" | "issemus" | "issetis" | "issent" )
+
+/* Imperative mood */
+<verb-imperative> ::= @MOOD[imperative] <verb-stem> | <verb-stem> "te" | <verb-stem> "tote"
+
+/* Infinitive */
+<verb-infinitive> ::= <present-infinitive> | <perfect-infinitive> | <future-infinitive>
+
+<present-infinitive> ::= @TENSE[present] @VOICE[active] <verb-stem> ( "are" | "ere" | "ere" | "ire" | "esse" )
+
+<perfect-infinitive> ::= @TENSE[perfect] @VOICE[active] <perfect-stem> "isse"
+
+<future-infinitive> ::= @TENSE[future] @VOICE[active] <participle-stem> "urus" <opt-whitespace> "esse"
+
+/* Participles */
+<participle> ::= <present-participle> | <perfect-participle> | <future-participle>
+
+<present-participle> ::= @TENSE[present] @VOICE[active] <verb-stem> "ns"
+
+<perfect-participle> ::= @TENSE[perfect] @VOICE[passive] <participle-stem> ( "us" | "a" | "um" )
+
+<future-participle> ::= @TENSE[future] @VOICE[active] <participle-stem> ( "urus" | "ura" | "urum" )
+
+/* Gerund and Gerundive */
+<gerund> ::= <verb-stem> "ndi" | <verb-stem> "ndo" | <verb-stem> "ndum" | <verb-stem> "ndo"
+
+<gerundive> ::= <verb-stem> "ndus" | <verb-stem> "nda" | <verb-stem> "ndum"
+
+/* Verb stems */
+<verb-stem> ::= /[a-z]+/
+<first-conj-stem> ::= /[a-z]+/
+<second-conj-stem> ::= /[a-z]+/
+<third-conj-stem> ::= /[a-z]+/
+<fourth-conj-stem> ::= /[a-z]+/
+<perfect-stem> ::= /[a-z]+/
+<participle-stem> ::= /[a-z]+/
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb>
+
+<time-adverb> ::= "nunc" | "tunc" | "hodie" | "heri" | "cras" | "semper" | "numquam" | "saepe" | "raro" | "mox" | "iam" | "adhuc" | "statim" | "postea" | "antea" | "olim" | "quondam" | "aliquando"
+
+<place-adverb> ::= "hic" | "ibi" | "ubi" | "quo" | "unde" | "intus" | "foris" | "sursum" | "deorsum" | "procul" | "prope"
+
+<manner-adverb> ::= "bene" | "male" | "pulchre" | "turpiter" | "celeriter" | "lente" | "facile" | "difficile" | "fortiter" | "timide" | "vehementer" | "leviter"
+
+<degree-adverb> ::= "valde" | "multum" | "parum" | "nimis" | "satis" | "magis" | "maxime" | "minus" | "minime" | "tam" | "quam"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition-accusative> <opt-whitespace> <noun-phrase-accusative>
+                        | <preposition-ablative> <opt-whitespace> <noun-phrase-ablative>
+
+<preposition-accusative> ::= @GOVERNS[accusative] ( "ad" | "ante" | "apud" | "circum" | "contra" | "extra" | "in" | "inter" | "intra" | "ob" | "per" | "post" | "praeter" | "prope" | "propter" | "super" | "trans" | "ultra" )
+
+<preposition-ablative> ::= @GOVERNS[ablative] ( "a" | "ab" | "abs" | "cum" | "de" | "e" | "ex" | "in" | "pro" | "sine" | "sub" )
+
+/* Ablative absolute construction */
+<ablative-absolute> ::= <noun-phrase-ablative> <opt-whitespace> <participle>
+
+/* Question words */
+<question-word> ::= "quis" | "quid" | "qui" | "quae" | "quod" | "ubi" | "unde" | "quo" | "quando" | "cur" | "quomodo" | "quot"
+
+/* Punctuation */
+<punctuation> ::= "." | "?" | "!" | "," | ";" | ":"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive validation rules */
+
+/* Case agreement between adjective and noun */
+@CONTEXT_RULE[adjective-noun-case-agreement]:
+    IF <adjective>.@CASE == <noun>.@CASE
+    THEN VALID
+    ELSE ERROR "Adjective and noun case must agree"
+
+/* Gender agreement between adjective and noun */
+@CONTEXT_RULE[adjective-noun-gender-agreement]:
+    IF <adjective>.@GENDER == <noun>.@GENDER
+    THEN VALID
+    ELSE ERROR "Adjective and noun gender must agree"
+
+/* Number agreement between adjective and noun */
+@CONTEXT_RULE[adjective-noun-number-agreement]:
+    IF <adjective>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Adjective and noun number must agree"
+
+/* Subject-verb number agreement */
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@NUMBER == <verb>.@NUMBER
+    THEN VALID
+    ELSE WARNING "Subject and verb number should agree"
+
+/* Preposition case governance */
+@CONTEXT_RULE[preposition-case-governance]:
+    IF <preposition-accusative> GOVERNS <noun-phrase-accusative>
+    THEN VALID
+    ELSE ERROR "Accusative preposition must govern accusative case"
+
+@CONTEXT_RULE[preposition-ablative-governance]:
+    IF <preposition-ablative> GOVERNS <noun-phrase-ablative>
+    THEN VALID
+    ELSE ERROR "Ablative preposition must govern ablative case"
+
+/* Subjunctive mood in subordinate clauses */
+@CONTEXT_RULE[subordinate-subjunctive]:
+    IF <subordinate-clause> CONTAINS <verb-subjunctive>
+    THEN VALID
+    ELSE WARNING "Subordinate clauses often require subjunctive mood"
+
+/* Example sentences demonstrating Classical Latin grammar:
+ *
+ * SIMPLE SENTENCES:
+ * - "Puella cantat" (The girl sings)
+ * - "Puer librum legit" (The boy reads a book)
+ * - "Romae habitamus" (We live in Rome)
+ *
+ * CASE USAGE:
+ * - "Marcus Iuliae librum dat" (Marcus gives a book to Julia - dative)
+ * - "Liber Marci magnus est" (Marcus's book is large - genitive)
+ * - "Cum amico venio" (I come with a friend - ablative)
+ *
+ * VERB CONJUGATIONS:
+ * - "Amo, amas, amat" (I love, you love, he/she loves - 1st conjugation)
+ * - "Moneo, mones, monet" (I warn, you warn, he/she warns - 2nd conjugation)
+ * - "Rego, regis, regit" (I rule, you rule, he/she rules - 3rd conjugation)
+ * - "Audio, audis, audit" (I hear, you hear, he/she hears - 4th conjugation)
+ *
+ * PERFECT TENSE:
+ * - "Amavi" (I have loved / I loved)
+ * - "Veni, vidi, vici" (I came, I saw, I conquered)
+ *
+ * SUBORDINATE CLAUSES:
+ * - "Scio quod venit" (I know that he comes)
+ * - "Cum venisset, laetus eram" (When he had come, I was happy - subjunctive)
+ *
+ * RELATIVE CLAUSES:
+ * - "Vir qui venit Romanus est" (The man who comes is Roman)
+ * - "Liber quem legis bonus est" (The book which you read is good)
+ *
+ * ABLATIVE ABSOLUTE:
+ * - "Caesare duce, Romani vicerunt" (With Caesar as leader, the Romans conquered)
+ * - "Urbe capta, hostes fugerunt" (The city having been captured, the enemies fled)
+ */

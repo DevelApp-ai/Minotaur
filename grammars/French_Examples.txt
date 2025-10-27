@@ -1,0 +1,533 @@
+# French Language Example Sentences
+# Demonstrating French Grammar
+
+## Simple Sentences
+
+Je parle.
+Tu manges.
+Il travaille.
+Elle étudie.
+Nous habitons.
+Vous jouez.
+Ils chantent.
+Elles dansent.
+
+## First Group Verbs (-er) - Present Tense
+
+# parler (to speak)
+Je parle.
+Tu parles.
+Il parle.
+Elle parle.
+Nous parlons.
+Vous parlez.
+Ils parlent.
+Elles parlent.
+
+# manger (to eat)
+Je mange.
+Tu manges.
+Il mange.
+Nous mangeons.
+Vous mangez.
+Ils mangent.
+
+# aimer (to love/like)
+J'aime.
+Tu aimes.
+Il aime.
+Nous aimons.
+Vous aimez.
+Ils aiment.
+
+## Second Group Verbs (-ir) - Present Tense
+
+# finir (to finish)
+Je finis.
+Tu finis.
+Il finit.
+Elle finit.
+Nous finissons.
+Vous finissez.
+Ils finissent.
+Elles finissent.
+
+# choisir (to choose)
+Je choisis.
+Tu choisis.
+Il choisit.
+Nous choisissons.
+Vous choisissez.
+Ils choisissent.
+
+## Irregular Verbs - Present Tense
+
+# être (to be)
+Je suis.
+Tu es.
+Il est.
+Elle est.
+Nous sommes.
+Vous êtes.
+Ils sont.
+Elles sont.
+
+# avoir (to have)
+J'ai.
+Tu as.
+Il a.
+Elle a.
+Nous avons.
+Vous avez.
+Ils ont.
+Elles ont.
+
+# aller (to go)
+Je vais.
+Tu vas.
+Il va.
+Elle va.
+Nous allons.
+Vous allez.
+Ils vont.
+Elles vont.
+
+# faire (to do/make)
+Je fais.
+Tu fais.
+Il fait.
+Nous faisons.
+Vous faites.
+Ils font.
+
+# venir (to come)
+Je viens.
+Tu viens.
+Il vient.
+Nous venons.
+Vous venez.
+Ils viennent.
+
+# pouvoir (can/to be able)
+Je peux.
+Tu peux.
+Il peut.
+Nous pouvons.
+Vous pouvez.
+Ils peuvent.
+
+# vouloir (to want)
+Je veux.
+Tu veux.
+Il veut.
+Nous voulons.
+Vous voulez.
+Ils veulent.
+
+# devoir (must/to have to)
+Je dois.
+Tu dois.
+Il doit.
+Nous devons.
+Vous devez.
+Ils doivent.
+
+# savoir (to know)
+Je sais.
+Tu sais.
+Il sait.
+Nous savons.
+Vous savez.
+Ils savent.
+
+## Gender Agreement - Masculine
+
+Un homme.
+Le livre.
+Un grand homme.
+Le livre rouge.
+Un beau château.
+Le petit chien.
+
+## Gender Agreement - Feminine
+
+Une femme.
+La table.
+Une grande femme.
+La table rouge.
+Une belle maison.
+La petite chatte.
+
+## Definite Articles
+
+Le livre.
+La table.
+L'homme.
+L'eau.
+Les livres.
+Les tables.
+
+## Indefinite Articles
+
+Un livre.
+Une table.
+Un homme.
+Une femme.
+Des livres.
+Des tables.
+
+## Adjective Agreement
+
+# Masculine Singular
+Un grand homme.
+Un petit livre.
+Un beau tableau.
+
+# Feminine Singular
+Une grande femme.
+Une petite table.
+Une belle maison.
+
+# Masculine Plural
+Des grands hommes.
+Des petits livres.
+Des beaux tableaux.
+
+# Feminine Plural
+Des grandes femmes.
+Des petites tables.
+Des belles maisons.
+
+## Passé Composé with avoir
+
+J'ai parlé.
+Tu as mangé.
+Il a fini.
+Elle a choisi.
+Nous avons travaillé.
+Vous avez étudié.
+Ils ont joué.
+Elles ont dansé.
+
+## Passé Composé with être
+
+Je suis allé.
+Tu es venu.
+Il est arrivé.
+Elle est partie.
+Nous sommes restés.
+Vous êtes montés.
+Ils sont descendus.
+Elles sont entrées.
+
+## Past Participle Agreement with être
+
+Il est allé.
+Elle est allée.
+Ils sont allés.
+Elles sont allées.
+Il est venu.
+Elle est venue.
+Ils sont venus.
+Elles sont venues.
+
+## Imperfect Tense
+
+J'étais.
+Tu avais.
+Il parlait.
+Elle mangeait.
+Nous finissions.
+Vous alliez.
+Ils faisaient.
+Elles venaient.
+
+## Future Tense
+
+Je parlerai.
+Tu mangeras.
+Il finira.
+Elle choisira.
+Nous irons.
+Vous ferez.
+Ils viendront.
+Elles seront.
+
+## Conditional Mood
+
+Je parlerais.
+Tu mangerais.
+Il finirait.
+Elle choisirait.
+Nous irions.
+Vous feriez.
+Ils viendraient.
+Elles seraient.
+
+## Negation
+
+Je ne parle pas.
+Tu ne manges pas.
+Il ne vient pas.
+Elle n'est pas là.
+Nous ne travaillons pas.
+Vous ne finissez pas.
+Ils ne vont pas.
+
+## Negation Variants
+
+Je ne fume plus.
+Tu ne viens jamais.
+Il ne voit rien.
+Elle ne connaît personne.
+Nous n'avons aucune idée.
+
+## Object Pronouns
+
+Je le vois.
+Tu la connais.
+Il les aime.
+Elle me regarde.
+Nous te comprenons.
+Vous nous écoutez.
+Ils vous aident.
+
+## Indirect Object Pronouns
+
+Je lui parle.
+Tu leur dis.
+Il me donne.
+Elle te montre.
+Nous vous expliquons.
+
+## Reflexive Verbs
+
+Je me lave.
+Tu te lèves.
+Il se couche.
+Elle se promène.
+Nous nous parlons.
+Vous vous amusez.
+Ils se regardent.
+Elles s'appellent.
+
+## Interrogative Forms
+
+# Intonation
+Tu viens?
+Elle parle français?
+Ils habitent ici?
+
+# Est-ce que
+Est-ce que tu viens?
+Est-ce qu'elle parle français?
+Est-ce qu'ils habitent ici?
+
+# Inversion
+Viens-tu?
+Parle-t-elle français?
+Habitent-ils ici?
+
+## Wh-Questions
+
+Qui es-tu?
+Que fais-tu?
+Où habites-tu?
+Quand viens-tu?
+Comment vas-tu?
+Pourquoi pars-tu?
+Combien coûte-t-il?
+
+## Imperative
+
+Parle!
+Mangez!
+Finis!
+Venez!
+Va!
+Allons!
+Sois sage!
+Ayez patience!
+
+## Comparative
+
+Plus grand que.
+Moins grand que.
+Aussi grand que.
+Plus belle que.
+Moins belle que.
+Meilleur que.
+Pire que.
+
+## Superlative
+
+Le plus grand.
+La plus grande.
+Les plus grands.
+Le moins grand.
+Le meilleur.
+La meilleure.
+Le pire.
+
+## Prepositions
+
+Je vais à Paris.
+Il vient de Rome.
+Nous habitons en France.
+Tu travailles dans un bureau.
+Elle est sur la table.
+C'est sous le lit.
+Je marche avec toi.
+Il part sans elle.
+C'est pour vous.
+Nous passons par ici.
+
+## Prepositional Contractions
+
+Je vais au marché.
+Tu parles aux enfants.
+Elle vient du magasin.
+Nous parlons des problèmes.
+
+## Subjunctive Mood
+
+Il faut que je parte.
+Je veux qu'il vienne.
+Elle souhaite que nous réussissions.
+Nous avons peur qu'ils soient en retard.
+Bien qu'il soit tard.
+Pour qu'elle comprenne.
+Avant qu'ils arrivent.
+
+## Relative Clauses
+
+L'homme qui parle.
+La femme que je connais.
+Le livre dont je parle.
+La ville où j'habite.
+La personne avec qui je travaille.
+
+## Complex Sentences
+
+Je sais que tu viens.
+Elle dit qu'il part.
+Nous pensons qu'ils arrivent.
+Quand tu viens nous partons.
+Si tu viens je serai content.
+Parce qu'il pleut je reste.
+
+## Possessive Adjectives
+
+Mon livre.
+Ma maison.
+Mes amis.
+Ton chat.
+Ta voiture.
+Tes livres.
+Son père.
+Sa mère.
+Ses enfants.
+Notre maison.
+Nos amis.
+Votre travail.
+Vos livres.
+Leur chien.
+Leurs enfants.
+
+## Demonstrative Adjectives
+
+Ce livre.
+Cet homme.
+Cette femme.
+Ces livres.
+Ces femmes.
+
+## Partitive Articles
+
+Je mange du pain.
+Tu bois de la eau.
+Il achète de l'eau.
+Nous mangeons des pommes.
+Elle veut du fromage.
+
+## Adverbs
+
+Je parle bien français.
+Tu cours vite.
+Il travaille lentement.
+Elle chante mal.
+Nous arrivons tôt.
+Vous partez tard.
+Ils viennent souvent.
+Elles vont parfois.
+
+## Time Expressions
+
+Aujourd'hui.
+Hier.
+Demain.
+Maintenant.
+Avant.
+Après.
+Toujours.
+Jamais.
+Souvent.
+Parfois.
+
+## Place Expressions
+
+Ici.
+Là.
+Là-bas.
+Partout.
+Ailleurs.
+Dehors.
+Dedans.
+Devant.
+Derrière.
+
+## Quantity Expressions
+
+Beaucoup.
+Peu.
+Assez.
+Trop.
+Très.
+Plus.
+Moins.
+
+## Compound Sentences
+
+Je parle et tu écoutes.
+Il vient mais elle part.
+Nous travaillons ou nous jouons.
+Tu lis donc tu apprends.
+
+## Conditional Sentences
+
+Si tu viens je serai content.
+Si j'avais de l'argent j'achèterais.
+Si elle était là nous partirions.
+
+## Direct and Indirect Speech
+
+Il dit qu'il vient.
+Elle pense que tu pars.
+Nous savons qu'ils arrivent.
+Je crois qu'elle comprend.
+
+## Pronominal Verbs - Reciprocal
+
+Nous nous parlons.
+Vous vous regardez.
+Ils se connaissent.
+Elles se voient.
+
+## Y and En Pronouns
+
+J'y vais.
+Tu y penses.
+Il en mange.
+Elle en veut.
+Nous y habitons.
+Vous en parlez.

@@ -1,0 +1,514 @@
+Grammar: Italian
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Italian Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Italian language structures including:
+ * - Regular and irregular verb conjugations (all tenses and moods)
+ * - Three verb groups (-are, -ere, -ire verbs)
+ * - Reflexive and pronominal verbs
+ * - Context-sensitive agreement rules (gender, number, person)
+ * - Masculine and feminine gender agreement
+ * - Definite and indefinite articles
+ * - Multiple tenses (presente, passato prossimo, imperfetto, futuro, etc.)
+ * - Conditional and subjunctive moods
+ * - SVO word order with flexibility
+ * - Relative clauses and subordinate structures
+ * - Comparative and superlative adjectives
+ * - Negation patterns
+ * - Clitic pronouns and their placement
+ */
+
+Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come, se, mentre, perciò, con, senza, in, su, sotto, di, del, dello, della, dei, degli, delle, a, al, allo, alla, ai, agli, alle, il, lo, la, i, gli, le, un, uno, una, questo, questa, questi, queste, mio, mia, miei, mie, tuo, tua, tuoi, tue, suo, sua, suoi, sue, nostro, nostra, nostri, nostre, vostro, vostra, vostri, vostre, loro, non, mai, niente, nulla, nessuno, io, tu, lui, lei, noi, voi, loro, mi, ti, si, ci, vi, ne
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+
+/* Main clause with SVO word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+
+/* SVO declarative: Subject + Verb + Object/Complement */
+<declarative-clause> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <declarative-clause> "?"
+                        | <question-word> <opt-whitespace> <verb> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+/* Imperative mood */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object-pronoun>* <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+/* Exclamative clause */
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
+
+<exclamative-word> ::= "Che" | "Come" | "Quanto" | "Quanta" | "Quanti" | "Quante"
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <subordinate-content>
+
+<subordinate-content> ::= <subject> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<subordinating-conjunction> ::= <temporal-conjunction>
+                             | <causal-conjunction>
+                             | <conditional-conjunction>
+                             | <concessive-conjunction>
+                             | <purpose-conjunction>
+                             | "che" | "perché" | "poiché" | "se" | "come"
+
+<temporal-conjunction> ::= "quando" | "mentre" | "finché" | "fino" <opt-whitespace> "a" <opt-whitespace> "quando" | "prima" <opt-whitespace> "che" | "dopo" <opt-whitespace> "che" | "appena"
+
+<causal-conjunction> ::= "perché" | "poiché" | "siccome" | "dato" <opt-whitespace> "che" | "visto" <opt-whitespace> "che"
+
+<conditional-conjunction> ::= "se" | "qualora" | "a" <opt-whitespace> "condizione" <opt-whitespace> "che" | "purché"
+
+<concessive-conjunction> ::= "benché" | "sebbene" | "anche" <opt-whitespace> "se" | "nonostante" | "malgrado"
+
+<purpose-conjunction> ::= "perché" | "affinché" | "così" <opt-whitespace> "che" | "in" <opt-whitespace> "modo" <opt-whitespace> "che"
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<relative-pronoun> ::= "che" | "cui" | "il" <opt-whitespace> "quale" | "la" <opt-whitespace> "quale" | "i" <opt-whitespace> "quali" | "le" <opt-whitespace> "quali" | "chi"
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "e" | "ed" | "o" | "oppure" | "ma" | "però" | "anzi" | "dunque" | "quindi" | "perciò" | "infatti" | "cioè"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> <main-clause>
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+           | <infinitive-as-subject>
+
+<infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+/* Pronouns */
+<pronoun-subject> ::= <personal-pronoun-subject>
+                   | <demonstrative-pronoun>
+                   | <indefinite-pronoun>
+
+<subject-pronoun> ::= "io" | "tu" | "lui" | "lei" | "Lei" | "noi" | "voi" | "loro" | "Loro"
+
+<personal-pronoun-subject> ::= @CASE[nominative] ( "io" | "tu" | "lui" | "lei" | "Lei" | "noi" | "voi" | "loro" | "Loro" )
+
+<personal-pronoun-object> ::= @CASE[accusative] ( "mi" | "ti" | "lo" | "la" | "La" | "ci" | "vi" | "li" | "le" | "Li" | "Le" )
+
+<personal-pronoun-indirect> ::= @CASE[dative] ( "mi" | "ti" | "gli" | "le" | "Le" | "ci" | "vi" | "loro" | "Loro" )
+
+<reflexive-pronoun> ::= @REFLEXIVE ( "mi" | "ti" | "si" | "ci" | "vi" | "si" )
+
+<adverbial-pronoun> ::= "ne" | "ci"
+
+<demonstrative-pronoun> ::= @GENDER[masculine] @NUMBER[singular] ( "questo" | "quello" | "codesto" )
+                         | @GENDER[feminine] @NUMBER[singular] ( "questa" | "quella" | "codesta" )
+                         | @GENDER[masculine] @NUMBER[plural] ( "questi" | "quelli" | "codesti" )
+                         | @GENDER[feminine] @NUMBER[plural] ( "queste" | "quelle" | "codeste" )
+                         | "ciò"
+
+<possessive-pronoun> ::= @GENDER[masculine] @NUMBER[singular] ( "il" <opt-whitespace> "mio" | "il" <opt-whitespace> "tuo" | "il" <opt-whitespace> "suo" | "il" <opt-whitespace> "nostro" | "il" <opt-whitespace> "vostro" | "il" <opt-whitespace> "loro" )
+                      | @GENDER[feminine] @NUMBER[singular] ( "la" <opt-whitespace> "mia" | "la" <opt-whitespace> "tua" | "la" <opt-whitespace> "sua" | "la" <opt-whitespace> "nostra" | "la" <opt-whitespace> "vostra" | "la" <opt-whitespace> "loro" )
+                      | @GENDER[masculine] @NUMBER[plural] ( "i" <opt-whitespace> "miei" | "i" <opt-whitespace> "tuoi" | "i" <opt-whitespace> "suoi" | "i" <opt-whitespace> "nostri" | "i" <opt-whitespace> "vostri" | "i" <opt-whitespace> "loro" )
+                      | @GENDER[feminine] @NUMBER[plural] ( "le" <opt-whitespace> "mie" | "le" <opt-whitespace> "tue" | "le" <opt-whitespace> "sue" | "le" <opt-whitespace> "nostre" | "le" <opt-whitespace> "vostre" | "le" <opt-whitespace> "loro" )
+
+<indefinite-pronoun> ::= "qualcuno" | "qualcosa" | "nessuno" | "niente" | "nulla" | "tutto" | "tutti" | "tutte" | "ciascuno" | "ciascuna" | "ognuno" | "ognuna" | "alcuni" | "alcune" | "alcuno" | "alcuna"
+
+<interrogative-pronoun> ::= "chi" | "che" | "cosa" | "che" <opt-whitespace> "cosa" | "quale" | "quali"
+
+/* Noun phrases with gender agreement */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <adjective-phrase>* <opt-whitespace> <prepositional-phrase>? <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <article>
+              | <demonstrative-determiner>
+              | <possessive-determiner>
+              | <quantifying-determiner>
+
+/* Articles with gender and number */
+<article> ::= <definite-article> | <indefinite-article>
+
+<definite-article> ::= @GENDER[masculine] @NUMBER[singular] ( "il" | "lo" | "l'" )
+                    | @GENDER[feminine] @NUMBER[singular] ( "la" | "l'" )
+                    | @GENDER[masculine] @NUMBER[plural] ( "i" | "gli" )
+                    | @GENDER[feminine] @NUMBER[plural] "le"
+
+<indefinite-article> ::= @GENDER[masculine] @NUMBER[singular] ( "un" | "uno" )
+                      | @GENDER[feminine] @NUMBER[singular] ( "una" | "un'" )
+
+<demonstrative-determiner> ::= @GENDER[masculine] @NUMBER[singular] ( "questo" | "quello" | "codesto" | "quel" | "quell'" )
+                            | @GENDER[feminine] @NUMBER[singular] ( "questa" | "quella" | "codesta" | "quell'" )
+                            | @GENDER[masculine] @NUMBER[plural] ( "questi" | "quelli" | "codesti" | "quei" | "quegli" )
+                            | @GENDER[feminine] @NUMBER[plural] ( "queste" | "quelle" | "codeste" )
+
+<possessive-determiner> ::= @GENDER[masculine] @NUMBER[singular] ( "mio" | "tuo" | "suo" | "nostro" | "vostro" | "loro" )
+                         | @GENDER[feminine] @NUMBER[singular] ( "mia" | "tua" | "sua" | "nostra" | "vostra" | "loro" )
+                         | @GENDER[masculine] @NUMBER[plural] ( "miei" | "tuoi" | "suoi" | "nostri" | "vostri" | "loro" )
+                         | @GENDER[feminine] @NUMBER[plural] ( "mie" | "tue" | "sue" | "nostre" | "vostre" | "loro" )
+
+<quantifying-determiner> ::= "tutto" | "tutta" | "tutti" | "tutte" | "ogni" | "qualche" | "alcuni" | "alcune" | "nessuno" | "nessuna"
+
+/* Nouns with gender and number */
+<noun> ::= <noun-masculine-singular>
+        | <noun-feminine-singular>
+        | <noun-plural>
+
+<noun-masculine-singular> ::= @GENDER[masculine] @NUMBER[singular] ( <noun-stem> "o" | <noun-stem> "e" | <noun-stem> )
+
+<noun-feminine-singular> ::= @GENDER[feminine] @NUMBER[singular] ( <noun-stem> "a" | <noun-stem> "e" | <noun-stem> )
+
+<noun-plural> ::= @GENDER[masculine] @NUMBER[plural] ( <noun-stem> "i" | <noun-stem> )
+               | @GENDER[feminine] @NUMBER[plural] ( <noun-stem> "e" | <noun-stem> )
+
+<noun-stem> ::= /[a-zàèéìíîòóùú]+/
+
+<proper-noun> ::= /[A-ZÀÈÉÌÍÎÒÓÙÚ][a-zàèéìíîòóùú]*/
+
+/* Adjectives with agreement and comparison */
+<adjective-phrase> ::= <degree-modifier>? <opt-whitespace> <adjective>
+
+<degree-modifier> ::= "molto" | "troppo" | "poco" | "abbastanza" | "più" | "meno" | "tanto" | "così"
+
+<adjective> ::= <adjective-positive>
+             | <adjective-comparative>
+             | <adjective-superlative>
+
+/* Positive degree with agreement */
+<adjective-positive> ::= <adjective-masculine-singular>
+                      | <adjective-feminine-singular>
+                      | <adjective-plural>
+
+<adjective-masculine-singular> ::= @AGREEMENT[masculine] @NUMBER[singular] @DEGREE[positive] ( <adjective-stem> "o" | <adjective-stem> "e" | <adjective-stem> )
+
+<adjective-feminine-singular> ::= @AGREEMENT[feminine] @NUMBER[singular] @DEGREE[positive] ( <adjective-stem> "a" | <adjective-stem> "e" | <adjective-stem> )
+
+<adjective-plural> ::= @AGREEMENT[masculine] @NUMBER[plural] @DEGREE[positive] ( <adjective-stem> "i" | <adjective-stem> )
+                    | @AGREEMENT[feminine] @NUMBER[plural] @DEGREE[positive] ( <adjective-stem> "e" | <adjective-stem> )
+
+/* Comparative degree */
+<adjective-comparative> ::= @DEGREE[comparative] ( <regular-comparative> | <irregular-comparative> )
+
+<regular-comparative> ::= "più" <opt-whitespace> <adjective-stem> ( "o" | "a" | "i" | "e" )?
+                       | "meno" <opt-whitespace> <adjective-stem> ( "o" | "a" | "i" | "e" )?
+                       | "tanto" <opt-whitespace> <adjective-stem> ( "o" | "a" | "i" | "e" )? <opt-whitespace> "quanto"
+
+<irregular-comparative> ::= "migliore" | "migliori" | "peggiore" | "peggiori" | "maggiore" | "maggiori" | "minore" | "minori"
+
+/* Superlative degree */
+<adjective-superlative> ::= @DEGREE[superlative] ( <regular-superlative> | <irregular-superlative> | <absolute-superlative> )
+
+<regular-superlative> ::= <definite-article> <opt-whitespace> "più" <opt-whitespace> <adjective-stem> ( "o" | "a" | "i" | "e" )?
+                       | <definite-article> <opt-whitespace> "meno" <opt-whitespace> <adjective-stem> ( "o" | "a" | "i" | "e" )?
+
+<irregular-superlative> ::= <definite-article> <opt-whitespace> ( "migliore" | "migliori" | "peggiore" | "peggiori" | "ottimo" | "ottima" | "ottimi" | "ottime" | "pessimo" | "pessima" | "pessimi" | "pessime" )
+
+<absolute-superlative> ::= <adjective-stem> ( "issimo" | "issima" | "issimi" | "issime" )
+
+<adjective-stem> ::= /[a-zàèéìíîòóùú]+/
+
+/* Verb phrases */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <pronominal-verb-phrase>
+
+<simple-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <verb> ( <opt-whitespace> <adverb> )?
+
+<compound-verb-phrase> ::= <object-pronoun>* <opt-whitespace> <adverbial-pronoun>* <opt-whitespace> <auxiliary-verb> <opt-whitespace> <adverb>? <opt-whitespace> <past-participle>
+
+<pronominal-verb-phrase> ::= <reflexive-pronoun> <opt-whitespace> <verb>
+
+<object-pronoun> ::= <personal-pronoun-object> | <personal-pronoun-indirect>
+
+/* Verbs - Three groups */
+<verb> ::= <verb-present>
+        | <verb-imperfect>
+        | <verb-future>
+        | <verb-conditional>
+        | <verb-subjunctive>
+        | <verb-imperative>
+
+/* Present tense - three groups */
+<verb-present> ::= @TENSE[present] @MOOD[indicative] ( <first-group-present> | <second-group-present> | <third-group-present> | <irregular-present> )
+
+/* First group (-are verbs) - parlare */
+<first-group-present> ::= @GROUP[1] @PERSON[1] @NUMBER[singular] <first-group-stem> "o"
+                       | @GROUP[1] @PERSON[2] @NUMBER[singular] <first-group-stem> "i"
+                       | @GROUP[1] @PERSON[3] @NUMBER[singular] <first-group-stem> "a"
+                       | @GROUP[1] @PERSON[1] @NUMBER[plural] <first-group-stem> "iamo"
+                       | @GROUP[1] @PERSON[2] @NUMBER[plural] <first-group-stem> "ate"
+                       | @GROUP[1] @PERSON[3] @NUMBER[plural] <first-group-stem> "ano"
+
+/* Second group (-ere verbs) - credere */
+<second-group-present> ::= @GROUP[2] @PERSON[1] @NUMBER[singular] <second-group-stem> "o"
+                        | @GROUP[2] @PERSON[2] @NUMBER[singular] <second-group-stem> "i"
+                        | @GROUP[2] @PERSON[3] @NUMBER[singular] <second-group-stem> "e"
+                        | @GROUP[2] @PERSON[1] @NUMBER[plural] <second-group-stem> "iamo"
+                        | @GROUP[2] @PERSON[2] @NUMBER[plural] <second-group-stem> "ete"
+                        | @GROUP[2] @PERSON[3] @NUMBER[plural] <second-group-stem> "ono"
+
+/* Third group (-ire verbs) - dormire/finire */
+<third-group-present> ::= @GROUP[3] @PERSON[1] @NUMBER[singular] <third-group-stem> "o"
+                       | @GROUP[3] @PERSON[2] @NUMBER[singular] <third-group-stem> "i"
+                       | @GROUP[3] @PERSON[3] @NUMBER[singular] <third-group-stem> "e"
+                       | @GROUP[3] @PERSON[1] @NUMBER[plural] <third-group-stem> "iamo"
+                       | @GROUP[3] @PERSON[2] @NUMBER[plural] <third-group-stem> "ite"
+                       | @GROUP[3] @PERSON[3] @NUMBER[plural] <third-group-stem> "ono"
+                       | @GROUP[3] @PERSON[1] @NUMBER[singular] <third-group-stem> "isco"
+                       | @GROUP[3] @PERSON[2] @NUMBER[singular] <third-group-stem> "isci"
+                       | @GROUP[3] @PERSON[3] @NUMBER[singular] <third-group-stem> "isce"
+                       | @GROUP[3] @PERSON[1] @NUMBER[plural] <third-group-stem> "iamo"
+                       | @GROUP[3] @PERSON[2] @NUMBER[plural] <third-group-stem> "ite"
+                       | @GROUP[3] @PERSON[3] @NUMBER[plural] <third-group-stem> "iscono"
+
+/* Common irregular verbs */
+<irregular-present> ::= @IRREGULAR ( <essere-present> | <avere-present> | <andare-present> | <fare-present> | <dare-present> | <stare-present> | <sapere-present> | <volere-present> | <potere-present> | <dovere-present> )
+
+<essere-present> ::= "sono" | "sei" | "è" | "siamo" | "siete" | "sono"
+
+<avere-present> ::= "ho" | "hai" | "ha" | "abbiamo" | "avete" | "hanno"
+
+<andare-present> ::= "vado" | "vai" | "va" | "andiamo" | "andate" | "vanno"
+
+<fare-present> ::= "faccio" | "fai" | "fa" | "facciamo" | "fate" | "fanno"
+
+<dare-present> ::= "do" | "dai" | "dà" | "diamo" | "date" | "danno"
+
+<stare-present> ::= "sto" | "stai" | "sta" | "stiamo" | "state" | "stanno"
+
+<sapere-present> ::= "so" | "sai" | "sa" | "sappiamo" | "sapete" | "sanno"
+
+<volere-present> ::= "voglio" | "vuoi" | "vuole" | "vogliamo" | "volete" | "vogliono"
+
+<potere-present> ::= "posso" | "puoi" | "può" | "possiamo" | "potete" | "possono"
+
+<dovere-present> ::= "devo" | "devi" | "deve" | "dobbiamo" | "dovete" | "devono"
+
+/* Imperfect tense */
+<verb-imperfect> ::= @TENSE[imperfect] @MOOD[indicative] <verb-stem> ( "avo" | "avi" | "ava" | "avamo" | "avate" | "avano" | "evo" | "evi" | "eva" | "evamo" | "evate" | "evano" | "ivo" | "ivi" | "iva" | "ivamo" | "ivate" | "ivano" )
+
+/* Future tense */
+<verb-future> ::= @TENSE[future] @MOOD[indicative] <future-stem> ( "ò" | "ai" | "à" | "emo" | "ete" | "anno" )
+
+<future-stem> ::= <verb-stem> ( "er" | "r" )
+
+/* Conditional mood */
+<verb-conditional> ::= @TENSE[present] @MOOD[conditional] <future-stem> ( "ei" | "esti" | "ebbe" | "emmo" | "este" | "ebbero" )
+
+/* Subjunctive mood */
+<verb-subjunctive> ::= @MOOD[subjunctive] <subjunctive-present> | <subjunctive-imperfect>
+
+<subjunctive-present> ::= @TENSE[present] <verb-stem> ( "i" | "i" | "i" | "iamo" | "iate" | "ino" | "a" | "a" | "a" | "iamo" | "iate" | "ano" )
+
+<subjunctive-imperfect> ::= @TENSE[imperfect] <verb-stem> ( "assi" | "assi" | "asse" | "assimo" | "aste" | "assero" | "essi" | "essi" | "esse" | "essimo" | "este" | "essero" | "issi" | "issi" | "isse" | "issimo" | "iste" | "issero" )
+
+/* Imperative mood */
+<verb-imperative> ::= @MOOD[imperative] ( <first-group-imperative> | <second-group-imperative> | <third-group-imperative> | <irregular-imperative> )
+
+<first-group-imperative> ::= <first-group-stem> ( "a" | "i" | "iamo" | "ate" | "ino" )
+
+<second-group-imperative> ::= <second-group-stem> ( "i" | "a" | "iamo" | "ete" | "ano" )
+
+<third-group-imperative> ::= <third-group-stem> ( "i" | "a" | "iamo" | "ite" | "ano" )
+
+<irregular-imperative> ::= "sii" | "sia" | "siamo" | "siate" | "siano" | "abbi" | "abbia" | "abbiamo" | "abbiate" | "abbiano" | "va'" | "vada" | "andiamo" | "andate" | "vadano"
+
+/* Infinitive */
+<verb-infinitive> ::= <first-group-infinitive> | <second-group-infinitive> | <third-group-infinitive>
+
+<first-group-infinitive> ::= @GROUP[1] <first-group-stem> "are"
+
+<second-group-infinitive> ::= @GROUP[2] <second-group-stem> "ere"
+
+<third-group-infinitive> ::= @GROUP[3] <third-group-stem> "ire"
+
+/* Auxiliary verbs */
+<auxiliary-verb> ::= <avere-present> | <essere-present>
+
+/* Past participle */
+<past-participle> ::= <regular-past-participle> | <irregular-past-participle>
+
+<regular-past-participle> ::= <first-group-stem> ( "ato" | "ata" | "ati" | "ate" )
+                           | <second-group-stem> ( "uto" | "uta" | "uti" | "ute" )
+                           | <third-group-stem> ( "ito" | "ita" | "iti" | "ite" )
+
+<irregular-past-participle> ::= @IRREGULAR ( "stato" | "stata" | "stati" | "state" | "avuto" | "avuta" | "avuti" | "avute" | "fatto" | "fatta" | "fatti" | "fatte" | "detto" | "detta" | "detti" | "dette" | "messo" | "messa" | "messi" | "messe" | "preso" | "presa" | "presi" | "prese" | "visto" | "vista" | "visti" | "viste" | "venuto" | "venuta" | "venuti" | "venute" | "andato" | "andata" | "andati" | "andate" | "nato" | "nata" | "nati" | "nate" | "morto" | "morta" | "morti" | "morte" )
+
+/* Verb stems */
+<verb-stem> ::= /[a-zàèéìíîòóùú]+/
+<first-group-stem> ::= /[a-zàèéìíîòóùú]+/
+<second-group-stem> ::= /[a-zàèéìíîòóùú]+/
+<third-group-stem> ::= /[a-zàèéìíîòóùú]+/
+
+/* Object */
+<object> ::= <direct-object>
+          | <indirect-object>
+
+<direct-object> ::= <noun-phrase>
+                 | <personal-pronoun-object>
+                 | <infinitive-phrase>
+
+<indirect-object> ::= "a" <opt-whitespace> <noun-phrase>
+                   | "a" <opt-whitespace> <personal-pronoun-indirect>
+                   | <personal-pronoun-indirect>
+
+<infinitive-phrase> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+<adverb> ::= <time-adverb> | <place-adverb> | <manner-adverb> | <degree-adverb> | <frequency-adverb>
+
+<time-adverb> ::= "ora" | "adesso" | "ieri" | "oggi" | "domani" | "prima" | "dopo" | "presto" | "tardi" | "sempre" | "mai" | "spesso" | "già" | "ancora" | "poi" | "subito" | "allora"
+
+<place-adverb> ::= "qui" | "qua" | "lì" | "là" | "laggiù" | "lassù" | "dovunque" | "ovunque" | "altrove" | "fuori" | "dentro" | "sopra" | "sotto" | "davanti" | "dietro" | "vicino" | "lontano"
+
+<manner-adverb> ::= "bene" | "male" | "così" | "come" | "insieme" | "solo" | "facilmente" | "difficilmente" | "velocemente" | "lentamente"
+
+<degree-adverb> ::= "molto" | "troppo" | "poco" | "abbastanza" | "più" | "meno" | "tanto" | "quanto" | "così" | "quasi"
+
+<frequency-adverb> ::= "sempre" | "mai" | "spesso" | "raramente" | "talvolta" | "a" <opt-whitespace> "volte"
+
+/* Prepositional phrases */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase>
+                        | <preposition> <opt-whitespace> <pronoun>
+                        | <preposition> <opt-whitespace> <verb-infinitive>
+
+<preposition> ::= "a" | "di" | "da" | "in" | "con" | "su" | "per" | "tra" | "fra" | "sopra" | "sotto" | "davanti" | "dietro" | "verso" | "durante" | "prima" | "dopo" | "senza" | "contro" | "secondo" | "mediante"
+
+/* Prepositional articles (contractions) */
+<prepositional-article> ::= "al" | "allo" | "alla" | "ai" | "agli" | "alle"
+                         | "del" | "dello" | "della" | "dei" | "degli" | "delle"
+                         | "dal" | "dallo" | "dalla" | "dai" | "dagli" | "dalle"
+                         | "nel" | "nello" | "nella" | "nei" | "negli" | "nelle"
+                         | "sul" | "sullo" | "sulla" | "sui" | "sugli" | "sulle"
+
+/* Negation */
+<negation> ::= "non" | "non" <opt-whitespace> "mai" | "non" <opt-whitespace> "più" | "non" <opt-whitespace> "ancora" | "non" <opt-whitespace> "niente" | "non" <opt-whitespace> "nulla" | "non" <opt-whitespace> "nessuno"
+
+/* Question words */
+<question-word> ::= "chi" | "che" | "cosa" | "che" <opt-whitespace> "cosa" | "dove" | "quando" | "come" | "perché" | "quanto" | "quanta" | "quanti" | "quante" | "quale" | "quali"
+
+/* Punctuation */
+<punctuation> ::= "." | "?" | "!" | "," | ";" | ":" | "..." | "-"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive validation rules */
+
+/* Article-noun gender agreement */
+@CONTEXT_RULE[article-noun-agreement]:
+    IF <article>.@GENDER == <noun>.@GENDER
+    THEN VALID
+    ELSE ERROR "Article and noun gender must agree"
+
+/* Article-noun number agreement */
+@CONTEXT_RULE[article-noun-number-agreement]:
+    IF <article>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Article and noun number must agree"
+
+/* Adjective-noun gender agreement */
+@CONTEXT_RULE[adjective-noun-gender-agreement]:
+    IF <adjective>.@AGREEMENT == <noun>.@GENDER OR <noun>.@NUMBER == "plural"
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun in gender"
+
+/* Adjective-noun number agreement */
+@CONTEXT_RULE[adjective-noun-number-agreement]:
+    IF <adjective>.@NUMBER == <noun>.@NUMBER
+    THEN VALID
+    ELSE ERROR "Adjective must agree with noun in number"
+
+/* Subject-verb number agreement */
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@NUMBER == <verb>.@NUMBER
+    THEN VALID
+    ELSE WARNING "Subject and verb number should agree"
+
+/* Subject-verb person agreement */
+@CONTEXT_RULE[subject-verb-person-agreement]:
+    IF <subject>.@PERSON == <verb>.@PERSON
+    THEN VALID
+    ELSE WARNING "Subject and verb person should agree"
+
+/* Past participle agreement with essere */
+@CONTEXT_RULE[participle-essere-agreement]:
+    IF <auxiliary-verb> == "essere" THEN <past-participle>.@GENDER == <subject>.@GENDER AND <past-participle>.@NUMBER == <subject>.@NUMBER
+    ELSE VALID
+
+/* Example sentences demonstrating Italian grammar:
+ *
+ * SIMPLE SENTENCES:
+ * - "Io parlo italiano" (I speak Italian)
+ * - "Lei mangia una mela" (She eats an apple)
+ * - "Noi abitiamo a Roma" (We live in Rome)
+ *
+ * VERB CONJUGATIONS:
+ * - "Io parlo, tu parli, lui parla" (I speak, you speak, he speaks - 1st group)
+ * - "Io credo, tu credi, lui crede" (I believe, you believe, he believes - 2nd group)
+ * - "Io dormo, tu dormi, lui dorme" (I sleep, you sleep, he sleeps - 3rd group)
+ * - "Io finisco, tu finisci, lui finisce" (I finish - 3rd group with -isc-)
+ *
+ * IRREGULAR VERBS:
+ * - "Io sono, tu sei, lui è" (I am, you are, he is - essere)
+ * - "Io ho, tu hai, lui ha" (I have, you have, he has - avere)
+ * - "Io vado, tu vai, lui va" (I go, you go, he goes - andare)
+ *
+ * PASSATO PROSSIMO:
+ * - "Ho parlato" (I spoke/have spoken - with avere)
+ * - "Sono andato" (I went/have gone - with essere, masc.)
+ * - "Sono andata" (I went/have gone - with essere, fem.)
+ * - "Lei è venuta" (She came/has come - agreement)
+ *
+ * GENDER AGREEMENT:
+ * - "Un uomo alto" (A tall man - masculine)
+ * - "Una donna alta" (A tall woman - feminine)
+ * - "Il libro rosso" (The red book - masculine)
+ * - "La tavola rossa" (The red table - feminine)
+ *
+ * NEGATION:
+ * - "Non parlo" (I don't speak)
+ * - "Non viene mai" (He/she never comes)
+ * - "Non ho niente" (I have nothing)
+ *
+ * OBJECT PRONOUNS:
+ * - "Lo vedo" (I see him/it)
+ * - "Gli parlo" (I speak to him)
+ * - "Li amo" (I love them)
+ *
+ * INTERROGATIVE:
+ * - "Parli italiano?" (Do you speak Italian?)
+ * - "Dove abiti?" (Where do you live?)
+ * - "Quando vieni?" (When are you coming?)
+ *
+ * SUBJUNCTIVE:
+ * - "Voglio che tu venga" (I want you to come)
+ * - "Penso che sia vero" (I think it is true)
+ * - "Benché sia tardi" (Although it is late)
+ *
+ * COMPARATIVE/SUPERLATIVE:
+ * - "Più alto di" (Taller than)
+ * - "Il più alto" (The tallest)
+ * - "Migliore di" (Better than)
+ * - "Il migliore" (The best)
+ * - "Bellissimo" (Very beautiful - absolute superlative)
+ *
+ * REFLEXIVE VERBS:
+ * - "Mi lavo" (I wash myself)
+ * - "Ci alziamo" (We get up)
+ * - "Si parlano" (They speak to each other)
+ */

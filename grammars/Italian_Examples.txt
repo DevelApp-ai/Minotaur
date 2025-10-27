@@ -1,0 +1,589 @@
+# Italian Language Example Sentences
+# Demonstrating Italian Grammar
+
+## Simple Sentences
+
+Io parlo.
+Tu mangi.
+Lui lavora.
+Lei studia.
+Noi abitiamo.
+Voi giocate.
+Loro cantano.
+
+## First Group Verbs (-are) - Present Tense
+
+# parlare (to speak)
+Io parlo.
+Tu parli.
+Lui parla.
+Lei parla.
+Noi parliamo.
+Voi parlate.
+Loro parlano.
+
+# mangiare (to eat)
+Io mangio.
+Tu mangi.
+Lui mangia.
+Lei mangia.
+Noi mangiamo.
+Voi mangiate.
+Loro mangiano.
+
+# amare (to love)
+Io amo.
+Tu ami.
+Lui ama.
+Noi amiamo.
+Voi amate.
+Loro amano.
+
+## Second Group Verbs (-ere) - Present Tense
+
+# credere (to believe)
+Io credo.
+Tu credi.
+Lui crede.
+Lei crede.
+Noi crediamo.
+Voi credete.
+Loro credono.
+
+# vendere (to sell)
+Io vendo.
+Tu vendi.
+Lui vende.
+Noi vendiamo.
+Voi vendete.
+Loro vendono.
+
+## Third Group Verbs (-ire) - Present Tense
+
+# dormire (to sleep)
+Io dormo.
+Tu dormi.
+Lui dorme.
+Lei dorme.
+Noi dormiamo.
+Voi dormite.
+Loro dormono.
+
+# finire (to finish - with -isc-)
+Io finisco.
+Tu finisci.
+Lui finisce.
+Lei finisce.
+Noi finiamo.
+Voi finite.
+Loro finiscono.
+
+## Irregular Verbs - Present Tense
+
+# essere (to be)
+Io sono.
+Tu sei.
+Lui è.
+Lei è.
+Noi siamo.
+Voi siete.
+Loro sono.
+
+# avere (to have)
+Io ho.
+Tu hai.
+Lui ha.
+Lei ha.
+Noi abbiamo.
+Voi avete.
+Loro hanno.
+
+# andare (to go)
+Io vado.
+Tu vai.
+Lui va.
+Lei va.
+Noi andiamo.
+Voi andate.
+Loro vanno.
+
+# fare (to do/make)
+Io faccio.
+Tu fai.
+Lui fa.
+Noi facciamo.
+Voi fate.
+Loro fanno.
+
+# dare (to give)
+Io do.
+Tu dai.
+Lui dà.
+Noi diamo.
+Voi date.
+Loro danno.
+
+# stare (to stay/be)
+Io sto.
+Tu stai.
+Lui sta.
+Noi stiamo.
+Voi state.
+Loro stanno.
+
+# sapere (to know)
+Io so.
+Tu sai.
+Lui sa.
+Noi sappiamo.
+Voi sapete.
+Loro sanno.
+
+# volere (to want)
+Io voglio.
+Tu vuoi.
+Lui vuole.
+Noi vogliamo.
+Voi volete.
+Loro vogliono.
+
+# potere (can/to be able)
+Io posso.
+Tu puoi.
+Lui può.
+Noi possiamo.
+Voi potete.
+Loro possono.
+
+# dovere (must/to have to)
+Io devo.
+Tu devi.
+Lui deve.
+Noi dobbiamo.
+Voi dovete.
+Loro devono.
+
+## Gender Agreement - Masculine
+
+Un uomo.
+Il libro.
+Un uomo alto.
+Il libro rosso.
+Un bel castello.
+Il piccolo cane.
+
+## Gender Agreement - Feminine
+
+Una donna.
+La tavola.
+Una donna alta.
+La tavola rossa.
+Una bella casa.
+La piccola gatta.
+
+## Definite Articles
+
+Il libro.
+Lo studente.
+L'uomo.
+La tavola.
+L'amica.
+I libri.
+Gli studenti.
+Le tavole.
+
+## Indefinite Articles
+
+Un libro.
+Uno studente.
+Un uomo.
+Una tavola.
+Un'amica.
+
+## Adjective Agreement
+
+# Masculine Singular
+Un uomo alto.
+Un libro piccolo.
+Un bel quadro.
+
+# Feminine Singular
+Una donna alta.
+Una tavola piccola.
+Una bella casa.
+
+# Masculine Plural
+Uomini alti.
+Libri piccoli.
+Bei quadri.
+
+# Feminine Plural
+Donne alte.
+Tavole piccole.
+Belle case.
+
+## Passato Prossimo with avere
+
+Ho parlato.
+Hai mangiato.
+Ha finito.
+Abbiamo lavorato.
+Avete studiato.
+Hanno giocato.
+
+## Passato Prossimo with essere
+
+Sono andato.
+Sei venuto.
+È arrivato.
+È partita.
+Siamo restati.
+Siete saliti.
+Sono scesi.
+Sono entrate.
+
+## Past Participle Agreement with essere
+
+Lui è andato.
+Lei è andata.
+Loro sono andati.
+Loro sono andate.
+Lui è venuto.
+Lei è venuta.
+Loro sono venuti.
+Loro sono venute.
+
+## Imperfect Tense
+
+Ero.
+Avevo.
+Parlava.
+Mangiava.
+Finivamo.
+Andavate.
+Facevano.
+Venivano.
+
+## Future Tense
+
+Parlerò.
+Mangerai.
+Finirà.
+Andremo.
+Farete.
+Verranno.
+Sarò.
+Avrai.
+
+## Conditional Mood
+
+Parlerei.
+Mangeresti.
+Finirebbe.
+Andremmo.
+Fareste.
+Verrebbero.
+Sarei.
+Avresti.
+
+## Negation
+
+Non parlo.
+Non mangi.
+Non viene.
+Non è qui.
+Non lavoriamo.
+Non finite.
+Non vanno.
+
+## Negation Variants
+
+Non fumo più.
+Non viene mai.
+Non vede niente.
+Non conosce nessuno.
+Non ho ancora finito.
+
+## Object Pronouns
+
+Lo vedo.
+La conosco.
+Li amo.
+Mi guarda.
+Ti capisco.
+Ci ascoltate.
+Vi aiutano.
+
+## Indirect Object Pronouns
+
+Gli parlo.
+Le dico.
+Mi dà.
+Ti mostro.
+Vi spiego.
+
+## Reflexive Verbs
+
+Mi lavo.
+Ti alzi.
+Si corica.
+Ci divertiamo.
+Vi parlate.
+Si guardano.
+Si chiamano.
+
+## Interrogative Forms
+
+Parli italiano?
+Lei parla francese?
+Loro abitano qui?
+Dove abiti?
+Quando vieni?
+Come stai?
+Perché parti?
+Quanto costa?
+
+## Wh-Questions
+
+Chi sei?
+Che fai?
+Cosa vuoi?
+Dove vai?
+Quando arrivi?
+Come ti chiami?
+Perché studi?
+Quanto tempo?
+
+## Imperative
+
+Parla!
+Mangiate!
+Finisci!
+Venite!
+Va'!
+Andiamo!
+Sii bravo!
+Abbiate pazienza!
+
+## Comparative
+
+Più alto di.
+Meno alto di.
+Tanto alto quanto.
+Più bella di.
+Meno bella di.
+Migliore di.
+Peggiore di.
+
+## Superlative
+
+Il più alto.
+La più alta.
+I più alti.
+Il meno alto.
+Il migliore.
+La migliore.
+Il peggiore.
+Bellissimo.
+Altissimo.
+
+## Prepositions
+
+Vado a Roma.
+Viene da Milano.
+Abitiamo in Italia.
+Lavori in ufficio.
+È sulla tavola.
+È sotto il letto.
+Cammino con te.
+Parte senza lei.
+È per voi.
+Passiamo per qui.
+
+## Prepositional Contractions
+
+Vado al mercato.
+Parli agli amici.
+Viene dal negozio.
+Parliamo dei problemi.
+Abito nel centro.
+Metto sul tavolo.
+
+## Subjunctive Mood
+
+Voglio che tu venga.
+Spero che lui arrivi.
+Penso che lei sia brava.
+Temiamo che loro siano in ritardo.
+Benché sia tardi.
+Affinché capisca.
+Prima che arrivino.
+
+## Relative Clauses
+
+L'uomo che parla.
+La donna che conosco.
+Il libro di cui parlo.
+La città dove abito.
+La persona con cui lavoro.
+
+## Complex Sentences
+
+So che vieni.
+Dice che parte.
+Pensiamo che arrivino.
+Quando vieni partiamo.
+Se vieni sarò contento.
+Perché piove resto.
+
+## Possessive Adjectives
+
+Il mio libro.
+La mia casa.
+I miei amici.
+Il tuo gatto.
+La tua macchina.
+I tuoi libri.
+Il suo padre.
+La sua madre.
+I suoi figli.
+Il nostro paese.
+I nostri amici.
+Il vostro lavoro.
+I vostri libri.
+Il loro cane.
+I loro figli.
+
+## Demonstrative Adjectives
+
+Questo libro.
+Quest'uomo.
+Questa donna.
+Questi libri.
+Queste donne.
+Quel libro.
+Quell'uomo.
+Quella donna.
+Quei libri.
+Quelle donne.
+
+## Adverbs
+
+Parlo bene italiano.
+Corri velocemente.
+Lavora lentamente.
+Canta male.
+Arriviamo presto.
+Partite tardi.
+Vengono spesso.
+Vanno talvolta.
+
+## Time Expressions
+
+Oggi.
+Ieri.
+Domani.
+Ora.
+Adesso.
+Prima.
+Dopo.
+Sempre.
+Mai.
+Spesso.
+A volte.
+
+## Place Expressions
+
+Qui.
+Qua.
+Lì.
+Là.
+Laggiù.
+Dovunque.
+Altrove.
+Fuori.
+Dentro.
+Davanti.
+Dietro.
+
+## Quantity Expressions
+
+Molto.
+Poco.
+Abbastanza.
+Troppo.
+Più.
+Meno.
+Tanto.
+Quanto.
+
+## Compound Sentences
+
+Parlo e tu ascolti.
+Viene ma lei parte.
+Lavoriamo o giochiamo.
+Leggi quindi impari.
+
+## Conditional Sentences
+
+Se vieni sarò contento.
+Se avessi soldi comprerei.
+Se fosse qui partiremmo.
+
+## Direct and Indirect Speech
+
+Dice che viene.
+Pensa che parti.
+Sappiamo che arrivano.
+Credo che capisca.
+
+## Reflexive Verbs - Reciprocal
+
+Ci parliamo.
+Vi guardate.
+Si conoscono.
+Si vedono.
+
+## Modal Verbs with Infinitive
+
+Posso parlare.
+Vuoi mangiare.
+Deve studiare.
+Sappiamo nuotare.
+Potete venire.
+
+## Pronominal Verbs
+
+Mi alzo presto.
+Ti svegli tardi.
+Si diverte molto.
+Ci riposiamo.
+Vi annoiate.
+Si sposano.
+
+## Complex Object Pronouns
+
+Me lo dai.
+Te la mostro.
+Glielo dico.
+Ce ne danno.
+Ve li porto.
+
+## Absolute Superlative
+
+Bellissimo.
+Altissimo.
+Fortissimo.
+Velocissimo.
+Grandissimo.
+Piccolissimo.
+Bravissimo.
+
+## Ne and Ci Pronouns
+
+Ne ho due.
+Ne voglio.
+Ci vado.
+Ci penso.
+Ne parliamo.
+Ci abito.
