@@ -383,3 +383,292 @@ Keywords: и, или, но, а, ами, че, който, която, което
     IF <aspectual-periphrastic> PRESENT
     THEN REQUIRES "да" + <present-tense-verb>
     ELSE VALID
+
+/* ============================================
+ * DISCOURSE MARKERS AND CONNECTIVES
+ * ============================================ */
+
+<discourse-marker> ::= <temporal-discourse> 
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+                    | <exemplification-discourse>
+
+<temporal-discourse> ::= "първо" | "после" | "след това" | "тогава" | "накрая" 
+                      | "най-накрая" | "междувременно" | "дотогава"
+
+<causal-discourse> ::= "защото" | "тъй като" | "понеже" | "затова" | "поради това"
+
+<contrastive-discourse> ::= "но" | "а" | "обаче" | "все пак" | "въпреки това"
+
+<additive-discourse> ::= "и" | "също" | "освен това" | "нещо повече" | "при това"
+
+<conclusive-discourse> ::= "следователно" | "значи" | "така" | "затова"
+
+<exemplification-discourse> ::= "например" | "като например" | "по-конкретно"
+
+/* ============================================
+ * TAG QUESTIONS
+ * ============================================ */
+
+<tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <question-tag>
+
+<question-tag> ::= "нали" | "не" | "нали така" | "нали то" | "или не"
+
+/* ============================================
+ * REPORTED SPEECH
+ * ============================================ */
+
+<direct-speech> ::= <quotation-marker> <opt-whitespace> <sentence> <opt-whitespace> <quotation-marker> <opt-whitespace> <reporting-verb>
+
+<quotation-marker> ::= "\"" | "«" | "»"
+
+<reporting-verb> ::= "казва" | "каза" | "пита" | "попита" | "отговаря" | "отговори"
+
+<indirect-speech> ::= <subject> <opt-whitespace> "че" <opt-whitespace> <embedded-clause> <opt-whitespace> <reporting-verb>
+
+/* ============================================
+ * CLEFT SENTENCES
+ * ============================================ */
+
+<it-cleft> ::= "това" <opt-whitespace> "е" <opt-whitespace> <focused-element> <opt-whitespace> "," <opt-whitespace> <relative-clause>
+
+<focused-element> ::= <noun-phrase> | <adverbial> | <prepositional-phrase>
+
+<pseudo-cleft> ::= <free-relative> <opt-whitespace> "е" <opt-whitespace> <noun-phrase>
+
+<free-relative> ::= "това, което" | "онова, което" | "там, където" | "тогава, когато"
+
+/* ============================================
+ * CORRELATIVE CONSTRUCTIONS
+ * ============================================ */
+
+<correlative-construction> ::= <both-and> | <either-or> | <neither-nor> | <not-only-but-also>
+
+<both-and> ::= "и" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "и" <opt-whitespace> <element>
+
+<either-or> ::= "или" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "или" <opt-whitespace> <element>
+
+<neither-nor> ::= "нито" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "нито" <opt-whitespace> <element>
+
+<not-only-but-also> ::= "не само" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "но и" <opt-whitespace> <element>
+
+<element> ::= <noun-phrase> | <verb-phrase> | <clause>
+
+/* ============================================
+ * DIALECTAL VARIATIONS EXTENDED
+ * ============================================ */
+
+@DIALECT[eastern]      /* Eastern Bulgarian dialects */
+@DIALECT[western]      /* Western Bulgarian dialects */
+@DIALECT[shopski]      /* Shop dialects (Sofia region) */
+@DIALECT[rodopski]     /* Rhodope dialects */
+@DIALECT[moesian]      /* Moesian dialects */
+
+<dialectal-vocabulary> ::= <eastern-dialect-words>
+                        | <western-dialect-words>
+                        | <shopski-dialect-words>
+                        | <rodopski-dialect-words>
+
+<eastern-dialect-words> ::= @DIALECT[eastern] ( "щъ" | "жд" | "ê" )
+
+<western-dialect-words> ::= @DIALECT[western] ( "що" | "жда" | "я" )
+
+<shopski-dialect-words> ::= @DIALECT[shopski] ( "йа" | "кво" | "тоя" )
+
+<rodopski-dialect-words> ::= @DIALECT[rodopski] ( "кво" | "на" | "са" )
+
+/* ============================================
+ * EXTENDED VERB FORMS
+ * ============================================ */
+
+/* Future in the past */
+<future-in-past> ::= "щях" <opt-whitespace> "да" <opt-whitespace> <verb-present>
+                  | "щяха" <opt-whitespace> "да" <opt-whitespace> <verb-present>
+
+/* Renarrative mood (evidential) */
+<renarrative-mood> ::= <verb-perfect-participle> <opt-whitespace> "бил" <person-suffix>
+
+<person-suffix> ::= "" | "-а" | "-о" | "-и"
+
+/* Dubitative mood */
+<dubitative-mood> ::= <verb-perfect-participle> <opt-whitespace> "ли" <opt-whitespace> "е"
+
+/* ============================================
+ * PERIPHRASTIC CONSTRUCTIONS
+ * ============================================ */
+
+<progressive-aspect> ::= "в момента" <opt-whitespace> <verb-present>
+                      | <verb-stem> "вам" | <verb-stem> "ваш" | <verb-stem> "ва"
+
+<recent-past> ::= "току-що" <opt-whitespace> <verb-aorist>
+
+<immediate-future> ::= "след малко" <opt-whitespace> "ще" <opt-whitespace> <verb-present>
+                    | "веднага" <opt-whitespace> "ще" <opt-whitespace> <verb-present>
+
+<habitual-aspect> ::= "обикновено" <opt-whitespace> <verb-present>
+                   | "винаги" <opt-whitespace> <verb-present>
+
+/* ============================================
+ * CAUSATIVE CONSTRUCTIONS
+ * ============================================ */
+
+<causative-construction> ::= "карам" <opt-whitespace> <noun-accusative> <opt-whitespace> "да" <opt-whitespace> <verb-present>
+                          | "правя" <opt-whitespace> <noun-accusative> <opt-whitespace> "да" <opt-whitespace> <verb-present>
+
+/* ============================================
+ * REFLEXIVE AND RECIPROCAL
+ * ============================================ */
+
+<reflexive-construction> ::= <subject> <opt-whitespace> "се" <opt-whitespace> <verb-present>
+
+<reciprocal-construction> ::= <subject-plural> <opt-whitespace> "се" <opt-whitespace> <verb-present>
+                           | <subject-plural> <opt-whitespace> "един друг" <case-marker>
+
+/* ============================================
+ * IDIOMATIC EXPRESSIONS
+ * ============================================ */
+
+<bulgarian-idiom> ::= "добър ден" | "лека нощ" | "довиждане" | "благодаря"
+                   | "моля" | "извинете" | "няма проблем" | "как си"
+                   | "всичко наред" | "супер" | "страхотно"
+
+/* ============================================
+ * TEMPORAL EXPRESSIONS
+ * ============================================ */
+
+<day-of-week> ::= "понеделник" | "вторник" | "сряда" | "четвъртък" | "петък" | "събота" | "неделя"
+
+<month-name> ::= "януари" | "февруари" | "март" | "април" | "май" | "юни"
+              | "юли" | "август" | "септември" | "октомври" | "ноември" | "декември"
+
+<season> ::= "пролет" | "лято" | "есен" | "зима"
+
+<time-of-day> ::= "сутрин" | "преди обед" | "обед" | "следобед" | "вечер" | "нощ" | "полунощ"
+
+<clock-time> ::= <hour> <opt-whitespace> "часа" <opt-whitespace> "и" <opt-whitespace> <minute>?
+
+<hour> ::= /[0-2]?[0-9]/
+
+<minute> ::= /[0-5][0-9]/ <opt-whitespace> "минути"
+
+/* ============================================
+ * CONDITIONAL SENTENCES
+ * ============================================ */
+
+<real-conditional> ::= "ако" <opt-whitespace> <condition-clause-real> <opt-whitespace> "," <opt-whitespace> <result-clause-real>
+
+<condition-clause-real> ::= <subject> <opt-whitespace> <verb-present>
+
+<result-clause-real> ::= <subject> <opt-whitespace> <verb-future>
+
+<hypothetical-conditional> ::= "ако" <opt-whitespace> <condition-clause-hyp> <opt-whitespace> "," <opt-whitespace> <result-clause-hyp>
+
+<condition-clause-hyp> ::= <subject> <opt-whitespace> <verb-imperfect>
+
+<result-clause-hyp> ::= <subject> <opt-whitespace> "щях" <opt-whitespace> "да" <opt-whitespace> <verb-present>
+
+<contrary-conditional> ::= "ако" <opt-whitespace> <condition-clause-contrary> <opt-whitespace> "," <opt-whitespace> <result-clause-contrary>
+
+<condition-clause-contrary> ::= <subject> <opt-whitespace> "бях" <opt-whitespace> <verb-perfect-participle>
+
+<result-clause-contrary> ::= <subject> <opt-whitespace> "щях" <opt-whitespace> "да" <opt-whitespace> "съм" <opt-whitespace> <verb-perfect-participle>
+
+/* ============================================
+ * COMPARATIVE AND SUPERLATIVE
+ * ============================================ */
+
+<comparative-construction> ::= "по-" <adjective>
+                            | "по-" <adjective> <opt-whitespace> "от" <opt-whitespace> <noun-phrase>
+
+<superlative-construction> ::= "най-" <adjective>
+                            | "най-" <adjective> <opt-whitespace> "от" <opt-whitespace> <noun-phrase>
+
+/* ============================================
+ * NEGATION PATTERNS
+ * ============================================ */
+
+<emphatic-negation> ::= "никога" | "никой" | "нищо" | "никъде" | "по никакъв начин"
+
+<double-negation> ::= <negation> <opt-whitespace> <negative-polarity-item>
+
+<negative-polarity-item> ::= "никой" | "нищо" | "никъде" | "никога"
+
+/* ============================================
+ * QUESTION FORMATION
+ * ============================================ */
+
+<alternative-question> ::= <yes-no-question> <opt-whitespace> "или" <opt-whitespace> <yes-no-question>
+
+<echo-question> ::= <declarative-clause> <opt-whitespace> "ли"
+
+/* ============================================
+ * DEFINITE ARTICLE SUFFIXES (UNIQUE TO BULGARIAN)
+ * ============================================ */
+
+<definite-article-masculine> ::= "-ът" | "-та" | "-то"
+
+<definite-article-feminine> ::= "-та"
+
+<definite-article-neuter> ::= "-то"
+
+<definite-article-plural> ::= "-те"
+
+/* ============================================
+ * ADDITIONAL CONTEXT RULES
+ * ============================================ */
+
+@CONTEXT_RULE[discourse-marker-position]:
+    IF <discourse-marker> PRESENT
+    THEN <discourse-marker> SHOULD_BE_SENTENCE_INITIAL OR CLAUSE_INITIAL
+    ELSE ALLOW
+
+@CONTEXT_RULE[tag-question-polarity]:
+    IF <declarative-clause> IS_AFFIRMATIVE
+    THEN <question-tag> MAY_BE "нали" OR "не"
+    ELSE ALLOW
+
+@CONTEXT_RULE[indirect-speech-че]:
+    IF <indirect-speech> PRESENT
+    THEN REQUIRES "че" COMPLEMENTIZER
+    ELSE VALID
+
+@CONTEXT_RULE[cleft-focus]:
+    IF <it-cleft> PRESENT
+    THEN <focused-element> MUST_CARRY_INFORMATION_FOCUS
+    ELSE NORMAL
+
+@CONTEXT_RULE[correlative-parallelism]:
+    IF <correlative-construction> PRESENT
+    THEN <element> STRUCTURES_MUST_BE_PARALLEL
+    ELSE ERROR "Correlative elements must be syntactically parallel"
+
+@CONTEXT_RULE[dialectal-consistency]:
+    IF @DIALECT SPECIFIED
+    THEN <vocabulary> AND <phonology> MUST_BE_CONSISTENT_WITH_DIALECT
+    ELSE ALLOW
+
+@CONTEXT_RULE[renarrative-evidentiality]:
+    IF <renarrative-mood> PRESENT
+    THEN INDICATES_REPORTED_OR_INFERRED_INFORMATION
+    ELSE NORMAL_ASSERTION
+
+@CONTEXT_RULE[definite-article-suffix]:
+    IF <noun> IS_DEFINITE
+    THEN <noun> MUST_HAVE_APPROPRIATE_SUFFIX_ARTICLE
+    ELSE <noun> HAS_NO_ARTICLE
+
+@CONTEXT_RULE[да-subjunctive]:
+    IF "да" PRESENT_BEFORE_VERB
+    THEN <verb> MUST_BE_IN_PRESENT_TENSE
+    ELSE ERROR "да requires present tense verb form"
+
+@CONTEXT_RULE[aspectual-pair-selection]:
+    IF <context> REQUIRES_PERFECTIVE_ASPECT
+    THEN USE <perfective-verb>
+    ELSE IF <context> REQUIRES_IMPERFECTIVE_ASPECT
+    THEN USE <imperfective-verb>
+    ELSE ALLOW_EITHER
+
+/* Bulgarian grammar enhancements complete - now at Danish benchmark level */
