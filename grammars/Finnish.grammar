@@ -1289,5 +1289,120 @@ rule nested_clause_depth {
 }
 
 // ============================================================================
+// ADDITIONAL DISCOURSE AND PRAGMATIC FEATURES
+// ============================================================================
+
+// Discourse markers for coherence and text structure
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+                    ;
+
+<temporal-discourse> ::= "ensin" | "sitten" | "sen jälkeen" | "lopuksi" 
+                      | "vihdoin" | "samaan aikaan" | "sillä välin"
+                      | "aikaisemmin" | "myöhemmin" | "lopulta"
+                      ;
+
+<causal-discourse> ::= "siksi" | "sen vuoksi" | "sen takia" | "näin ollen"
+                    | "siten" | "sen seurauksena" | "täten"
+                    ;
+
+<contrastive-discourse> ::= "kuitenkin" | "sitä vastoin" | "sen sijaan"
+                         | "toisaalta" | "siitä huolimatta" | "silti"
+                         | "vaikka" | "tosin" | "sentään"
+                         ;
+
+<additive-discourse> ::= "lisäksi" | "myös" | "vielä" | "samoin" 
+                      | "niin ikään" | "sitä paitsi" | "edelleen"
+                      | "muutenkin" | "yhä"
+                      ;
+
+<conclusive-discourse> ::= "siis" | "lyhyesti sanoen" | "toisin sanoen"
+                        | "yhteenvetona" | "kaiken kaikkiaan" | "lopuksi"
+                        ;
+
+// Tag questions and elliptical structures
+<tag-question> ::= <declarative-sentence> <question-particle> "?"
+                ;
+
+<question-particle> ::= "vai" | "vai mitä" | "eikö" | "eikö niin" 
+                     | "vai kuinka" | "eikö vain"
+                     ;
+
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+                     ;
+
+<elliptical-response> ::= <particle>
+                       | <adverb>
+                       | <noun-phrase>
+                       | <verb-phrase>
+                       ;
+
+<elliptical-coordination> ::= <main-clause> <conjunction> <elliptical-clause>
+                           ;
+
+// Reported speech and indirect discourse
+<reported-speech> ::= <reporting-verb> <reported-clause>
+                   ;
+
+<reporting-verb> ::= "sanoo" | "sanoi" | "kertoo" | "kertoi" 
+                  | "väittää" | "väitti" | "kysyy" | "kysyi"
+                  | "väitää" | "toteaa" | "totesi"
+                  ;
+
+<reported-clause> ::= "että" <subordinate-content>
+                   | <embedded-question>
+                   ;
+
+// Free indirect speech (common in Finnish literature)
+<free-indirect-speech> ::= <main-clause> ( <main-clause> )+
+                        ;
+
+// Cleft sentence variations (extended)
+<it-cleft> ::= "se" "on" <focused-constituent> <relative-clause>
+            | "se" "oli" <focused-constituent> <relative-clause>
+            ;
+
+<pseudo-cleft> ::= <wh-clause> "on" <focused-constituent>
+                | <wh-clause> "oli" <focused-constituent>
+                ;
+
+// Correlative constructions
+<correlative-construction> ::= <correlative-pair> <clause-sequence>
+                            ;
+
+<correlative-pair> ::= "sekä" "että"
+                    | "joko" "tai"  
+                    | "ei" "vaan" "myös"
+                    | "ei" "ainoastaan" "vaan" "myös"
+                    | "sitä" "mitä"
+                    ;
+
+// Additional context-sensitive validation rules
+// Rule 16: Vowel Harmony Consistency in Compounds
+rule vowel_harmony_in_compounds {
+    when compound_word present
+    validate: consistent vowel harmony across morpheme boundaries
+    error: "Compound word violates vowel harmony"
+}
+
+// Rule 17: Case Agreement in Noun Phrases
+rule case_agreement_noun_phrases {
+    when adjective and noun in same phrase
+    validate: both in same grammatical case
+    error: "Adjective and noun must agree in case"
+}
+
+// Rule 18: Passive Voice Formation
+rule passive_voice_formation {
+    when passive construction present
+    validate: verb has passive suffix -taan/-tään/-tta/-ttä
+    error: "Passive voice requires proper suffix"
+}
+
+// ============================================================================
 // END OF FINNISH GRAMMAR
 // ============================================================================
