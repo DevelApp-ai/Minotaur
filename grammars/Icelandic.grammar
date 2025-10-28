@@ -884,4 +884,557 @@ Keywords: og, eða, en, ef, að, sem, er, var, vera, hafa, hefur, við, þú, ha
 
 <whitespace> ::= /[ \t\n\r]+/
 
+// ============================================================================
+// DISCOURSE MARKERS
+// ============================================================================
+
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+                    | <exemplification-discourse>
+
+<temporal-discourse> ::= "fyrst" | "síðan" | "þá" | "næst" | "loks" | "að lokum"
+                      | "í fyrstu" | "í upphafi" | "til að byrja með" | "í framhaldinu"
+                      | "að endingu" | "á meðan" | "á sama tíma" | "samhliða"
+
+<causal-discourse> ::= "því" | "vegna þess" | "af því að" | "þar sem" | "þar eð"
+                    | "þess vegna" | "þannig að" | "af þessum sökum" | "því til stuðnings"
+
+<contrastive-discourse> ::= "en" | "hins vegar" | "þó" | "þrátt fyrir það" | "samt sem áður"
+                         | "á móti" | "aftur á móti" | "engu að síður" | "þrátt fyrir"
+                         | "hitt er rétt að" | "þvert á móti"
+
+<additive-discourse> ::= "og" | "einnig" | "jafnframt" | "auk þess" | "að auki"
+                      | "ennfremur" | "að sama skapi" | "til viðbótar" | "þar að auki"
+                      | "sömuleiðis" | "líka" | "líklega"
+
+<conclusive-discourse> ::= "þannig" | "því" | "þar af leiðandi" | "í stuttu máli"
+                        | "samantekið" | "að lokum" | "til að draga saman"
+                        | "því má ljóst vera" | "svo sem sagt"
+
+<exemplification-discourse> ::= "til dæmis" | "t.d." | "sem dæmi" | "til að mynda"
+                             | "svo sem" | "eins og" | "sem til dæmis"
+
+// ============================================================================
+// TAG QUESTIONS AND ELLIPTICAL STRUCTURES
+// ============================================================================
+
+<tag-question> ::= <statement> <opt-whitespace> "," <opt-whitespace> <tag-marker>
+
+<tag-marker> ::= "ekki satt" | "er það ekki" | "ekki" | "eða hvað"
+              | "skilurðu" | "veistu"
+
+<elliptical-structure> ::= <noun-phrase> | <adjective-phrase> | <adverb>
+                        | <prepositional-phrase>
+
+// ============================================================================
+// REPORTED SPEECH AND INDIRECT DISCOURSE
+// ============================================================================
+
+<reported-speech> ::= <direct-speech> | <indirect-speech> | <free-indirect-speech>
+
+<direct-speech> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> ":" 
+                    <opt-whitespace> "\"" <sentence> "\""
+
+<indirect-speech> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> "að"
+                     <opt-whitespace> <subordinate-clause>
+
+<free-indirect-speech> ::= <sentence> <opt-whitespace> <sentence>
+
+// ============================================================================
+// CLEFT SENTENCES
+// ============================================================================
+
+<cleft-sentence> ::= <it-cleft> | <pseudo-cleft> | <reversed-cleft>
+
+<it-cleft> ::= "það" <opt-whitespace> "er" <opt-whitespace> <noun-phrase>
+             <opt-whitespace> "sem" <opt-whitespace> <verb-phrase>
+
+<pseudo-cleft> ::= "það" <opt-whitespace> "sem" <opt-whitespace> <subordinate-clause>
+                 <opt-whitespace> "er" <opt-whitespace> <noun-phrase>
+
+<reversed-cleft> ::= <noun-phrase> <opt-whitespace> "er" <opt-whitespace> "það"
+                   <opt-whitespace> "sem" <opt-whitespace> <verb-phrase>
+
+// ============================================================================
+// CORRELATIVE CONSTRUCTIONS
+// ============================================================================
+
+<correlative-construction> ::= <both-and> | <either-or> | <neither-nor> | <not-only-but-also>
+
+<both-and> ::= "bæði" <opt-whitespace> <phrase> <opt-whitespace> "og" <opt-whitespace> <phrase>
+
+<either-or> ::= "annaðhvort" <opt-whitespace> <phrase> <opt-whitespace> "eða" 
+              <opt-whitespace> <phrase>
+
+<neither-nor> ::= "hvorki" <opt-whitespace> <phrase> <opt-whitespace> "né" 
+                <opt-whitespace> <phrase>
+
+<not-only-but-also> ::= "ekki aðeins" <opt-whitespace> <phrase> <opt-whitespace> "heldur einnig"
+                      <opt-whitespace> <phrase>
+
+// ============================================================================
+// EXTENDED DIALECTAL VARIATIONS
+// ============================================================================
+
+@DIALECT[northwestern]     /* Norðvestlenska - Northwestern Iceland */
+@DIALECT[northeastern]     /* Norðausturlenska - Northeastern Iceland */
+@DIALECT[southwestern]     /* Suðvestlenska - Southwestern Iceland */
+@DIALECT[southeastern]     /* Suðausturlenska - Southeastern Iceland */
+@DIALECT[reykjavik]        /* Höfuðborgarsvæðið - Capital region */
+
+<dialectal-variation> ::= <northern-dialect> | <southern-dialect> | <western-dialect> | <eastern-dialect>
+
+<northern-dialect> ::= @DIALECT[northern] <noun-phrase> | @DIALECT[northern] <verb-phrase>
+
+<southern-dialect> ::= @DIALECT[southern] <noun-phrase> | @DIALECT[southern] <verb-phrase>
+
+<western-dialect> ::= @DIALECT[western] <noun-phrase> | @DIALECT[western] <verb-phrase>
+
+<eastern-dialect> ::= @DIALECT[eastern] <noun-phrase> | @DIALECT[eastern] <verb-phrase>
+
+// ============================================================================
+// EXTENDED VERB CONSTRUCTIONS
+// ============================================================================
+
+<periphrastic-construction> ::= <progressive> | <recent-past> | <immediate-future>
+                             | <habitual> | <inceptive>
+
+<progressive> ::= "vera" <opt-whitespace> "að" <opt-whitespace> <infinitive>
+
+<recent-past> ::= "vera" <opt-whitespace> "nýbúinn" <opt-whitespace> "að" 
+                <opt-whitespace> <infinitive>
+
+<immediate-future> ::= "vera" <opt-whitespace> "að" <opt-whitespace> "fara" 
+                     <opt-whitespace> "að" <opt-whitespace> <infinitive>
+
+<habitual> ::= "hafa" <opt-whitespace> "fyrir" <opt-whitespace> "venju" 
+             <opt-whitespace> "að" <opt-whitespace> <infinitive>
+
+<inceptive> ::= "fara" <opt-whitespace> "að" <opt-whitespace> <infinitive>
+
+<causative-construction> ::= "láta" <opt-whitespace> <noun-phrase> <opt-whitespace> <infinitive>
+
+<permissive-construction> ::= "leyfa" <opt-whitespace> <noun-phrase> <opt-whitespace> "að"
+                           <opt-whitespace> <infinitive>
+
+<perception-construction> ::= <perception-verb> <opt-whitespace> <noun-phrase>
+                           <opt-whitespace> <infinitive>
+
+<perception-verb> ::= "sjá" | "heyra" | "finna" | "skynja"
+
+// ============================================================================
+// IDIOMATIC EXPRESSIONS
+// ============================================================================
+
+<idiomatic-expression> ::= "að koma sér vel" | "að gera sér far um" | "að taka mark á"
+                        | "að halda í höfuðið á sér" | "að vera með hausinn á réttu stað"
+                        | "að detta úr" | "að fara á taugarnar" | "að fara í taugarnar á"
+                        | "að hafa fingur í pottinum" | "að fara í gegnum" | "að halda áfram"
+                        | "að taka þátt í" | "að passa upp á" | "að gefa kost á sér"
+                        | "að láta vita" | "að láta undan" | "að láta vaða"
+                        | "að láta sem" | "að taka eftir" | "að bera fyrir sig"
+                        | "að bera að höndum" | "að bera höfuðið hátt"
+
+// ============================================================================
+// TEMPORAL EXPRESSIONS EXTENDED
+// ============================================================================
+
+<extended-temporal> ::= <time-of-day> | <day-of-week> | <month-name> | <season>
+                     | <clock-time> | <relative-time>
+
+<time-of-day> ::= "morgunn" | "hádegi" | "eftirmiðdagur" | "kvöld" | "nótt" | "miðnætti"
+
+<day-of-week> ::= "mánudagur" | "þriðjudagur" | "miðvikudagur" | "fimmtudagur"
+               | "föstudagur" | "laugardagur" | "sunnudagur"
+
+<month-name> ::= "janúar" | "febrúar" | "mars" | "apríl" | "maí" | "júní"
+              | "júlí" | "ágúst" | "september" | "október" | "nóvember" | "desember"
+
+<season> ::= "vor" | "sumar" | "haust" | "vetur"
+
+<clock-time> ::= <cardinal-number> <opt-whitespace> ( "á" | "klukkan" )
+
+<relative-time> ::= "í dag" | "í gær" | "í fyrradag" | "á morgun" | "hinn daginn"
+                 | "í fyrra" | "á þessu ári" | "á næsta ári" | "núna" | "strax"
+                 | "bráðum" | "eftir smá stund" | "fyrir löngu" | "nýlega"
+
+// ============================================================================
+// CONDITIONAL SENTENCES EXTENDED
+// ============================================================================
+
+<extended-conditional> ::= <real-conditional> | <hypothetical-conditional> 
+                        | <contrary-to-fact-conditional> | <mixed-conditional>
+
+<real-conditional> ::= "ef" <opt-whitespace> <present-tense-clause> <opt-whitespace> ","
+                     <opt-whitespace> <present-or-future-clause>
+
+<hypothetical-conditional> ::= "ef" <opt-whitespace> <subjunctive-clause> <opt-whitespace> ","
+                            <opt-whitespace> <conditional-clause>
+
+<contrary-to-fact-conditional> ::= "ef" <opt-whitespace> <past-subjunctive-clause>
+                                 <opt-whitespace> "," <opt-whitespace> <conditional-perfect-clause>
+
+<mixed-conditional> ::= "ef" <opt-whitespace> <past-subjunctive-clause> <opt-whitespace> ","
+                      <opt-whitespace> <conditional-clause>
+
+// ============================================================================
+// COMPARATIVE AND SUPERLATIVE EXTENDED
+// ============================================================================
+
+<extended-comparison> ::= <equative-comparison> | <comparative-clause> | <superlative-clause>
+                       | <absolute-superlative>
+
+<equative-comparison> ::= "jafn" <opt-whitespace> <adjective> <opt-whitespace> "og"
+                       <opt-whitespace> <noun-phrase>
+
+<absolute-superlative> ::= "aller" <opt-whitespace> <adjective>
+                        | <adjective> <opt-whitespace> "á alla lund"
+
+// ============================================================================
+// NEGATION PATTERNS EXTENDED
+// ============================================================================
+
+<extended-negation> ::= <simple-negation> | <double-negation> | <emphatic-negation>
+                     | <negative-concord>
+
+<simple-negation> ::= "ekki" <opt-whitespace> <verb-phrase>
+
+<double-negation> ::= "ekki" <opt-whitespace> <verb> <opt-whitespace> <negative-indefinite>
+
+<negative-indefinite> ::= "neitt" | "neinn" | "nein" | "aldrei" | "hvergi" | "enginn"
+
+<emphatic-negation> ::= "alls ekki" | "aldrei nokkurn tímann" | "alls ekki nokkurn veginn"
+                     | "alls ekki á neinn hátt"
+
+<negative-concord> ::= "aldrei" <opt-whitespace> "neinn" | "aldrei" <opt-whitespace> "neitt"
+
+// ============================================================================
+// QUESTION FORMATION EXTENDED
+// ============================================================================
+
+<extended-question> ::= <yes-no-question> | <wh-question> | <alternative-question>
+                     | <indirect-question> | <rhetorical-question>
+
+<alternative-question> ::= <yes-no-question> <opt-whitespace> "eða" <opt-whitespace> <yes-no-question>
+
+<indirect-question> ::= <verb> <opt-whitespace> <subject> <opt-whitespace> <question-word>
+                     <opt-whitespace> <subordinate-clause>
+
+<rhetorical-question> ::= <wh-question> | <yes-no-question>
+
+// ============================================================================
+// RELATIVE CLAUSES EXTENDED
+// ============================================================================
+
+<extended-relative-clause> ::= <restrictive-relative> | <non-restrictive-relative>
+                            | <headless-relative> | <free-relative>
+
+<headless-relative> ::= "sem" <opt-whitespace> <verb-phrase>
+
+<free-relative> ::= "sá" <opt-whitespace> "sem" <opt-whitespace> <verb-phrase>
+                 | "það" <opt-whitespace> "sem" <opt-whitespace> <verb-phrase>
+
+// ============================================================================
+// PASSIVE VOICE EXTENDED
+// ============================================================================
+
+<extended-passive> ::= <periphrastic-passive> | <middle-voice-passive> | <impersonal-passive>
+
+<periphrastic-passive> ::= "vera" <opt-whitespace> <past-participle>
+
+<middle-voice-passive> ::= <verb-stem> <opt-whitespace> "st"
+
+<impersonal-passive> ::= "verða" <opt-whitespace> <past-participle>
+
+// ============================================================================
+// GERUND AND INFINITIVE CONSTRUCTIONS
+// ============================================================================
+
+<gerund-construction> ::= "að" <opt-whitespace> <infinitive>
+
+<infinitive-construction> ::= <infinitive> | "að" <opt-whitespace> <infinitive>
+
+// ============================================================================
+// SUBJUNCTIVE MOOD EXTENDED
+// ============================================================================
+
+<extended-subjunctive> ::= <present-subjunctive> | <past-subjunctive> | <subjunctive-trigger>
+
+<subjunctive-trigger> ::= "að" <opt-whitespace> <verb> <opt-whitespace> "að"
+                       | "ef" <opt-whitespace> <verb>
+                       | "þótt" <opt-whitespace> <verb>
+
+// ============================================================================
+// OLD NORSE FEATURES PRESERVED
+// ============================================================================
+
+<old-norse-feature> ::= <dual-number> | <u-umlaut> | <i-umlaut>
+
+<dual-number> ::= "vit" | "ykur" | "þit"
+
+<u-umlaut> ::= /[aá]/ /* becomes ö */
+
+<i-umlaut> ::= /[aá]/ /* becomes e */
+
+// ============================================================================
+// COMPOUND WORD FORMATION
+// ============================================================================
+
+<compound-word> ::= <noun-stem> <opt-whitespace> <linking-element> <opt-whitespace> <noun-stem>
+                 | <adjective> <opt-whitespace> <noun-stem>
+                 | <noun-stem> <opt-whitespace> <noun-stem>
+
+<linking-element> ::= "s" | "a" | "ar" | "na" | ""
+
+// ============================================================================
+// PHONOLOGICAL NOTES
+// ============================================================================
+
+<phonological-feature> ::= <vowel-length> | <consonant-cluster> | <stress-pattern>
+
+<vowel-length> ::= /[áéíóúý]/ /* long vowels */
+                | /[aeiouy]/ /* short vowels */
+
+<consonant-cluster> ::= "ng" | "nk" | "ll" | "nn" | "kk" | "pp" | "tt"
+
+<stress-pattern> ::= /* Initial stress on first syllable */
+
+// ============================================================================
+// CONTEXT-SENSITIVE VALIDATION RULES
+// ============================================================================
+
+@CONTEXT_RULE[gender-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.GENDER MUST_EQUAL <noun>.GENDER
+    ELSE ERROR "Adjective gender must agree with noun"
+
+@CONTEXT_RULE[number-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.NUMBER MUST_EQUAL <noun>.NUMBER
+    ELSE ERROR "Adjective number must agree with noun"
+
+@CONTEXT_RULE[case-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.CASE MUST_EQUAL <noun>.CASE
+    ELSE ERROR "Adjective case must agree with noun"
+
+@CONTEXT_RULE[definiteness-agreement]:
+    IF <adjective> MODIFIES <definite-noun>
+    THEN <adjective> MUST_BE_WEAK_FORM
+    ELSE ERROR "Weak adjective form required with definite nouns"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject> IN_NOMINATIVE_CASE
+    THEN <verb>.PERSON MUST_EQUAL <subject>.PERSON
+         AND <verb>.NUMBER MUST_EQUAL <subject>.NUMBER
+    ELSE ERROR "Subject-verb agreement violation"
+
+@CONTEXT_RULE[v2-word-order]:
+    IF <sentence> IS_MAIN_CLAUSE
+    THEN <finite-verb> MUST_BE_SECOND_ELEMENT
+    ELSE ERROR "V2 word order required in main clauses"
+
+@CONTEXT_RULE[subjunctive-trigger]:
+    IF <subordinate-clause> FOLLOWS ( "að" | "ef" | "þótt" )
+    THEN <verb> MAY_USE_SUBJUNCTIVE
+    ELSE <verb> USES_INDICATIVE
+
+@CONTEXT_RULE[middle-voice-reflexive]:
+    IF <verb> ENDS_WITH "st"
+    THEN <verb> IS_REFLEXIVE OR <verb> IS_PASSIVE
+    ELSE ERROR "Middle voice marker -st has special meaning"
+
+@CONTEXT_RULE[dative-subject]:
+    IF <verb> IN_SET ( "líka", "leiðast", "finnast", "þykja" )
+    THEN <subject> MUST_BE_DATIVE_CASE
+    ELSE ERROR "These verbs require dative subjects"
+
+@CONTEXT_RULE[genitive-object]:
+    IF <verb> IN_SET ( "njóta", "gæta", "sakna", "neita" )
+    THEN <object> MUST_BE_GENITIVE_CASE
+    ELSE ERROR "These verbs require genitive objects"
+
+@CONTEXT_RULE[accusative-with-preposition]:
+    IF <preposition> IN_SET ( "um", "fyrir", "gegn", "kring" )
+    THEN <noun-phrase> MUST_BE_ACCUSATIVE_CASE
+    ELSE ERROR "These prepositions govern accusative case"
+
+@CONTEXT_RULE[dative-with-preposition]:
+    IF <preposition> IN_SET ( "að", "af", "frá", "hjá", "með", "úr" )
+    THEN <noun-phrase> MUST_BE_DATIVE_CASE
+    ELSE ERROR "These prepositions govern dative case"
+
+@CONTEXT_RULE[genitive-with-preposition]:
+    IF <preposition> IN_SET ( "til", "milli", "án", "vegna" )
+    THEN <noun-phrase> MUST_BE_GENITIVE_CASE
+    ELSE ERROR "These prepositions govern genitive case"
+
+@CONTEXT_RULE[auxiliary-verb-order]:
+    IF <auxiliary-verb> PRESENT
+    THEN <main-verb> MUST_BE_INFINITIVE OR <main-verb> MUST_BE_PAST_PARTICIPLE
+    ELSE ERROR "Auxiliary verbs require infinitive or past participle"
+
+@CONTEXT_RULE[negative-polarity-item]:
+    IF <negative-indefinite> PRESENT
+    THEN <negation> MUST_BE_PRESENT
+    ELSE ERROR "Negative indefinites require negation"
+
+@CONTEXT_RULE[cleft-sentence-structure]:
+    IF <it-cleft> USED
+    THEN "það" MUST_PRECEDE "er" AND "sem" MUST_INTRODUCE_RELATIVE_CLAUSE
+    ELSE ERROR "Cleft sentence structure violation"
+
+@CONTEXT_RULE[reported-speech-tense]:
+    IF <indirect-speech> USED
+    THEN <subordinate-clause-verb> TENSE_MAY_BACKSHIFT
+    ELSE <subordinate-clause-verb> TENSE_REMAINS
+
+@CONTEXT_RULE[conditional-mood]:
+    IF <conditional-clause> PRESENT
+    THEN <verb> SHOULD_USE_CONDITIONAL_MOOD OR <verb> SHOULD_USE_SUBJUNCTIVE
+    ELSE ERROR "Conditional/subjunctive required in conditional clauses"
+
+@CONTEXT_RULE[participial-agreement]:
+    IF <past-participle> USED_ATTRIBUTIVELY
+    THEN <past-participle> MUST_AGREE_WITH_NOUN_IN_GENDER_NUMBER_CASE
+    ELSE ERROR "Participial agreement violation"
+
+@CONTEXT_RULE[compound-tense-formation]:
+    IF <perfect-tense> OR <pluperfect-tense>
+    THEN "hafa" MUST_BE_AUXILIARY WITH <past-participle>
+    ELSE ERROR "Perfect tenses require hafa + past participle"
+
+@CONTEXT_RULE[passive-voice-formation]:
+    IF <passive-voice> USED
+    THEN ( "vera" OR "verða" ) WITH <past-participle> OR <verb> ENDS_WITH "st"
+    ELSE ERROR "Passive voice formation error"
+
+@CONTEXT_RULE[question-word-fronting]:
+    IF <wh-question> USED
+    THEN <question-word> MUST_BE_SENTENCE_INITIAL
+    ELSE ERROR "Question words must be fronted"
+
+@CONTEXT_RULE[topicalization]:
+    IF <topic> FRONTED
+    THEN <finite-verb> MUST_IMMEDIATELY_FOLLOW
+    ELSE ERROR "V2 violation after topicalization"
+
+@CONTEXT_RULE[subordinate-clause-word-order]:
+    IF <subordinate-clause> PRESENT
+    THEN <subject> MAY_PRECEDE <finite-verb>
+    ELSE ERROR "Subordinate clause word order violation"
+
+@CONTEXT_RULE[correlative-construction-parallelism]:
+    IF <correlative-construction> USED
+    THEN BOTH_PHRASES MUST_BE_SYNTACTICALLY_PARALLEL
+    ELSE ERROR "Correlative phrases must be parallel"
+
+@CONTEXT_RULE[vocative-case-usage]:
+    IF <noun> IN_VOCATIVE_FUNCTION
+    THEN <noun> MAY_USE_NOMINATIVE_OR_VOCATIVE_CASE
+    ELSE <noun> USES_REGULAR_CASE
+
+@CONTEXT_RULE[imperative-subject]:
+    IF <verb> IN_IMPERATIVE_MOOD
+    THEN <subject> TYPICALLY_OMITTED
+    ELSE ERROR "Imperative mood has implicit subject"
+
+@CONTEXT_RULE[infinitive-marker]:
+    IF <infinitive> FOLLOWS_MODAL_OR_AUXILIARY
+    THEN "að" MAY_BE_OMITTED
+    ELSE "að" TYPICALLY_PRESENT
+
+@CONTEXT_RULE[dialect-consistency]:
+    IF <dialectal-variation> USED
+    THEN MAINTAIN_DIALECT_THROUGHOUT_SENTENCE
+    ELSE ERROR "Mixed dialects in single sentence"
+
+@CONTEXT_RULE[old-norse-preservation]:
+    IF <old-norse-feature> USED
+    THEN FEATURE_PRESERVED_IN_MODERN_ICELANDIC
+    ELSE ERROR "Old Norse features maintained"
+
+@CONTEXT_RULE[compound-word-linking]:
+    IF <compound-word> FORMED
+    THEN <linking-element> MUST_BE_APPROPRIATE_FOR_STEM
+    ELSE ERROR "Incorrect linking element in compound"
+
+@CONTEXT_RULE[vowel-harmony]:
+    IF <suffix> ADDED_TO_STEM
+    THEN <suffix-vowel> SHOULD_HARMONIZE_WITH_STEM_VOWEL
+    ELSE ERROR "Vowel harmony violation"
+
+@CONTEXT_RULE[consonant-assimilation]:
+    IF <prefix> PRECEDES_STEM
+    THEN CONSONANT_ASSIMILATION_MAY_OCCUR
+    ELSE ERROR "Consonant assimilation error"
+
+@CONTEXT_RULE[stress-placement]:
+    IF <word> IS_NATIVE_ICELANDIC
+    THEN STRESS_ON_FIRST_SYLLABLE
+    ELSE STRESS_MAY_VARY_FOR_LOANWORDS
+
+@CONTEXT_RULE[u-umlaut-trigger]:
+    IF <stem-vowel> IS_A_OR_Á AND <suffix-vowel> IS_U
+    THEN <stem-vowel> BECOMES_Ö
+    ELSE NO_UMLAUT
+
+@CONTEXT_RULE[i-umlaut-trigger]:
+    IF <stem-vowel> IS_A_OR_Á AND <suffix-vowel> IS_I
+    THEN <stem-vowel> BECOMES_E
+    ELSE NO_UMLAUT
+
+@CONTEXT_RULE[periphrastic-future]:
+    IF <future-tense> EXPRESSED_PERIPHRASTICALLY
+    THEN USE ( "munu" | "ætla að" | "vera að fara að" ) WITH <infinitive>
+    ELSE USE_PRESENT_TENSE_FOR_FUTURE
+
+@CONTEXT_RULE[aspect-marking]:
+    IF <progressive-aspect> REQUIRED
+    THEN USE "vera að" WITH <infinitive>
+    ELSE USE_SIMPLE_TENSE
+
+@CONTEXT_RULE[evidentiality]:
+    IF <reported-information> PRESENT
+    THEN MAY_USE_SUBJUNCTIVE_TO_MARK_HEARSAY
+    ELSE USE_INDICATIVE
+
+@CONTEXT_RULE[politeness-level]:
+    IF <formal-address> USED
+    THEN USE_PLURAL_FORMS_FOR_SINGULAR_ADDRESSEE
+    ELSE USE_INFORMAL_TÚ
+
+@CONTEXT_RULE[diminutive-formation]:
+    IF <diminutive> FORMED
+    THEN USE_SUFFIX ( "-lingur" | "-ka" | "-i" )
+    ELSE NO_DIMINUTIVE
+
+@CONTEXT_RULE[augmentative-formation]:
+    IF <augmentative> FORMED
+    THEN USE_PREFIX "stór-" OR SUFFIX "-ungur"
+    ELSE NO_AUGMENTATIVE
+
+@CONTEXT_RULE[noun-incorporation]:
+    IF <noun> INCORPORATED_INTO_VERB
+    THEN <noun> LOSES_INDEPENDENT_CASE_MARKING
+    ELSE <noun> MAINTAINS_CASE
+
+@CONTEXT_RULE[clitic-placement]:
+    IF <clitic-pronoun> PRESENT
+    THEN <clitic> FOLLOWS_FINITE_VERB_IN_MAIN_CLAUSE
+    ELSE ERROR "Clitic placement violation"
+
+@CONTEXT_RULE[double-definiteness]:
+    IF <adjective> MODIFIES <definite-noun>
+    THEN BOTH_ARTICLE_AND_SUFFIX_USED
+    ELSE ERROR "Double definiteness required"
+
+@CONTEXT_RULE[neuter-plural-verb]:
+    IF <subject> IS_NEUTER_PLURAL
+    THEN <verb> MAY_BE_SINGULAR_OR_PLURAL
+    ELSE <verb> MUST_AGREE_IN_NUMBER
+
 // END OF GRAMMAR
