@@ -24,6 +24,7 @@ public class Program
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.TemplateService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarSyntaxHighlightingService>();
         builder.Services.AddScoped<Minotaur.UI.Blazor.Services.GrammarCodeCompletionService>();
+        builder.Services.AddScoped<Minotaur.UI.Blazor.Services.ProjectLoaderService>();
         builder.Services.AddHttpClient();
 
         var app = builder.Build();
