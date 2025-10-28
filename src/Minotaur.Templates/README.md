@@ -20,6 +20,18 @@ A complete Blazor web application featuring:
 - SignalR real-time communication
 - Service layer architecture
 - Component-based design
+- Grammar editor with syntax highlighting
+- Railroad diagram visualization
+- Parse tree visualization
+
+### Electron Desktop Application (`content/ElectronDesktop/`)
+A native Linux desktop application featuring:
+- Electron-based wrapper for Blazor UI
+- Native desktop menus and dialogs
+- File system integration
+- Cross-platform build support (AppImage, deb, rpm)
+- Auto-update capabilities
+- Full IDE experience on Linux
 
 ## Installation
 
@@ -58,10 +70,31 @@ After installing this package, you can access the source code in your NuGet pack
    dotnet run
    ```
 
+### Getting Started with the Electron Desktop App
+
+1. Copy the ElectronDesktop folder contents to your project
+2. Install Node.js dependencies:
+   ```bash
+   cd ElectronDesktop
+   npm install
+   ```
+3. Ensure the Blazor UI is set up (see above)
+4. Run the desktop application:
+   ```bash
+   npm run dev
+   ```
+
 ## Requirements
 
 - .NET 8.0 or later
+- Node.js 18+ and npm (for Electron desktop app)
 - DevelApp.Minotaur package (automatically referenced)
+
+## Platform Support
+
+- **Web**: Blazor Server application (Windows, macOS, Linux, all browsers)
+- **Linux Desktop**: Electron application with native integration
+- **Future**: MAUI applications for Windows, macOS, iOS, and Android
 
 ## Examples
 

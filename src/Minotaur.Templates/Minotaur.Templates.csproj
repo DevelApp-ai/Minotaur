@@ -10,16 +10,16 @@
     <PackageId>DevelApp.Minotaur.Templates</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
     <Title>Minotaur Application Templates</Title>
-    <Description>Source code templates and examples for building applications on top of the DevelApp.Minotaur cognitive graph framework. Includes demo applications, Blazor UI components, and integration examples.</Description>
+    <Description>Source code templates and examples for building applications on top of the DevelApp.Minotaur cognitive graph framework. Includes demo applications, Blazor UI web application, Electron desktop application for Linux, and integration examples for Windows, macOS, Linux, iOS, and Android.</Description>
     <Authors>DevelApp AI</Authors>
     <Company>DevelApp AI</Company>
     <Copyright>Copyright © 2024 DevelApp AI</Copyright>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur.git</RepositoryUrl>
+    <PackageRepositoryUrl>https://github.com/DevelApp-ai/Minotaur.git</PackageRepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>minotaur;templates;cognitive-graph;blazor;demo;examples;source</PackageTags>
+    <PackageTags>minotaur;templates;cognitive-graph;blazor;electron;desktop;demo;examples;source;maui;cross-platform</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <ContentTargetFolders>content</ContentTargetFolders>
   </PropertyGroup>
@@ -35,6 +35,15 @@
     <Content Include="../Minotaur.UI.Blazor/*.csproj" PackagePath="content/BlazorUI/" />
     <Content Include="../Minotaur.UI.Blazor/**/*.json" Exclude="../Minotaur.UI.Blazor/obj/**;../Minotaur.UI.Blazor/bin/**" PackagePath="content/BlazorUI/" />
     <Content Include="../Minotaur.UI.Blazor/**/*.css" Exclude="../Minotaur.UI.Blazor/obj/**;../Minotaur.UI.Blazor/bin/**" PackagePath="content/BlazorUI/" />
+    <Content Include="../Minotaur.UI.Blazor/**/*.js" Exclude="../Minotaur.UI.Blazor/obj/**;../Minotaur.UI.Blazor/bin/**" PackagePath="content/BlazorUI/" />
+    
+    <!-- Include Electron Desktop Application -->
+    <Content Include="../Minotaur.UI.Electron/**/*.js" Exclude="../Minotaur.UI.Electron/node_modules/**;../Minotaur.UI.Electron/dist/**" PackagePath="content/ElectronDesktop/" />
+    <Content Include="../Minotaur.UI.Electron/**/*.sh" PackagePath="content/ElectronDesktop/" />
+    <Content Include="../Minotaur.UI.Electron/package.json" PackagePath="content/ElectronDesktop/" />
+    <Content Include="../Minotaur.UI.Electron/.gitignore" PackagePath="content/ElectronDesktop/" />
+    <Content Include="../Minotaur.UI.Electron/**/*.md" PackagePath="content/ElectronDesktop/" />
+    <Content Include="../Minotaur.UI.Electron/assets/**/*.*" PackagePath="content/ElectronDesktop/assets/" />
     
     <!-- Include README -->
     <None Include="README.md" Pack="true" PackagePath="" />
