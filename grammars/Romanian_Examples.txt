@@ -1,0 +1,128 @@
+# Romanian Language Example Sentences
+
+## Present Tense
+
+Eu lucrez la birou.
+Tu vorbești românește.
+El merge la școală.
+Ea citește o carte.
+Noi învățăm limba română.
+Voi mâncați prânzul.
+Ei lucrează împreună.
+
+## Irregular Verbs - Present
+
+Eu sunt student.
+Tu ai timp.
+El face temele.
+Ea vrea să plece.
+Noi putem veni.
+Voi știți răspunsul.
+Ei dau examene.
+
+## Perfect Compus (Compound Past)
+
+Eu am lucrat ieri.
+Tu ai vorbit cu el.
+El a mers acasă.
+Ea a citit cartea.
+Noi am învățat mult.
+Voi ați mâncat bine.
+Ei au lucrat toată ziua.
+
+## Imperfect
+
+Eu lucram când ai sunat.
+Tu vorbeai cu Maria.
+El mergea la școală.
+Ea citea în fiecare zi.
+
+## Future - Periphrastic
+
+Eu voi lucra mâine.
+Tu vei vorbi cu el.
+El va merge acolo.
+Ea va citi cartea.
+
+## Future - Subjunctive Form
+
+Eu o să lucrez mâine.
+Tu o să vorbești cu el.
+El o să meargă acolo.
+Ea o să citească cartea.
+
+## Subjunctive Mood
+
+Trebuie să lucrez.
+Vreau să vorbesc.
+El trebuie să meargă.
+Ea vrea să citească.
+
+## Conditional
+
+Aș lucra dacă aș putea.
+Ai vorbi cu el?
+El ar merge dacă ar avea timp.
+Ea ar citi dacă ar avea cartea.
+
+## Definite Article Suffixes
+
+# Masculine
+băiatul (the boy)
+băieții (the boys)
+
+# Feminine
+cartea (the book)
+cărțile (the books)
+
+# Neuter
+scaunul (the chair)
+scaunele (the chairs)
+
+## Clitic Doubling
+
+Îi dau cartea Mariei.
+Le scriu prietenilor mei.
+Îi cumpăr flori mamei.
+
+## Differential Object Marking (pe)
+
+Văd pe Maria.
+Caut pe doctor.
+Iubesc pe mama.
+Văd cartea. (no "pe" for inanimate)
+
+## Genitive-Dative
+
+# Genitive
+Cartea băiatului (the boy's book)
+Casa Mariei (Maria's house)
+
+# Dative
+Dau cartea băiatului.
+Spun adevărul Mariei.
+
+## Questions
+
+Cine este acolo?
+Ce faci?
+Când pleci?
+Unde mergi?
+Cum te numești?
+De ce plângi?
+
+## Negation
+
+Nu lucrez astăzi.
+Nu am timp.
+Nimeni nu știe.
+Nimic nu se întâmplă.
+Nu merg niciodată acolo.
+
+## Complex Sentences
+
+Știu că el lucrează.
+Dacă vii, o să fim fericiți.
+Când am ajuns, el pleca.
+Vreau să merg, dar nu pot.
+Cartea pe care o citesc este interesantă.

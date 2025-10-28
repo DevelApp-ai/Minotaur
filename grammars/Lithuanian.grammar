@@ -1,0 +1,20 @@
+Grammar: Lithuanian
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+Keywords: ir, arba, bet, kad, kuris, kas, kada, kur, kaip, kodėl, jei, ar, ne, į, iš, su, be, ant, po, per, apie, šis, tas, mano, tavo, aš, tu, jis, ji, mes, jūs, jie, jos
+<sentence> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> <object>? <punctuation>?
+<subject> ::= <pronoun> | <noun>
+<pronoun> ::= "aš" | "tu" | "jis" | "ji" | "mes" | "jūs" | "jie" | "jos"
+<noun> ::= /[a-ząčęėįšųūž]+/ <case-ending>?
+<case-ending> ::= "o" | "as" | "ų" | "ui" | "ams" | "oje" | "e" | "ė"
+<verb> ::= /[a-ząčęėįšųūž]+/ ( "u" | "i" | "a" | "ame" | "ate" )
+<object> ::= <noun>
+<punctuation> ::= "." | "?" | "!"
+<whitespace> ::= /[ \t\n\r]+/
+<opt-whitespace> ::= /[ \t\n\r]*/
+@CONTEXT_RULE[case-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.@CASE == <noun>.@CASE
+    ELSE ERROR "Case agreement required"

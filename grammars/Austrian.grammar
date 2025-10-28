@@ -1269,3 +1269,130 @@ Keywords: und, oder, aber, wenn, weil, dass, als, ob, wie, der, die, das, ein, e
     IF <verb> INDICATES_MOTION
     THEN USE <sein-verb> AS_AUXILIARY
     ELSE USE <haben-verb>
+
+/* Additional Austrian German linguistic features and validation rules */
+
+/* Advanced discourse structures */
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+                    ;
+
+<temporal-discourse> ::= "zuerst" | "dann" | "danach" | "schließlich" 
+                      | "endlich" | "gleichzeitig" | "inzwischen" | "währenddessen"
+                      | "früher" | "später" | "letztendlich"
+                      ;
+
+<causal-discourse> ::= "deshalb" | "deswegen" | "daher" | "somit" | "folglich"
+                    | "demnach" | "aus diesem Grund" | "darum"
+                    ;
+
+<contrastive-discourse> ::= "dagegen" | "hingegen" | "andererseits" | "allerdings"
+                         | "jedoch" | "dennoch" | "trotzdem" | "nichtsdestotrotz"
+                         | "immerhin" | "jedenfalls"
+                         ;
+
+<additive-discourse> ::= "außerdem" | "ferner" | "weiterhin" | "überdies"
+                      | "zudem" | "darüber hinaus" | "ebenfalls" | "auch"
+                      | "zusätzlich" | "weiters" @AUSTRIAN[vocabulary]
+                      ;
+
+<conclusive-discourse> ::= "also" | "kurz gesagt" | "mit anderen Worten"
+                        | "zusammengefasst" | "im Endeffekt" | "letztlich"
+                        ;
+
+/* Tag questions and elliptical structures */
+<tag-question> ::= <declarative-clause> "," <question-tag> "?"
+                ;
+
+<question-tag> ::= "nicht wahr" | "oder" | "gell" @AUSTRIAN[vocabulary]
+                | "nicht" | "stimmt's" | "oder etwa nicht"
+                | "mhm" @AUSTRIAN[vocabulary]
+                ;
+
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+                     ;
+
+<elliptical-response> ::= <modal-particle>
+                       | <adverb>
+                       | <noun-phrase>
+                       | <verb-phrase>
+                       ;
+
+<elliptical-coordination> ::= <main-clause> <conjunction> <elliptical-clause>
+                           ;
+
+/* Reported speech and indirect discourse */
+<reported-speech> ::= <reporting-verb> <reported-clause>
+                   ;
+
+<reporting-verb> ::= "sagt" | "sagte" | "meint" | "meinte" | "glaubt" | "glaubte"
+                  | "fragt" | "fragte" | "erzählt" | "erzählte" | "behauptet" | "behauptete"
+                  ;
+
+<reported-clause> ::= "dass" <subordinate-content>
+                   | <embedded-question>
+                   ;
+
+/* Free indirect speech */
+<free-indirect-speech> ::= <main-clause> ( <main-clause> )+
+                        ;
+
+/* Cleft sentence variations */
+<it-cleft> ::= "es" "ist" <focused-constituent> <relative-clause>
+            | "es" "war" <focused-constituent> <relative-clause>
+            ;
+
+<pseudo-cleft> ::= <wh-clause> "ist" <focused-constituent>
+                | <wh-clause> "war" <focused-constituent>
+                ;
+
+/* Correlative constructions */
+<correlative-construction> ::= <correlative-pair> <clause-sequence>
+                            ;
+
+<correlative-pair> ::= "sowohl" "als" "auch"
+                    | "entweder" "oder"
+                    | "weder" "noch"
+                    | "nicht" "nur" "sondern" "auch"
+                    | "je" "desto"
+                    ;
+
+/* Additional context-sensitive validation rules */
+@CONTEXT_RULE[austrian-vocabulary-formality]:
+    IF <austrian-specific-vocabulary> IN_FORMAL_WRITTEN_CONTEXT
+    THEN WARNING "Some Austrian terms may be too informal for formal writing"
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-diminutive-appropriateness]:
+    IF <austrian-diminutive> OVERUSED
+    THEN WARNING "Excessive diminutives may sound overly familiar"
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-regional-consistency]:
+    IF <viennese-specific> AND <tyrolean-specific> IN_SAME_TEXT
+    THEN WARNING "Mixing regional variants may be inconsistent"
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-temporal-expression]:
+    IF @AUSTRIAN[temporal] "heuer" OR "heurig" USED
+    THEN VERIFY_AUSTRIAN_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-culinary-term]:
+    IF @AUSTRIAN[culinary] TERM_USED
+    THEN MAY_NEED_EXPLANATION_OUTSIDE_AUSTRIA
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-administrative-language]:
+    IF @AUSTRIAN[administrative] PRESENT
+    THEN APPROPRIATE_IN_OFFICIAL_CONTEXT
+    ELSE VALID
+
+@CONTEXT_RULE[austrian-greeting-context]:
+    IF <austrian-specific-greeting> USED
+    THEN APPROPRIATE_FORMALITY_LEVEL
+    ELSE VALID

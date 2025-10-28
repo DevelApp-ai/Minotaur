@@ -1,0 +1,106 @@
+# Czech Language Example Sentences
+
+## Present Tense
+
+Já čtu knihu.
+Ty píšeš dopis.
+On studuje matematiku.
+Ona pracuje ve škole.
+My bydlíme v Praze.
+Vy máte čas.
+Oni se učí česky.
+
+## Past Tense - Masculine
+
+Já byl doma.
+Ty jsi četl noviny.
+On psal dopis.
+
+## Past Tense - Feminine
+
+Já byla ve škole.
+Ty jsi četla knihu.
+Ona psala dopis.
+
+## Future Tense
+
+Já budu číst.
+Ty budeš psát.
+On přečte knihu.
+Ona napíše dopis.
+
+## Seven Cases
+
+# Nominative
+To je kniha.
+Ten dům je velký.
+
+# Genitive
+Nemám knihu.
+To je dům otce.
+
+# Dative
+Dávám knihu bratru.
+
+# Accusative
+Čtu knihu.
+Vidím dům.
+
+# Instrumental
+Píšu perem.
+Jsem učitelem.
+
+# Locative
+Myslím na dům.
+Bydlím v Praze.
+
+# Vocative
+Pane profesore!
+Marku!
+
+## Masculine Animate vs Inanimate
+
+# Animate (accusative = genitive)
+Vidím studenta.
+Znám doktora.
+
+# Inanimate (accusative = nominative)
+Vidím stůl.
+Mám dům.
+
+## Questions
+
+Mluvíš česky?
+Kdo to je?
+Co děláš?
+Kde bydlíš?
+Kdy přijdeš?
+
+## Negation
+
+Nemluvím anglicky.
+Nemám čas.
+Nikdo neví.
+Nic se neděje.
+Nikdy tam nejdu.
+
+## Conditional
+
+Kdyby bylo hezky, šli bychom ven.
+Četl bych, kdybych měl čas.
+
+## Vowel Length Distinctions
+
+krátký (short)
+dát (to give)
+být (to be)
+víš (you know)
+nůž (knife)
+můj (my)
+
+## Complex Sentences
+
+Vím, že on pracuje.
+Když přijdeš, budeme rádi.
+Kniha, kterou čtu, je zajímavá.
+Jestli budeš chtít, můžeme jít.

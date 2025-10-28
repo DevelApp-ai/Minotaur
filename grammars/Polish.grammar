@@ -1,0 +1,1574 @@
+Grammar: Polish
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Polish Natural Language Grammar - Comprehensive Edition
+ * 
+ * This grammar provides extensive coverage of Polish language structures including:
+ * - Regular and irregular verb conjugations (perfective and imperfective aspects)
+ * - Seven grammatical cases (nominative, genitive, dative, accusative, instrumental, locative, vocative)
+ * - Three genders (masculine personal, masculine animate, masculine inanimate, feminine, neuter)
+ * - Context-sensitive agreement rules (gender, number, case, aspect)
+ * - Verb aspects (perfective and imperfective)
+ * - Multiple tenses (present, past, future, conditional)
+ * - Free word order (SVO default but flexible)
+ * - Relative clauses and subordinate structures
+ * - Comparative and superlative adjectives
+ * - Mobile stress patterns
+ * - Diminutives and augmentatives
+ */
+
+Keywords: i, a, ale, lub, czy, że, który, która, które, kto, co, kiedy, gdzie, jak, dlaczego, jeśli, gdyby, to, tak, nie, ani, nigdy, nic, nikt, na, w, z, do, od, dla, przez, o, po, przed, za, nad, pod, bez, obok, przy, wokół, ten, ta, to, ci, te, tamten, tamta, tamto, mój, moja, moje, twój, twoja, twoje, jego, jej, nasz, nasza, nasze, wasz, wasza, wasze, ich, ja, ty, on, ona, ono, my, wy, oni, one, mnie, ciebie, jego, jej, nas, was, ich
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause>
+            | <subordinate-clause>
+            | <compound-sentence>
+            | <complex-sentence>
+            | <multi-embedded-sentence>
+            | <split-complex-sentence>
+            | <passive-sentence>
+
+/* Main clause with flexible word order */
+<main-clause> ::= <declarative-clause>
+               | <interrogative-clause>
+               | <imperative-clause>
+               | <exclamative-clause>
+
+/* Multi-embedded and complex structures */
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause> <opt-whitespace> <subordinate-clause>
+
+<split-complex-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+/* Passive voice constructions */
+<passive-sentence> ::= <passive-clause> <opt-whitespace> <agent-phrase>? <opt-whitespace> <punctuation>?
+
+<passive-clause> ::= <subject> <opt-whitespace> <passive-verb-phrase> <opt-whitespace> <adverbial>*
+
+<passive-verb-phrase> ::= <być-auxiliary> <opt-whitespace> <past-participle>
+                       | <reflexive-passive>
+
+<być-auxiliary> ::= "jest" | "był" | "była" | "było" | "są" | "byli" | "były" | "będzie" | "będą"
+
+<past-participle> ::= <participle-stem> <participle-ending>
+
+<participle-stem> ::= <verb-stem>
+
+<participle-ending> ::= @GENDER[masculine] @NUMBER[singular] "y"
+                     | @GENDER[feminine] @NUMBER[singular] "a"
+                     | @GENDER[neuter] @NUMBER[singular] "e"
+                     | @NUMBER[plural] ( "e" | "i" )
+
+<reflexive-passive> ::= <verb-phrase> <opt-whitespace> "się"
+
+<agent-phrase> ::= "przez" <opt-whitespace> <noun-phrase-accusative>
+
+<exclamative-clause> ::= "jak" <opt-whitespace> <adjective> <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase>? "!"
+                      | "co" <opt-whitespace> "za" <opt-whitespace> <noun-phrase> "!"
+
+<declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+                      | <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+                      | <object>? <opt-whitespace> <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+/* Subject */
+<subject> ::= <pronoun-subject>
+           | <noun-phrase>
+           | <proper-noun>
+
+<pronoun-subject> ::= <personal-pronoun-nominative>
+                   | <demonstrative-pronoun>
+
+<personal-pronoun-nominative> ::= @CASE[nominative] ( "ja" | "ty" | "on" | "ona" | "ono" | "my" | "wy" | "oni" | "one" )
+
+/* Noun phrase with case agreement */
+<noun-phrase> ::= <determiner>? <opt-whitespace> <adjective-phrase>* <opt-whitespace> <noun> <opt-whitespace> <relative-clause>?
+
+<determiner> ::= <demonstrative-determiner>
+              | <possessive-pronoun>
+
+/* Demonstrative determiners with gender/number/case agreement */
+<demonstrative-determiner> ::= @GENDER[masculine-personal] @NUMBER[singular] @CASE[nominative] "ten"
+                            | @GENDER[feminine] @NUMBER[singular] @CASE[nominative] "ta"
+                            | @GENDER[neuter] @NUMBER[singular] @CASE[nominative] "to"
+                            | @GENDER[masculine-personal] @NUMBER[plural] @CASE[nominative] "ci"
+                            | @NUMBER[plural] @CASE[nominative] "te"
+
+/* Possessive pronouns with gender/number/case */
+<possessive-pronoun> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] ( "mój" | "twój" | "jego" | "nasz" | "wasz" | "ich" )
+                      | @GENDER[feminine] @NUMBER[singular] @CASE[nominative] ( "moja" | "twoja" | "jego" | "nasza" | "wasza" | "ich" )
+                      | @GENDER[neuter] @NUMBER[singular] @CASE[nominative] ( "moje" | "twoje" | "jego" | "nasze" | "wasze" | "ich" )
+
+/* Nouns with 7 cases */
+<noun> ::= <noun-nominative> | <noun-genitive> | <noun-dative> | <noun-accusative> | <noun-instrumental> | <noun-locative> | <noun-vocative>
+
+<noun-nominative> ::= @CASE[nominative] <noun-stem>
+
+<noun-genitive> ::= @CASE[genitive] <noun-stem> <genitive-ending>
+
+<noun-dative> ::= @CASE[dative] <noun-stem> <dative-ending>
+
+<noun-accusative> ::= @CASE[accusative] <noun-stem> <accusative-ending>
+
+<noun-instrumental> ::= @CASE[instrumental] <noun-stem> <instrumental-ending>
+
+<noun-locative> ::= @CASE[locative] <noun-stem> <locative-ending>
+
+<noun-vocative> ::= @CASE[vocative] <noun-stem> <vocative-ending>
+
+<noun-stem> ::= /[a-ząćęłńóśźż]+/
+
+<genitive-ending> ::= "a" | "u" | "y" | "i" | "ów" | "i" | ""
+
+<dative-ending> ::= "owi" | "ie" | "om" | "u"
+
+<accusative-ending> ::= "a" | "ę" | "" | "y" | "i"
+
+<instrumental-ending> ::= "em" | "ą" | "ami" | "ią"
+
+<locative-ending> ::= "ie" | "u" | "ach"
+
+<vocative-ending> ::= "ie" | "u" | "o" | "e" | ""
+
+<proper-noun> ::= /[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]*/
+
+/* Adjectives with case/gender/number agreement */
+<adjective-phrase> ::= <adjective>
+
+<adjective> ::= <adjective-positive> | <adjective-comparative> | <adjective-superlative>
+
+<adjective-positive> ::= @DEGREE[positive] <adjective-with-agreement>
+
+<adjective-with-agreement> ::= @GENDER[masculine] @NUMBER[singular] @CASE[nominative] <adjective-stem> ( "y" | "i" )
+                            | @GENDER[feminine] @NUMBER[singular] @CASE[nominative] <adjective-stem> "a"
+                            | @GENDER[neuter] @NUMBER[singular] @CASE[nominative] <adjective-stem> "e"
+
+<adjective-comparative> ::= @DEGREE[comparative] ( <adjective-stem> "szy" | "bardziej" <opt-whitespace> <adjective-stem> )
+
+<adjective-superlative> ::= @DEGREE[superlative] ( "naj" <adjective-stem> "szy" | "najbardziej" <opt-whitespace> <adjective-stem> )
+
+<adjective-stem> ::= /[a-ząćęłńóśźż]+/
+
+/* Verb phrases with aspect distinction */
+<verb-phrase> ::= <simple-verb-phrase>
+               | <compound-verb-phrase>
+               | <modal-verb-phrase>
+
+<simple-verb-phrase> ::= <finite-verb>
+
+<finite-verb> ::= <verb-present>
+               | <verb-past>
+               | <verb-future>
+               | <verb-conditional>
+
+/* Present tense (imperfective aspect only) */
+<verb-present> ::= @TENSE[present] @ASPECT[imperfective] <present-conjugation>
+
+<present-conjugation> ::= <verb-stem> ( "ę" | "esz" | "e" | "emy" | "ecie" | "ą" )
+                       | <verb-stem> ( "ę" | "isz" | "i" | "imy" | "icie" | "ą" )
+                       | <irregular-present>
+
+<irregular-present> ::= "jestem" | "jesteś" | "jest" | "jesteśmy" | "jesteście" | "są" /* być */
+                     | "mam" | "masz" | "ma" | "mamy" | "macie" | "mają" /* mieć */
+                     | "mogę" | "możesz" | "może" | "możemy" | "możecie" | "mogą" /* móc */
+                     | "chcę" | "chcesz" | "chce" | "chcemy" | "chcecie" | "chcą" /* chcieć */
+                     | "wiem" | "wiesz" | "wie" | "wiemy" | "wiecie" | "wiedzą" /* wiedzieć */
+                     | "jem" | "jesz" | "je" | "jemy" | "jecie" | "jedzą" /* jeść */
+                     | "idę" | "idziesz" | "idzie" | "idziemy" | "idziecie" | "idą" /* iść */
+                     | "dam" | "dasz" | "da" | "damy" | "dacie" | "dadzą" /* dać */
+                     | "wezmę" | "weźmiesz" | "weźmie" | "weźmiemy" | "weźmiecie" | "wezmą" /* wziąć */
+                     | "powiem" | "powiesz" | "powie" | "powiemy" | "powiecie" | "powiedzą" /* powiedzieć */
+                     | "muszę" | "musisz" | "musi" | "musimy" | "musicie" | "muszą" /* musieć */
+                     | "piszę" | "piszesz" | "pisze" | "piszemy" | "piszecie" | "piszą" /* pisać */
+                     | "czytam" | "czytasz" | "czyta" | "czytamy" | "czytacie" | "czytają" /* czytać */
+                     | "robię" | "robisz" | "robi" | "robimy" | "robicie" | "robią" /* robić */
+                     | "mówię" | "mówisz" | "mówi" | "mówimy" | "mówicie" | "mówią" /* mówić */
+                     | "piję" | "pijesz" | "pije" | "pijemy" | "pijecie" | "piją" /* pić */
+                     | "widzę" | "widzisz" | "widzi" | "widzimy" | "widzicie" | "widzą" /* widzieć */
+                     | "słyszę" | "słyszysz" | "słyszy" | "słyszymy" | "słyszycie" | "słyszą" /* słyszeć */
+                     | "lubię" | "lubisz" | "lubi" | "lubimy" | "lubicie" | "lubią" /* lubić */
+                     | "kocham" | "kochasz" | "kocha" | "kochamy" | "kochacie" | "kochają" /* kochać */
+                     | "rozumiem" | "rozumiesz" | "rozumie" | "rozumiemy" | "rozumiecie" | "rozumieją" /* rozumieć */
+                     | "myślę" | "myślisz" | "myśli" | "myślimy" | "myślicie" | "myślą" /* myśleć */
+                     | "śpię" | "śpisz" | "śpi" | "śpimy" | "śpicie" | "śpią" /* spać */
+                     | "staję" | "stajesz" | "staje" | "stajemy" | "stajecie" | "stoją" /* stać */
+                     | "siedzę" | "siedzisz" | "siedzi" | "siedzimy" | "siedzicie" | "siedzą" /* siedzieć */
+                     | "leżę" | "leżysz" | "leży" | "leżymy" | "leżycie" | "leżą" /* leżeć */
+                     | "żyję" | "żyjesz" | "żyje" | "żyjemy" | "żyjecie" | "żyją" /* żyć */
+                     | "umiem" | "umiesz" | "umie" | "umiemy" | "umiecie" | "umieją" /* umieć */
+                     | "wolę" | "wolisz" | "woli" | "wolimy" | "wolicie" | "wolą" /* woleć */
+                     | "potrzebuję" | "potrzebujesz" | "potrzebuje" | "potrzebujemy" | "potrzebujecie" | "potrzebują" /* potrzebować */
+                     | "biorę" | "bierzesz" | "bierze" | "bierzemy" | "bierzecie" | "biorą" /* brać */
+                     | "daję" | "dajesz" | "daje" | "dajemy" | "dajecie" | "dają" /* dawać */
+                     | "przychodzę" | "przychodzisz" | "przychodzi" | "przychodzimy" | "przychodzicie" | "przychodzą" /* przychodzić */
+                     | "wychodzę" | "wychodzisz" | "wychodzi" | "wychodzimy" | "wychodzicie" | "wychodzą" /* wychodzić */
+
+/* Past tense with gender agreement */
+<verb-past> ::= @TENSE[past] <past-conjugation>
+
+<past-conjugation> ::= <past-stem> <past-ending-gender-agreement>
+
+<past-stem> ::= <verb-stem> "ł" | <verb-stem> "a" "ł"
+
+<past-ending-gender-agreement> ::= @GENDER[masculine] @NUMBER[singular] ( "em" | "eś" | "" )
+                                 | @GENDER[feminine] @NUMBER[singular] ( "am" | "aś" | "a" )
+                                 | @GENDER[neuter] @NUMBER[singular] "o"
+                                 | @GENDER[masculine-personal] @NUMBER[plural] ( "iśmy" | "iście" | "i" )
+                                 | @NUMBER[plural] ( "yśmy" | "yście" | "y" )
+
+/* Future tense */
+<verb-future> ::= @TENSE[future] ( <perfective-future> | <imperfective-future> )
+
+<perfective-future> ::= @ASPECT[perfective] <present-conjugation>
+
+<imperfective-future> ::= @ASPECT[imperfective] <być-future> <opt-whitespace> <infinitive>
+
+<być-future> ::= "będę" | "będziesz" | "będzie" | "będziemy" | "będziecie" | "będą"
+
+<infinitive> ::= <verb-stem> ( "ć" | "ać" | "ić" | "yć" | "eć" )
+
+/* Conditional mood */
+<verb-conditional> ::= @MOOD[conditional] <past-stem> "by" <conditional-ending>
+
+<conditional-ending> ::= "m" | "ś" | "" | "śmy" | "ście" | ""
+
+/* Compound verb phrases */
+<compound-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+                        | <aspectual-periphrastic>
+
+/* Aspectual periphrastic constructions */
+<aspectual-periphrastic> ::= <ingressive-construction>
+                          | <continuative-construction>
+                          | <terminative-construction>
+
+<ingressive-construction> ::= ( "zaczynać" | "zacząć" | "rozpoczynać" | "rozpocząć" ) <opt-whitespace> <infinitive>
+
+<continuative-construction> ::= ( "kontynuować" | "nadal" ) <opt-whitespace> <infinitive>
+
+<terminative-construction> ::= ( "skończyć" | "przestać" | "zakończyć" ) <opt-whitespace> <infinitive>
+
+<modal-verb> ::= "mogę" | "możesz" | "może" | "możemy" | "możecie" | "mogą"
+              | "chcę" | "chcesz" | "chce" | "chcemy" | "chcecie" | "chcą"
+              | "muszę" | "musisz" | "musi" | "musimy" | "musicie" | "muszą"
+              | "powinienem" | "powinieneś" | "powinien" | "powinniśmy" | "powinniście" | "powinni"
+              | "wolę" | "wolisz" | "woli" | "wolimy" | "wolicie" | "wolą"
+              | "potrafię" | "potrafisz" | "potrafi" | "potrafimy" | "potraficie" | "potrafią"
+
+<modal-verb-phrase> ::= <modal-verb> <opt-whitespace> <infinitive>
+
+/* Conditional sentences */
+<conditional-sentence> ::= <simple-conditional>
+                        | <contrary-to-fact-conditional>
+
+<simple-conditional> ::= "jeśli" <opt-whitespace> <declarative-clause> <opt-whitespace> "," <opt-whitespace> <declarative-clause>
+
+<contrary-to-fact-conditional> ::= "gdyby" <opt-whitespace> <verb-past> <opt-whitespace> "," <opt-whitespace> <verb-conditional> <opt-whitespace> <object>?
+
+<verb-stem> ::= /[a-ząćęłńóśźż]+/
+
+/* Object */
+<object> ::= <direct-object> | <indirect-object>
+
+<direct-object> ::= <noun-phrase-accusative>
+                 | <pronoun-accusative>
+
+<indirect-object> ::= <noun-phrase-dative>
+                   | <pronoun-dative>
+
+<noun-phrase-accusative> ::= @CASE[accusative] <noun-phrase>
+
+<noun-phrase-dative> ::= @CASE[dative] <noun-phrase>
+
+<pronoun-accusative> ::= @CASE[accusative] ( "mnie" | "ciebie" | "go" | "ją" | "je" | "nas" | "was" | "ich" )
+
+<pronoun-dative> ::= @CASE[dative] ( "mi" | "ci" | "mu" | "jej" | "nam" | "wam" | "im" )
+
+/* Adverbials */
+<adverbial> ::= <adverb>
+             | <prepositional-phrase>
+
+<adverb> ::= <manner-adverb> | <time-adverb> | <place-adverb>
+
+<manner-adverb> ::= "dobrze" | "źle" | "szybko" | "wolno" | "łatwo" | "trudno" | /[a-ząćęłńóśźż]+o/
+
+<time-adverb> ::= "teraz" | "wczoraj" | "dziś" | "jutro" | "zawsze" | "nigdy" | "już" | "jeszcze" | "wcześnie" | "późno"
+
+<place-adverb> ::= "tutaj" | "tam" | "gdzie" | "blisko" | "daleko" | "wysoko" | "nisko"
+
+/* Prepositional phrases with case government */
+<prepositional-phrase> ::= <preposition> <opt-whitespace> <noun-phrase-with-case>
+
+<preposition> ::= <prep-genitive> | <prep-dative> | <prep-accusative> | <prep-instrumental> | <prep-locative>
+
+<prep-genitive> ::= @GOVERNS[genitive] ( "od" | "do" | "z" | "bez" | "dla" | "obok" | "wokół" | "u" )
+
+<prep-dative> ::= @GOVERNS[dative] ( "dzięki" | "ku" | "przeciw" )
+
+<prep-accusative> ::= @GOVERNS[accusative] ( "na" | "przez" | "po" | "o" | "za" | "w" )
+
+<prep-instrumental> ::= @GOVERNS[instrumental] ( "z" | "nad" | "pod" | "przed" | "za" | "między" )
+
+<prep-locative> ::= @GOVERNS[locative] ( "w" | "na" | "o" | "po" | "przy" )
+
+<noun-phrase-with-case> ::= <noun-phrase>
+
+/* Subordinate clauses */
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
+
+<subordinating-conjunction> ::= "że" | "żeby" | "gdy" | "kiedy" | "jeśli" | "gdyby" | "bo" | "ponieważ" | "chociaż"
+
+/* Relative clauses */
+<relative-clause> ::= <relative-pronoun> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>?
+
+<relative-pronoun> ::= "który" | "która" | "które" | "którzy" | "kto" | "co"
+
+/* Compound and complex sentences */
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "i" | "a" | "ale" | "lub" | "czy" | "ani"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> <subordinate-clause>
+                    | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+/* Interrogative clauses */
+<interrogative-clause> ::= <yes-no-question> | <wh-question>
+
+<yes-no-question> ::= "czy" <opt-whitespace> <declarative-clause> "?"
+
+<wh-question> ::= <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <subject>? <opt-whitespace> <object>? "?"
+
+<question-word> ::= "kto" | "co" | "kiedy" | "gdzie" | "jak" | "dlaczego" | "jaki" | "która" | "które"
+
+/* Imperative clauses */
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>? <punctuation>?
+
+<verb-imperative> ::= <verb-stem> | <verb-stem> "j" | <irregular-imperative>
+
+<irregular-imperative> ::= "bądź" | "miej" | "jedz" | "idź"
+
+/* Negation */
+<negation> ::= "nie" | "nigdy" | "nic" | "nikt" | "ani"
+
+/* Punctuation */
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+/* Whitespace */
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context-sensitive agreement rules */
+
+@CONTEXT_RULE[noun-adjective-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.@GENDER == <noun>.@GENDER AND <adjective>.@NUMBER == <noun>.@NUMBER AND <adjective>.@CASE == <noun>.@CASE
+    ELSE ERROR "Adjective must agree with noun in gender, number, and case"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject>.@PERSON == <verb>.@PERSON AND <subject>.@NUMBER == <verb>.@NUMBER
+    THEN VALID
+    ELSE WARNING "Subject and verb should agree"
+
+@CONTEXT_RULE[past-tense-gender-agreement]:
+    IF <verb>.@TENSE == past
+    THEN <verb>.@GENDER == <subject>.@GENDER
+    ELSE VALID
+
+@CONTEXT_RULE[preposition-case-government]:
+    IF <preposition>.@GOVERNS == genitive
+    THEN <noun-phrase>.@CASE MUST BE genitive
+    ELSE IF <preposition>.@GOVERNS == dative
+    THEN <noun-phrase>.@CASE MUST BE dative
+    ELSE IF <preposition>.@GOVERNS == accusative
+    THEN <noun-phrase>.@CASE MUST BE accusative
+    ELSE IF <preposition>.@GOVERNS == instrumental
+    THEN <noun-phrase>.@CASE MUST BE instrumental
+    ELSE IF <preposition>.@GOVERNS == locative
+    THEN <noun-phrase>.@CASE MUST BE locative
+    ELSE ERROR "Preposition requires specific case"
+
+@CONTEXT_RULE[aspect-tense-restriction]:
+    IF <verb>.@TENSE == present
+    THEN <verb>.@ASPECT MUST BE imperfective
+    ELSE IF <verb>.@TENSE == future AND <verb> IS <perfective-future>
+    THEN <verb>.@ASPECT MUST BE perfective
+    ELSE VALID
+
+@CONTEXT_RULE[masculine-personal-plural]:
+    IF <noun>.@GENDER == masculine-personal AND <noun>.@NUMBER == plural
+    THEN SPECIAL <nominative-ending>
+    ELSE VALID
+
+@CONTEXT_RULE[genitive-of-negation]:
+    IF <sentence> CONTAINS <negation> AND <direct-object>
+    THEN <direct-object>.@CASE MAY_BE genitive
+    ELSE <direct-object>.@CASE IS accusative
+
+@CONTEXT_RULE[passive-agent-case]:
+    IF <passive-sentence> CONTAINS <agent-phrase>
+    THEN <agent-phrase> USES accusative AFTER "przez"
+    ELSE VALID
+
+@CONTEXT_RULE[reflexive-passive-no-agent]:
+    IF <passive-verb-phrase> IS <reflexive-passive>
+    THEN <sentence> SHOULD_NOT_CONTAIN <agent-phrase>
+    ELSE VALID
+
+@CONTEXT_RULE[participle-agreement]:
+    IF <passive-verb-phrase> CONTAINS <past-participle>
+    THEN <past-participle>.@GENDER == <subject>.@GENDER AND <past-participle>.@NUMBER == <subject>.@NUMBER
+    ELSE VALID
+
+@CONTEXT_RULE[conditional-tense-agreement]:
+    IF <sentence> IS <contrary-to-fact-conditional>
+    THEN <protasis> USES past-tense AND <apodosis> USES conditional
+    ELSE VALID
+
+@CONTEXT_RULE[aspectual-verb-selection]:
+    IF <aspectual-periphrastic> IS <ingressive-construction>
+    THEN <infinitive> SHOULD_BE imperfective
+    ELSE IF <aspectual-periphrastic> IS <terminative-construction>
+    THEN <infinitive> CAN_BE perfective OR imperfective
+    ELSE VALID
+
+@CONTEXT_RULE[modal-infinitive-aspect]:
+    IF <modal-verb-phrase> CONTAINS <modal-verb>
+    THEN <infinitive> CAN_BE perfective OR imperfective
+    ELSE VALID
+
+@CONTEXT_RULE[pronoun-case-agreement]:
+    IF <pronoun> IN <prepositional-phrase>
+    THEN <pronoun>.@CASE == <preposition>.REQUIRED_CASE
+    ELSE VALID
+
+@CONTEXT_RULE[genitive-of-quantity]:
+    IF <noun-phrase> CONTAINS <quantity-numeral> AND <quantity-numeral> > 4
+    THEN <noun>.@CASE == genitive
+    ELSE VALID
+
+@CONTEXT_RULE[temporal-case-requirement]:
+    IF <temporal-expression> USES <preposition>
+    THEN <noun>.@CASE == <preposition>.REQUIRED_CASE
+    ELSE VALID
+
+@CONTEXT_RULE[comparative-case-government]:
+    IF <comparative-clause> USES "niż"
+    THEN <noun-phrase> USES nominative
+    ELSE IF <comparative-clause> USES "od"
+    THEN <noun-phrase>.@CASE == genitive
+    ELSE VALID
+
+@CONTEXT_RULE[quantifier-agreement]:
+    IF <noun-phrase> CONTAINS <indefinite-quantifier>
+    THEN <noun>.@NUMBER == <indefinite-quantifier>.REQUIRED_NUMBER
+    ELSE VALID
+
+/* Extended sentence structures */
+<parenthetical-clause> ::= <topic-field> <opt-whitespace> <finite-verb> <opt-whitespace> "," <opt-whitespace> <parenthetical-insertion> <opt-whitespace> "," <opt-whitespace> <middle-field>? <opt-whitespace> <verb-complement>? <punctuation>?
+
+<parenthetical-insertion> ::= <subordinate-clause>
+                           | <relative-clause>
+                           | <adverbial-phrase>
+
+<fronted-subordinate-sentence> ::= <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<coordinated-complex-sentence> ::= <complex-sentence> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <complex-sentence>
+
+<extraposed-clause> ::= <correlate-pronoun> <opt-whitespace> "," <opt-whitespace> <subordinate-clause>
+
+<correlate-pronoun> ::= "to" | "tego"
+
+<embedded-clause-sequence> ::= <subordinate-clause> ( <opt-whitespace> <coordinating-conjunction>? <opt-whitespace> <subordinate-clause> ){2,}
+
+<infinitive-as-subject> ::= <verb-infinitive> ( <opt-whitespace> <object> )?
+
+<clause-as-subject> ::= "że" <opt-whitespace> <subordinate-content>
+
+/* Comprehensive pronoun systems */
+<demonstrative-pronoun> ::= <demonstrative-proximal> | <demonstrative-distal>
+
+<demonstrative-proximal> ::= @CASE[nominative] @GENDER[masculine-personal] @NUMBER[singular] "ten"
+                          | @CASE[nominative] @GENDER[feminine] @NUMBER[singular] "ta"
+                          | @CASE[nominative] @GENDER[neuter] @NUMBER[singular] "to"
+                          | @CASE[nominative] @GENDER[masculine-personal] @NUMBER[plural] "ci"
+                          | @CASE[nominative] @GENDER[non-masculine-personal] @NUMBER[plural] "te"
+                          | @CASE[genitive] @GENDER[masculine] @NUMBER[singular] "tego"
+                          | @CASE[genitive] @GENDER[feminine] @NUMBER[singular] "tej"
+                          | @CASE[genitive] @NUMBER[plural] "tych"
+                          | @CASE[dative] @GENDER[masculine] @NUMBER[singular] "temu"
+                          | @CASE[dative] @GENDER[feminine] @NUMBER[singular] "tej"
+                          | @CASE[dative] @NUMBER[plural] "tym"
+                          | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[singular] "tego"
+                          | @CASE[accusative] @GENDER[masculine-inanimate] @NUMBER[singular] "ten"
+                          | @CASE[accusative] @GENDER[feminine] @NUMBER[singular] "tę"
+                          | @CASE[accusative] @GENDER[neuter] @NUMBER[singular] "to"
+                          | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[plural] "tych"
+                          | @CASE[accusative] @GENDER[non-masculine-personal] @NUMBER[plural] "te"
+                          | @CASE[instrumental] @GENDER[masculine] @NUMBER[singular] "tym"
+                          | @CASE[instrumental] @GENDER[feminine] @NUMBER[singular] "tą"
+                          | @CASE[instrumental] @NUMBER[plural] "tymi"
+                          | @CASE[locative] @GENDER[masculine] @NUMBER[singular] "tym"
+                          | @CASE[locative] @GENDER[feminine] @NUMBER[singular] "tej"
+                          | @CASE[locative] @NUMBER[plural] "tych"
+
+<demonstrative-distal> ::= @CASE[nominative] @GENDER[masculine-personal] @NUMBER[singular] "tamten"
+                        | @CASE[nominative] @GENDER[feminine] @NUMBER[singular] "tamta"
+                        | @CASE[nominative] @GENDER[neuter] @NUMBER[singular] "tamto"
+                        | @CASE[nominative] @GENDER[masculine-personal] @NUMBER[plural] "tamci"
+                        | @CASE[nominative] @GENDER[non-masculine-personal] @NUMBER[plural] "tamte"
+                        | @CASE[genitive] @GENDER[masculine] @NUMBER[singular] "tamtego"
+                        | @CASE[genitive] @GENDER[feminine] @NUMBER[singular] "tamtej"
+                        | @CASE[genitive] @NUMBER[plural] "tamtych"
+                        | @CASE[dative] @GENDER[masculine] @NUMBER[singular] "tamtemu"
+                        | @CASE[dative] @GENDER[feminine] @NUMBER[singular] "tamtej"
+                        | @CASE[dative] @NUMBER[plural] "tamtym"
+                        | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[singular] "tamtego"
+                        | @CASE[accusative] @GENDER[masculine-inanimate] @NUMBER[singular] "tamten"
+                        | @CASE[accusative] @GENDER[feminine] @NUMBER[singular] "tamtę"
+                        | @CASE[accusative] @GENDER[neuter] @NUMBER[singular] "tamto"
+                        | @CASE[accusative] @GENDER[masculine-personal] @NUMBER[plural] "tamtych"
+                        | @CASE[accusative] @GENDER[non-masculine-personal] @NUMBER[plural] "tamte"
+                        | @CASE[instrumental] @GENDER[masculine] @NUMBER[singular] "tamtym"
+                        | @CASE[instrumental] @GENDER[feminine] @NUMBER[singular] "tamtą"
+                        | @CASE[instrumental] @NUMBER[plural] "tamtymi"
+                        | @CASE[locative] @GENDER[masculine] @NUMBER[singular] "tamtym"
+                        | @CASE[locative] @GENDER[feminine] @NUMBER[singular] "tamtej"
+                        | @CASE[locative] @NUMBER[plural] "tamtych"
+
+<interrogative-pronoun-extended> ::= @CASE[nominative] "kto" | "co" | "który" | "jaki" | "czyj"
+                                  | @CASE[genitive] "kogo" | "czego" | "którego" | "jakiego" | "czyje go"
+                                  | @CASE[dative] "komu" | "czemu" | "któremu" | "jakiemu" | "czyjem u"
+                                  | @CASE[accusative] "kogo" | "co" | "którego" | "jakiego" | "czyje go"
+                                  | @CASE[instrumental] "kim" | "czym" | "którym" | "jakim" | "czyi m"
+                                  | @CASE[locative] "kim" | "czym" | "którym" | "jakim" | "czyim"
+
+<indefinite-pronoun> ::= "ktoś" | "coś" | "jakiś" | "któryś" | "pewien" | "pewna" | "pewne"
+                      | "niektóry" | "każdy" | "wszystko" | "wszyscy" | "wszelki" | "oba" | "obaj"
+                      | "żaden" | "nikt" | "nic" | "żadna" | "żadne"
+
+<reciprocal-pronoun> ::= "siebie" <opt-whitespace> "nawzajem"
+                      | "wzajemnie"
+                      | "jeden" <opt-whitespace> "drugiego"
+
+/* Full numeral system */
+<numeral-system> ::= <cardinal-numeral> | <ordinal-numeral> | <fractional-numeral> | <distributive-numeral>
+
+<cardinal-numeral> ::= "zero" | "jeden" | "dwa" | "trzy" | "cztery" | "pięć" | "sześć" | "siedem" | "osiem" | "dziewięć" | "dziesięć"
+                    | "jedenaście" | "dwanaście" | "trzynaście" | "czternaście" | "piętnaście" | "szesnaście" | "siedemnaście" | "osiemnaście" | "dziewiętnaście"
+                    | "dwadzieścia" | "trzydzieści" | "czterdzieści" | "pięćdziesiąt" | "sześćdziesiąt" | "siedemdziesiąt" | "osiemdziesiąt" | "dziewięćdziesiąt"
+                    | "sto" | "dwieście" | "trzysta" | "czterysta" | "pięćset" | "sześćset" | "siedemset" | "osiemset" | "dziewięćset"
+                    | "tysiąc" | "milion" | "miliard" | /[0-9]+/
+
+<ordinal-numeral> ::= "pierwszy" | "drugi" | "trzeci" | "czwarty" | "piąty" | "szósty" | "siódmy" | "ósmy" | "dziewiąty" | "dziesiąty"
+                   | "jedenasty" | "dwunasty" | "trzynasty" | "czternasty" | "piętnasty" | "szesnasty" | "siedemnasty" | "osiemnasty" | "dziewiętnasty"
+                   | "dwudziesty" | "trzydziesty" | "czterdziesty" | "pięćdziesiąty" | "sześćdziesiąty" | "siedemdziesiąty" | "osiemdziesiąty" | "dziewięćdziesiąty"
+                   | "setny" | "tysięczny" | "milionowy"
+
+<fractional-numeral> ::= "pół" | "jedna" <opt-whitespace> "druga" | "jedna" <opt-whitespace> "trzecia" | "jedna" <opt-whitespace> "czwarta"
+                      | "dwie" <opt-whitespace> "trzecie" | "trzy" <opt-whitespace> "czwarte"
+
+<distributive-numeral> ::= "po" <opt-whitespace> <cardinal-numeral>
+
+/* Indefinite and universal quantifiers */
+<indefinite-quantifier> ::= "parę" | "kilka" | "kilkanaście" | "kilkadziesiąt" | "kilkaset"
+                         | "wiele" | "dużo" | "mało" | "trochę" | "niewiele" | "sporo"
+                         | "więcej" | "mniej" | "więcej" <opt-whitespace> "niż" | "mniej" <opt-whitespace> "niż"
+
+<universal-quantifier> ::= "każdy" | "wszystko" | "wszyscy" | "cały" | "wszystek" | "wszelki"
+
+<negative-quantifier> ::= "żaden" | "nic" | "nikt" | "ani" <opt-whitespace> "jeden"
+
+/* Temporal and spatial expressions */
+<temporal-adverbial> ::= <time-point> | <time-duration> | <frequency> | <time-of-day>
+
+<time-point> ::= "wczoraj" | "dzisiaj" | "dziś" | "jutro" | "przedwczoraj" | "pojutrze"
+              | "teraz" | "obecnie" | "wtedy" | "wówczas" | "kiedyś" | "już" | "jeszcze" | "zaraz" | "niedawno"
+              | "dawno" <opt-whitespace> "temu" | "za" <opt-whitespace> <cardinal-numeral> <opt-whitespace> <time-unit>
+              | <cardinal-numeral> <opt-whitespace> <time-unit> <opt-whitespace> "temu"
+
+<time-duration> ::= "przez" <opt-whitespace> <cardinal-numeral> <opt-whitespace> <time-unit>
+                 | "od" <opt-whitespace> <time-point> <opt-whitespace> "do" <opt-whitespace> <time-point>
+
+<time-unit> ::= "sekunda" | "sekund" | "sekund" | "minuta" | "minut" | "minuty"
+             | "godzina" | "godzin" | "godziny" | "dzień" | "dni" | "dzień"
+             | "tydzień" | "tygodni" | "tygodnie" | "miesiąc" | "miesięcy" | "miesiące"
+             | "rok" | "lat" | "lata"
+
+<frequency> ::= "zawsze" | "często" | "rzadko" | "czasami" | "czasem" | "nigdy" | "nieraz" | "wielokrotnie"
+             | "codziennie" | "co" <opt-whitespace> "dzień" | "co" <opt-whitespace> "tydzień" | "co" <opt-whitespace> "miesiąc" | "co" <opt-whitespace> "rok"
+             | "raz" | "dwa" <opt-whitespace> "razy" | "trzy" <opt-whitespace> "razy" | <cardinal-numeral> <opt-whitespace> "razy"
+
+<time-of-day> ::= "rano" | "w" <opt-whitespace> "południe" | "po" <opt-whitespace> "południu"
+               | "wieczorem" | "w" <opt-whitespace> "nocy" | "o" <opt-whitespace> "północy"
+               | "o" <opt-whitespace> <cardinal-numeral> ( ":" <cardinal-numeral> )?
+
+<spatial-adverbial> ::= <location> | <direction> | <distance>
+
+<location> ::= "tu" | "tutaj" | "tam" | "wszędzie" | "nigdzie" | "gdzieś" | "blisko" | "daleko"
+            | "w" <opt-whitespace> "środku" | "na" <opt-whitespace> "zewnątrz" | "wewnątrz"
+            | "powyżej" | "poniżej" | "obok" | "naprzeciwko"
+
+<direction> ::= "stąd" | "stamtąd" | "dokąd" | "skąd" | "w" <opt-whitespace> "górę" | "w" <opt-whitespace> "dół"
+             | "na" <opt-whitespace> "prawo" | "na" <opt-whitespace> "lewo" | "do" <opt-whitespace> "przodu"
+             | "do" <opt-whitespace> "tyłu" | "na" <opt-whitespace> "wprost"
+
+<distance> ::= "blisko" | "daleko" | "niedaleko" | <cardinal-numeral> <opt-whitespace> <distance-unit> <opt-whitespace> "stąd"
+
+<distance-unit> ::= "metr" | "metrów" | "metry" | "kilometr" | "kilometrów" | "kilometry" | "krok" | "kroków" | "kroki"
+
+/* Comparative constructions */
+<comparative-clause> ::= <comparative-with-niż> | <comparative-with-od> | <equality-comparison> | <proportional-comparison>
+
+<comparative-with-niż> ::= <adjective-comparative> <opt-whitespace> "niż" <opt-whitespace> <noun-phrase>
+
+<comparative-with-od> ::= <adjective-comparative> <opt-whitespace> "od" <opt-whitespace> @CASE[genitive] <noun-phrase>
+
+<equality-comparison> ::= "tak" <opt-whitespace> <adjective> <opt-whitespace> "jak" <opt-whitespace> <noun-phrase>
+                       | "taki" <opt-whitespace> "sam" <opt-whitespace> "jak" <opt-whitespace> <noun-phrase>
+
+<proportional-comparison> ::= "im" <opt-whitespace> <adjective-comparative> <opt-whitespace> "," <opt-whitespace> "tym" <opt-whitespace> <adjective-comparative>
+
+/* Genitive and compound patterns */
+<genitive-modifier> ::= @CASE[genitive] <noun-phrase>
+                     | <possessive-genitive>
+                     | <partitive-genitive>
+                     | <quantified-genitive>
+
+<possessive-genitive> ::= @CASE[genitive] <proper-noun> | <personal-pronoun-genitive>
+
+<partitive-genitive> ::= @CASE[genitive] <noun> /* część czegoś */
+
+<quantified-genitive> ::= <indefinite-quantifier> <opt-whitespace> @CASE[genitive] <noun>
+
+<compound-noun> ::= <noun> "-" <noun>
+                 | <noun> <opt-whitespace> <noun> /* closely bound compound */
+
+<double-genitive> ::= @CASE[genitive] <noun-phrase> <opt-whitespace> @CASE[genitive] <noun-phrase>
+
+/* Extended question words */
+<question-word-extended> ::= "kto" | "co" | "kiedy" | "gdzie" | "jak" | "dlaczego" | "po" <opt-whitespace> "co"
+                          | "czemu" | "skąd" | "dokąd" | "ile" | "czyj" | "jaki" | "który"
+                          | "jak" <opt-whitespace> "długo" | "jak" <opt-whitespace> "często" | "jak" <opt-whitespace> "daleko"
+
+/* Expanded subordinating conjunctions */
+<subordinating-conjunction-extended> ::= "że" | "czy" | "jeśli" | "gdyby" | "gdy" | "kiedy" | "zanim" | "po" <opt-whitespace> "tym" <opt-whitespace> "jak"
+                                      | "żeby" | "aby" | "chociaż" | "choć" | "mimo" <opt-whitespace> "że"
+                                      | "ponieważ" | "dlatego" <opt-whitespace> "że" | "gdyż" | "bo"
+                                      | "podczas" <opt-whitespace> "gdy" | "dopóki" | "aż" | "odkąd"
+
+/* Expanded coordinating conjunctions */
+<coordinating-conjunction-extended> ::= "i" | "a" | "ale" | "lecz" | "lub" | "albo" | "czy" | "ani" | "tudzież" | "bądź" | "oraz"
+
+/* Sentence adverbs and modal particles */
+<sentence-adverb-extended> ::= "przecież" | "właśnie" | "właściwie" | "zresztą" | "oczywiście" | "naprawdę"
+                            | "prawdopodobnie" | "możliwe" | "chyba" | "może" | "widocznie" | "najwyraźniej"
+                            | "zapewne" | "niewątpliwie" | "rzeczywiście" | "faktycznie"
+
+/* Prepositional phrases with all case governments */
+<prepositional-phrase-comprehensive> ::= <preposition-with-genitive> <opt-whitespace> @CASE[genitive] <noun-phrase>
+                                      | <preposition-with-dative> <opt-whitespace> @CASE[dative] <noun-phrase>
+                                      | <preposition-with-accusative> <opt-whitespace> @CASE[accusative] <noun-phrase>
+                                      | <preposition-with-instrumental> <opt-whitespace> @CASE[instrumental] <noun-phrase>
+                                      | <preposition-with-locative> <opt-whitespace> @CASE[locative] <noun-phrase>
+
+<preposition-with-genitive> ::= "od" | "do" | "z" | "ze" | "bez" | "dla" | "koło" | "obok" | "wokół" | "u" | "spod" | "znad" | "spoza"
+
+<preposition-with-dative> ::= "ku" | "wbrew" | "dzięki" | "przeciw"
+
+<preposition-with-accusative> ::= "na" | "w" | "przez" | "o" | "za" | "po" | "pod" | "nad" | "między" | "mimo"
+
+<preposition-with-instrumental> ::= "z" | "ze" | "nad" | "pod" | "przed" | "za" | "między"
+
+<preposition-with-locative> ::= "w" | "na" | "o" | "po" | "przy"
+
+/* Adjectival phrases with agreement */
+<adjective-phrase-extended> ::= <adverb>? <opt-whitespace> <adjective> <opt-whitespace> <prepositional-phrase>?
+
+/* Additional whitespace and punctuation handling */
+<opt-whitespace> ::= /\s*/
+
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":" | "..." | "–" | "—"
+
+/* ===== DISCOURSE MARKERS AND CONNECTIVES ===== */
+
+<discourse-marker> ::= <temporal-discourse> | <causal-discourse> | <contrastive-discourse> 
+                     | <additive-discourse> | <conclusive-discourse> | <exemplification-discourse>
+
+<temporal-discourse> ::= "najpierw" | "potem" | "później" | "wtedy" | "wreszcie" 
+                       | "w końcu" | "tymczasem" | "w międzyczasie" | "jednocześnie"
+                       | "zanim" | "przedtem" | "nagle" | "równocześnie"
+
+<causal-discourse> ::= "ponieważ" | "dlatego" | "więc" | "zatem" | "bowiem" 
+                     | "gdyż" | "wobec tego" | "z tego powodu" | "w rezultacie"
+                     | "skutkiem tego" | "stąd" | "przeto"
+
+<contrastive-discourse> ::= "jednak" | "ale" | "lecz" | "natomiast" | "jednakże"
+                          | "mimo to" | "pomimo tego" | "z drugiej strony"
+                          | "w przeciwieństwie" | "odwrotnie" | "wręcz przeciwnie"
+
+<additive-discourse> ::= "ponadto" | "dodatkowo" | "również" | "także" | "oprócz tego"
+                       | "co więcej" | "poza tym" | "a także" | "tudzież"
+
+<conclusive-discourse> ::= "zatem" | "więc" | "wobec tego" | "w rezultacie"
+                         | "w konsekwencji" | "podsumowując" | "reasumując"
+                         | "ostatecznie" | "w końcu" | "finalnie"
+
+<exemplification-discourse> ::= "na przykład" | "przykładowo" | "chociażby"
+                              | "mianowicie" | "to znaczy" | "tzn." | "tj."
+                              | "innymi słowy" | "mówiąc inaczej"
+
+/* ===== TAG QUESTIONS AND ELLIPTICAL STRUCTURES ===== */
+
+<tag-question> ::= "prawda?" | "nie?" | "tak?" | "dobrze?" | "zgadza się?"
+                 | "no nie?" | "czyż nie?" | "nieprawdaż?" | "czyż nie tak?"
+
+<elliptical-answer> ::= "tak" | "nie" | "oczywiście" | "naturalnie" | "jasne"
+                      | "pewnie" | "może" | "chyba" | "raczej" | "właściwie"
+
+/* ===== REPORTED SPEECH AND INDIRECT DISCOURSE ===== */
+
+<reporting-verb> ::= "mówić" | "powiedzieć" | "twierdzić" | "zapewnić" | "sądzić"
+                   | "uważać" | "myśleć" | "przypuszczać" | "wierzyć" | "sądzić"
+
+<reported-speech> ::= <reporting-verb> <opt-whitespace> "," <opt-whitespace> "że" 
+                    <opt-whitespace> <sentence>
+
+<indirect-question> ::= <reporting-verb> <opt-whitespace> "," <opt-whitespace> 
+                      ("czy" | "kiedy" | "gdzie" | "jak" | "dlaczego") 
+                      <opt-whitespace> <sentence>
+
+/* ===== CLEFT SENTENCES ===== */
+
+<cleft-sentence> ::= "to" <opt-whitespace> <noun-phrase> <opt-whitespace> 
+                   <relative-clause>
+
+<pseudo-cleft> ::= "tym" <opt-whitespace> "," <opt-whitespace> "co" 
+                 <opt-whitespace> <sentence> <opt-whitespace> "," 
+                 <opt-whitespace> "jest" <opt-whitespace> <noun-phrase>
+
+/* ===== CORRELATIVE CONSTRUCTIONS ===== */
+
+<correlative-both> ::= "zarówno" <opt-whitespace> <phrase> <opt-whitespace> 
+                     "jak" <opt-whitespace> "i" <opt-whitespace> <phrase>
+
+<correlative-either> ::= "albo" <opt-whitespace> <phrase> <opt-whitespace> 
+                       "albo" <opt-whitespace> <phrase>
+
+<correlative-neither> ::= "ani" <opt-whitespace> <phrase> <opt-whitespace> 
+                        "ani" <opt-whitespace> <phrase>
+
+<correlative-not-only> ::= "nie" <opt-whitespace> "tylko" <opt-whitespace> <phrase> 
+                         <opt-whitespace> "ale" <opt-whitespace> ("także" | "również") 
+                         <opt-whitespace> <phrase>
+
+/* ===== DIALECTAL VARIATIONS ===== */
+
+@DIALECT[wielkopolski] @DIALECT[malopolski] @DIALECT[mazowiecki] 
+@DIALECT[slaski] @DIALECT[kaszubski] @DIALECT[podhalanski] @DIALECT[warszawski]
+
+/* Greater Poland dialect (Wielkopolskie) */
+<wielkopolski-pronoun> ::= @DIALECT[wielkopolski] ("my" | "wy" | "wos")
+
+<wielkopolski-verb> ::= @DIALECT[wielkopolski] <verb-stem> ("om" | "amy" | "omy")
+
+/* Lesser Poland dialect (Małopolskie) */
+<malopolski-ending> ::= @DIALECT[malopolski] ("ek" | "ka" | "ko" | "uś")
+
+/* Silesian dialect (Śląskie) */
+<slaski-pronoun> ::= @DIALECT[slaski] ("ja" | "ty" | "ón" | "óna" | "my" | "wy" | "óni")
+
+<slaski-particle> ::= @DIALECT[slaski] ("też" | "tyż" | "ale" | "fto" | "kaj")
+
+/* Kashubian dialect (Kaszubskie) */
+<kaszubski-greeting> ::= @DIALECT[kaszubski] ("witôj" | "dzéń dobri" | "dobri wiecór")
+
+/* Highland dialect (Podhalańskie - Góralskie) */
+<podhalanski-pronoun> ::= @DIALECT[podhalanski] ("ja" | "ty" | "ón" | "óna" | "my" | "wy" | "óni")
+
+<podhalanski-particle> ::= @DIALECT[podhalanski] ("ale" | "nó" | "co" | "kaj" | "dyć")
+
+/* Warsaw dialect (Warszawskie) */
+<warszawski-slang> ::= @DIALECT[warszawski] ("frajer" | "baba" | "gapa" | "ciura")
+
+/* ===== EXTENDED VERB CONSTRUCTIONS ===== */
+
+/* Aspectual pairs - perfective and imperfective */
+<aspectual-pair> ::= <imperfective-verb> | <perfective-verb>
+
+<imperfective-verb> ::= "czytać" | "pisać" | "robić" | "mówić" | "jeść"
+                      | "pić" | "brać" | "dawać" | "pytać" | "otwierać"
+
+<perfective-verb> ::= "przeczytać" | "napisać" | "zrobić" | "powiedzieć" | "zjeść"
+                    | "wypić" | "wziąć" | "dać" | "zapytać" | "otworzyć"
+
+/* Reflexive verbs */
+<reflexive-verb> ::= <verb-stem> ("się" | "sobie")
+
+<reflexive-construction> ::= <subject> <opt-whitespace> <reflexive-verb>
+
+/* Causative constructions */
+<causative-verb> ::= "kazać" | "polecić" | "nakazać" | "zlecić" | "rozkazać"
+
+<causative-construction> ::= <causative-verb> <opt-whitespace> <indirect-object> 
+                           <opt-whitespace> <infinitive>
+
+/* Permissive constructions */
+<permissive-verb> ::= "pozwolić" | "zezwolić" | "dopuścić" | "dać"
+
+<permissive-construction> ::= <permissive-verb> <opt-whitespace> <indirect-object> 
+                            <opt-whitespace> <infinitive>
+
+/* Motion verbs with prefixes */
+<motion-verb-prefix> ::= "przy-" | "od-" | "do-" | "w-" | "wy-" | "z-" | "nad-" 
+                       | "pod-" | "prze-" | "roz-" | "za-" | "u-"
+
+<prefixed-motion-verb> ::= <motion-verb-prefix> ("iść" | "jechać" | "lecieć" 
+                         | "biec" | "pływać" | "chodzić" | "jeździć")
+
+/* ===== TEMPORAL EXPRESSIONS ===== */
+
+<time-of-day> ::= "rano" | "w południe" | "popołudniu" | "wieczorem" | "w nocy"
+                | "o świcie" | "o zmierzchu" | "o północy"
+
+<day-reference> ::= "dzisiaj" | "dziś" | "wczoraj" | "jutro" | "pojutrze" | "przedwczoraj"
+
+<week-reference> ::= "w tym tygodniu" | "w przyszłym tygodniu" | "w zeszłym tygodniu"
+
+<month-reference> ::= "w tym miesiącu" | "w przyszłym miesiącu" | "w zeszłym miesiącu"
+
+<year-reference> ::= "w tym roku" | "w przyszłym roku" | "w zeszłym roku"
+
+<temporal-preposition-phrase> ::= ("przed" | "po" | "podczas" | "w trakcie" | "w czasie") 
+                                <opt-whitespace> <temporal-noun>
+
+/* ===== IDIOMATIC EXPRESSIONS ===== */
+
+<idiom> ::= "kopnąć w kalendarz" | "wziąć się w garść" | "mieć muchy w nosie"
+          | "trzymać kciuki" | "wyjść na swoje" | "mieć głowę na karku"
+          | "mówić od rzeczy" | "dostać kosza" | "bułka z masłem" 
+          | "dmuchać na zimne" | "brać nogi za pas" | "wpaść w tarapaty"
+          | "trzymać język za zębami" | "kłamać jak z nut" | "wyjść cało"
+
+/* ===== CONDITIONAL SENTENCES ===== */
+
+/* Real conditional (possible in present/future) */
+<real-conditional> ::= "jeśli" <opt-whitespace> <present-tense-clause> 
+                     <opt-whitespace> "," <opt-whitespace> <future-tense-clause>
+
+/* Hypothetical conditional (unlikely but possible) */
+<hypothetical-conditional> ::= "gdyby" <opt-whitespace> <past-tense-clause> 
+                             <opt-whitespace> "," <opt-whitespace> <conditional-clause>
+
+/* Contrary-to-fact conditional (impossible) */
+<contrary-conditional> ::= "gdyby" <opt-whitespace> <pluperfect-clause> 
+                         <opt-whitespace> "," <opt-whitespace> <conditional-perfect-clause>
+
+/* ===== COMPARATIVE AND SUPERLATIVE EXTENDED ===== */
+
+<comparative-construction> ::= <adjective> <opt-whitespace> ("niż" | "od") 
+                             <opt-whitespace> <noun-phrase>
+
+<superlative-construction> ::= "naj" <adjective> | "najbardziej" <opt-whitespace> <adjective>
+
+<equality-comparison> ::= "tak" <opt-whitespace> <adjective> <opt-whitespace> 
+                        "jak" <opt-whitespace> <noun-phrase>
+
+<inequality-comparison> ::= "bardziej" <opt-whitespace> <adjective> <opt-whitespace> 
+                          "niż" <opt-whitespace> <noun-phrase>
+
+/* ===== NEGATION PATTERNS EXTENDED ===== */
+
+<double-negation> ::= "nigdy" | "nigdzie" | "nic" | "nikt"
+
+<negation-with-genitive> ::= "nie" <opt-whitespace> "ma" <opt-whitespace> 
+                           <noun-genitive>
+
+<emphatic-negation> ::= "wcale" <opt-whitespace> "nie" | "zupełnie" 
+                      <opt-whitespace> "nie" | "absolutnie" <opt-whitespace> "nie"
+
+/* ===== RELATIVE CLAUSES EXTENDED ===== */
+
+<relative-pronoun-all-cases> ::= "który" | "która" | "które" | "którzy" | "którego"
+                               | "której" | "któremu" | "którą" | "którym" | "których"
+
+<relative-clause-extended> ::= <relative-pronoun-all-cases> <opt-whitespace> <sentence>
+
+/* ===== QUESTION FORMATION EXTENDED ===== */
+
+<yes-no-question> ::= "czy" <opt-whitespace> <sentence>
+
+<alternative-question> ::= <sentence> <opt-whitespace> "," <opt-whitespace> "czy" 
+                         <opt-whitespace> <sentence>
+
+<rhetorical-question> ::= "czyż" <opt-whitespace> "nie" <opt-whitespace> <sentence>
+
+/* ===== IMPERATIVE FORMS EXTENDED ===== */
+
+<imperative-polite> ::= "proszę" <opt-whitespace> <infinitive>
+
+<imperative-emphatic> ::= "niech" <opt-whitespace> <subject> <opt-whitespace> <verb>
+
+<imperative-negative> ::= "nie" <opt-whitespace> <imperative>
+
+/* ===== PARTICIPLES AND ADJECTIVAL FORMS ===== */
+
+<active-participle-present> ::= <verb-stem> ("ący" | "ąca" | "ące" | "ący")
+
+<active-participle-past> ::= <verb-stem> ("wszy" | "wszy" | "łszy")
+
+<passive-participle> ::= <verb-stem> ("ny" | "na" | "ne" | "ty" | "ta" | "te")
+
+<adjectival-participle> ::= <active-participle-present> | <active-participle-past> 
+                          | <passive-participle>
+
+/* ===== VERBAL NOUNS (GERUNDS) ===== */
+
+<verbal-noun> ::= <verb-stem> ("nie" | "cie" | "enie" | "anie")
+
+<gerund-construction> ::= <verbal-noun> <opt-whitespace> <noun-genitive>
+
+/* ===== VOICE CONSTRUCTIONS ===== */
+
+/* Passive voice with być + passive participle */
+<passive-voice-być> ::= <subject> <opt-whitespace> ("być" | "jest" | "są" | "był" | "była") 
+                      <opt-whitespace> <passive-participle>
+
+/* Impersonal passive with -no/-to */
+<impersonal-passive> ::= <verb-stem> ("no" | "to")
+
+/* Reflexive passive with się */
+<reflexive-passive> ::= <verb> <opt-whitespace> "się"
+
+/* ===== NUMERAL CONSTRUCTIONS EXTENDED ===== */
+
+<collective-numeral> ::= "dwoje" | "troje" | "czworo" | "pięcioro" | "sześcioro"
+                       | "siedmioro" | "ośmioro" | "dziewięcioro" | "dziesięcioro"
+
+<collective-construction> ::= <collective-numeral> <opt-whitespace> <noun-genitive-plural>
+
+<fractional-numeral> ::= "pół" | "półtora" | "ćwierć" | "jedna trzecia" 
+                       | "dwie trzecie" | "trzy czwarte"
+
+/* ===== DIMINUTIVES AND AUGMENTATIVES ===== */
+
+<diminutive-suffix> ::= "ek" | "ka" | "ko" | "eczek" | "eczka" | "uszek" | "uszka"
+                      | "ik" | "yk" | "czek" | "czka" | "ulek" | "ulka"
+
+<augmentative-suffix> ::= "isko" | "uch" | "ucha" | "al" | "ala"
+
+<diminutive-form> ::= <noun-stem> <diminutive-suffix>
+
+<augmentative-form> ::= <noun-stem> <augmentative-suffix>
+
+/* ===== VOCATIVE CASE EXTENDED ===== */
+
+<vocative-form> ::= <noun-stem> ("u" | "o" | "e" | "ie" | "ciu" | "ko")
+
+<vocative-address> ::= <vocative-form> <opt-whitespace> ("!" | ",")
+
+/* ===== EXCLAMATORY SENTENCES ===== */
+
+<exclamation-word> ::= "Ależ" | "Jakże" | "Ileż" | "Co za" | "Jaki" | "Jaka" | "Jakie"
+
+<exclamatory-sentence> ::= <exclamation-word> <opt-whitespace> <noun-phrase> 
+                         <opt-whitespace> "!"
+
+/* ===== OPTATIVE SENTENCES (WISHES) ===== */
+
+<optative-particle> ::= "oby" | "bodaj" | "niech" | "niechaj" | "obyś"
+
+<optative-sentence> ::= <optative-particle> <opt-whitespace> <sentence>
+
+/* ===== MODAL PARTICLES ===== */
+
+<modal-particle> ::= "przecież" | "właśnie" | "dopiero" | "dopiero co" | "właśnie że"
+                   | "już" | "jeszcze" | "jeszcze nie" | "zaraz" | "ledwo" | "ledwie"
+                   | "dopiero" | "wreszcie" | "nareszcie"
+
+/* ===== DISCOURSE PARTICLES ===== */
+
+<discourse-particle> ::= "no" | "no to" | "ale" | "ale że" | "bo" | "a" | "a to"
+                       | "więc" | "przecież" | "właściwie" | "w zasadzie"
+
+/* ===== EMPHATIC CONSTRUCTIONS ===== */
+
+<emphatic-particle> ::= "właśnie" | "akurat" | "dopiero" | "przecież" | "aż"
+
+<emphatic-construction> ::= <emphatic-particle> <opt-whitespace> <sentence>
+
+/* ===== ADVERBIAL CLAUSES EXTENDED ===== */
+
+<temporal-conjunction> ::= "kiedy" | "gdy" | "jak" | "zanim" | "nim" | "odkąd"
+                         | "dopóki" | "póki" | "zaledwie" | "skoro tylko"
+
+<causal-conjunction> ::= "ponieważ" | "bo" | "gdyż" | "dlatego że" | "z tego że"
+                       | "skoro" | "jako że"
+
+<concessive-conjunction> ::= "chociaż" | "choć" | "mimo że" | "pomimo że" | "aczkolwiek"
+
+<conditional-conjunction> ::= "jeśli" | "jeżeli" | "gdyby" | "o ile" | "byleby"
+
+<purpose-conjunction> ::= "żeby" | "aby" | "by" | "po to aby" | "w celu"
+
+<result-conjunction> ::= "tak że" | "że" | "więc" | "zatem"
+
+/* ===== COMPARATIVE STRUCTURES ===== */
+
+<comparative-conjunction> ::= "jak" | "niż" | "jako" | "niczym" | "jakby"
+
+<comparative-clause> ::= <comparative-conjunction> <opt-whitespace> <sentence>
+
+/* ===== PERIPHRASTIC CONSTRUCTIONS ===== */
+
+/* Future periphrastic with będę + imperfective infinitive */
+<future-periphrastic> ::= ("będę" | "będziesz" | "będzie" | "będziemy" | "będziecie" | "będą") 
+                        <opt-whitespace> <imperfective-verb>
+
+/* Perfect construction with mieć + passive participle */
+<perfect-mieć> ::= ("mam" | "masz" | "ma" | "mamy" | "macie" | "mają") 
+                 <opt-whitespace> <passive-participle>
+
+/* ===== SUBJUNCTIVE MOOD (CONDITIONAL) ===== */
+
+<conditional-auxiliary> ::= "bym" | "byś" | "by" | "byśmy" | "byście" | "by"
+
+<conditional-form> ::= <past-participle> <opt-whitespace> <conditional-auxiliary>
+
+/* ===== CONTEXT-SENSITIVE VALIDATION RULES ===== */
+
+@CONTEXT_RULE[case-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.case MUST_EQUAL <noun>.case
+    AND <adjective>.gender MUST_EQUAL <noun>.gender
+    AND <adjective>.number MUST_EQUAL <noun>.number
+    ELSE ERROR "Adjective must agree with noun in case, gender, and number"
+
+@CONTEXT_RULE[verb-subject-agreement]:
+    IF <verb> HAS <subject>
+    THEN <verb>.person MUST_EQUAL <subject>.person
+    AND <verb>.number MUST_EQUAL <subject>.number
+    ELSE ERROR "Verb must agree with subject in person and number"
+
+@CONTEXT_RULE[aspect-tense-compatibility]:
+    IF <verb>.aspect = "perfective"
+    THEN <verb>.tense CANNOT_BE "present"
+    ELSE ERROR "Perfective verbs cannot have present tense (use future instead)"
+
+@CONTEXT_RULE[genitive-negation]:
+    IF <sentence> HAS "nie ma"
+    THEN <direct-object>.case MUST_BE "genitive"
+    ELSE ERROR "Negated existence requires genitive case"
+
+@CONTEXT_RULE[numeral-case]:
+    IF <numeral> IN ["dwa", "trzy", "cztery"]
+    THEN <noun>.case MUST_BE "nominative"
+    AND <noun>.number MUST_BE "plural"
+    ELSE IF <numeral> >= 5
+    THEN <noun>.case MUST_BE "genitive"
+    AND <noun>.number MUST_BE "plural"
+    ELSE ERROR "Numerals 2-4 take nominative plural, 5+ take genitive plural"
+
+@CONTEXT_RULE[preposition-case]:
+    IF <preposition> IN <preposition-with-genitive>
+    THEN <noun>.case MUST_BE "genitive"
+    ELSE IF <preposition> IN <preposition-with-dative>
+    THEN <noun>.case MUST_BE "dative"
+    ELSE IF <preposition> IN <preposition-with-accusative>
+    THEN <noun>.case MUST_BE "accusative"
+    ELSE IF <preposition> IN <preposition-with-instrumental>
+    THEN <noun>.case MUST_BE "instrumental"
+    ELSE IF <preposition> IN <preposition-with-locative>
+    THEN <noun>.case MUST_BE "locative"
+    ELSE ERROR "Preposition requires specific case"
+
+@CONTEXT_RULE[reflexive-się-position]:
+    IF <verb> IS "reflexive"
+    THEN "się" MUST_BE_ADJACENT_TO <verb>
+    ELSE ERROR "Reflexive particle 'się' must be adjacent to verb"
+
+@CONTEXT_RULE[conditional-mood]:
+    IF <sentence> HAS "gdyby"
+    THEN <verb> MUST_USE <conditional-form>
+    ELSE ERROR "Conditional conjunction requires conditional verb form"
+
+@CONTEXT_RULE[imperative-aspect]:
+    IF <verb-mood> = "imperative"
+    THEN <verb>.aspect CAN_BE ("perfective" | "imperfective")
+    NOTE "Perfective imperative for single/completed actions, imperfective for repeated/ongoing"
+
+@CONTEXT_RULE[motion-verb-direction]:
+    IF <verb> IN <prefixed-motion-verb>
+    THEN <prefix> INDICATES_DIRECTION
+    NOTE "Motion verb prefixes indicate direction: przy-(toward), od-(away), do-(to), etc."
+
+@CONTEXT_RULE[vocative-usage]:
+    IF <address> IS_DIRECT
+    THEN <noun>.case SHOULD_BE "vocative"
+    ELSE WARNING "Direct address typically uses vocative case"
+
+@CONTEXT_RULE[passive-voice-formation]:
+    IF <sentence>.voice = "passive"
+    THEN <verb> MUST_USE ("być" + <passive-participle> | <reflexive-passive> | <impersonal-passive>)
+    ELSE ERROR "Passive voice requires proper construction"
+
+@CONTEXT_RULE[collective-numeral-usage]:
+    IF <numeral> IN <collective-numeral>
+    THEN <noun> MUST_BE_COLLECTIVE_OR_MIXED_GENDER
+    ELSE ERROR "Collective numerals used with mixed-gender groups or children"
+
+@CONTEXT_RULE[diminutive-formation]:
+    IF <noun> HAS <diminutive-suffix>
+    THEN <noun> EXPRESSES_AFFECTION_OR_SMALL_SIZE
+    NOTE "Diminutives very common in Polish, express affection or small size"
+
+@CONTEXT_RULE[aspectual-pairs]:
+    IF <verb-action> IS_COMPLETED
+    THEN <verb>.aspect SHOULD_BE "perfective"
+    ELSE IF <verb-action> IS_ONGOING_OR_REPEATED
+    THEN <verb>.aspect SHOULD_BE "imperfective"
+    ELSE WARNING "Choose aspect based on action completion"
+
+@CONTEXT_RULE[dialectal-consistency]:
+    IF @DIALECT IS_SET
+    THEN ALL_DIALECTAL_FORMS MUST_MATCH_DIALECT
+    ELSE ERROR "Mixed dialects in same utterance should be avoided"
+
+@CONTEXT_RULE[reported-speech-że]:
+    IF <verb> IN <reporting-verb>
+    THEN TYPICALLY_FOLLOWED_BY "że" + <sentence>
+    NOTE "Reported speech typically uses 'że' conjunction"
+
+@CONTEXT_RULE[question-word-order]:
+    IF <question-type> = "yes-no"
+    THEN TYPICALLY_STARTS_WITH "czy"
+    ELSE IF <question-type> = "wh-question"
+    THEN STARTS_WITH <question-word>
+    NOTE "Yes-no questions often use 'czy', wh-questions start with question word"
+
+@CONTEXT_RULE[politeness-level]:
+    IF <context> = "formal"
+    THEN USE ("Pan" | "Pani" | "Państwo") + <third-person-verb>
+    ELSE IF <context> = "informal"
+    THEN USE "ty" + <second-person-verb>
+    ELSE WARNING "Choose appropriate politeness level"
+
+@CONTEXT_RULE[temporal-preposition-case]:
+    IF <preposition> = "w"
+    AND <time-reference> IS_SPECIFIC
+    THEN <time-noun>.case MUST_BE "accusative"
+    ELSE IF <preposition> = "w"
+    AND <time-reference> IS_GENERAL
+    THEN <time-noun>.case MUST_BE "locative"
+    ELSE ERROR "Temporal 'w' uses accusative for specific, locative for general time"
+
+/* ===== EXTENSIVE DIALECTAL EXAMPLES AND FEATURES ===== */
+
+/* GREATER POLAND DIALECT (WIELKOPOLSKIE) COMPREHENSIVE EXAMPLES */
+/*
+ * PHONOLOGICAL FEATURES:
+ * - Nasal vowels preserved differently than standard
+ * - Characteristic intonation patterns
+ * - Specific vowel qualities
+ *
+ * MORPHOLOGICAL FEATURES:
+ * - Different verb endings: -om, -amy, -omy instead of standard -ę, -amy, -imy
+ * - Unique pronoun forms: "wos" for "was" (you-accusative-plural)
+ * - Different adjective endings
+ *
+ * LEXICAL FEATURES:
+ * - "pyry" for "kartofle" (potatoes)
+ * - "byk" for "chleb" (bread) 
+ * - "rzodkiew" for "rzodkiewka" (radish)
+ *
+ * EXAMPLE SENTENCES:
+ * - "My sie żenim" (Żenimy się - We are getting married)
+ * - "Wos widział" (Widziałem was - I saw you)
+ * - "Idziemy na miasto" (Idziemy do miasta - We're going to town)
+ */
+
+/* LESSER POLAND DIALECT (MAŁOPOLSKIE) COMPREHENSIVE EXAMPLES */
+/*
+ * PHONOLOGICAL FEATURES:
+ * - Characteristic vowel lengthening
+ * - Preservation of archaic consonant clusters
+ * - Specific intonation melody
+ *
+ * MORPHOLOGICAL FEATURES:
+ * - Diminutive suffixes: -ek, -ka, -ko, -uś
+ * - Augmentative suffixes: -isko, -ucha
+ * - Different plural formations
+ *
+ * LEXICAL FEATURES:
+ * - "buraki" for "buraczki" (beets)
+ * - "kapuśniak" for "bigos" (cabbage stew)
+ *
+ * EXAMPLE SENTENCES:
+ * - "Idziem do chałupy" (Idziemy do domu - We're going home)
+ * - "Matuchna gotowała" (Matka gotowała - Mother was cooking)
+ * - "Dzieci sie bawiły" (Dzieci się bawiły - Children were playing)
+ */
+
+/* SILESIAN DIALECT (ŚLĄSKIE) COMPREHENSIVE EXAMPLES */
+/*
+ * PHONOLOGICAL FEATURES:
+ * - Characteristic diphthongs
+ * - Specific consonant shifts
+ * - Unique stress patterns
+ *
+ * MORPHOLOGICAL FEATURES:
+ * - Different pronoun system: ja, ty, ón, óna, my, wy, óni
+ * - Unique verb conjugations
+ * - Germanic loanwords integrated
+ *
+ * LEXICAL FEATURES:
+ * - "szlus" for "koniec" (end) - from German "Schluss"
+ * - "fajrant" for "koniec pracy" (end of work) - from German "Feierabend"
+ * - "szneka" for "ślimak" (snail) - from German "Schnecke"
+ * - "glejt" for "żelazko" (iron) - from German "Glätteisen"
+ *
+ * EXAMPLE SENTENCES:
+ * - "Kaj ty sie podziywosz?" (Gdzie się podziałeś? - Where have you been?)
+ * - "Fto to je?" (Kto to jest? - Who is it?)
+ * - "My idymy na robota" (Idziemy do pracy - We're going to work)
+ * - "Óna mo fest dużo roboty" (Ona ma bardzo dużo pracy - She has a lot of work)
+ */
+
+/* KASHUBIAN DIALECT (KASZUBSKIE) COMPREHENSIVE EXAMPLES */
+/*
+ * PHONOLOGICAL FEATURES:
+ * - Unique vowel system
+ * - Specific consonant palatalization
+ * - Characteristic intonation
+ *
+ * MORPHOLOGICAL FEATURES:
+ * - Distinct case system
+ * - Unique dual number (partial preservation)
+ * - Different verb aspects
+ *
+ * LEXICAL FEATURES:
+ * - "môrze" for "morze" (sea)
+ * - "bùten" for "butelka" (bottle)
+ * - "stégna" for "stodoła" (barn)
+ *
+ * EXAMPLE SENTENCES:
+ * - "Witôj!" (Witaj! - Hello!)
+ * - "Dzéń dobri" (Dzień dobry - Good day)
+ * - "Jak sã môsz?" (Jak się masz? - How are you?)
+ * - "Jem gbùr" (Jestem rolnikiem - I am a farmer)
+ * - "Mieszkóm przë môrzu" (Mieszkam przy morzu - I live by the sea)
+ */
+
+/* HIGHLAND DIALECT (PODHALAŃSKIE - GÓRALSKIE) COMPREHENSIVE EXAMPLES */
+/*
+ * PHONOLOGICAL FEATURES:
+ * - Characteristic ó sound
+ * - Specific vowel qualities
+ * - Mountain intonation
+ *
+ * MORPHOLOGICAL FEATURES:
+ * - Different pronoun forms: ja, ty, ón, óna
+ * - Unique verb endings
+ * - Archaic case forms preserved
+ *
+ * LEXICAL FEATURES:
+ * - "bacówka" for "góralska chata" (mountain hut)
+ * - "oscypek" for "góralski ser" (highland cheese)
+ * - "gazdyna" for "gospodyni" (hostess)
+ * - "hala" for "pastwisko górskie" (mountain pasture)
+ *
+ * EXAMPLE SENTENCES:
+ * - "Kaj sie idzies?" (Gdzie idziesz? - Where are you going?)
+ * - "Idã na halã" (Idę na pastwisko - I'm going to the pasture)
+ * - "Baca pasie owiecki" (Baca pasie owce - The shepherd is herding sheep)
+ * - "We wiosce jes wesele" (W wiosce jest wesele - There's a wedding in the village)
+ * - "Hej, górale, cy z je tam kłopot?" (Hej, górale, czy jest tam kłopot? - Hey, highlanders, is there trouble?)
+ */
+
+/* WARSAW DIALECT (WARSZAWSKIE) COMPREHENSIVE EXAMPLES */
+/*
+ * PHONOLOGICAL FEATURES:
+ * - Characteristic urban pronunciation
+ * - Specific vowel reductions
+ * - Fast speech patterns
+ *
+ * MORPHOLOGICAL FEATURES:
+ * - Simplified case usage
+ * - Colloquial verb forms
+ * - Urban slang integration
+ *
+ * LEXICAL FEATURES (Historical Warsaw slang - "gwara warszawska"):
+ * - "frajer" for "naiwny człowiek" (naive person)
+ * - "baba" for "kobieta" (woman)
+ * - "gapa" for "głupek" (fool)
+ * - "ciura" for "więzienie" (prison)
+ * - "faja" for "fajka" (pipe)
+ * - "haruje" for "pracuje ciężko" (works hard)
+ *
+ * EXAMPLE SENTENCES:
+ * - "Idę na miasto" (Idę do centrum - I'm going downtown)
+ * - "Widziałeś tego frajera?" (Widziałeś tego naiwniaka? - Did you see that sucker?)
+ * - "Nie gapuj sie!" (Nie gap się! - Don't stare!)
+ * - "Harował cały dzień" (Pracował ciężko cały dzień - He worked hard all day)
+ */
+
+/* MASOVIAN DIALECT (MAZOWIECKIE) COMPREHENSIVE EXAMPLES */
+/*
+ * PHONOLOGICAL FEATURES:
+ * - Characteristic mazuration (sz→s, ż→z, cz→c, dż→dz)
+ * - Specific vowel nasalization
+ * - Regional intonation
+ *
+ * MORPHOLOGICAL FEATURES:
+ * - Different adjective endings
+ * - Unique diminutive formations
+ * - Archaic plural forms
+ *
+ * LEXICAL FEATURES:
+ * - Regional agricultural terminology
+ * - Specific kinship terms
+ *
+ * EXAMPLE SENTENCES:
+ * - "Siostryca przyjechała" (Siostra przyjechała - Sister arrived)
+ * - "Idzie do kostioła" (Idzie do kościoła - He's going to church)
+ * - "Pole trza zaorać" (Pole trzeba zaorać - The field needs to be plowed)
+ */
+
+/* ===== COMPREHENSIVE VERB PREFIXATION SYSTEM ===== */
+
+/* Detailed prefix meanings and examples */
+/*
+ * PREFIX: do-
+ * Meaning: Completion, reaching destination
+ * Examples: dojść (to reach by foot), dojechać (to reach by vehicle)
+ *           dokończyć (to finish), dopłynąć (to swim to)
+ *
+ * PREFIX: na-
+ * Meaning: Accumulation, onto, filling
+ * Examples: napisać (to write), najeść się (to eat one's fill)
+ *           napić się (to drink), nazbierać (to gather)
+ *
+ * PREFIX: ob-/o-
+ * Meaning: Around, surrounding
+ * Examples: obejść (to go around), objechać (to drive around)
+ *           opowiedzieć (to tell), obejrzeć (to watch)
+ *
+ * PREFIX: od-
+ * Meaning: Away from, separation
+ * Examples: odejść (to go away), odjechać (to drive away)
+ *           odłożyć (to put aside), odpowiedzieć (to answer)
+ *
+ * PREFIX: po-
+ * Meaning: After, completion, a little
+ * Examples: pójść (to go), poczekać (to wait a bit)
+ *           pobiegać (to run a bit), poczytać (to read a bit)
+ *
+ * PREFIX: pod-
+ * Meaning: Under, approaching
+ * Examples: podejść (to approach), podjechać (to drive up)
+ *           podlać (to water), podnieść (to lift)
+ *
+ * PREFIX: prze-
+ * Meaning: Through, across, excessively
+ * Examples: przejść (to cross), przejechać (to drive through)
+ *           przepłynąć (to swim across), przeczytać (to read through)
+ *
+ * PREFIX: przy-
+ * Meaning: Toward, attachment, addition
+ * Examples: przyjść (to come), przyjechać (to arrive)
+ *           przynieść (to bring), przygotować (to prepare)
+ *
+ * PREFIX: roz-
+ * Meaning: Distribution, separation, intensification
+ * Examples: rozejść się (to disperse), rozłożyć (to spread out)
+ *           rozbić (to break apart), rozumieć (to understand)
+ *
+ * PREFIX: u-
+ * Meaning: Completion, achievement
+ * Examples: usnąć (to fall asleep), upaść (to fall)
+ *           upiec (to bake), uczyć się (to learn)
+ *
+ * PREFIX: w-/wejść
+ * Meaning: Into, entering
+ * Examples: wejść (to enter), wjechać (to drive in)
+ *           wpłynąć (to swim in/influence), wpaść (to fall in)
+ *
+ * PREFIX: wy-
+ * Meaning: Out, completion, exhaustion
+ * Examples: wyjść (to exit), wyjechać (to drive out)
+ *           wypić (to drink up), wyspać się (to sleep well)
+ *
+ * PREFIX: z-/ze-
+ * Meaning: Down, completion, gathering
+ * Examples: zejść (to descend), zjechać (to drive down)
+ *           zebrać (to gather), zrobić (to do/make)
+ *
+ * PREFIX: za-
+ * Meaning: Behind, beginning, excessive
+ * Examples: zajść (to go behind), zajechać (to drive behind)
+ *           zanieść (to take), zapomnieć (to forget)
+ */
+
+/* ===== ADVANCED ASPECTUAL SYSTEM ===== */
+
+/* Common imperfective-perfective pairs with nuanced meanings */
+/*
+ * VERBAL ASPECT PAIRS:
+ *
+ * brać - wziąć (to take)
+ * kupować - kupić (to buy)
+ * pisać - napisać (to write)
+ * czytać - przeczytać (to read)
+ * robić - zrobić (to do/make)
+ * mówić - powiedzieć (to say)
+ * jeść - zjeść (to eat)
+ * pić - wypić (to drink)
+ * dawać - dać (to give)
+ * otwierać - otworzyć (to open)
+ * zamykać - zamknąć (to close)
+ * sprzedawać - sprzedać (to sell)
+ * widzieć - zobaczyć (to see)
+ * słyszeć - usłyszeć (to hear)
+ * uczyć się - nauczyć się (to learn)
+ * kończyć - skończyć (to finish)
+ * zaczynać - zacząć (to begin)
+ * wracać - wrócić (to return)
+ * rozumieć - zrozumieć (to understand)
+ * tłumaczyć - przetłumaczyć (to translate)
+ * pytać - zapytać (to ask)
+ * odpowiadać - odpowiedzieć (to answer)
+ * zapominać - zapomnieć (to forget)
+ * pamiętać - zapamiętać (to remember)
+ * znajdować - znaleźć (to find)
+ * gubić - zgubić (to lose)
+ * wstawać - wstać (to get up)
+ * kłaść się - położyć się (to lie down)
+ * budzić się - obudzić się (to wake up)
+ * myć - umyć (to wash)
+ * ubierać się - ubrać się (to get dressed)
+ * przygotowywać - przygotować (to prepare)
+ * gotować - ugotować (to cook)
+ * śmiać się - zaśmiać się (to laugh)
+ * płakać - zapłakać (to cry)
+ * śpiewać - zaśpiewać (to sing)
+ * tańczyć - zatańczyć (to dance)
+ * grać - zagrać (to play)
+ * wygrywać - wygrać (to win)
+ * przegrywać - przegrać (to lose)
+ * pokazywać - pokazać (to show)
+ * chować - schować (to hide)
+ * wyjaśniać - wyjaśnić (to explain)
+ * opisywać - opisać (to describe)
+ * opowiadać - opowiedzieć (to tell/narrate)
+ * zapraszać - zaprosić (to invite)
+ * proponować - zaproponować (to propose)
+ * pomagać - pomóc (to help)
+ * szkodzić - zaszkodzić (to harm)
+ * czyścić - wyczyścić (to clean)
+ * naprawiać - naprawić (to repair)
+ * niszczyć - zniszczyć (to destroy)
+ * budować - zbudować (to build)
+ * malować - pomalować (to paint)
+ * rysować - narysować (to draw)
+ * fotografować - sfotografować (to photograph)
+ */
+
+/* ===== COMPREHENSIVE CASE SYSTEM EXAMPLES ===== */
+
+/* All seven cases with multiple examples */
+/*
+ * NOMINATIVE (Mianownik) - Subject, predicate nominative
+ * Examples: pies (dog), kot (cat), książka (book)
+ * Usage: "Pies śpi" (The dog sleeps), "To jest kot" (This is a cat)
+ *
+ * GENITIVE (Dopełniacz) - Possession, negation, after numbers 5+
+ * Examples: psa (dog's), kota (cat's), książki (book's)
+ * Usage: "Nie mam psa" (I don't have a dog), "Pięć książek" (Five books)
+ *        "Dom ojca" (Father's house)
+ *
+ * DATIVE (Celownik) - Indirect object, beneficiary
+ * Examples: psu (to dog), kotu (to cat), książce (to book)
+ * Usage: "Daję kotu mleko" (I give the cat milk), "Dziękuję ojcu" (I thank father)
+ *
+ * ACCUSATIVE (Biernik) - Direct object
+ * Examples: psa (dog), kota (cat), książkę (book)
+ * Usage: "Widzę psa" (I see a dog), "Czytam książkę" (I read a book)
+ *
+ * INSTRUMENTAL (Narzędnik) - Instrument, accompaniment
+ * Examples: psem (with dog), kotem (with cat), książką (with book)
+ * Usage: "Piszę ołówkiem" (I write with a pencil), "Idę z kotem" (I go with the cat)
+ *        "Zostać lekarzem" (To become a doctor)
+ *
+ * LOCATIVE (Miejscownik) - Location (always with preposition)
+ * Examples: psie (about dog), kocie (about cat), książce (about book)
+ * Usage: "Myślę o psie" (I think about the dog), "W domu" (In the house)
+ *
+ * VOCATIVE (Wołacz) - Direct address
+ * Examples: psie! (dog!), kocie! (cat!), Janie! (John!)
+ * Usage: "Psie, chodź!" (Dog, come!), "Janie, gdzie jesteś?" (John, where are you?)
+ */
+
+/* ===== POLISH PHONOLOGICAL AND ORTHOGRAPHIC NOTES ===== */
+
+/*
+ * POLISH ALPHABET SPECIFICS:
+ * - 32 letters including: ą, ć, ę, ł, ń, ó, ś, ź, ż
+ * - Digraphs: ch, cz, dz, , rz, sz
+ * - No q, v, x except in foreign words
+ *
+ * STRESS RULES:
+ * - Almost always on penultimate (second-to-last) syllable
+ * - Exceptions: some foreign words, conditional forms
+ * - Examples: "ro-ZU-miem" (I understand), "po-MOC" (help)
+ *
+ * CONSONANT CLUSTERS:
+ * - Very common and complex
+ * - Examples: "chrząszcz" (beetle), "źdźbło" (blade of grass)
+ *             "pszczoła" (bee), "trzmiel" (bumblebee)
+ *
+ * VOWEL SYSTEM:
+ * - Oral vowels: a, e, i, o, u, y
+ * - Nasal vowels: ą [ɔw̃], ę [ɛw̃]
+ * - Nasal vowels represent historical nasalization
+ */
+
+/* ===== PRAGMATIC AND SOCIOLINGUISTIC FEATURES ===== */
+
+/*
+ * POLITENESS STRATEGIES:
+ *
+ * FORMAL ADDRESS:
+ * - "Pan" (Mr./Sir) + third person: "Pan jest" (You are - formal)
+ * - "Pani" (Mrs./Madam) + third person: "Pani ma" (You have - formal)
+ * - "Państwo" (Ladies and Gentlemen) + third person plural
+ *
+ * INFORMAL ADDRESS:
+ * - "Ty" + second person: "Ty jesteś" (You are - informal)
+ *
+ * POLITE REQUESTS:
+ * - "Proszę" + infinitive: "Proszę usiąść" (Please sit down)
+ * - Conditional: "Mógłby Pan..." (Could you... - formal)
+ *               "Mógłbyś..." (Could you... - informal)
+ *
+ * GRATITUDE EXPRESSIONS:
+ * - "Dziękuję" (Thank you)
+ * - "Bardzo dziękuję" (Thank you very much)
+ * - "Serdecznie dziękuję" (I thank you sincerely)
+ * - "Dziękuję uprzejmie" (I thank you kindly)
+ *
+ * APOLOGIES:
+ * - "Przepraszam" (I'm sorry/Excuse me)
+ * - "Bardzo przepraszam" (I'm very sorry)
+ * - "Proszę wybaczyć" (Please forgive)
+ *
+ * GREETINGS:
+ * - "Dzień dobry" (Good day - formal)
+ * - "Dobry wieczór" (Good evening - formal)
+ * - "Cześć" (Hi/Bye - informal)
+ * - "Witaj/Witajcie" (Welcome - informal)
+ * - "Do widzenia" (Goodbye - formal)
+ * - "Pa/Papa" (Bye - informal)
+ */
+
+/* End of comprehensive Polish grammar - now at Danish benchmark level */

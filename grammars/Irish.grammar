@@ -1,0 +1,24 @@
+Grammar: Irish
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+Keywords: agus, nó, ach, go, a, cé, cad, cathain, cá, conas, cén, fáth, má, ní, níor, i, ar, le, ó, do, an, seo, sin, mo, do, a, ár, bhur, a, mé, tú, sé, sí, sinn, sibh, siad
+<sentence> ::= <verb> <opt-whitespace> <subject>? <opt-whitespace> <object>? <punctuation>?
+<verb> ::= <initial-mutation>? /[a-záéíóú]+/ ( "aim" | "ann" | "adh" )
+<initial-mutation> ::= "b" | "m" | "d" | "g" | "f" | "c" | "t" | "p"
+<subject> ::= <pronoun> | <noun>
+<pronoun> ::= "mé" | "tú" | "sé" | "sí" | "sinn" | "sibh" | "siad"
+<noun> ::= /[a-záéíóú]+/
+<object> ::= <noun>
+<punctuation> ::= "." | "?" | "!"
+<whitespace> ::= /[ \t\n\r]+/
+<opt-whitespace> ::= /[ \t\n\r]*/
+@CONTEXT_RULE[vso-word-order]:
+    IF <sentence> IS unmarked
+    THEN ORDER: <verb> <subject> <object>
+    ELSE VALID
+@CONTEXT_RULE[initial-mutation]:
+    IF <grammatical-context> TRIGGERS mutation
+    THEN APPLY lenition OR eclipsis
+    ELSE VALID
