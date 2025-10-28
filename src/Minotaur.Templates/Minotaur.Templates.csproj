@@ -5,6 +5,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeContentInPack>true</IncludeContentInPack>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
     
     <!-- NuGet Package Properties -->
     <PackageId>DevelApp.Minotaur.Templates</PackageId>
@@ -41,12 +42,14 @@
     <Content Include="../Minotaur.UI.Electron/**/*.js" Exclude="../Minotaur.UI.Electron/node_modules/**;../Minotaur.UI.Electron/dist/**" PackagePath="content/ElectronDesktop/" />
     <Content Include="../Minotaur.UI.Electron/**/*.sh" PackagePath="content/ElectronDesktop/" />
     <Content Include="../Minotaur.UI.Electron/package.json" PackagePath="content/ElectronDesktop/" />
-    <Content Include="../Minotaur.UI.Electron/.gitignore" PackagePath="content/ElectronDesktop/" />
     <Content Include="../Minotaur.UI.Electron/**/*.md" PackagePath="content/ElectronDesktop/" />
     <Content Include="../Minotaur.UI.Electron/assets/**/*.*" PackagePath="content/ElectronDesktop/assets/" />
     
     <!-- Include README -->
     <None Include="README.md" Pack="true" PackagePath="" />
+    
+    <!-- Explicitly include .gitignore file (files starting with '.' need explicit inclusion) -->
+    <None Include="../Minotaur.UI.Electron/.gitignore" Pack="true" PackagePath="content/ElectronDesktop/" />
   </ItemGroup>
 
 </Project>
