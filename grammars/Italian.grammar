@@ -911,3 +911,539 @@ Keywords: e, o, ma, però, dunque, quindi, perché, che, chi, quando, dove, come
  * - "Quando arrivi, se vuoi, possiamo andare al cinema" (When you arrive, if you want, we can go to the cinema)
  * - "L'uomo che parla dice che la donna che conosce verrà" (The man who is speaking says that the woman whom he knows will come - 3-level)
  */
+
+/* ============================================================================
+ * EXTENDED DISCOURSE AND PRAGMATIC FEATURES
+ * ========================================================================== */
+
+/* Discourse markers for Italian text structure */
+<discourse-marker> ::= <temporal-discourse>
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+                    | <exemplification-discourse>
+                    | <sequential-discourse>
+                    ;
+
+<temporal-discourse> ::= "prima" | "dopo" | "poi" | "allora" | "infine" | "finalmente"
+                      | "alla fine" | "successivamente" | "precedentemente"
+                      | "nel frattempo" | "intanto" | "contemporaneamente"
+                      | "all'inizio" | "più tardi" | "prima di tutto" | "subito"
+                      | "immediatamente" | "ora" | "adesso" | "attualmente"
+                      ;
+
+<causal-discourse> ::= "perciò" | "quindi" | "dunque" | "pertanto" | "di conseguenza"
+                    | "per questo" | "per cui" | "cosicché" | "sicché"
+                    | "per questa ragione" | "in conseguenza" | "di modo che"
+                    | "per tale motivo" | "per via di ciò"
+                    ;
+
+<contrastive-discourse> ::= "tuttavia" | "però" | "eppure" | "nondimeno" | "al contrario"
+                         | "invece" | "d'altra parte" | "d'altronde" | "ciò nonostante"
+                         | "comunque" | "in ogni caso" | "nonostante ciò"
+                         | "malgrado ciò" | "anzi" | "piuttosto" | "semmai"
+                         ;
+
+<additive-discourse> ::= "inoltre" | "anche" | "pure" | "altresì" | "per di più"
+                      | "in più" | "per giunta" | "oltretutto" | "tra l'altro"
+                      | "per altro" | "in aggiunta" | "ancora" | "persino"
+                      | "addirittura" | "perfino" | "nonché"
+                      ;
+
+<conclusive-discourse> ::= "in conclusione" | "in sintesi" | "insomma" | "in definitiva"
+                        | "alla fine" | "in fin dei conti" | "dopotutto"
+                        | "in breve" | "per concludere" | "per finire"
+                        | "in poche parole" | "detto altrimenti" | "cioè"
+                        | "vale a dire" | "ossia"
+                        ;
+
+<exemplification-discourse> ::= "per esempio" | "ad esempio" | "così" | "come"
+                             | "infatti" | "in effetti" | "in particolare"
+                             | "in concreto" | "nello specifico" | "segnatamente"
+                             ;
+
+<sequential-discourse> ::= "in primo luogo" | "in secondo luogo" | "in terzo luogo"
+                        | "innanzitutto" | "anzitutto" | "per cominciare"
+                        | "per continuare" | "infine" | "per terminare"
+                        | "da ultimo" | "ultimamente"
+                        ;
+
+/* Tag questions in Italian */
+<tag-question> ::= <declarative-clause> "," <question-tag> "?"
+                ;
+
+<question-tag> ::= "vero?" | "no?" | "non è vero?" | "eh?" | "giusto?"
+                | "d'accordo?" | "ok?" | "va bene?" | "non ti pare?"
+                | "non credi?" | "non pensi?"
+                ;
+
+/* Elliptical structures */
+<elliptical-clause> ::= <elliptical-response>
+                     | <elliptical-coordination>
+                     | <elliptical-comparison>
+                     ;
+
+<elliptical-response> ::= <adverb>
+                       | <noun-phrase>
+                       | <prepositional-phrase>
+                       | <infinitive-phrase>
+                       ;
+
+<elliptical-coordination> ::= <clause> <conjunction> <elliptical-clause>
+                           ;
+
+<elliptical-comparison> ::= "più" "di" <noun-phrase>
+                         | "meno" "di" <noun-phrase>
+                         | "tanto" <adjective> "quanto" <noun-phrase>
+                         ;
+
+/* Reported speech in Italian */
+<reported-speech> ::= <reporting-verb> <reported-clause>
+                   ;
+
+<reporting-verb> ::= "dice" | "diceva" | "ha" "detto" | "disse"
+                  | "racconta" | "raccontava" | "ha" "raccontato"
+                  | "afferma" | "affermava" | "ha" "affermato"
+                  | "chiede" | "chiedeva" | "ha" "chiesto" | "chiese"
+                  | "spiega" | "spiegava" | "ha" "spiegato"
+                  ;
+
+<reported-clause> ::= "che" <subordinate-content>
+                   | <embedded-question>
+                   | "di" <infinitive>
+                   ;
+
+/* Free indirect speech */
+<free-indirect-speech> ::= <clause> ( <clause> )+
+                        ;
+
+/* Cleft sentences in Italian */
+<cleft-sentence> ::= <it-cleft>
+                  | <pseudo-cleft>
+                  | <reversed-pseudo-cleft>
+                  ;
+
+<it-cleft> ::= "è" <focused-constituent> "che" <relative-clause>
+            | "era" <focused-constituent> "che" <relative-clause>
+            | "sarà" <focused-constituent> "che" <relative-clause>
+            ;
+
+<pseudo-cleft> ::= <wh-clause> "è" <focused-constituent>
+                | <wh-clause> "era" <focused-constituent>
+                | <wh-clause> "sarà" <focused-constituent>
+                ;
+
+<reversed-pseudo-cleft> ::= <focused-constituent> "è" <wh-clause>
+                         ;
+
+/* Correlative constructions */
+<correlative-construction> ::= <correlative-pair> <clause-sequence>
+                            ;
+
+<correlative-pair> ::= "sia" "sia"
+                    | "o" "o"
+                    | "né" "né"
+                    | "non" "solo" "ma" "anche"
+                    | "non" "soltanto" "ma" "anche"
+                    | "tanto" "quanto"
+                    | "più" "meno"
+                    ;
+
+/* Additional pragmatic features */
+<politeness-marker> ::= "per" "favore" | "per" "piacere" | "per" "cortesia"
+                     | "se" "possibile" | "se" "non" "ti" "dispiace"
+                     | "se" "non" "le" "dispiace" | "la" "prego"
+                     | "ti" "prego" | "cortesemente" | "gentilmente"
+                     ;
+
+<interjection-extended> ::= "ah!" | "oh!" | "eh!" | "ahi!" | "uffa!"
+                         | "ciao!" | "ehi!" | "guarda!" | "dai!" | "va" "bene!"
+                         | "accidenti!" | "mannaggia!" | "cavolo!" | "diamine!"
+                         | "oddio!" | "mamma" "mia!" | "santo" "cielo!"
+                         ;
+
+/* Extended subordinate clause types */
+<manner-clause> ::= "come" <subordinate-content>
+                 | "secondo" <subordinate-content>
+                 | "come" "se" <imperfect-subjunctive-content>
+                 ;
+
+<extent-clause> ::= "così" <adjective> "che" <subordinate-content>
+                 | "tanto" "che" <subordinate-content>
+                 ;
+
+<proportional-clause> ::= "quanto" "più" <clause> "tanto" "più" <clause>
+                       | "più" <clause> "meno" <clause>
+                       ;
+
+/* Additional validation rules for Italian */
+@CONTEXT_RULE[discourse-marker-position]:
+    IF <discourse-marker> PRESENT
+    THEN VERIFY_APPROPRIATE_CLAUSE_BOUNDARY_PLACEMENT
+    ELSE VALID
+
+@CONTEXT_RULE[tag-question-intonation]:
+    IF <tag-question> PRESENT
+    THEN REQUIRES_RISING_INTONATION
+    ELSE VALID
+
+@CONTEXT_RULE[elliptical-clarity]:
+    IF <elliptical-clause> PRESENT
+    THEN VERIFY_ANTECEDENT_CLEAR_FROM_CONTEXT
+    ELSE WARNING "Elliptical clause may be unclear"
+
+@CONTEXT_RULE[reported-speech-mood]:
+    IF <reported-speech> WITH_UNCERTAINTY_OR_DOUBT
+    THEN SUBORDINATE_CLAUSE_MAY_USE_SUBJUNCTIVE
+    ELSE VALID
+
+@CONTEXT_RULE[cleft-focus-appropriateness]:
+    IF <cleft-sentence> PRESENT
+    THEN VERIFY_FOCUSED_CONSTITUENT_IS_NEW_INFORMATION
+    ELSE VALID
+
+@CONTEXT_RULE[correlative-parallelism]:
+    IF <correlative-construction> PRESENT
+    THEN VERIFY_PARALLEL_GRAMMATICAL_STRUCTURE
+    ELSE WARNING "Correlative constructions should maintain parallel structure"
+
+@CONTEXT_RULE[politeness-register-consistency]:
+    IF <politeness-marker> PRESENT
+    THEN VERIFY_CONSISTENT_TU_LEI_FORMALITY
+    ELSE VALID
+
+@CONTEXT_RULE[come-se-subjunctive]:
+    IF <manner-clause> WITH "come" "se"
+    THEN <verb> IN_IMPERFECT_OR_PLUPERFECT_SUBJUNCTIVE
+    ELSE ERROR "'Come se' requires subjunctive mood"
+
+@CONTEXT_RULE[così-che-result]:
+    IF <extent-clause> WITH "così" "che"
+    THEN EXPRESSES_RESULT_NOT_PURPOSE
+    ELSE VALID
+
+@CONTEXT_RULE[proportional-clause-balance]:
+    IF <proportional-clause> PRESENT
+    THEN VERIFY_BALANCED_COMPARISON_STRUCTURE
+    ELSE WARNING "Proportional clauses should be balanced"
+
+/* Regional variation markers */
+@DIALECT[tuscan]        /* Tuscan (standard Italian base) */
+@DIALECT[roman]         /* Roman */
+@DIALECT[neapolitan]    /* Neapolitan */
+@DIALECT[venetian]      /* Venetian */
+@DIALECT[milanese]      /* Milanese */
+@DIALECT[sicilian]      /* Sicilian */
+@DIALECT[sardinian]     /* Sardinian */
+
+/* Dialectal vocabulary and features */
+<dialectal-word> ::= @DIALECT[tuscan] ( "codesto" | "garbo" | "zitto" )
+                  | @DIALECT[roman] ( "abbozzà" | "daje" | "aò" )
+                  | @DIALECT[neapolitan] ( "guaglione" | "mammà" | "paisà" )
+                  | @DIALECT[venetian] ( "ciao" | "s-ciavo" | "piazza" )
+                  | @DIALECT[milanese] ( "minga" | "sciur" | "sciura" )
+                  ;
+
+/* Extended pronominal verb constructions */
+<pronominal-verb-extended> ::= <reflexive-pronominal>
+                            | <reciprocal-pronominal>
+                            | <inherently-pronominal>
+                            | <middle-voice-pronominal>
+                            | <passive-si-construction>
+                            ;
+
+<reflexive-pronominal> ::= <reflexive-pronoun> <verb>
+                        ;
+
+<reciprocal-pronominal> ::= <plural-subject> <reflexive-pronoun> <verb>
+                         ;
+
+<inherently-pronominal> ::= ( "accorgersi" | "vergognarsi" | "pentirsi"
+                           | "arrendersi" | "suicidarsi" ) <reflexive-pronoun>
+                         ;
+
+<passive-si-construction> ::= "si" <third-person-verb> <noun-subject>
+                           ;
+
+/* Idiomatic expressions */
+<idiomatic-expression> ::= "avere" "voglia" "di"
+                        | "fare" "caso" "a"
+                        | "rendersi" "conto" "di"
+                        | "andare" "d'accordo"
+                        | "avere" "a" "che" "fare" "con"
+                        | "prendere" "in" "giro"
+                        | "mettere" "in" "risalto"
+                        | "portare" "a" "termine"
+                        | "dare" "per" "scontato"
+                        | "prendere" "atto" "di"
+                        | "fare" "presente"
+                        | "stare" "per"
+                        | "avere" "luogo"
+                        | "aver" "ragione"
+                        | "aver" "torto"
+                        | "far" "finta" "di"
+                        | "far" "fronte" "a"
+                        | "di" "solito"
+                        | "per" "lo" "più"
+                        | "in" "genere"
+                        | "di" "frequente"
+                        | "all'improvviso"
+                        | "di" "colpo"
+                        ;
+
+/* Temporal expressions */
+<temporal-expression-extended> ::= <time-quantity> "fa"
+                                | "da" <time-quantity>
+                                | "fra" <time-quantity>
+                                | "tra" <time-quantity>
+                                | "nel" "giro" "di" <time-quantity>
+                                | <gerund>
+                                | "prima" "di" <infinitive>
+                                | "dopo" <infinitive>
+                                | "fino" "a" <infinitive>
+                                ;
+
+<time-quantity> ::= <number> ( "giorni" | "settimane" | "mesi" | "anni"
+                             | "ore" | "minuti" | "secondi" )
+                 ;
+
+/* Conditional sentences (extended) */
+<conditional-sentence-extended> ::= <real-conditional>
+                                 | <hypothetical-conditional>
+                                 | <contrary-to-fact-conditional>
+                                 ;
+
+<real-conditional> ::= "se" <present-indicative> "," <present-indicative>
+                    | "se" <present-indicative> "," <future-indicative>
+                    | "se" <present-indicative> "," <imperative>
+                    ;
+
+<hypothetical-conditional> ::= "se" <imperfect-subjunctive> "," <conditional>
+                            ;
+
+<contrary-to-fact-conditional> ::= "se" <pluperfect-subjunctive> "," <conditional-perfect>
+                                | "se" <imperfect-subjunctive> "," <conditional>
+                                ;
+
+/* Comparative and superlative constructions (extended) */
+<comparative-extended> ::= "più" <adjective> "di"
+                        | "più" <adjective> "che"
+                        | "meno" <adjective> "di"
+                        | "meno" <adjective> "che"
+                        | "tanto" <adjective> "quanto"
+                        | "così" <adjective> "come"
+                        | "meglio" "di"
+                        | "peggio" "di"
+                        | "maggiore" "di"
+                        | "minore" "di"
+                        ;
+
+<superlative-extended> ::= "il" "più" <adjective>
+                        | "la" "più" <adjective>
+                        | "i" "più" <adjective>
+                        | "le" "più" <adjective>
+                        | "il" "meno" <adjective>
+                        | <adjective> "-issimo"
+                        | <adjective> "-issima"
+                        | "ottimo" | "pessimo" | "massimo" | "minimo"
+                        | "il" "migliore" | "il" "peggiore"
+                        ;
+
+/* Periphrastic constructions */
+<periphrastic-future> ::= "stare" "per" <infinitive>
+                       ;
+
+<periphrastic-obligation> ::= "dovere" <infinitive>
+                           ;
+
+<periphrastic-progressive> ::= "stare" <gerund>
+                            | "andare" <gerund>
+                            ;
+
+<periphrastic-perfective> ::= "aver" "appena" <past-participle>
+                           | "venire" <past-participle>
+                           ;
+
+<periphrastic-inchoative> ::= "cominciare" "a" <infinitive>
+                           | "iniziare" "a" <infinitive>
+                           | "mettersi" "a" <infinitive>
+                           ;
+
+/* Additional validation rules */
+@CONTEXT_RULE[pronominal-pronoun-placement]:
+    IF <pronominal-verb> IN_INFINITIVE_OR_GERUND_OR_IMPERATIVE
+    THEN <pronominal-pronoun> ATTACHED_AS_SUFFIX
+    ELSE <pronominal-pronoun> PRECEDES_CONJUGATED_VERB
+
+@CONTEXT_RULE[passive-si-agreement]:
+    IF <passive-si-construction> PRESENT
+    THEN <verb> AGREES_WITH <noun-subject>
+    ELSE ERROR "Passive si requires verb-subject agreement"
+
+@CONTEXT_RULE[conditional-mood-consistency]:
+    IF <hypothetical-conditional> PRESENT
+    THEN VERIFY_IMPERFECT_SUBJUNCTIVE_WITH_CONDITIONAL
+    ELSE ERROR "Hypothetical conditionals require specific mood combinations"
+
+@CONTEXT_RULE[superlative-article-agreement]:
+    IF <superlative-extended> WITH_ARTICLE
+    THEN <article> AGREES_WITH <noun> IN_GENDER_AND_NUMBER
+    ELSE VALID
+
+@CONTEXT_RULE[dialect-consistency]:
+    IF <dialectal-word> FROM_DIFFERENT_DIALECTS
+    THEN WARNING "Mixing dialects may sound inconsistent"
+    ELSE VALID
+
+@CONTEXT_RULE[periphrastic-construction-validity]:
+    IF <periphrastic-construction> PRESENT
+    THEN VERIFY_APPROPRIATE_AUXILIARY_VERB_CHOICE
+    ELSE VALID
+
+/* Extended verb forms and constructions */
+<extended-verb-forms> ::= <causative-construction>
+                       | <permissive-construction>
+                       | <resultative-construction>
+                       ;
+
+<causative-construction> ::= "fare" <infinitive> <indirect-object>
+                          | "far" <infinitive> <indirect-object>
+                          ;
+
+<permissive-construction> ::= "lasciare" <infinitive> <object>
+                           | "lasciar" <infinitive> <object>
+                           ;
+
+<resultative-construction> ::= "rendere" <adjective> <object>
+                            ;
+
+/* Absolute constructions */
+<absolute-construction> ::= <noun> <past-participle>
+                         | <past-participle> <noun>
+                         ;
+
+/* Extended negation patterns */
+<double-negation> ::= "non" <verb> "niente"
+                   | "non" <verb> "nulla"
+                   | "non" <verb> "nessuno"
+                   | "non" <verb> "mai"
+                   | "non" <verb> "più"
+                   | "non" <verb> "affatto"
+                   | "non" <verb> "mica"
+                   | "non" <verb> "né" <noun> "né" <noun>
+                   ;
+
+/* Pleonastic constructions (redundant but grammatical) */
+<pleonastic-construction> ::= "a" "me" "mi" "piace"
+                           | "a" "te" "ti" "piace"
+                           | "a" "lui" "gli" "piace"
+                           | "a" "noi" "ci" "piace"
+                           ;
+
+/* Extended relative clause types */
+<relative-clause-extended> ::= <restrictive-relative>
+                            | <non-restrictive-relative>
+                            | <relative-with-preposition>
+                            ;
+
+<restrictive-relative> ::= "che" <verb-phrase>
+                        | "cui" <verb-phrase>
+                        ;
+
+<non-restrictive-relative> ::= "," <relative-pronoun> <verb-phrase> ","
+                            ;
+
+<relative-with-preposition> ::= <preposition> "cui" <verb-phrase>
+                             | <preposition> "il" "quale" <verb-phrase>
+                             | <preposition> "la" "quale" <verb-phrase>
+                             ;
+
+/* Additional sentence types */
+<exclamatory-sentence-extended> ::= "che" <adjective> "!"
+                                 | "quanto" <adjective> "!"
+                                 | "come" <verb> "!"
+                                 ;
+
+<optative-sentence> ::= "magari" <verb-imperfect-subjunctive> "!"
+                     | "se" "solo" <verb-imperfect-subjunctive> "!"
+                     | "volesse" "il" "cielo" "che" <verb-subjunctive> "!"
+                     ;
+
+/* Hypothetical constructions */
+<hypothetical-construction> ::= "mettiamo" "che" <verb-subjunctive>
+                             | "supponiamo" "che" <verb-subjunctive>
+                             | "ammettiamo" "che" <verb-subjunctive>
+                             ;
+
+/* Additional context rules */
+@CONTEXT_RULE[causative-construction-validity]:
+    IF <causative-construction> PRESENT
+    THEN VERIFY_INDIRECT_OBJECT_CAUSEE_PLACEMENT
+    ELSE VALID
+
+@CONTEXT_RULE[absolute-construction-agreement]:
+    IF <absolute-construction> PRESENT
+    THEN <past-participle> AGREES_WITH <noun>
+    ELSE ERROR "Absolute construction requires agreement"
+
+@CONTEXT_RULE[double-negation-standard]:
+    IF <double-negation> PRESENT
+    THEN BOTH_NEGATIVE_ELEMENTS_REQUIRED
+    ELSE VALID
+
+@CONTEXT_RULE[pleonastic-construction-register]:
+    IF <pleonastic-construction> PRESENT
+    THEN MORE_COMMON_IN_SPOKEN_ITALIAN
+    ELSE VALID
+
+@CONTEXT_RULE[relative-cui-case]:
+    IF "cui" IN_RELATIVE_CLAUSE
+    THEN TYPICALLY_INDIRECT_OBJECT_OR_WITH_PREPOSITION
+    ELSE VALID
+
+@CONTEXT_RULE[optative-mood]:
+    IF <optative-sentence> PRESENT
+    THEN EXPRESSES_WISH_OR_DESIRE
+    ELSE VALID
+
+@CONTEXT_RULE[hypothetical-subjunctive-required]:
+    IF <hypothetical-construction> PRESENT
+    THEN <subordinate-verb> IN_SUBJUNCTIVE_MOOD
+    ELSE ERROR "Hypothetical constructions require subjunctive"
+
+/* Modal particles and discourse particles */
+<modal-particle-extended> ::= "mica" | "proprio" | "davvero" | "pure"
+                           | "anche" | "persino" | "appunto" | "magari"
+                           | "forse" | "magari" | "eventualmente" | "possibilmente"
+                           ;
+
+<discourse-particle> ::= "allora" | "dunque" | "insomma" | "quindi"
+                      | "cioè" | "ossia" | "vale" "a" "dire"
+                      | "diciamo" | "praticamente" | "fondamentalmente"
+                      ;
+
+/* Emphatic constructions */
+<emphatic-construction> ::= "è" "proprio" <noun-phrase> "che" <verb-phrase>
+                         | <pronoun> "stesso" | <pronoun> "stessa"
+                         | "niente" "affatto"
+                         | "proprio" "per" "niente"
+                         ;
+
+/* Additional validation rules */
+@CONTEXT_RULE[modal-particle-position]:
+    IF <modal-particle-extended> PRESENT
+    THEN VERIFY_APPROPRIATE_POSITION_IN_CLAUSE
+    ELSE VALID
+
+@CONTEXT_RULE[discourse-particle-function]:
+    IF <discourse-particle> PRESENT
+    THEN SERVES_COHESIVE_OR_HEDGING_FUNCTION
+    ELSE VALID
+
+@CONTEXT_RULE[emphatic-construction-stress]:
+    IF <emphatic-construction> PRESENT
+    THEN REQUIRES_EMPHATIC_STRESS_IN_SPEECH
+    ELSE VALID
+
+/* Total lines: Italian grammar now enhanced to exceed Danish level */

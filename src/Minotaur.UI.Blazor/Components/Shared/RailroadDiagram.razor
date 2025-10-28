@@ -1,0 +1,314 @@
+@* Railroad Diagram Component for Grammar Visualization *@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<div class="railroad-diagram-container">
+    @if (!string.IsNullOrEmpty(RuleName) && !string.IsNullOrEmpty(RuleDefinition))
+    {
+        <div class="diagram-header">
+            <h6>@RuleName</h6>
+            <div class="diagram-actions">
+                <button class="btn btn-sm btn-outline-secondary" @onclick="ExportSVG" title="Export as SVG">
+                    <i class="bi bi-download"></i> SVG
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" @onclick="ExportPNG" title="Export as PNG">
+                    <i class="bi bi-image"></i> PNG
+                </button>
+            </div>
+        </div>
+        
+        <div class="diagram-canvas" @ref="diagramRef">
+            @* SVG Railroad Diagram will be rendered here *@
+            <svg id="railroad-diagram-svg" width="100%" height="@(DiagramHeight)px" class="railroad-svg">
+                @((MarkupString)GenerateSVGDiagram())
+            </svg>
+        </div>
+        
+        <div class="diagram-info">
+            <small class="text-muted">
+                <i class="bi bi-info-circle"></i> 
+                Railroad diagram shows the syntax flow for this grammar rule
+            </small>
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-muted p-4">
+            <i class="bi bi-diagram-3 fs-1"></i>
+            <p>Select a grammar rule to view its railroad diagram</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? RuleName { get; set; }
+    
+    [Parameter]
+    public string? RuleDefinition { get; set; }
+    
+    [Parameter]
+    public int DiagramHeight { get; set; } = 200;
+    
+    private ElementReference diagramRef;
+    
+    private string GenerateSVGDiagram()
+    {
+        if (string.IsNullOrEmpty(RuleDefinition))
+            return string.Empty;
+            
+        // Enhanced railroad diagram generation with support for more grammar patterns
+        var sb = new System.Text.StringBuilder();
+        
+        // Start with basic SVG structure
+        int y = 50;
+        int x = 20;
+        int startX = x;
+        
+        // Entry point
+        sb.Append($"<circle cx=\"{x}\" cy=\"{y}\" r=\"5\" fill=\"#007bff\" />");
+        x += 15;
+        
+        // Parse the rule definition into components
+        var components = ParseRuleComponents(RuleDefinition);
+        
+        foreach (var component in components)
+        {
+            if (component.Type == "terminal")
+            {
+                // Terminal: rounded rectangle
+                int width = Math.Max(60, component.Text.Length * 10);
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" rx=\"15\" fill=\"#e3f2fd\" stroke=\"#2196f3\" stroke-width=\"2\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"12\" fill=\"#1565c0\">{System.Web.HttpUtility.HtmlEncode(component.Text)}</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
+            }
+            else if (component.Type == "nonterminal")
+            {
+                // Non-terminal: rectangle (clickable in future)
+                int width = Math.Max(80, component.Text.Length * 10);
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" fill=\"#fff3e0\" stroke=\"#ff9800\" stroke-width=\"2\" class=\"nonterminal-ref\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#e65100\">{System.Web.HttpUtility.HtmlEncode(component.Text)}</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
+            }
+            else if (component.Type == "choice")
+            {
+                // Choice operator (|)
+                sb.Append($"<text x=\"{x}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"monospace\" font-size=\"16\" font-weight=\"bold\" fill=\"#d32f2f\">|</text>");
+                sb.Append($"<line x1=\"{x + 10}\" y1=\"{y}\" x2=\"{x + 30}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += 30;
+            }
+            else if (component.Type == "optional")
+            {
+                // Optional: ? - show with bypass path
+                int width = Math.Max(80, component.Text.Length * 10);
+                
+                // Draw bypass arc above
+                sb.Append($"<path d=\"M {x} {y} Q {x + width/2} {y - 25} {x + width} {y}\" fill=\"none\" stroke=\"#9e9e9e\" stroke-width=\"1\" stroke-dasharray=\"3,3\" />");
+                
+                // Draw main element
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" rx=\"5\" fill=\"#f3e5f5\" stroke=\"#9c27b0\" stroke-width=\"2\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#6a1b9a\">{System.Web.HttpUtility.HtmlEncode(component.Text)}?</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
+            }
+            else if (component.Type == "repeat")
+            {
+                // Repetition: * or + - show with loop back
+                int width = Math.Max(80, component.Text.Length * 10);
+                
+                // Draw loop arc below
+                sb.Append($"<path d=\"M {x + width} {y} Q {x + width/2} {y + 25} {x} {y}\" fill=\"none\" stroke=\"#4caf50\" stroke-width=\"2\" />");
+                sb.Append($"<polygon points=\"{x + 5},{y - 3} {x},{y} {x + 5},{y + 3}\" fill=\"#4caf50\" />");
+                
+                // Draw main element
+                sb.Append($"<rect x=\"{x}\" y=\"{y - 15}\" width=\"{width}\" height=\"30\" rx=\"5\" fill=\"#e8f5e9\" stroke=\"#4caf50\" stroke-width=\"2\" />");
+                sb.Append($"<text x=\"{x + width/2}\" y=\"{y + 5}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" fill=\"#2e7d32\">{System.Web.HttpUtility.HtmlEncode(component.Text)}{component.Modifier}</text>");
+                
+                // Connection line
+                sb.Append($"<line x1=\"{x + width}\" y1=\"{y}\" x2=\"{x + width + 20}\" y2=\"{y}\" stroke=\"#007bff\" stroke-width=\"2\" />");
+                x += width + 20;
+            }
+        }
+        
+        // Exit point
+        sb.Append($"<circle cx=\"{x}\" cy=\"{y}\" r=\"5\" fill=\"#007bff\" />");
+        sb.Append($"<circle cx=\"{x}\" cy=\"{y}\" r=\"8\" fill=\"none\" stroke=\"#007bff\" stroke-width=\"2\" />");
+        
+        return sb.ToString();
+    }
+    
+    private List<DiagramComponent> ParseRuleComponents(string definition)
+    {
+        var components = new List<DiagramComponent>();
+        
+        // Enhanced parser with support for ?, *, + modifiers
+        var parts = definition.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var part = parts[i];
+            
+            // Skip grammar syntax
+            if (part == ":" || part == ";" || part == "(" || part == ")")
+                continue;
+                
+            if (part == "|")
+            {
+                components.Add(new DiagramComponent { Type = "choice", Text = "|" });
+            }
+            else if (part.StartsWith("'") || part.StartsWith("\""))
+            {
+                // Terminal (literal) - check for modifiers
+                var text = part.Trim('\'', '"', '?', '*', '+');
+                var type = "terminal";
+                
+                if (part.EndsWith("?"))
+                    type = "optional";
+                else if (part.EndsWith("*") || part.EndsWith("+"))
+                {
+                    type = "repeat";
+                    components.Add(new DiagramComponent { Type = type, Text = text, Modifier = part.EndsWith("*") ? "*" : "+" });
+                    continue;
+                }
+                
+                components.Add(new DiagramComponent { Type = type, Text = text });
+            }
+            else if (char.IsUpper(part[0]) && part.TrimEnd('?', '*', '+').All(c => char.IsUpper(c) || c == '_'))
+            {
+                // Token/Terminal (uppercase) - check for modifiers
+                var text = part.TrimEnd('?', '*', '+');
+                var type = "terminal";
+                
+                if (part.EndsWith("?"))
+                    type = "optional";
+                else if (part.EndsWith("*") || part.EndsWith("+"))
+                {
+                    type = "repeat";
+                    components.Add(new DiagramComponent { Type = type, Text = text, Modifier = part.EndsWith("*") ? "*" : "+" });
+                    continue;
+                }
+                
+                components.Add(new DiagramComponent { Type = type, Text = text });
+            }
+            else
+            {
+                // Non-terminal rule reference - check for modifiers
+                var text = part.TrimEnd('?', '*', '+');
+                var type = "nonterminal";
+                
+                if (part.EndsWith("?"))
+                    type = "optional";
+                else if (part.EndsWith("*") || part.EndsWith("+"))
+                {
+                    type = "repeat";
+                    components.Add(new DiagramComponent { Type = type, Text = text, Modifier = part.EndsWith("*") ? "*" : "+" });
+                    continue;
+                }
+                
+                components.Add(new DiagramComponent { Type = type, Text = text });
+            }
+        }
+        
+        return components;
+    }
+    
+    private async Task ExportSVG()
+    {
+        // Export SVG by downloading the SVG content
+        var svgContent = GenerateCompleteSVG();
+        var fileName = $"{RuleName}_railroad_diagram.svg";
+        
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "image/svg+xml", svgContent);
+    }
+    
+    private async Task ExportPNG()
+    {
+        // Export PNG by converting SVG to PNG using canvas
+        var fileName = $"{RuleName}_railroad_diagram.png";
+        await JSRuntime.InvokeVoidAsync("exportSvgToPng", "railroad-diagram-svg", fileName);
+    }
+    
+    private string GenerateCompleteSVG()
+    {
+        // Generate a complete standalone SVG file with XML declaration and proper dimensions
+        var svgContent = GenerateSVGDiagram();
+        
+        return $@"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?>
+<svg xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" 
+     width=""100%"" height=""{DiagramHeight}px"" viewBox=""0 0 800 {DiagramHeight}"">
+  <title>Railroad Diagram: {System.Web.HttpUtility.HtmlEncode(RuleName)}</title>
+  <desc>Railroad diagram for grammar rule: {System.Web.HttpUtility.HtmlEncode(RuleName)}</desc>
+  <rect width=""100%"" height=""100%"" fill=""#f8f9fa""/>
+  {svgContent}
+</svg>";
+    }
+    
+    private class DiagramComponent
+    {
+        public string Type { get; set; } = "";
+        public string Text { get; set; } = "";
+        public string Modifier { get; set; } = "";
+    }
+}
+
+<style>
+    .railroad-diagram-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .diagram-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .diagram-header h6 {
+        margin: 0;
+        color: #495057;
+    }
+    
+    .diagram-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .diagram-canvas {
+        flex: 1;
+        overflow: auto;
+        padding: 1rem;
+        background: #f8f9fa;
+    }
+    
+    .railroad-svg {
+        display: block;
+        margin: 0 auto;
+    }
+    
+    .railroad-svg .nonterminal-ref {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .railroad-svg .nonterminal-ref:hover {
+        filter: brightness(0.9);
+        stroke-width: 3;
+    }
+    
+    .diagram-info {
+        padding: 0.5rem;
+        border-top: 1px solid #dee2e6;
+        background: #f8f9fa;
+    }
+</style>

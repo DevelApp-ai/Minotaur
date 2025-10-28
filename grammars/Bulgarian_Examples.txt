@@ -1,0 +1,127 @@
+# Bulgarian Language Example Sentences
+
+## Present Tense
+
+Аз чета книга.
+Ти пишеш писмо.
+Той учи математика.
+Тя работи в училище.
+Ние живеем в София.
+Вие имате време.
+Те учат български.
+
+## Past Tense - Aorist (Perfective)
+
+Аз прочетох книгата.
+Ти написа писмото.
+Той научи урока.
+Тя отиде на работа.
+
+## Past Tense - Imperfect (Imperfective)
+
+Аз четях когато ти дойде.
+Ти пишеше цял ден.
+Той учеше вчера.
+Тя работеше в София.
+
+## Perfect Tense
+
+Аз съм чел тази книга.
+Ти си писал писмо.
+Той е учил математика.
+Тя е била там.
+
+## Future Tense
+
+Аз ще чета книгата.
+Ти ще пишеш писмо.
+Той ще учи утре.
+Тя ще работи.
+
+## Definite Article Suffixes
+
+# Masculine
+човекът (the man)
+столът (the chair)
+
+# Feminine
+книгата (the book)
+жената (the woman)
+
+# Neuter
+детето (the child)
+морето (the sea)
+
+# Plural
+хората (the people)
+книгите (the books)
+
+## Да-Construction
+
+# Subjunctive/Purpose
+Искам да чета.
+Трябва да отида.
+Може да дойда.
+
+# Imperative
+Да четеш!
+Да дойдеш!
+
+## No Cases - Prepositional Phrases
+
+в къщата (in the house)
+на масата (on the table)
+от София (from Sofia)
+до града (to the city)
+за теб (for you)
+с мен (with me)
+
+## Questions
+
+Кой си ти?
+Какво правиш?
+Къде живееш?
+Кога ще дойдеш?
+Как се казваш?
+Защо учиш български?
+
+## Negation
+
+Не чета.
+Не отивам.
+Никой не знае.
+Нищо не се случва.
+Никога не ходя там.
+
+## Aspect Pairs
+
+# Imperfective
+Чета книга всеки ден.
+Пиша писмо.
+
+# Perfective
+Прочетох книгата.
+Написах писмото.
+
+## Comparative and Superlative
+
+добър (good)
+по-добър (better)
+най-добър (best)
+
+голям (big)
+по-голям (bigger)
+най-голям (biggest)
+
+## Complex Sentences
+
+Знам, че той работи.
+Ако дойдеш, ще се радвам.
+Книгата, която чета, е интересна.
+Когато дойдох, той си тръгваше.
+
+## Clitic Doubling
+
+Казах му на Иван.
+Дадох й на Мария.
+Видях ги децата.

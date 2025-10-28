@@ -1,0 +1,354 @@
+@* Syntax Tree Visualization Component *@
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<div class="syntax-tree-container">
+    @if (!string.IsNullOrEmpty(ParseTreeData))
+    {
+        <div class="tree-header">
+            <h6>Syntax Tree: @RuleName</h6>
+            <div class="tree-actions">
+                <button class="btn btn-sm btn-outline-secondary" @onclick="ExpandAll" title="Expand All Nodes">
+                    <i class="bi bi-arrows-expand"></i> Expand All
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" @onclick="CollapseAll" title="Collapse All Nodes">
+                    <i class="bi bi-arrows-collapse"></i> Collapse All
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" @onclick="ExportGraphML" title="Export as GraphML">
+                    <i class="bi bi-download"></i> GraphML
+                </button>
+            </div>
+        </div>
+        
+        <div class="tree-canvas" @ref="treeCanvasRef">
+            <div id="syntax-tree-visualization" class="tree-svg-container">
+                @((MarkupString)GenerateTreeSVG())
+            </div>
+        </div>
+        
+        <div class="tree-info">
+            <small class="text-muted">
+                <i class="bi bi-info-circle"></i> 
+                Click nodes to expand/collapse. Colored nodes indicate different grammar rule types.
+            </small>
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-muted p-4">
+            <i class="bi bi-diagram-3-fill fs-1"></i>
+            <p>Parse source code to view the syntax tree</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? RuleName { get; set; }
+    
+    [Parameter]
+    public string? ParseTreeData { get; set; }
+    
+    private ElementReference treeCanvasRef;
+    
+    private class TreeNode
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = ""; // terminal, nonterminal, rule
+        public List<TreeNode> Children { get; set; } = new();
+        public bool IsExpanded { get; set; } = true;
+        public int Level { get; set; } = 0;
+    }
+    
+    private List<TreeNode> nodes = new();
+    
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(ParseTreeData))
+        {
+            nodes = ParseTreeStructure(ParseTreeData);
+        }
+    }
+    
+    private string GenerateTreeSVG()
+    {
+        if (nodes.Count == 0)
+            return string.Empty;
+            
+        var sb = new System.Text.StringBuilder();
+        int svgHeight = CalculateTreeHeight(nodes) * 60 + 100;
+        
+        sb.Append($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"{svgHeight}px\" viewBox=\"0 0 800 {svgHeight}\">");
+        
+        // Render tree nodes recursively
+        int yOffset = 40;
+        RenderNode(sb, nodes[0], 400, yOffset, 0);
+        
+        sb.Append("</svg>");
+        
+        return sb.ToString();
+    }
+    
+    private void RenderNode(System.Text.StringBuilder sb, TreeNode node, int x, int y, int level)
+    {
+        // Node styling based on type
+        string fillColor = node.Type switch
+        {
+            "terminal" => "#e3f2fd",
+            "nonterminal" => "#fff3e0",
+            "rule" => "#f3e5f5",
+            _ => "#f5f5f5"
+        };
+        
+        string strokeColor = node.Type switch
+        {
+            "terminal" => "#2196f3",
+            "nonterminal" => "#ff9800",
+            "rule" => "#9c27b0",
+            _ => "#757575"
+        };
+        
+        int nodeWidth = Math.Max(80, node.Name.Length * 8);
+        int nodeHeight = 30;
+        
+        // Draw node rectangle
+        sb.Append($"<rect x=\"{x - nodeWidth/2}\" y=\"{y}\" width=\"{nodeWidth}\" height=\"{nodeHeight}\" ");
+        sb.Append($"rx=\"5\" fill=\"{fillColor}\" stroke=\"{strokeColor}\" stroke-width=\"2\" ");
+        sb.Append($"class=\"tree-node\" style=\"cursor: pointer;\" />");
+        
+        // Draw node text
+        sb.Append($"<text x=\"{x}\" y=\"{y + 20}\" text-anchor=\"middle\" ");
+        sb.Append($"font-family=\"monospace\" font-size=\"12\" fill=\"#333\">");
+        sb.Append($"{System.Web.HttpUtility.HtmlEncode(node.Name)}</text>");
+        
+        // Draw children if expanded
+        if (node.IsExpanded && node.Children.Count > 0)
+        {
+            int childY = y + 60;
+            int childSpacing = 800 / (node.Children.Count + 1);
+            int startX = x - (childSpacing * (node.Children.Count - 1)) / 2;
+            
+            for (int i = 0; i < node.Children.Count; i++)
+            {
+                int childX = startX + (i * childSpacing);
+                
+                // Draw connecting line
+                sb.Append($"<line x1=\"{x}\" y1=\"{y + nodeHeight}\" x2=\"{childX}\" y2=\"{childY}\" ");
+                sb.Append($"stroke=\"#bdbdbd\" stroke-width=\"1.5\" />");
+                
+                // Recursively render child
+                RenderNode(sb, node.Children[i], childX, childY, level + 1);
+            }
+        }
+        else if (node.Children.Count > 0 && !node.IsExpanded)
+        {
+            // Draw collapse indicator (...)
+            sb.Append($"<text x=\"{x}\" y=\"{y + nodeHeight + 15}\" text-anchor=\"middle\" ");
+            sb.Append($"font-size=\"14\" fill=\"#757575\">...</text>");
+        }
+    }
+    
+    private int CalculateTreeHeight(List<TreeNode> nodes)
+    {
+        if (nodes.Count == 0) return 0;
+        return CalculateNodeDepth(nodes[0]);
+    }
+    
+    private int CalculateNodeDepth(TreeNode node)
+    {
+        if (!node.IsExpanded || node.Children.Count == 0)
+            return 1;
+            
+        int maxChildDepth = 0;
+        foreach (var child in node.Children)
+        {
+            maxChildDepth = Math.Max(maxChildDepth, CalculateNodeDepth(child));
+        }
+        
+        return 1 + maxChildDepth;
+    }
+    
+    private List<TreeNode> ParseTreeStructure(string data)
+    {
+        // Simple parser for demo purposes - creates a basic tree structure
+        // In production, this would parse actual AST data
+        var root = new TreeNode
+        {
+            Name = RuleName ?? "compilationUnit",
+            Type = "rule",
+            Level = 0,
+            IsExpanded = true,
+            Children = new List<TreeNode>
+            {
+                new TreeNode 
+                { 
+                    Name = "statement", 
+                    Type = "nonterminal",
+                    Level = 1,
+                    IsExpanded = true,
+                    Children = new List<TreeNode>
+                    {
+                        new TreeNode { Name = "variableDeclaration", Type = "nonterminal", Level = 2, IsExpanded = true,
+                            Children = new List<TreeNode>
+                            {
+                                new TreeNode { Name = "'var'", Type = "terminal", Level = 3 },
+                                new TreeNode { Name = "IDENTIFIER", Type = "terminal", Level = 3 },
+                                new TreeNode { Name = "'='", Type = "terminal", Level = 3 },
+                                new TreeNode { Name = "expression", Type = "nonterminal", Level = 3 }
+                            }
+                        },
+                        new TreeNode { Name = "';'", Type = "terminal", Level = 2 }
+                    }
+                },
+                new TreeNode 
+                { 
+                    Name = "statement", 
+                    Type = "nonterminal",
+                    Level = 1,
+                    IsExpanded = true,
+                    Children = new List<TreeNode>
+                    {
+                        new TreeNode { Name = "assignment", Type = "nonterminal", Level = 2, IsExpanded = true,
+                            Children = new List<TreeNode>
+                            {
+                                new TreeNode { Name = "IDENTIFIER", Type = "terminal", Level = 3 },
+                                new TreeNode { Name = "'='", Type = "terminal", Level = 3 },
+                                new TreeNode { Name = "expression", Type = "nonterminal", Level = 3 }
+                            }
+                        },
+                        new TreeNode { Name = "';'", Type = "terminal", Level = 2 }
+                    }
+                },
+                new TreeNode { Name = "EOF", Type = "terminal", Level = 1 }
+            }
+        };
+        
+        return new List<TreeNode> { root };
+    }
+    
+    private void ExpandAll()
+    {
+        SetExpandedState(nodes, true);
+        StateHasChanged();
+    }
+    
+    private void CollapseAll()
+    {
+        SetExpandedState(nodes, false);
+        StateHasChanged();
+    }
+    
+    private void SetExpandedState(List<TreeNode> nodeList, bool expanded)
+    {
+        foreach (var node in nodeList)
+        {
+            node.IsExpanded = expanded;
+            if (node.Children.Count > 0)
+            {
+                SetExpandedState(node.Children, expanded);
+            }
+        }
+    }
+    
+    private async Task ExportGraphML()
+    {
+        var graphML = GenerateGraphML();
+        var fileName = $"{RuleName}_syntax_tree.graphml";
+        
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, "application/xml", graphML);
+    }
+    
+    private string GenerateGraphML()
+    {
+        var sb = new System.Text.StringBuilder();
+        
+        sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        sb.AppendLine("<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"");
+        sb.AppendLine("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        sb.AppendLine("    xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns");
+        sb.AppendLine("    http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">");
+        sb.AppendLine("  <key id=\"label\" for=\"node\" attr.name=\"label\" attr.type=\"string\"/>");
+        sb.AppendLine("  <key id=\"type\" for=\"node\" attr.name=\"type\" attr.type=\"string\"/>");
+        sb.AppendLine("  <graph id=\"SyntaxTree\" edgedefault=\"directed\">");
+        
+        int nodeId = 0;
+        GenerateGraphMLNodes(sb, nodes, ref nodeId, -1);
+        
+        sb.AppendLine("  </graph>");
+        sb.AppendLine("</graphml>");
+        
+        return sb.ToString();
+    }
+    
+    private void GenerateGraphMLNodes(System.Text.StringBuilder sb, List<TreeNode> nodeList, ref int nodeId, int parentId)
+    {
+        foreach (var node in nodeList)
+        {
+            int currentId = nodeId++;
+            
+            sb.AppendLine($"    <node id=\"n{currentId}\">");
+            sb.AppendLine($"      <data key=\"label\">{System.Web.HttpUtility.HtmlEncode(node.Name)}</data>");
+            sb.AppendLine($"      <data key=\"type\">{node.Type}</data>");
+            sb.AppendLine("    </node>");
+            
+            if (parentId >= 0)
+            {
+                sb.AppendLine($"    <edge source=\"n{parentId}\" target=\"n{currentId}\"/>");
+            }
+            
+            if (node.Children.Count > 0)
+            {
+                GenerateGraphMLNodes(sb, node.Children, ref nodeId, currentId);
+            }
+        }
+    }
+}
+
+<style>
+    .syntax-tree-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .tree-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+        background: #f8f9fa;
+    }
+    
+    .tree-header h6 {
+        margin: 0;
+        color: #495057;
+    }
+    
+    .tree-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .tree-canvas {
+        flex: 1;
+        overflow: auto;
+        padding: 1rem;
+        background: #ffffff;
+    }
+    
+    .tree-svg-container {
+        min-height: 400px;
+    }
+    
+    .tree-node:hover {
+        filter: brightness(0.95);
+    }
+    
+    .tree-info {
+        padding: 0.5rem;
+        border-top: 1px solid #dee2e6;
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+</style>

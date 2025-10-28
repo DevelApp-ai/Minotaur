@@ -1,0 +1,130 @@
+# Hungarian Language Example Sentences
+
+## Present Tense - Indefinite Conjugation
+
+Én olvasok.
+Te írasz.
+Ő tanul.
+Mi lakunk Budapesten.
+Ti esztek.
+Ők dolgoznak.
+
+## Present Tense - Definite Conjugation
+
+Én olvasom a könyvet.
+Te írod a levelet.
+Ő tanulja a leckét.
+Mi látjuk a filmet.
+Ti eszitek az ételt.
+Ők olvassák az újságot.
+
+## Past Tense
+
+Én olvastam.
+Te írtál.
+Ő tanult.
+Mi laktunk Budapesten.
+Ti ettetek.
+Ők dolgoztak.
+
+## Future Tense
+
+Én fogok olvasni.
+Te fogsz írni.
+Ő fog tanulni.
+Mi fogunk lakni.
+Ti fogtok enni.
+Ők fognak dolgozni.
+
+## 18+ Cases
+
+# Nominative
+könyv (book)
+
+# Accusative
+könyvet olvasok (I read a book)
+
+# Dative
+a könyvnek (to the book)
+
+# Instrumental
+könyvvel tanulok (I study with a book)
+
+# Inessive (in)
+a házban (in the house)
+
+# Superessive (on)
+az asztalon (on the table)
+
+# Adessive (at/by)
+az iskolánál (at the school)
+
+# Illative (into)
+a házba megyek (I go into the house)
+
+# Sublative (onto)
+az asztalra teszem (I put onto the table)
+
+# Allative (towards)
+a városhoz érkezem (I arrive to the city)
+
+# Elative (out of)
+a házból jövök (I come out of the house)
+
+# Delative (from on)
+az asztalról veszem (I take from the table)
+
+# Ablative (away from)
+a várostól jövök (I come from the city)
+
+## Vowel Harmony
+
+# Back vowels
+házban (in house)
+városnak (to city)
+autóval (with car)
+
+# Front vowels
+kertben (in garden)
+épületnek (to building)
+kerékpárral (with bicycle)
+
+## Postpositions
+
+a ház mellett (next to the house)
+az asztal alatt (under the table)
+a fa mögött (behind the tree)
+értem (for me)
+nélküled (without you)
+
+## Possessive + Case Stacking
+
+könyvem (my book)
+könyved (your book)
+könyvemben (in my book)
+könyveimben (in my books)
+házamban (in my house)
+házaimban (in my houses)
+
+## Questions
+
+Ki vagy?
+Mi ez?
+Hol vagy?
+Mikor jössz?
+Miért tanulsz magyarul?
+
+## Negation
+
+Nem olvasok.
+Nem megyek.
+Senki sem tudja.
+Semmi sem történik.
+Soha nem járok oda.
+
+## Complex Sentences
+
+Tudom, hogy ő dolgozik.
+Ha jössz, örülünk.
+A könyv, amit olvasok, érdekes.
+Amikor megérkeztem, ő távozott.

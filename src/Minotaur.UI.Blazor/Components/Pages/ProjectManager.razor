@@ -1,7 +1,10 @@
 @page "/project-manager"
 @using Minotaur.Projects
 @using Minotaur.Analysis.Symbolic
+@using Minotaur.UI.Blazor.Services
+@using SystemIO = System.IO
 @inject IJSRuntime JSRuntime
+@inject ProjectLoaderService ProjectLoader
 
 <PageTitle>Project Manager - Minotaur</PageTitle>
 
@@ -297,12 +300,50 @@
                     }
                     else if (isAnalyzing)
                     {
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary mb-3" role="status">
-                                <span class="visually-hidden">Analyzing...</span>
+                        <div class="analysis-progress py-4">
+                            <div class="text-center mb-4">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Analyzing...</span>
+                                </div>
+                                <h5 class="mb-2">Analyzing Project</h5>
+                                <p class="text-muted mb-3">@loadStatus</p>
                             </div>
-                            <p class="text-muted">Analyzing project...</p>
-                            <small>This may take a few moments depending on project size</small>
+                            
+                            <!-- Progress Bar -->
+                            <div class="progress mb-3" style="height: 25px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                     role="progressbar" 
+                                     style="width: @(loadProgress)%"
+                                     aria-valuenow="@loadProgress" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    @loadProgress%
+                                </div>
+                            </div>
+                            
+                            @if (languageStats.Any())
+                            {
+                                <div class="language-stats mt-3">
+                                    <h6 class="text-muted mb-2">Language Distribution</h6>
+                                    @foreach (var lang in languageStats.OrderByDescending(x => x.Value))
+                                    {
+                                        <div class="lang-stat-item mb-2">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <span class="lang-name">@lang.Key</span>
+                                                <span class="lang-count">@lang.Value files</span>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-info" 
+                                                     style="width: @(languageStats.Values.Max() > 0 ? (lang.Value * 100.0 / languageStats.Values.Max()) : 0)%"></div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            
+                            <small class="text-muted d-block text-center mt-3">
+                                This may take a few moments depending on project size
+                            </small>
                         </div>
                     }
                     else
@@ -371,7 +412,7 @@
         // In a real implementation, this would open a directory picker dialog
         // For now, we'll use a simple prompt-like approach
         var newDirectory = await JSRuntime.InvokeAsync<string>("prompt", "Enter directory path:", currentDirectory);
-        if (!string.IsNullOrEmpty(newDirectory) && Directory.Exists(newDirectory))
+        if (!string.IsNullOrEmpty(newDirectory) && SystemIO.Directory.Exists(newDirectory))
         {
             currentDirectory = newDirectory;
             RefreshProjects();
@@ -400,46 +441,92 @@
         }
     }
 
+    private int loadProgress = 0;
+    private string loadStatus = "";
+    private Dictionary<string, int> languageStats = new();
+
     private async Task AnalyzeProject()
     {
         if (selectedProject == null) return;
 
         isAnalyzing = true;
+        loadProgress = 0;
+        loadStatus = "Initializing...";
+        languageStats.Clear();
         StateHasChanged();
 
         try
         {
-            // Simulate analysis
-            await Task.Delay(2000);
+            // Subscribe to progress events
+            ProjectLoader.ProgressChanged += OnProgressChanged;
+            
+            // Load project using ProjectLoaderService
+            var result = await ProjectLoader.LoadProjectAsync(
+                SystemIO.Path.GetDirectoryName(selectedProject.Path) ?? selectedProject.Path,
+                new[] { ".cs", ".js", ".ts", ".py", ".java", ".cpp", ".h" }
+            );
+            
+            // Update language statistics
+            languageStats = result.FilesByLanguage.ToDictionary(
+                kvp => kvp.Key.TrimStart('.').ToUpper(),
+                kvp => kvp.Value
+            );
+            
+            // Calculate metrics
+            var avgComplexity = result.ComplexityByFile.Any() 
+                ? result.ComplexityByFile.Values.Average() 
+                : 0;
+            var totalComplexity = result.ComplexityByFile.Values.Sum();
+            
+            // Update analysis results with real data
             analysisResults = new AnalysisResult
             {
-                TotalSymbols = 42,
-                ComplexityScore = 7.5,
-                QualityScore = 85,
-                LinesOfCode = 1250,
-                CyclomaticComplexity = 12,
-                MaintainabilityIndex = 75,
-                TechnicalDebtRatio = 8,
-                Symbols = new List<SymbolInfo>
-                {
-                    new SymbolInfo { Name = "Calculator", Type = "Class", Location = "Calculator.cs:5", ReferenceCount = 3 },
-                    new SymbolInfo { Name = "Add", Type = "Method", Location = "Calculator.cs:12", ReferenceCount = 5 }
-                },
-                Issues = new List<IssueInfo>
-                {
-                    new IssueInfo { Message = "Method too complex", Location = "Calculator.cs:25", Severity = "Warning" }
-                }
+                TotalSymbols = result.TotalFiles,
+                ComplexityScore = avgComplexity,
+                QualityScore = Math.Max(0, 100 - (int)(avgComplexity * 5)),
+                LinesOfCode = result.TotalLines,
+                CyclomaticComplexity = totalComplexity,
+                MaintainabilityIndex = Math.Max(0, 100 - (int)(avgComplexity * 3)),
+                TechnicalDebtRatio = (int)(avgComplexity * 2),
+                Symbols = result.ComplexityByFile.Take(10).Select(kvp => new SymbolInfo 
+                { 
+                    Name = kvp.Key, 
+                    Type = "File", 
+                    Location = kvp.Key,
+                    ReferenceCount = kvp.Value 
+                }).ToList(),
+                Issues = result.ComplexityByFile
+                    .Where(kvp => kvp.Value > 10)
+                    .Select(kvp => new IssueInfo 
+                    { 
+                        Message = $"High complexity detected ({kvp.Value})", 
+                        Location = kvp.Key, 
+                        Severity = kvp.Value > 20 ? "Error" : "Warning" 
+                    })
+                    .Take(10)
+                    .ToList()
             };
+            
+            loadStatus = $"Completed! Analyzed {result.TotalFiles} files";
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error analyzing project: {ex.Message}");
+            loadStatus = $"Error: {ex.Message}";
         }
         finally
         {
+            ProjectLoader.ProgressChanged -= OnProgressChanged;
             isAnalyzing = false;
             StateHasChanged();
         }
+    }
+    
+    private void OnProgressChanged(object? sender, ProjectLoaderService.ProjectLoadProgressEventArgs e)
+    {
+        loadProgress = (int)e.PercentageComplete;
+        loadStatus = $"Processing {e.CurrentFile}... ({e.FilesProcessed}/{e.TotalFiles})";
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task OpenInEditor()
@@ -657,5 +744,27 @@
     .nav-tabs-sm .nav-link {
         padding: 0.375rem 0.75rem;
         font-size: 0.875rem;
+    }
+    
+    .analysis-progress {
+        padding: 1rem;
+    }
+    
+    .lang-stat-item {
+        font-size: 0.875rem;
+    }
+    
+    .lang-name {
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    .lang-count {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .progress-bar-animated {
+        animation: progress-bar-stripes 1s linear infinite;
     }
 </style>

@@ -129,9 +129,33 @@ dotnet test src/Minotaur.sln
 dotnet test src/Minotaur.sln --collect:"XPlat Code Coverage"
 ```
 
+## 🖥️ Desktop Application
+
+Minotaur is available as a native Linux desktop application using Electron:
+
+```bash
+cd src/Minotaur.UI.Electron
+npm install
+npm run dev
+```
+
+Features:
+- Native Linux application (AppImage, deb, rpm packages)
+- Integrated Blazor UI with automatic server management
+- Full keyboard shortcuts and menu integration
+- Native file dialogs for grammar files
+- Cross-platform support (x64, arm64)
+
+See [Phase 2 & 3 Implementation](./PHASE_2_3_IMPLEMENTATION.md) for details.
+
 ## 📚 Documentation
 
 - [Grammar Generation Guide](./src/Minotaur/GrammarGeneration/README.md)
+- [UI Flow Documentation](./docs/ui-screenshots/UI_FLOW.md) - Comprehensive guide to all UI pages with screenshots
+- [Code Development Guide](./docs/ui-screenshots/CODE_DEVELOPMENT_GUIDE.md) - Using Minotaur for application code analysis
+- [Implementation Status](./docs/ui-screenshots/IMPLEMENTATION_STATUS.md) - Track progress of visualization features
+- [Phase 2 & 3 Implementation](./PHASE_2_3_IMPLEMENTATION.md) - Desktop application implementation
+- [Electron Integration Guide](./src/Minotaur.UI.Electron/INTEGRATION_GUIDE.md) - Blazor-Electron integration
 - [GAP Analysis](./GAP_Analysis_StepParser_Implementation.md)
 - [Technical Design Documents](./docs/)
 
@@ -160,7 +184,22 @@ Contributions are welcome! Please feel free to open issues or submit pull reques
 
 ## 📈 Roadmap
 
+### Completed ✅
+- Core compiler-compiler functionality
+- StepParser integration
+- Multi-language plugin system
+- Grammar generation and analysis
+- Blazor-based web UI
+- **Phase 2: Project loading with real-time progress**
+- **Phase 3: Linux Electron desktop application**
+
+### In Progress 🚧
 - Enhanced IDE integration
 - Additional language plugins
 - Performance optimizations
+
+### Planned 📋
+- MAUI mobile applications (iOS, Android)
+- Advanced visualization features
 - Extended documentation
+- Cloud-based grammar sharing
