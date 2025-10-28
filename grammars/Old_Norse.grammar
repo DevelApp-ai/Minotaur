@@ -1275,4 +1275,174 @@ ei"
     THEN ANY_VOWEL_ALLITERATES_WITH_ANY_VOWEL
     ELSE CONSONANTS_MUST_MATCH_EXACTLY
 
+// ============================================================================
+// ADDITIONAL VERB FORMS AND MOODS
+// ============================================================================
+
+<optative-mood> ::= <verb-stem> <opt-whitespace> <optative-ending>
+                 /* Expressing wishes or prayers */
+
+<optative-ending> ::= "a" | "um"
+
+<imperative-extended> ::= <imperative-singular> | <imperative-plural> | <imperative-dual>
+
+<imperative-singular> ::= <verb-stem>
+
+<imperative-plural> ::= <verb-stem> <opt-whitespace> "ið"
+
+<imperative-dual> ::= <verb-stem> <opt-whitespace> "it"
+
+// ============================================================================
+// NOUN DECLENSION PARADIGMS
+// ============================================================================
+
+<strong-masculine-noun> ::= <a-stem-masculine> | <i-stem-masculine> | <u-stem-masculine>
+
+<a-stem-masculine> ::= "dagr" | "armr" | "staðr" /* day, arm, place */
+
+<i-stem-masculine> ::= "gestr" | "staðr" /* guest, place */
+
+<u-stem-masculine> ::= "sonr" | "vǫllr" /* son, field */
+
+<strong-feminine-noun> ::= <ō-stem-feminine> | <i-stem-feminine>
+
+<ō-stem-feminine> ::= "saga" | "gjǫf" | "mǫrk" /* story, gift, mark */
+
+<i-stem-feminine> ::= "brúðr" | "dýrð" /* bride, glory */
+
+<strong-neuter-noun> ::= <a-stem-neuter> | <ja-stem-neuter>
+
+<a-stem-neuter> ::= "skip" | "land" | "hús" /* ship, land, house */
+
+<ja-stem-neuter> ::= "kyn" | "ríki" /* kin, kingdom */
+
+<weak-masculine-noun> ::= <an-stem-masculine>
+
+<an-stem-masculine> ::= "hani" | "goði" /* rooster, chieftain */
+
+<weak-feminine-noun> ::= <ōn-stem-feminine>
+
+<ōn-stem-feminine> ::= "tunga" | "saga" /* tongue, story */
+
+<weak-neuter-noun> ::= <an-stem-neuter>
+
+<an-stem-neuter> ::= "hjarta" | "auga" /* heart, eye */
+
+// ============================================================================
+// PRONOUN PARADIGMS EXTENDED
+// ============================================================================
+
+<demonstrative-pronoun-extended> ::= <demonstrative-near> | <demonstrative-far>
+
+<demonstrative-near> ::= "þessi" | "þetta" | "þessir" /* this, these */
+
+<demonstrative-far> ::= "sá" | "sú" | "þat" | "þeir" | "þær" | "þau" /* that, those */
+
+<interrogative-pronoun-extended> ::= "hverr" | "hvat" | "hvárt" /* who, what, which */
+
+<indefinite-pronoun-extended> ::= "nǫkkurr" | "einn-hverr" | "sumr" /* some, someone, some */
+
+<reflexive-pronoun-extended> ::= "sik" | "sér" | "sín" /* self (accusative, dative, genitive) */
+
+// ============================================================================
+// ADJECTIVE DECLENSION EXTENDED
+// ============================================================================
+
+<strong-adjective-declension> ::= <strong-masculine-adj> | <strong-feminine-adj> | <strong-neuter-adj>
+
+<strong-masculine-adj> ::= "góðr" | "stórr" | "gamall" /* good, great, old */
+
+<strong-feminine-adj> ::= "góð" | "stór" | "gǫmul"
+
+<strong-neuter-adj> ::= "gott" | "stórt" | "gamalt"
+
+<weak-adjective-declension> ::= <weak-masculine-adj> | <weak-feminine-adj> | <weak-neuter-adj>
+
+<weak-masculine-adj> ::= "góði" | "stóri" | "gamli"
+
+<weak-feminine-adj> ::= "góða" | "stóra" | "gamla"
+
+<weak-neuter-adj> ::= "góða" | "stóra" | "gamla"
+
+// ============================================================================
+// NUMERALS EXTENDED
+// ============================================================================
+
+<cardinal-number-extended> ::= "einn" | "tveir" | "þrír" | "fjórir" | "fimm"
+                            | "sex" | "sjau" | "átta" | "níu" | "tíu"
+                            | "ellifu" | "tólf" | "þrettán" | "fjórtán" | "fimmtán"
+
+<ordinal-number-extended> ::= "fyrstr" | "annarr" | "þriði" | "fjórði" | "fimmti"
+
+// ============================================================================
+// PREPOSITIONS EXTENDED
+// ============================================================================
+
+<preposition-with-accusative> ::= "um" | "fyrir" | "gegn" | "í" | "á" | "undir" | "yfir"
+
+<preposition-with-dative> ::= "at" | "af" | "frá" | "hjá" | "með" | "úr" | "í" | "á" | "undir" | "yfir"
+
+<preposition-with-genitive> ::= "til" | "milli" | "án" | "vegna" | "fyr"
+
+// ============================================================================
+// CONJUNCTIONS EXTENDED
+// ============================================================================
+
+<coordinating-conjunction-extended> ::= "ok" | "eða" | "en" | "né" | "enda"
+
+<subordinating-conjunction-extended> ::= "at" | "ef" | "þegar" | "þar er" | "er" | "sem"
+                                       | "þó at" | "þótt" | "áðr" | "síðan"
+
+// ============================================================================
+// SAGA FORMULAS
+// ============================================================================
+
+<saga-formula> ::= "Svá er sagt" /* So it is said */
+                | "Nú er at segja frá" /* Now it is to be told about */
+                | "Þat er upphaf þessar sögu" /* That is the beginning of this story */
+                | "Þar til er" /* Until */
+                | "Einn daginn" /* One day */
+                | "Þá er" /* When */
+
+// ============================================================================
+// MYTHOLOGICAL AND RELIGIOUS TERMS
+// ============================================================================
+
+<mythological-term> ::= "Óðinn" | "Þórr" | "Freyja" | "Loki" | "Týr"
+                     | "Valhǫll" | "Ásgarðr" | "Miðgarðr" | "Jǫtunheimr"
+                     | "Yggdrasill" | "Ragnarǫk"
+
+<religious-term> ::= "blót" | "goði" | "hǫrgr" | "hof" | "vé"
+                  /* sacrifice, chieftain, shrine, temple, sanctuary */
+
+// ============================================================================
+// SHIP AND SEAFARING TERMS
+// ============================================================================
+
+<ship-term> ::= "skip" | "knǫrr" | "langskip" | "byrðingr"
+             /* ship, cargo ship, longship, trading vessel */
+
+<seafaring-term> ::= "segl" | "rá" | "stafn" | "kjǫlr" | "stýri"
+                  /* sail, yard, stem, keel, rudder */
+
+// ============================================================================
+// WEAPONS AND WARFARE TERMS
+// ============================================================================
+
+<weapon-term> ::= "sverð" | "øx" | "spjót" | "bogi" | "ǫr" | "skjǫldr"
+               /* sword, axe, spear, bow, arrow, shield */
+
+<warfare-term> ::= "bardagi" | "orrusta" | "einvígi" | "hólmganga"
+                /* battle, fight, duel, island duel */
+
+// ============================================================================
+// SOCIAL AND LEGAL TERMS
+// ============================================================================
+
+<social-term> ::= "konungr" | "jarl" | "hersir" | "bóndi" | "þræll"
+               /* king, earl, chieftain, farmer, slave */
+
+<legal-term> ::= "lǫg" | "þing" | "dómr" | "sekð" | "vígð"
+              /* law, assembly, judgment, fine, manslaughter */
+
 // END OF GRAMMAR

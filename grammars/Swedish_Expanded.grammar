@@ -1190,4 +1190,255 @@ VALIDATE dialect_consistency:
     THEN NO_ARTICLE_USED
     ELSE ARTICLE_MAY_BE_USED
 
+// ============================================================================
+// ADDITIONAL VERB FORMS
+// ============================================================================
+
+<supine-verb-form> ::= <verb-stem> <opt-whitespace> "it" | "t"
+                    /* Used with auxiliary verbs ha/vara */
+
+<present-participle-extended> ::= <verb-stem> <opt-whitespace> "ande" | "ende"
+
+<past-participle-extended> ::= <verb-stem> <opt-whitespace> <past-participle-ending>
+
+<past-participle-ending> ::= "d" | "t" | "dd" | "tt" | "en" | "et"
+
+// ============================================================================
+// NOUN DECLENSION PATTERNS
+// ============================================================================
+
+<common-gender-noun-pattern> ::= <en-word-plural> | <ar-word-plural> | <or-word-plural> | <er-word-plural>
+
+<en-word-plural> ::= <noun-stem> <opt-whitespace> "ar" /* pojke → pojkar */
+
+<ar-word-plural> ::= <noun-stem> <opt-whitespace> "or" /* flicka → flickor */
+
+<or-word-plural> ::= <noun-stem> <opt-whitespace> "er" /* lärare → lärare */
+
+<er-word-plural> ::= <noun-stem> /* no change */
+
+<neuter-gender-noun-pattern> ::= <et-word-plural>
+
+<et-word-plural> ::= <noun-stem> /* barn → barn */ | <noun-stem> <opt-whitespace> "n" /* äpple → äpplen */
+
+// ============================================================================
+// REFLEXIVE VERBS EXTENDED
+// ============================================================================
+
+<reflexive-verb-construction> ::= <verb> <opt-whitespace> <reflexive-pronoun>
+
+<reflexive-pronoun-extended> ::= "mig" | "dig" | "sig" | "oss" | "er" | "sig"
+
+<reciprocal-construction> ::= <subject-plural> <opt-whitespace> <verb> <opt-whitespace> "varandra"
+
+// ============================================================================
+// DEPONENT VERBS
+// ============================================================================
+
+<deponent-verb> ::= "hoppas" | "låtsas" | "kräkas" | "minnas" | "synas" | "tyckas" | "kännas"
+                 /* Verbs that end in -s but are not passive */
+
+// ============================================================================
+// PHRASAL VERBS EXTENDED
+// ============================================================================
+
+<phrasal-verb-extended> ::= <verb> <opt-whitespace> <particle-extended>
+
+<particle-extended> ::= "upp" | "ner" | "ut" | "in" | "bort" | "fram" | "tillbaka"
+                     | "över" | "under" | "omkring" | "igenom" | "emot"
+
+// ============================================================================
+// COMPOUND WORDS EXTENDED
+// ============================================================================
+
+<compound-noun-extended> ::= <noun> <opt-whitespace> <linking-s-extended> <opt-whitespace> <noun>
+
+<linking-s-extended> ::= "s" | ""
+
+<compound-adjective> ::= <adjective> <opt-whitespace> <noun>
+                      | <noun> <opt-whitespace> <adjective>
+
+// ============================================================================
+// TIME EXPRESSIONS DETAILED
+// ============================================================================
+
+<clock-time-detailed> ::= "klockan" <opt-whitespace> <number>
+                       | <number> <opt-whitespace> "på" <opt-whitespace> ("morgonen" | "förmiddagen" | "eftermiddagen" | "kvällen")
+
+<duration-expression> ::= "i" <opt-whitespace> <number> <opt-whitespace> <time-unit>
+
+<time-unit> ::= "sekund" | "sekunder" | "minut" | "minuter" | "timme" | "timmar"
+             | "dag" | "dagar" | "vecka" | "veckor" | "månad" | "månader" | "år"
+
+<frequency-expression> ::= "varje" <opt-whitespace> <time-unit>
+                        | "en gång" <opt-whitespace> ("i" | "per") <opt-whitespace> <time-unit>
+
+// ============================================================================
+// MEASUREMENT AND QUANTITY
+// ============================================================================
+
+<measurement-expression> ::= <number> <opt-whitespace> <unit>
+
+<unit> ::= "meter" | "centimeter" | "kilometer" | "gram" | "kilogram"
+        | "liter" | "deciliter" | "milliliter"
+
+<quantity-expression> ::= "mycket" | "lite" | "lagom" | "för mycket" | "för lite"
+                       | "tillräckligt" | "nästan" | "ungefär"
+
+// ============================================================================
+// POLITENESS AND FORMALITY EXTENDED
+// ============================================================================
+
+<formal-address-extended> ::= "ni" | "Ni" | "er" | "Er"
+
+<informal-address-extended> ::= "du" | "dig" | "ditt" | "dina"
+
+<polite-phrase> ::= "tack" | "tack så mycket" | "varsågod" | "ursäkta" | "förlåt"
+                 | "ingen orsak" | "det var så lite"
+
+// ============================================================================
+// SENTENCE ADVERBIALS EXTENDED
+// ============================================================================
+
+<sentence-adverbial-extended> ::= <modal-adverb> | <temporal-adverb> | <negation-adverb>
+
+<modal-adverb> ::= "kanske" | "möjligen" | "förmodligen" | "troligen" | "säkert"
+                | "verkligen" | "faktiskt" | "naturligtvis" | "självklart"
+
+<temporal-adverb-extended> ::= "nu" | "då" | "sedan" | "snart" | "strax" | "genast"
+                            | "alltid" | "aldrig" | "ofta" | "sällan" | "ibland"
+
+<negation-adverb> ::= "inte" | "ej" | "icke"
+
+// ============================================================================
+// INTENSIFIERS AND DEGREE MODIFIERS
+// ============================================================================
+
+<intensifier> ::= "mycket" | "väldigt" | "jättel" | "ganska" | "rätt" | "ganska"
+               | "alldeles" | "helt" | "fullkomligt" | "ytterst"
+
+<downtoner> ::= "lite" | "något" | "aningen" | "knappast"
+
+// ============================================================================
+// CONJUNCTIVE ADVERBS
+// ============================================================================
+
+<conjunctive-adverb> ::= "därför" | "då" | "alltså" | "nämligen" | "emellertid"
+                      | "likväl" | "ändå" | "dock"
+
+// ============================================================================
+// INDEFINITE PRONOUNS EXTENDED
+// ============================================================================
+
+<indefinite-pronoun-extended> ::= "någon" | "något" | "några" | "ingen" | "inget" | "inga"
+                               | "all" | "allt" | "alla" | "varje" | "envar"
+                               | "man" | "en" | "ens"
+
+// ============================================================================
+// DEMONSTRATIVE PRONOUNS EXTENDED  
+// ============================================================================
+
+<demonstrative-pronoun-extended> ::= "den här" | "det här" | "de här"
+                                  | "den där" | "det där" | "de där"
+                                  | "denna" | "detta" | "dessa"
+
+// ============================================================================
+// POSSESSIVE CONSTRUCTIONS EXTENDED
+// ============================================================================
+
+<possessive-construction-extended> ::= <possessive-pronoun> <opt-whitespace> <noun>
+                                    | <noun> <opt-whitespace> "-s" <opt-whitespace> <noun>
+
+<possessive-pronoun-extended> ::= "min" | "mitt" | "mina" | "din" | "ditt" | "dina"
+                               | "sin" | "sitt" | "sina" | "vår" | "vårt" | "våra"
+                               | "er" | "ert" | "era" | "deras"
+
+// ============================================================================
+// QUOTATIVE CONSTRUCTIONS
+// ============================================================================
+
+<quotative-construction> ::= <subject> <opt-whitespace> <speech-verb> <opt-whitespace> "att"
+                          <opt-whitespace> <subordinate-clause>
+
+<speech-verb> ::= "säga" | "berätta" | "förklara" | "meddela" | "påstå" | "hävda"
+
+// ============================================================================
+// ADDITIONAL CONTEXT RULES
+// ============================================================================
+
+@CONTEXT_RULE[supine-with-auxiliary]:
+    IF <perfect-tense> OR <pluperfect-tense>
+    THEN "ha" OR "vara" WITH_SUPINE_FORM
+    ELSE ERROR "Supine form requires auxiliary"
+
+@CONTEXT_RULE[present-participle-usage]:
+    IF <present-participle> USED_ATTRIBUTIVELY
+    THEN MUST_MODIFY_NOUN
+    ELSE ERROR "Present participle must modify noun when attributive"
+
+@CONTEXT_RULE[past-participle-agreement-swedish]:
+    IF <past-participle> USED_ATTRIBUTIVELY
+    THEN MUST_AGREE_IN_GENDER_AND_NUMBER
+    ELSE ERROR "Past participle agreement required"
+
+@CONTEXT_RULE[reflexive-pronoun-agreement]:
+    IF <reflexive-verb> USED
+    THEN <reflexive-pronoun> MUST_AGREE_WITH_SUBJECT
+    ELSE ERROR "Reflexive pronoun must agree with subject"
+
+@CONTEXT_RULE[deponent-verb-no-passive]:
+    IF <deponent-verb> USED
+    THEN NOT_PASSIVE_DESPITE_S_ENDING
+    ELSE ERROR "Deponent verbs are not passive"
+
+@CONTEXT_RULE[phrasal-verb-particle-stress]:
+    IF <phrasal-verb> USED
+    THEN STRESS_ON_PARTICLE
+    ELSE STRESS_ON_VERB
+
+@CONTEXT_RULE[compound-word-stress]:
+    IF <compound-noun> FORMED
+    THEN STRESS_ON_FIRST_COMPONENT
+    ELSE REGULAR_STRESS
+
+@CONTEXT_RULE[measurement-singular-form]:
+    IF <measurement-expression> WITH_NUMBER_GREATER_THAN_ONE
+    THEN <unit> MAY_BE_SINGULAR_OR_PLURAL
+    ELSE <unit> IS_SINGULAR
+
+@CONTEXT_RULE[formal-ni-capitalized]:
+    IF FORMAL_ADDRESS_USED
+    THEN "Ni" MAY_BE_CAPITALIZED
+    ELSE USE_LOWERCASE
+
+@CONTEXT_RULE[sentence-adverbial-position]:
+    IF <sentence-adverbial> PRESENT
+    THEN TYPICALLY_AFTER_FINITE_VERB_IN_MAIN_CLAUSE
+    ELSE POSITION_VARIES
+
+@CONTEXT_RULE[intensifier-with-adjective]:
+    IF <intensifier> USED
+    THEN MUST_PRECEDE_ADJECTIVE_OR_ADVERB
+    ELSE ERROR "Intensifier position error"
+
+@CONTEXT_RULE[indefinite-pronoun-agreement]:
+    IF <indefinite-pronoun> USED_AS_SUBJECT
+    THEN <verb> MUST_AGREE
+    ELSE ERROR "Indefinite pronoun verb agreement"
+
+@CONTEXT_RULE[demonstrative-denna-formal]:
+    IF "denna" | "detta" | "dessa" USED
+    THEN INDICATES_FORMAL_REGISTER
+    ELSE NEUTRAL_REGISTER
+
+@CONTEXT_RULE[possessive-s-no-apostrophe]:
+    IF POSSESSIVE_S_MARKER
+    THEN NO_APOSTROPHE_USED_IN_SWEDISH
+    ELSE ERROR "Swedish does not use apostrophe for possessive"
+
+@CONTEXT_RULE[quotative-att-required]:
+    IF <indirect-speech> WITH_SPEECH_VERB
+    THEN "att" TYPICALLY_REQUIRED
+    ELSE ERROR "Quotative construction requires att"
+
 /* END OF SWEDISH GRAMMAR */
