@@ -50,7 +50,6 @@
     public string? ParseTreeData { get; set; }
     
     private ElementReference treeCanvasRef;
-    private bool allExpanded = true;
     
     private class TreeNode
     {
@@ -229,14 +228,12 @@
     
     private void ExpandAll()
     {
-        allExpanded = true;
         SetExpandedState(nodes, true);
         StateHasChanged();
     }
     
     private void CollapseAll()
     {
-        allExpanded = false;
         SetExpandedState(nodes, false);
         StateHasChanged();
     }
