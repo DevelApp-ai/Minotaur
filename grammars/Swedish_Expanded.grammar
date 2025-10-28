@@ -805,4 +805,640 @@ VALIDATE dialect_consistency:
   THEN ALL forms IN sentence SHOULD match @DIALECT
   ELSE WARNING "Mixing dialects may cause inconsistency"
 
+// ============================================================================
+// DISCOURSE MARKERS
+// ============================================================================
+
+<discourse-marker> ::= <temporal-discourse> | <causal-discourse> | <contrastive-discourse>
+                    | <additive-discourse> | <conclusive-discourse> | <exemplification-discourse>
+
+<temporal-discourse> ::= "först" | "sedan" | "därefter" | "slutligen" | "till slut"
+                      | "till att börja med" | "i fortsättningen" | "samtidigt" | "medan"
+
+<causal-discourse> ::= "därför" | "eftersom" | "på grund av" | "därför att" | "ty"
+                    | "av den anledningen" | "till följd av"
+
+<contrastive-discourse> ::= "men" | "dock" | "däremot" | "å andra sidan" | "trots att"
+                         | "fast" | "ändå" | "emellertid" | "likväl"
+
+<additive-discourse> ::= "och" | "också" | "dessutom" | "vidare" | "därtill"
+                      | "för övrigt" | "ytterligare" | "tillika"
+
+<conclusive-discourse> ::= "alltså" | "således" | "följaktligen" | "sammanfattningsvis"
+                        | "kort sagt" | "med andra ord"
+
+<exemplification-discourse> ::= "till exempel" | "t.ex." | "exempelvis" | "som till exempel"
+                             | "såsom"
+
+// ============================================================================
+// TAG QUESTIONS AND ELLIPTICAL STRUCTURES
+// ============================================================================
+
+<tag-question> ::= <statement> <opt-whitespace> "," <opt-whitespace> <tag-marker>
+
+<tag-marker> ::= "eller hur" | "inte sant" | "va" | "visst" | "eller" | "väl"
+
+<elliptical-structure> ::= <noun-phrase> | <adjective-phrase> | <adverb> | <prepositional-phrase>
+
+// ============================================================================
+// REPORTED SPEECH AND INDIRECT DISCOURSE
+// ============================================================================
+
+<reported-speech> ::= <direct-speech> | <indirect-speech> | <free-indirect-speech>
+
+<direct-speech> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> ":" 
+                    <opt-whitespace> "\"" <sentence> "\""
+
+<indirect-speech> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> "att"
+                     <opt-whitespace> <subordinate-clause>
+
+<free-indirect-speech> ::= <sentence> <opt-whitespace> <sentence>
+
+// ============================================================================
+// CLEFT SENTENCES
+// ============================================================================
+
+<cleft-sentence> ::= <it-cleft> | <pseudo-cleft> | <reversed-cleft>
+
+<it-cleft> ::= "det" <opt-whitespace> "är" <opt-whitespace> <noun-phrase>
+             <opt-whitespace> "som" <opt-whitespace> <verb-phrase>
+
+<pseudo-cleft> ::= "det" <opt-whitespace> "som" <opt-whitespace> <subordinate-clause>
+                 <opt-whitespace> "är" <opt-whitespace> <noun-phrase>
+
+<reversed-cleft> ::= <noun-phrase> <opt-whitespace> "är" <opt-whitespace> "det"
+                   <opt-whitespace> "som" <opt-whitespace> <verb-phrase>
+
+// ============================================================================
+// CORRELATIVE CONSTRUCTIONS EXTENDED
+// ============================================================================
+
+<correlative-construction-extended> ::= <both-and> | <either-or> | <neither-nor> | <not-only-but-also>
+
+<both-and> ::= "både" <opt-whitespace> <phrase> <opt-whitespace> "och" <opt-whitespace> <phrase>
+
+<either-or> ::= "antingen" <opt-whitespace> <phrase> <opt-whitespace> "eller" 
+              <opt-whitespace> <phrase>
+
+<neither-nor> ::= "varken" <opt-whitespace> <phrase> <opt-whitespace> "eller" 
+                <opt-whitespace> <phrase>
+
+<not-only-but-also> ::= "inte bara" <opt-whitespace> <phrase> <opt-whitespace> "utan även"
+                      <opt-whitespace> <phrase>
+
+// ============================================================================
+// EXTENDED DIALECTAL VARIATIONS
+// ============================================================================
+
+@DIALECT[dalecarlian]       /* Dalmål - Dalarna dialect */
+@DIALECT[scanian]           /* Skånska - Scania dialect */
+@DIALECT[gotlandic]         /* Gotländska - Gotland dialect */
+@DIALECT[finland-swedish]   /* Finlandssvenska - Finland Swedish */
+@DIALECT[jamtlandic]        /* Jämtska - Jämtland dialect */
+@DIALECT[norrland]          /* Norrländska - Northern dialects */
+@DIALECT[stockholm]         /* Stockholmska - Stockholm dialect */
+
+// ============================================================================
+// PERIPHRASTIC CONSTRUCTIONS
+// ============================================================================
+
+<periphrastic-construction-extended> ::= <progressive-aspect> | <recent-past-aspect> 
+                                      | <immediate-future> | <habitual-aspect>
+
+<progressive-aspect> ::= "hålla på att" <opt-whitespace> <infinitive>
+
+<recent-past-aspect> ::= "just" <opt-whitespace> <perfect-tense>
+
+<immediate-future> ::= "komma att" <opt-whitespace> <infinitive>
+
+<habitual-aspect> ::= "bruka" <opt-whitespace> <infinitive>
+
+// ============================================================================
+// CAUSATIVE AND PERMISSIVE CONSTRUCTIONS
+// ============================================================================
+
+<causative-construction-extended> ::= "låta" <opt-whitespace> <noun-phrase> <opt-whitespace> <infinitive>
+                                   | "få" <opt-whitespace> <noun-phrase> <opt-whitespace> "att" <opt-whitespace> <infinitive>
+
+<permissive-construction-extended> ::= "tillåta" <opt-whitespace> <noun-phrase> <opt-whitespace> "att"
+                                    <opt-whitespace> <infinitive>
+
+// ============================================================================
+// IDIOMATIC EXPRESSIONS
+// ============================================================================
+
+<idiomatic-expression> ::= "ta det lugnt" | "hålla sig för skratt" | "slå två flugor i en smäll"
+                        | "kasta in handduken" | "ta bladet från munnen" | "sätta punkt"
+                        | "dra sig till minnes" | "ta hänsyn till" | "göra sig besvär"
+                        | "ha koll på" | "få syn på" | "ge sig av" | "ta del av"
+                        | "hålla tummarna" | "slå huvudet på spiken" | "bära frukt"
+
+// ============================================================================
+// TEMPORAL EXPRESSIONS EXTENDED
+// ============================================================================
+
+<extended-temporal-expressions> ::= <time-of-day-extended> | <day-of-week-extended> 
+                                 | <month-name-extended> | <season-extended>
+
+<time-of-day-extended> ::= "morgon" | "förmiddag" | "middag" | "eftermiddag" | "kväll" | "natt"
+
+<day-of-week-extended> ::= "måndag" | "tisdag" | "onsdag" | "torsdag" | "fredag" | "lördag" | "söndag"
+
+<month-name-extended> ::= "januari" | "februari" | "mars" | "april" | "maj" | "juni"
+                       | "juli" | "augusti" | "september" | "oktober" | "november" | "december"
+
+<season-extended> ::= "vår" | "sommar" | "höst" | "vinter"
+
+// ============================================================================
+// CONDITIONAL SENTENCES EXTENDED
+// ============================================================================
+
+<conditional-sentence-extended> ::= <real-conditional-extended> | <hypothetical-conditional-extended>
+                                 | <contrary-to-fact-conditional-extended>
+
+<real-conditional-extended> ::= "om" <opt-whitespace> <present-tense-clause> <opt-whitespace> ","
+                             <opt-whitespace> <present-or-future-clause>
+
+<hypothetical-conditional-extended> ::= "om" <opt-whitespace> <past-tense-clause> <opt-whitespace> ","
+                                     <opt-whitespace> "skulle" <opt-whitespace> <infinitive>
+
+<contrary-to-fact-conditional-extended> ::= "om" <opt-whitespace> <pluperfect-clause>
+                                         <opt-whitespace> "," <opt-whitespace> "skulle ha" <opt-whitespace> <past-participle>
+
+// ============================================================================
+// COMPARATIVE AND SUPERLATIVE EXTENDED
+// ============================================================================
+
+<comparison-extended> ::= <equative-comparison-extended> | <comparative-clause-extended> 
+                       | <superlative-clause-extended>
+
+<equative-comparison-extended> ::= "lika" <opt-whitespace> <adjective> <opt-whitespace> "som"
+                                <opt-whitespace> <noun-phrase>
+
+<comparative-clause-extended> ::= <adjective-comparative> <opt-whitespace> "än" <opt-whitespace> <noun-phrase>
+
+<superlative-clause-extended> ::= "den" | "det" | "de" <opt-whitespace> <adjective-superlative>
+
+// ============================================================================
+// NEGATION PATTERNS EXTENDED
+// ============================================================================
+
+<negation-extended> ::= <simple-negation-extended> | <double-negation-extended> | <emphatic-negation-extended>
+
+<simple-negation-extended> ::= "inte" <opt-whitespace> <verb-phrase>
+
+<double-negation-extended> ::= "inte" <opt-whitespace> <verb> <opt-whitespace> <negative-indefinite-extended>
+
+<negative-indefinite-extended> ::= "någon" | "något" | "några" | "någonsin" | "någonstans"
+
+<emphatic-negation-extended> ::= "inte alls" | "aldrig någonsin" | "absolut inte"
+
+// ============================================================================
+// QUESTION FORMATION EXTENDED
+// ============================================================================
+
+<question-extended> ::= <yes-no-question-extended> | <wh-question-extended> 
+                     | <alternative-question-extended> | <indirect-question-extended>
+
+<yes-no-question-extended> ::= <auxiliary-verb> <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+
+<wh-question-extended> ::= <question-word-extended> <opt-whitespace> <auxiliary-verb> 
+                        <opt-whitespace> <subject> <opt-whitespace> <verb-phrase>
+
+<question-word-extended> ::= "vem" | "vad" | "när" | "var" | "hur" | "varför" | "vilken" | "vilket" | "vilka"
+
+<alternative-question-extended> ::= <yes-no-question> <opt-whitespace> "eller" <opt-whitespace> <yes-no-question>
+
+<indirect-question-extended> ::= <verb> <opt-whitespace> <question-word> <opt-whitespace> <subordinate-clause>
+
+// ============================================================================
+// RELATIVE CLAUSES EXTENDED
+// ============================================================================
+
+<relative-clause-extended> ::= <restrictive-relative-extended> | <non-restrictive-relative-extended>
+
+<restrictive-relative-extended> ::= "som" <opt-whitespace> <verb-phrase>
+
+<non-restrictive-relative-extended> ::= "," <opt-whitespace> "som" <opt-whitespace> <verb-phrase>
+
+// ============================================================================
+// PASSIVE VOICE EXTENDED
+// ============================================================================
+
+<passive-voice-extended> ::= <s-passive> | <bli-passive>
+
+<s-passive> ::= <verb-stem> <opt-whitespace> "s"
+
+<bli-passive> ::= "bli" <opt-whitespace> <past-participle>
+
+// ============================================================================
+// CONTEXT-SENSITIVE VALIDATION RULES EXTENDED
+// ============================================================================
+
+@CONTEXT_RULE[discourse-marker-position]:
+    IF <discourse-marker> USED
+    THEN TYPICALLY_SENTENCE_INITIAL_OR_AFTER_FINITE_VERB
+    ELSE ERROR "Discourse marker position error"
+
+@CONTEXT_RULE[tag-question-agreement]:
+    IF <tag-question> USED
+    THEN <tag-marker> MUST_MATCH_STATEMENT_POLARITY
+    ELSE ERROR "Tag question must match statement"
+
+@CONTEXT_RULE[reported-speech-tense-backshift]:
+    IF <indirect-speech> USED
+    THEN <subordinate-clause-verb> TENSE_MAY_BACKSHIFT
+    ELSE <subordinate-clause-verb> TENSE_REMAINS
+
+@CONTEXT_RULE[cleft-sentence-structure-swedish]:
+    IF <it-cleft> USED
+    THEN "det" MUST_PRECEDE "är" AND "som" MUST_INTRODUCE_RELATIVE_CLAUSE
+    ELSE ERROR "Cleft sentence structure violation"
+
+@CONTEXT_RULE[correlative-parallelism]:
+    IF <correlative-construction> USED
+    THEN BOTH_PHRASES MUST_BE_SYNTACTICALLY_PARALLEL
+    ELSE ERROR "Correlative phrases must be parallel"
+
+@CONTEXT_RULE[dialectal-consistency]:
+    IF <dialectal-variation> USED
+    THEN MAINTAIN_DIALECT_THROUGHOUT_SENTENCE
+    ELSE ERROR "Mixed dialects in single sentence"
+
+@CONTEXT_RULE[progressive-aspect-syntax]:
+    IF <progressive-aspect> USED
+    THEN "hålla på att" MUST_BE_FOLLOWED_BY_INFINITIVE
+    ELSE ERROR "Progressive aspect requires infinitive"
+
+@CONTEXT_RULE[habitual-aspect-syntax]:
+    IF <habitual-aspect> USED
+    THEN "bruka" MUST_BE_FOLLOWED_BY_INFINITIVE
+    ELSE ERROR "Habitual aspect requires infinitive"
+
+@CONTEXT_RULE[causative-syntax-swedish]:
+    IF <causative-construction> USED
+    THEN ( "låta" | "få" ) WITH_OBJECT WITH_INFINITIVE
+    ELSE ERROR "Causative construction requires specific syntax"
+
+@CONTEXT_RULE[permissive-syntax-swedish]:
+    IF <permissive-construction> USED
+    THEN "tillåta" WITH_OBJECT WITH_"att"_INFINITIVE
+    ELSE ERROR "Permissive construction requires specific syntax"
+
+@CONTEXT_RULE[idiomatic-fixed-form]:
+    IF <idiomatic-expression> USED
+    THEN EXPRESSION_MUST_BE_FIXED_FORM
+    ELSE WARNING "Non-standard idiomatic expression"
+
+@CONTEXT_RULE[temporal-expression-case]:
+    IF <temporal-expression> USED
+    THEN MAY_USE_SPECIFIC_PREPOSITIONS
+    ELSE ERROR "Temporal expressions have specific requirements"
+
+@CONTEXT_RULE[conditional-mood-swedish]:
+    IF <conditional-clause> PRESENT
+    THEN <verb> SHOULD_USE_PAST_TENSE_OR_"skulle"
+    ELSE ERROR "Conditional requires past tense or skulle"
+
+@CONTEXT_RULE[comparative-än]:
+    IF <comparative-adjective> USED
+    THEN USE_"än"_FOR_COMPARISON
+    ELSE ERROR "Comparatives use än"
+
+@CONTEXT_RULE[superlative-definiteness]:
+    IF <superlative-adjective> USED_ATTRIBUTIVELY
+    THEN DEFINITE_ARTICLE_REQUIRED
+    ELSE ERROR "Superlatives require definite form"
+
+@CONTEXT_RULE[negation-placement-swedish]:
+    IF <negation> USED
+    THEN <negation> TYPICALLY_FOLLOWS_FINITE_VERB
+    ELSE ERROR "Negation placement error"
+
+@CONTEXT_RULE[question-word-fronting-swedish]:
+    IF <wh-question> USED
+    THEN <question-word> MUST_BE_SENTENCE_INITIAL
+    ELSE ERROR "Question words must be fronted"
+
+@CONTEXT_RULE[relative-clause-marker-swedish]:
+    IF <relative-clause> USED
+    THEN USE_"som"_AS_RELATIVE_MARKER
+    ELSE ERROR "Relative clauses use som"
+
+@CONTEXT_RULE[s-passive-formation]:
+    IF <s-passive> USED
+    THEN VERB_STEM_PLUS_"s"
+    ELSE ERROR "S-passive formation error"
+
+@CONTEXT_RULE[bli-passive-participle]:
+    IF <bli-passive> USED
+    THEN "bli" MUST_BE_FOLLOWED_BY_PAST_PARTICIPLE
+    ELSE ERROR "Bli-passive requires past participle"
+
+@CONTEXT_RULE[double-determination]:
+    IF <adjective> MODIFIES <definite-noun>
+    THEN BOTH_ARTICLE_AND_SUFFIX_USED
+    ELSE ERROR "Double determination required"
+
+@CONTEXT_RULE[verb-particle-placement]:
+    IF <separable-verb> USED
+    THEN PARTICLE_PLACEMENT_DEPENDS_ON_CLAUSE_TYPE
+    ELSE ERROR "Verb particle placement error"
+
+@CONTEXT_RULE[infinitive-marker-swedish]:
+    IF <infinitive> USED
+    THEN "att" MAY_PRECEDE_INFINITIVE
+    ELSE ERROR "Infinitive marker usage"
+
+@CONTEXT_RULE[perfect-auxiliary]:
+    IF <perfect-tense> USED
+    THEN USE_"ha"_OR_"vara"_AS_AUXILIARY
+    ELSE ERROR "Perfect tense requires auxiliary"
+
+@CONTEXT_RULE[future-construction]:
+    IF <future-tense> EXPRESSED
+    THEN USE ( "ska" | "kommer att" ) WITH_INFINITIVE
+    ELSE USE_PRESENT_TENSE_FOR_FUTURE
+
+@CONTEXT_RULE[imperative-subject-deletion-swedish]:
+    IF <verb> IN_IMPERATIVE_MOOD
+    THEN <subject> TYPICALLY_DELETED
+    ELSE <subject> PRESENT
+
+@CONTEXT_RULE[clitic-pronoun-placement]:
+    IF <clitic-pronoun> PRESENT
+    THEN <clitic> FOLLOWS_FINITE_VERB
+    ELSE ERROR "Clitic placement violation"
+
+@CONTEXT_RULE[compound-word-swedish]:
+    IF <compound-word> FORMED
+    THEN COMPONENTS_JOINED_DIRECTLY_OR_WITH_LINKING_S
+    ELSE ERROR "Compound word formation error"
+
+@CONTEXT_RULE[gender-consistency-swedish]:
+    IF <noun> HAS_GENDER
+    THEN ALL_MODIFIERS_MUST_AGREE_IN_GENDER
+    ELSE ERROR "Gender agreement violation"
+
+@CONTEXT_RULE[definiteness-marking]:
+    IF <noun> IS_DEFINITE
+    THEN USE_SUFFIX ( "en" | "et" | "n" | "t" )
+    ELSE NO_DEFINITENESS_SUFFIX
+
+@CONTEXT_RULE[plural-indefinite-no-article]:
+    IF <noun> IS_PLURAL AND INDEFINITE
+    THEN NO_ARTICLE_USED
+    ELSE ARTICLE_MAY_BE_USED
+
+// ============================================================================
+// ADDITIONAL VERB FORMS
+// ============================================================================
+
+<supine-verb-form> ::= <verb-stem> <opt-whitespace> "it" | "t"
+                    /* Used with auxiliary verbs ha/vara */
+
+<present-participle-extended> ::= <verb-stem> <opt-whitespace> "ande" | "ende"
+
+<past-participle-extended> ::= <verb-stem> <opt-whitespace> <past-participle-ending>
+
+<past-participle-ending> ::= "d" | "t" | "dd" | "tt" | "en" | "et"
+
+// ============================================================================
+// NOUN DECLENSION PATTERNS
+// ============================================================================
+
+<common-gender-noun-pattern> ::= <en-word-plural> | <ar-word-plural> | <or-word-plural> | <er-word-plural>
+
+<en-word-plural> ::= <noun-stem> <opt-whitespace> "ar" /* pojke → pojkar */
+
+<ar-word-plural> ::= <noun-stem> <opt-whitespace> "or" /* flicka → flickor */
+
+<or-word-plural> ::= <noun-stem> <opt-whitespace> "er" /* lärare → lärare */
+
+<er-word-plural> ::= <noun-stem> /* no change */
+
+<neuter-gender-noun-pattern> ::= <et-word-plural>
+
+<et-word-plural> ::= <noun-stem> /* barn → barn */ | <noun-stem> <opt-whitespace> "n" /* äpple → äpplen */
+
+// ============================================================================
+// REFLEXIVE VERBS EXTENDED
+// ============================================================================
+
+<reflexive-verb-construction> ::= <verb> <opt-whitespace> <reflexive-pronoun>
+
+<reflexive-pronoun-extended> ::= "mig" | "dig" | "sig" | "oss" | "er" | "sig"
+
+<reciprocal-construction> ::= <subject-plural> <opt-whitespace> <verb> <opt-whitespace> "varandra"
+
+// ============================================================================
+// DEPONENT VERBS
+// ============================================================================
+
+<deponent-verb> ::= "hoppas" | "låtsas" | "kräkas" | "minnas" | "synas" | "tyckas" | "kännas"
+                 /* Verbs that end in -s but are not passive */
+
+// ============================================================================
+// PHRASAL VERBS EXTENDED
+// ============================================================================
+
+<phrasal-verb-extended> ::= <verb> <opt-whitespace> <particle-extended>
+
+<particle-extended> ::= "upp" | "ner" | "ut" | "in" | "bort" | "fram" | "tillbaka"
+                     | "över" | "under" | "omkring" | "igenom" | "emot"
+
+// ============================================================================
+// COMPOUND WORDS EXTENDED
+// ============================================================================
+
+<compound-noun-extended> ::= <noun> <opt-whitespace> <linking-s-extended> <opt-whitespace> <noun>
+
+<linking-s-extended> ::= "s" | ""
+
+<compound-adjective> ::= <adjective> <opt-whitespace> <noun>
+                      | <noun> <opt-whitespace> <adjective>
+
+// ============================================================================
+// TIME EXPRESSIONS DETAILED
+// ============================================================================
+
+<clock-time-detailed> ::= "klockan" <opt-whitespace> <number>
+                       | <number> <opt-whitespace> "på" <opt-whitespace> ("morgonen" | "förmiddagen" | "eftermiddagen" | "kvällen")
+
+<duration-expression> ::= "i" <opt-whitespace> <number> <opt-whitespace> <time-unit>
+
+<time-unit> ::= "sekund" | "sekunder" | "minut" | "minuter" | "timme" | "timmar"
+             | "dag" | "dagar" | "vecka" | "veckor" | "månad" | "månader" | "år"
+
+<frequency-expression> ::= "varje" <opt-whitespace> <time-unit>
+                        | "en gång" <opt-whitespace> ("i" | "per") <opt-whitespace> <time-unit>
+
+// ============================================================================
+// MEASUREMENT AND QUANTITY
+// ============================================================================
+
+<measurement-expression> ::= <number> <opt-whitespace> <unit>
+
+<unit> ::= "meter" | "centimeter" | "kilometer" | "gram" | "kilogram"
+        | "liter" | "deciliter" | "milliliter"
+
+<quantity-expression> ::= "mycket" | "lite" | "lagom" | "för mycket" | "för lite"
+                       | "tillräckligt" | "nästan" | "ungefär"
+
+// ============================================================================
+// POLITENESS AND FORMALITY EXTENDED
+// ============================================================================
+
+<formal-address-extended> ::= "ni" | "Ni" | "er" | "Er"
+
+<informal-address-extended> ::= "du" | "dig" | "ditt" | "dina"
+
+<polite-phrase> ::= "tack" | "tack så mycket" | "varsågod" | "ursäkta" | "förlåt"
+                 | "ingen orsak" | "det var så lite"
+
+// ============================================================================
+// SENTENCE ADVERBIALS EXTENDED
+// ============================================================================
+
+<sentence-adverbial-extended> ::= <modal-adverb> | <temporal-adverb> | <negation-adverb>
+
+<modal-adverb> ::= "kanske" | "möjligen" | "förmodligen" | "troligen" | "säkert"
+                | "verkligen" | "faktiskt" | "naturligtvis" | "självklart"
+
+<temporal-adverb-extended> ::= "nu" | "då" | "sedan" | "snart" | "strax" | "genast"
+                            | "alltid" | "aldrig" | "ofta" | "sällan" | "ibland"
+
+<negation-adverb> ::= "inte" | "ej" | "icke"
+
+// ============================================================================
+// INTENSIFIERS AND DEGREE MODIFIERS
+// ============================================================================
+
+<intensifier> ::= "mycket" | "väldigt" | "jättel" | "ganska" | "rätt" | "ganska"
+               | "alldeles" | "helt" | "fullkomligt" | "ytterst"
+
+<downtoner> ::= "lite" | "något" | "aningen" | "knappast"
+
+// ============================================================================
+// CONJUNCTIVE ADVERBS
+// ============================================================================
+
+<conjunctive-adverb> ::= "därför" | "då" | "alltså" | "nämligen" | "emellertid"
+                      | "likväl" | "ändå" | "dock"
+
+// ============================================================================
+// INDEFINITE PRONOUNS EXTENDED
+// ============================================================================
+
+<indefinite-pronoun-extended> ::= "någon" | "något" | "några" | "ingen" | "inget" | "inga"
+                               | "all" | "allt" | "alla" | "varje" | "envar"
+                               | "man" | "en" | "ens"
+
+// ============================================================================
+// DEMONSTRATIVE PRONOUNS EXTENDED  
+// ============================================================================
+
+<demonstrative-pronoun-extended> ::= "den här" | "det här" | "de här"
+                                  | "den där" | "det där" | "de där"
+                                  | "denna" | "detta" | "dessa"
+
+// ============================================================================
+// POSSESSIVE CONSTRUCTIONS EXTENDED
+// ============================================================================
+
+<possessive-construction-extended> ::= <possessive-pronoun> <opt-whitespace> <noun>
+                                    | <noun> <opt-whitespace> "-s" <opt-whitespace> <noun>
+
+<possessive-pronoun-extended> ::= "min" | "mitt" | "mina" | "din" | "ditt" | "dina"
+                               | "sin" | "sitt" | "sina" | "vår" | "vårt" | "våra"
+                               | "er" | "ert" | "era" | "deras"
+
+// ============================================================================
+// QUOTATIVE CONSTRUCTIONS
+// ============================================================================
+
+<quotative-construction> ::= <subject> <opt-whitespace> <speech-verb> <opt-whitespace> "att"
+                          <opt-whitespace> <subordinate-clause>
+
+<speech-verb> ::= "säga" | "berätta" | "förklara" | "meddela" | "påstå" | "hävda"
+
+// ============================================================================
+// ADDITIONAL CONTEXT RULES
+// ============================================================================
+
+@CONTEXT_RULE[supine-with-auxiliary]:
+    IF <perfect-tense> OR <pluperfect-tense>
+    THEN "ha" OR "vara" WITH_SUPINE_FORM
+    ELSE ERROR "Supine form requires auxiliary"
+
+@CONTEXT_RULE[present-participle-usage]:
+    IF <present-participle> USED_ATTRIBUTIVELY
+    THEN MUST_MODIFY_NOUN
+    ELSE ERROR "Present participle must modify noun when attributive"
+
+@CONTEXT_RULE[past-participle-agreement-swedish]:
+    IF <past-participle> USED_ATTRIBUTIVELY
+    THEN MUST_AGREE_IN_GENDER_AND_NUMBER
+    ELSE ERROR "Past participle agreement required"
+
+@CONTEXT_RULE[reflexive-pronoun-agreement]:
+    IF <reflexive-verb> USED
+    THEN <reflexive-pronoun> MUST_AGREE_WITH_SUBJECT
+    ELSE ERROR "Reflexive pronoun must agree with subject"
+
+@CONTEXT_RULE[deponent-verb-no-passive]:
+    IF <deponent-verb> USED
+    THEN NOT_PASSIVE_DESPITE_S_ENDING
+    ELSE ERROR "Deponent verbs are not passive"
+
+@CONTEXT_RULE[phrasal-verb-particle-stress]:
+    IF <phrasal-verb> USED
+    THEN STRESS_ON_PARTICLE
+    ELSE STRESS_ON_VERB
+
+@CONTEXT_RULE[compound-word-stress]:
+    IF <compound-noun> FORMED
+    THEN STRESS_ON_FIRST_COMPONENT
+    ELSE REGULAR_STRESS
+
+@CONTEXT_RULE[measurement-singular-form]:
+    IF <measurement-expression> WITH_NUMBER_GREATER_THAN_ONE
+    THEN <unit> MAY_BE_SINGULAR_OR_PLURAL
+    ELSE <unit> IS_SINGULAR
+
+@CONTEXT_RULE[formal-ni-capitalized]:
+    IF FORMAL_ADDRESS_USED
+    THEN "Ni" MAY_BE_CAPITALIZED
+    ELSE USE_LOWERCASE
+
+@CONTEXT_RULE[sentence-adverbial-position]:
+    IF <sentence-adverbial> PRESENT
+    THEN TYPICALLY_AFTER_FINITE_VERB_IN_MAIN_CLAUSE
+    ELSE POSITION_VARIES
+
+@CONTEXT_RULE[intensifier-with-adjective]:
+    IF <intensifier> USED
+    THEN MUST_PRECEDE_ADJECTIVE_OR_ADVERB
+    ELSE ERROR "Intensifier position error"
+
+@CONTEXT_RULE[indefinite-pronoun-agreement]:
+    IF <indefinite-pronoun> USED_AS_SUBJECT
+    THEN <verb> MUST_AGREE
+    ELSE ERROR "Indefinite pronoun verb agreement"
+
+@CONTEXT_RULE[demonstrative-denna-formal]:
+    IF "denna" | "detta" | "dessa" USED
+    THEN INDICATES_FORMAL_REGISTER
+    ELSE NEUTRAL_REGISTER
+
+@CONTEXT_RULE[possessive-s-no-apostrophe]:
+    IF POSSESSIVE_S_MARKER
+    THEN NO_APOSTROPHE_USED_IN_SWEDISH
+    ELSE ERROR "Swedish does not use apostrophe for possessive"
+
+@CONTEXT_RULE[quotative-att-required]:
+    IF <indirect-speech> WITH_SPEECH_VERB
+    THEN "att" TYPICALLY_REQUIRED
+    ELSE ERROR "Quotative construction requires att"
+
 /* END OF SWEDISH GRAMMAR */

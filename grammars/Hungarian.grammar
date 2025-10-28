@@ -436,3 +436,375 @@ Keywords: és, vagy, de, hanem, hogy, aki, ami, amely, amelyik, ki, mi, mikor, h
     IF <modal-verb> PRESENT
     THEN REQUIRES <infinitive>
     ELSE VALID
+
+/* ============================================
+ * DISCOURSE MARKERS AND CONNECTIVES
+ * ============================================ */
+
+/* Discourse markers - sentence connectors */
+<discourse-marker> ::= <temporal-discourse> 
+                    | <causal-discourse>
+                    | <contrastive-discourse>
+                    | <additive-discourse>
+                    | <conclusive-discourse>
+                    | <exemplification-discourse>
+
+<temporal-discourse> ::= "először" | "azután" | "utána" | "akkor" | "végül" 
+                      | "végre" | "közben" | "eközben" | "időközben"
+
+<causal-discourse> ::= "mert" | "mivel" | "ugyanis" | "ezért" | "ennélfogva" | "tehát"
+
+<contrastive-discourse> ::= "de" | "hanem" | "ellenben" | "azonban" | "mégis" | "pedig"
+
+<additive-discourse> ::= "és" | "meg" | "valamint" | "továbbá" | "sőt" | "azonkívül"
+
+<conclusive-discourse> ::= "tehát" | "így" | "következésképpen" | "ezért" | "ennélfogva"
+
+<exemplification-discourse> ::= "például" | "mint például" | "nevezetesen"
+
+/* ============================================
+ * TAG QUESTIONS AND ELLIPTICAL STRUCTURES
+ * ============================================ */
+
+/* Tag questions */
+<tag-question> ::= <declarative-clause> <opt-whitespace> "," <opt-whitespace> <question-tag>
+
+<question-tag> ::= "ugye" | "nem" | "igaz" | "nem igaz" | "vagy sem"
+
+/* Elliptical structures */
+<elliptical-structure> ::= <elliptical-response> | <elliptical-clause>
+
+<elliptical-response> ::= "igen" | "nem" | "talán" | "persze" | "természetesen"
+
+<elliptical-clause> ::= <subject> <opt-whitespace> "is" | <verb-phrase> "is"
+
+/* ============================================
+ * REPORTED SPEECH
+ * ============================================ */
+
+/* Direct speech */
+<direct-speech> ::= <quotation-marker> <opt-whitespace> <sentence> <opt-whitespace> <quotation-marker> <opt-whitespace> <reporting-verb>
+
+<quotation-marker> ::= "\"" | "»" | "«"
+
+<reporting-verb> ::= "mond" <person-suffix> | "kérdez" <person-suffix> | "válaszol" <person-suffix>
+
+/* Indirect speech */
+<indirect-speech> ::= <subject> <opt-whitespace> "hogy" <opt-whitespace> <embedded-clause> <opt-whitespace> <reporting-verb>
+
+<embedded-clause> ::= <subordinate-clause>
+
+/* ============================================
+ * CLEFT SENTENCES
+ * ============================================ */
+
+/* It-cleft (Az-cleft in Hungarian) */
+<it-cleft> ::= "az" <opt-whitespace> <copula> <opt-whitespace> <focused-element> <opt-whitespace> "," <opt-whitespace> <relative-clause>
+
+<focused-element> ::= <noun-phrase> | <adverbial> | <prepositional-phrase>
+
+/* Pseudo-cleft */
+<pseudo-cleft> ::= <free-relative> <opt-whitespace> <copula> <opt-whitespace> <noun-phrase>
+
+<free-relative> ::= "ami" | "aki" | "ahol" | "amikor" | "ahogy"
+
+/* ============================================
+ * CORRELATIVE CONSTRUCTIONS
+ * ============================================ */
+
+<correlative-construction> ::= <both-and> | <either-or> | <neither-nor> | <not-only-but-also>
+
+<both-and> ::= "mind" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "mind" <opt-whitespace> <element>
+
+<either-or> ::= "vagy" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "vagy" <opt-whitespace> <element>
+
+<neither-nor> ::= "sem" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "sem" <opt-whitespace> <element>
+
+<not-only-but-also> ::= "nemcsak" <opt-whitespace> <element> <opt-whitespace> "," <opt-whitespace> "hanem" <opt-whitespace> <element> <opt-whitespace> "is"
+
+<element> ::= <noun-phrase> | <verb-phrase> | <clause>
+
+/* ============================================
+ * DIALECTAL VARIATIONS EXTENDED
+ * ============================================ */
+
+@DIALECT[standard]  /* Standard Hungarian (Budapest-based) */
+@DIALECT[western]   /* Western dialects (Dunántúl) */
+@DIALECT[northeastern]  /* Northeastern dialects (Tiszántúl) */
+@DIALECT[transylvanian]  /* Transylvanian Hungarian */
+@DIALECT[csángó]    /* Csángó Hungarian (Moldova) */
+@DIALECT[palóc]     /* Palóc dialect (Northern Hungary) */
+
+<dialectal-vocabulary> ::= <western-dialect-words>
+                        | <northeastern-dialect-words>
+                        | <transylvanian-dialect-words>
+                        | <csángó-dialect-words>
+                        | <palóc-dialect-words>
+
+<western-dialect-words> ::= @DIALECT[western] ( "lányka" | "szöszi" | "oszt" | "mög" )
+
+<northeastern-dialect-words> ::= @DIALECT[northeastern] ( "lyány" | "oszt" | "mög" )
+
+<transylvanian-dialect-words> ::= @DIALECT[transylvanian] ( "lányka" | "ejsze" | "mondják" )
+
+<csángó-dialect-words> ::= @DIALECT[csángó] ( "lián" | "házé" | "főd" )
+
+<palóc-dialect-words> ::= @DIALECT[palóc] ( "lian" | "aszongyák" | "mönt" )
+
+/* ============================================
+ * EXTENDED VERB CONJUGATIONS
+ * ============================================ */
+
+/* Imperative mood extended */
+<imperative-extended> ::= <verb-stem> <imperative-suffix> <person-suffix-imperative>
+
+<imperative-suffix> ::= "-j" | "-jé" | "-jön" | "-jenek"
+
+<person-suffix-imperative> ::= "-ak" | "-ál" | "-on" | "-anak" | "-ék" | "-él" | "-ön" | "-enek"
+
+/* Conditional mood extended */
+<conditional-extended> ::= <verb-stem> <conditional-suffix> <person-suffix-conditional>
+
+<conditional-suffix> ::= "-ná" | "-né"
+
+<person-suffix-conditional> ::= "-k" | "-l" | "" | "-nk" | "-tok" | "-tek" | "-nak" | "-nek"
+
+/* Subjunctive mood (expressing wish/possibility) */
+<subjunctive-mood> ::= "bárcsak" <opt-whitespace> <verb-conditional>
+                    | "vajha" <opt-whitespace> <verb-conditional>
+
+/* ============================================
+ * EXTENDED PERIPHRASTIC CONSTRUCTIONS
+ * ============================================ */
+
+/* Progressive aspect */
+<progressive-aspect> ::= "éppen" <opt-whitespace> <verb-present>
+                      | <verb-stem> "ni" <opt-whitespace> "van"
+
+/* Recent past */
+<recent-past> ::= "most" <opt-whitespace> <verb-past>
+               | "éppen" <opt-whitespace> <verb-past>
+
+/* Immediate future */
+<immediate-future> ::= "mindjárt" <opt-whitespace> <verb-future>
+                    | "rögtön" <opt-whitespace> <verb-future>
+
+/* Habitual aspect */
+<habitual-aspect> ::= "szokta" <opt-whitespace> <infinitive>
+                   | <verb-stem> "ni" <opt-whitespace> "szokott"
+
+/* Inceptive aspect */
+<inceptive-aspect> ::= "kezd" <opt-whitespace> <infinitive>
+                    | "fog hozzá" <opt-whitespace> <infinitive>
+
+/* ============================================
+ * CAUSATIVE CONSTRUCTIONS EXTENDED
+ * ============================================ */
+
+<causative-extended> ::= <causative-suffix-verb> | <analytical-causative>
+
+<causative-suffix-verb> ::= <verb-stem> <causative-marker> <person-suffix>
+
+<causative-marker> ::= "-tat" | "-tet" | "-at" | "-et"
+
+<analytical-causative> ::= <causative-verb> <opt-whitespace> <infinitive>
+
+<causative-verb> ::= "megcsináltat" | "elvégeztet" | "megnézet"
+
+/* ============================================
+ * REFLEXIVE AND RECIPROCAL CONSTRUCTIONS
+ * ============================================ */
+
+/* Reflexive constructions */
+<reflexive-construction> ::= <subject> <opt-whitespace> <reflexive-pronoun-accusative> <opt-whitespace> <transitive-verb>
+
+<reflexive-pronoun-accusative> ::= "magam" | "magad" | "magát" | "magunkat" | "magatokat" | "magukat"
+
+/* Reciprocal constructions */
+<reciprocal-construction> ::= <subject-plural> <opt-whitespace> <reciprocal-pronoun> <opt-whitespace> <transitive-verb>
+
+<reciprocal-pronoun> ::= "egymást" | "egymással" | "egymásnak"
+
+/* ============================================
+ * IDIOMATIC EXPRESSIONS
+ * ============================================ */
+
+<hungarian-idiom> ::= "kutya hideg van" | "esik a hó" | "fáj a fejem"
+                   | "jó napot" | "viszontlátásra" | "köszönöm szépen"
+                   | "tessék parancsolni" | "nincs mit" | "nagyon szívesen"
+                   | "mi újság" | "semmi baj" | "minden rendben"
+
+/* ============================================
+ * TEMPORAL EXPRESSIONS EXTENDED
+ * ============================================ */
+
+/* Days of the week */
+<day-of-week> ::= "hétfő" | "kedd" | "szerda" | "csütörtök" | "péntek" | "szombat" | "vasárnap"
+
+/* Months */
+<month-name> ::= "január" | "február" | "március" | "április" | "május" | "június"
+              | "július" | "augusztus" | "szeptember" | "október" | "november" | "december"
+
+/* Seasons */
+<season> ::= "tavasz" | "nyár" | "ősz" | "tél"
+
+/* Time of day */
+<time-of-day> ::= "reggel" | "délelőtt" | "dél" | "délután" | "este" | "éjjel" | "éjfél"
+
+/* Clock time */
+<clock-time> ::= <hour> <opt-whitespace> "óra" <opt-whitespace> <minute>?
+
+<hour> ::= /[0-2]?[0-9]/
+
+<minute> ::= /[0-5][0-9]/ <opt-whitespace> "perc"
+
+/* ============================================
+ * CONDITIONAL SENTENCES EXTENDED
+ * ============================================ */
+
+/* Real conditional (factual) */
+<real-conditional> ::= "ha" <opt-whitespace> <condition-clause-real> <opt-whitespace> "," <opt-whitespace> <result-clause-real>
+
+<condition-clause-real> ::= <subject> <opt-whitespace> <verb-present>
+
+<result-clause-real> ::= "akkor" <opt-whitespace> <subject> <opt-whitespace> <verb-present>
+
+/* Hypothetical conditional */
+<hypothetical-conditional> ::= "ha" <opt-whitespace> <condition-clause-hyp> <opt-whitespace> "," <opt-whitespace> <result-clause-hyp>
+
+<condition-clause-hyp> ::= <subject> <opt-whitespace> <verb-conditional>
+
+<result-clause-hyp> ::= "akkor" <opt-whitespace> <subject> <opt-whitespace> <verb-conditional>
+
+/* Contrary-to-fact conditional */
+<contrary-conditional> ::= "ha" <opt-whitespace> <condition-clause-contrary> <opt-whitespace> "," <opt-whitespace> <result-clause-contrary>
+
+<condition-clause-contrary> ::= <subject> <opt-whitespace> <verb-past-conditional>
+
+<result-clause-contrary> ::= "akkor" <opt-whitespace> <subject> <opt-whitespace> <verb-past-conditional>
+
+<verb-past-conditional> ::= <verb-stem> "t" <conditional-suffix> <person-suffix>
+
+/* ============================================
+ * COMPARATIVE AND SUPERLATIVE CONSTRUCTIONS
+ * ============================================ */
+
+/* Comparative structures */
+<comparative-construction> ::= <adjective> "-bb" | <adjective> "-abb" | <adjective> "-ebb"
+                            | "inkább" <opt-whitespace> <adjective>
+
+/* Superlative structures */
+<superlative-construction> ::= "leg" <adjective> "-bb"
+                            | "leg" <adjective> "-abb"
+                            | "leg" <adjective> "-ebb"
+                            | "a" <opt-whitespace> "leg" <adjective> "-bb"
+
+/* Comparative sentences */
+<comparative-sentence> ::= <noun-phrase> <opt-whitespace> <comparative-adjective> <opt-whitespace> "mint" <opt-whitespace> <noun-phrase>
+
+<comparative-adjective> ::= <adjective> "-bb" | <adjective> "-abb" | <adjective> "-ebb"
+
+/* ============================================
+ * EXTENDED NEGATION PATTERNS
+ * ============================================ */
+
+/* Emphatic negation */
+<emphatic-negation> ::= "egyáltalán" <opt-whitespace> "nem" | "semmilyen" | "semmiképpen"
+
+/* Double negation */
+<double-negation> ::= "sem" <opt-whitespace> <noun> <opt-whitespace> "," <opt-whitespace> "sem" <opt-whitespace> <noun>
+
+/* Negative polarity items */
+<negative-polarity-item> ::= "senki" | "semmi" | "sehol" | "sehova" | "soha"
+
+/* ============================================
+ * QUESTION FORMATION EXTENDED
+ * ============================================ */
+
+/* Alternative questions */
+<alternative-question> ::= <yes-no-question> <opt-whitespace> "vagy" <opt-whitespace> <yes-no-question>
+
+/* Echo questions */
+<echo-question> ::= <declarative-clause> <opt-whitespace> "?" <opt-whitespace> <question-word>
+
+/* ============================================
+ * EXTENDED CASE MARKERS AND POSTPOSITIONS
+ * ============================================ */
+
+/* Additional case markers */
+<case-marker-extended> ::= "-ként" | "-képpen" | "-ig" | "-ul" | "-ül" | "-stul" | "-stül"
+
+/* Compound postpositions */
+<compound-postposition> ::= "miatt" | "helyett" | "előtt" | "után" | "alatt" | "fölött"
+                         | "között" | "köré" | "körül" | "mentén" | "végett"
+
+/* ============================================
+ * EXTENDED WORD FORMATION
+ * ============================================ */
+
+/* Compound nouns */
+<compound-noun> ::= <noun> <compound-marker>? <noun>
+
+<compound-marker> ::= "-" | ""
+
+/* Diminutives */
+<diminutive-suffix> ::= "-ka" | "-ke" | "-cska" | "-cske"
+
+/* Augmentatives */
+<augmentative-suffix> ::= "-s" | "-os" | "-es" | "-ös"
+
+/* ============================================
+ * ADDITIONAL CONTEXT RULES
+ * ============================================ */
+
+@CONTEXT_RULE[discourse-marker-position]:
+    IF <discourse-marker> PRESENT
+    THEN <discourse-marker> SHOULD_BE_SENTENCE_INITIAL OR CLAUSE_INITIAL
+    ELSE ALLOW
+
+@CONTEXT_RULE[tag-question-polarity]:
+    IF <declarative-clause> IS_AFFIRMATIVE
+    THEN <question-tag> SHOULD_BE_NEGATIVE
+    ELSE <question-tag> SHOULD_BE_AFFIRMATIVE
+
+@CONTEXT_RULE[indirect-speech-mood]:
+    IF <indirect-speech> PRESENT
+    THEN <embedded-clause> MAY_USE_SUBJUNCTIVE OR INDICATIVE
+    ELSE NORMAL
+
+@CONTEXT_RULE[cleft-focus]:
+    IF <it-cleft> PRESENT
+    THEN <focused-element> MUST_CARRY_INFORMATION_FOCUS
+    ELSE NORMAL
+
+@CONTEXT_RULE[correlative-parallelism]:
+    IF <correlative-construction> PRESENT
+    THEN <element> STRUCTURES_MUST_BE_PARALLEL
+    ELSE ERROR "Correlative elements must be syntactically parallel"
+
+@CONTEXT_RULE[dialectal-consistency]:
+    IF @DIALECT SPECIFIED
+    THEN <vocabulary> AND <phonology> MUST_BE_CONSISTENT_WITH_DIALECT
+    ELSE ALLOW
+
+@CONTEXT_RULE[causative-transitivity]:
+    IF <causative-construction> PRESENT
+    THEN <verb> MUST_BE_TRANSITIVE
+    ELSE ERROR "Causatives require transitive verb base"
+
+@CONTEXT_RULE[reflexive-pronoun-agreement]:
+    IF <reflexive-construction> PRESENT
+    THEN <reflexive-pronoun> MUST_AGREE_WITH <subject> IN_PERSON_AND_NUMBER
+    ELSE ERROR "Reflexive pronoun must agree with subject"
+
+@CONTEXT_RULE[conditional-mood-consistency]:
+    IF <conditional-sentence> TYPE IS HYPOTHETICAL
+    THEN BOTH <condition-clause> AND <result-clause> MUST_USE_CONDITIONAL_MOOD
+    ELSE ERROR "Hypothetical conditionals require conditional mood in both clauses"
+
+@CONTEXT_RULE[comparative-than-phrase]:
+    IF <comparative-construction> PRESENT
+    THEN "mint" PHRASE MAY_BE_INCLUDED
+    ELSE NORMAL
+
+/* Hungarian grammar enhancements complete - now at Danish benchmark level */

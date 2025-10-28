@@ -1365,3 +1365,34 @@ Keywords: und, oder, aber, wenn, weil, dass, als, ob, wie, der, die, das, ein, e
     IF <unreal-conditional> PRESENT
     THEN <subjunctive-verb> REQUIRED
     ELSE WARNING "Unreal conditionals should use subjunctive mood"
+
+/* Additional German language validation rules for comprehensive coverage */
+@CONTEXT_RULE[dialect-consistency]:
+    IF @DIALECT MARKER_PRESENT
+    THEN CONSISTENT_DIALECT_USAGE_WITHIN_UTTERANCE
+    ELSE VALID
+
+@CONTEXT_RULE[compound-noun-length]:
+    IF <compound-noun> LENGTH > 4_PARTS
+    THEN WARNING "Very long compound nouns may reduce readability"
+    ELSE VALID
+
+@CONTEXT_RULE[modal-particle-stacking]:
+    IF MULTIPLE_MODAL_PARTICLES IN_SEQUENCE
+    THEN WARNING "Stacking modal particles (doch halt mal) may sound redundant"
+    ELSE VALID
+
+@CONTEXT_RULE[separable-prefix-placement]:
+    IF <separable-verb> IN_MAIN_CLAUSE
+    THEN <prefix> AT_CLAUSE_END
+    ELSE ERROR "Separable prefix must be at end of main clause"
+
+@CONTEXT_RULE[genitive-modern-usage]:
+    IF <genitive-case> IN_SPOKEN_CONTEXT
+    THEN WARNING "Genitive rare in spoken German, consider dative with 'von'"
+    ELSE VALID
+
+@CONTEXT_RULE[subjunctive-2-preference]:
+    IF <unreal-wish> OR <polite-request>
+    THEN PREFER_SUBJUNCTIVE_2_OVER_WÜRDE_CONSTRUCTION
+    ELSE VALID
