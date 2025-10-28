@@ -1383,3 +1383,14 @@ Keywords: und, oder, aber, wenn, weil, dass, als, ob, wie, der, die, das, ein, e
     IF <swiss-modal-particle-extended> IN_FORMAL_CONTEXT
     THEN WARNING "Modal particles typically informal"
     ELSE VALID
+
+/* Additional Swiss German validation rules for completeness */
+@CONTEXT_RULE[swiss-french-loan-usage]:
+    IF <swiss-french-loan> IN_STANDARD_GERMAN_CONTEXT
+    THEN WARNING "French loanword may not be understood outside Switzerland"
+    ELSE VALID
+
+@CONTEXT_RULE[swiss-italian-loan-usage]:
+    IF <swiss-italian-loan> IN_FORMAL_WRITTEN_CONTEXT
+    THEN WARNING "Italian loanword typically used in spoken Swiss German"
+    ELSE VALID

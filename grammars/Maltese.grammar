@@ -1,0 +1,25 @@
+Grammar: Maltese
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+Keywords: u, jew, iżda, li, min, x, meta, fejn, kif, għaliex, jekk, le, f, fuq, minn, għal, b, ma, dan, dak, tiegħi, tiegħek, jiena, inti, huwa, hi, aħna, intom, huma
+<sentence> ::= <subject>? <opt-whitespace> <verb> <opt-whitespace> <object>? <punctuation>?
+<subject> ::= <pronoun> | <noun>
+<pronoun> ::= "jiena" | "inti" | "huwa" | "hi" | "aħna" | "intom" | "huma"
+<noun> ::= /[a-zċġħż]+/ | <triconsonantal-root>
+<triconsonantal-root> ::= /[bcdfgħjklmnpqrstvwxzżċġ]{3}/
+<verb> ::= <triconsonantal-root> <pattern>?
+<pattern> ::= "a" | "ie" | "u" | "et" | "it"
+<object> ::= <noun>
+<punctuation> ::= "." | "?" | "!"
+<whitespace> ::= /[ \t\n\r]+/
+<opt-whitespace> ::= /[ \t\n\r]*/
+@CONTEXT_RULE[triconsonantal-morphology]:
+    IF <word> IS verb OR noun
+    THEN USE <triconsonantal-root> + <pattern>
+    ELSE VALID
+@CONTEXT_RULE[romance-influence]:
+    IF <word> IS romance-origin
+    THEN FOLLOWS romance-grammar
+    ELSE FOLLOWS semitic-grammar

@@ -1,0 +1,216 @@
+Grammar: Estonian
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+
+/*
+ * Estonian Natural Language Grammar - Comprehensive Edition
+ * 
+ * Uralic/Finnic language with 14 grammatical cases, agglutinative morphology,
+ * consonant gradation, and vowel harmony.
+ */
+
+Keywords: ja, või, aga, kuid, ent, vaid, et, kes, mis, kus, millal, kuidas, miks, kui, siis, see, too, need, minu, sinu, tema, meie, teie, nende, ma, mina, sa, sina, ta, tema, me, meie, te, teie, nad, nemad, ei, pole, on, ole, olema, saama, minema, tulema, tahtma, võima, pidama, oskama, ei, ega, ning, või, ent, kuid, sest, et, nii, siis, seal, siin, sinna, sealt, siia
+
+/* Top-level sentence structure */
+<sentence> ::= <main-clause> | <subordinate-clause> | <compound-sentence> | <complex-sentence> | <multi-embedded-sentence>
+
+<main-clause> ::= <declarative-clause> | <interrogative-clause> | <imperative-clause> | <exclamative-clause>
+
+<declarative-clause> ::= <subject>? <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? <opt-whitespace> <adverbial>* <opt-whitespace> <punctuation>?
+
+<multi-embedded-sentence> ::= <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause> ( <opt-whitespace> "," <opt-whitespace> <subordinate-clause> )+
+
+<subject> ::= <pronoun-subject> | <noun-phrase> | <proper-noun>
+
+<pronoun-subject> ::= @CASE[nominative] ( "ma" | "mina" | "sa" | "sina" | "ta" | "tema" | "me" | "meie" | "te" | "teie" | "nad" | "nemad" )
+
+<exclamative-clause> ::= <exclamative-word> <opt-whitespace> <adjective>? <opt-whitespace> <noun-phrase>? <opt-whitespace> <verb-phrase>? "!"
+
+<exclamative-word> ::= "kui" | "milline" | "mis"
+
+/* Fourteen-case noun system (agglutinative) */
+<noun-phrase> ::= <adjective>* <opt-whitespace> <noun>
+
+<noun> ::= <noun-nominative> | <noun-genitive> | <noun-partitive> | <noun-illative> | <noun-inessive> | <noun-elative> | <noun-allative> | <noun-adessive> | <noun-ablative> | <noun-translative> | <noun-terminative> | <noun-essive> | <noun-abessive> | <noun-comitative>
+
+<noun-nominative> ::= @CASE[nominative] <noun-stem> ( "" | "d" )
+
+<noun-genitive> ::= @CASE[genitive] <noun-stem> ( "" | "e" | "a" | "u" | "de" | "te" )
+
+<noun-partitive> ::= @CASE[partitive] <noun-stem> ( "t" | "d" | "a" | "e" | "id" | "sid" )
+
+<noun-illative> ::= @CASE[illative] <noun-stem> ( "sse" | "de" | "he" | "hte" )
+
+<noun-inessive> ::= @CASE[inessive] <noun-stem> ( "s" | "es" | "as" | "des" )
+
+<noun-elative> ::= @CASE[elative] <noun-stem> ( "st" | "est" | "ast" | "dest" )
+
+<noun-allative> ::= @CASE[allative] <noun-stem> ( "le" | "dele" | "tele" )
+
+<noun-adessive> ::= @CASE[adessive] <noun-stem> ( "l" | "el" | "al" | "del" )
+
+<noun-ablative> ::= @CASE[ablative] <noun-stem> ( "lt" | "elt" | "alt" | "delt" )
+
+<noun-translative> ::= @CASE[translative] <noun-stem> ( "ks" | "eks" | "deks" )
+
+<noun-terminative> ::= @CASE[terminative] <noun-stem> ( "ni" | "ini" | "deni" )
+
+<noun-essive> ::= @CASE[essive] <noun-stem> ( "na" | "ena" | "dena" )
+
+<noun-abessive> ::= @CASE[abessive] <noun-stem> ( "ta" | "mata" | "ta" )
+
+<noun-comitative> ::= @CASE[comitative] <noun-stem> ( "ga" | "dega" )
+
+<noun-stem> ::= /[a-zäõöü]+/
+
+/* Consonant gradation patterns */
+<noun-stem-with-gradation> ::= /[a-zäõöü]*[kpt][a-zäõöü]+/ | /[a-zäõöü]*[kg][a-zäõöü]+/
+
+<adjective> ::= <adj-stem> <adj-ending>?
+
+<adj-ending> ::= "" | "e" | "t" | "d" | "a" | "ks" | "s" | "st" | "le" | "l" | "lt" | "ma" | "m" | "mas" | "mast" | "mata" | "maks" | "ni" | "na" | "ta" | "ga"
+
+<adj-stem> ::= /[a-zäõöü]+/
+
+/* Verb phrase with full conjugation */
+<verb-phrase> ::= <finite-verb> | <modal-construction> | <passive-voice> | <aspectual-construction>
+
+<finite-verb> ::= <verb-present> | <verb-past> | <verb-imperative> | <irregular-verb>
+
+<verb-present> ::= @TENSE[present] <verb-stem> ( "n" | "d" | "b" | "me" | "te" | "vad" | "ad" | "eb" )
+
+<verb-past> ::= @TENSE[past] <verb-stem> ( "sin" | "sid" | "s" | "sime" | "site" | "sid" )
+
+<verb-imperative> ::= @MOOD[imperative] <verb-stem> ( "" | "gu" | "gem" | "ge" | "gu" )
+
+/* Passive voice construction */
+<passive-voice> ::= @VOICE[passive] <verb-stem> ( "takse" | "ti" | "tud" | "dakse" | "da" | "dud" )
+
+<modal-construction> ::= <modal-verb> <opt-whitespace> <infinitive>
+
+<modal-verb> ::= "võin" | "võid" | "võib" | "võime" | "võite" | "võivad" | "pean" | "pead" | "peab" | "peame" | "peate" | "peavad" | "tahan" | "tahad" | "tahab" | "tahame" | "tahate" | "tahavad"
+
+<aspectual-construction> ::= <aspectual-verb> <opt-whitespace> <infinitive>
+
+<aspectual-verb> ::= "hakkan" | "hakkad" | "hakkab" | "hakkame" | "hakkate" | "hakkavad" | "lõpetan" | "lõpetad" | "lõpetab" | "lõpetame" | "lõpetate" | "lõpetavad" | "jätkan" | "jätkad" | "jätkab" | "jätkame" | "jätkate" | "jätkavad"
+
+/* Ten irregular verbs */
+<irregular-verb> ::= <verb-olema> | <verb-saama> | <verb-minema> | <verb-tulema> | <verb-tegema> | <verb-andma> | <verb-võtma> | <verb-nägema> | <verb-sööma> | <verb-jooma>
+
+<verb-olema> ::= "olen" | "oled" | "on" | "oleme" | "olete" | "on" | "pole" | "ei ole" | "olin" | "olid" | "oli" | "olime" | "olite" | "olid" | "olema" | "olla"
+
+<verb-saama> ::= "saan" | "saad" | "saab" | "saame" | "saate" | "saavad" | "sain" | "said" | "sai" | "saime" | "saite" | "said" | "saama" | "saada"
+
+<verb-minema> ::= "lähen" | "lähed" | "läheb" | "läheme" | "lähete" | "lähevad" | "läksin" | "läksid" | "läks" | "läksime" | "läksite" | "läksid" | "minema" | "minna"
+
+<verb-tulema> ::= "tulen" | "tuled" | "tuleb" | "tuleme" | "tulete" | "tulevad" | "tulin" | "tulid" | "tuli" | "tulime" | "tulite" | "tulid" | "tulema" | "tulla"
+
+<verb-tegema> ::= "teen" | "teed" | "teeb" | "teeme" | "teete" | "teevad" | "tegin" | "tegid" | "tegi" | "tegime" | "tegite" | "tegid" | "tegema" | "teha"
+
+<verb-andma> ::= "annan" | "annad" | "annab" | "anname" | "annate" | "annavad" | "andsin" | "andsid" | "andis" | "andsime" | "andsite" | "andsid" | "andma" | "anda"
+
+<verb-võtma> ::= "võtan" | "võtad" | "võtab" | "võtame" | "võtate" | "võtavad" | "võtsin" | "võtsid" | "võttis" | "võtsime" | "võtsite" | "võtsid" | "võtma" | "võtta"
+
+<verb-nägema> ::= "näen" | "näed" | "näeb" | "näeme" | "näete" | "näevad" | "nägin" | "nägid" | "nägi" | "nägime" | "nägite" | "nägid" | "nägema" | "näha"
+
+<verb-sööma> ::= "söön" | "sööd" | "sööb" | "sööme" | "sööte" | "söövad" | "sõin" | "sõid" | "sõi" | "sõime" | "sõite" | "sõid" | "sööma" | "süüa"
+
+<verb-jooma> ::= "joon" | "jood" | "joob" | "joome" | "joote" | "joovad" | "jõin" | "jõid" | "jõi" | "jõime" | "jõite" | "jõid" | "jooma" | "juua"
+
+<infinitive> ::= <verb-stem> ( "ma" | "da" | "ta" | "a" )
+
+<verb-stem> ::= /[a-zäõöü]+/
+
+/* Conditional sentences */
+<conditional-sentence> ::= "kui" <opt-whitespace> <declarative-clause> <opt-whitespace> "," <opt-whitespace> "siis" <opt-whitespace> <main-clause>
+
+<object> ::= <noun-phrase> | <pronoun-object>
+
+<pronoun-object> ::= @CASE[partitive] ( "mind" | "sind" | "teda" | "meid" | "teid" | "neid" )
+
+<adverbial> ::= <adverb> | <adverbial-phrase> | <temporal-expression>
+
+<adverb> ::= "hästi" | "halvasti" | "kiiresti" | "aeglaselt" | "nüüd" | "täna" | "homme" | "eile" | "alati" | "mitte kunagi" | "sageli" | "vahel" | "seal" | "siin" | "sinna" | "sealt" | "siia"
+
+<temporal-expression> ::= "enne" <opt-whitespace> <noun-partitive> | "pärast" <opt-whitespace> <noun-partitive> | "ajal" <opt-whitespace> <noun-genitive>
+
+<adverbial-phrase> ::= <postposition> <opt-whitespace> <noun-genitive>
+
+<postposition> ::= "pärast" | "enne" | "juurde" | "juurest" | "juures" | "taga" | "ees" | "vahel" | "kõrval" | "peale" | "all" | "peal" | "sees" | "seest" | "poole"
+
+<subordinate-clause> ::= <subordinating-conjunction> <opt-whitespace> <declarative-clause>
+
+<subordinating-conjunction> ::= "et" | "kui" | "kuna" | "sest" | "kuigi" | "ehkki" | "nagu" | "justkui" | "enne kui" | "pärast kui" | "kuni"
+
+<compound-sentence> ::= <main-clause> <opt-whitespace> <coordinating-conjunction> <opt-whitespace> <main-clause>
+
+<coordinating-conjunction> ::= "ja" | "ning" | "või" | "aga" | "kuid" | "ent" | "vaid" | "ega"
+
+<complex-sentence> ::= <main-clause> <opt-whitespace> "," <opt-whitespace> <subordinate-clause> | <subordinate-clause> <opt-whitespace> "," <opt-whitespace> <main-clause>
+
+<interrogative-clause> ::= <declarative-clause> "?" | "kas" <opt-whitespace> <declarative-clause> "?" | <question-word> <opt-whitespace> <verb-phrase> <opt-whitespace> <object>? "?"
+
+<question-word> ::= "kes" | "mis" | "kus" | "millal" | "kuidas" | "miks" | "kui palju" | "milline" | "kelle"
+
+<imperative-clause> ::= <verb-imperative> <opt-whitespace> <object>? <opt-whitespace> <adverbial>?
+
+<proper-noun> ::= /[A-ZÄÖÜÕ][a-zäöüõ]*/
+
+<punctuation> ::= "." | "!" | "?" | "," | ";" | ":"
+
+<whitespace> ::= /[ \t\n\r]+/
+
+<opt-whitespace> ::= /[ \t\n\r]*/
+
+/* Context rules for Estonian */
+@CONTEXT_RULE[case-suffix-agglutination]:
+    IF <noun> HAS multiple-case-markers
+    THEN STACK suffixes IN correct-order
+    ELSE VALID
+
+@CONTEXT_RULE[consonant-gradation]:
+    IF <noun-stem> OR <verb-stem> HAS gradation-pattern
+    THEN APPLY grade-alternation IN weak-or-strong-context
+    ELSE VALID
+
+@CONTEXT_RULE[vowel-harmony]:
+    IF <suffix> ATTACHED-TO <stem>
+    THEN <suffix> HARMONIZES-WITH <stem> vowels
+    ELSE WARNING "Check vowel harmony"
+
+@CONTEXT_RULE[partitive-usage]:
+    IF <object> IS PARTIAL OR INDEFINITE
+    THEN USE partitive-case
+    ELSE USE genitive-or-nominative
+    
+@CONTEXT_RULE[negation-agreement]:
+    IF <sentence> CONTAINS negation-word
+    THEN <verb> TAKES special-negative-form
+    ELSE VALID
+
+@CONTEXT_RULE[passive-impersonal]:
+    IF <passive-voice> IN <sentence>
+    THEN NO explicit-subject
+    ELSE WARNING "Passive is impersonal"
+
+@CONTEXT_RULE[postposition-case]:
+    IF <postposition> IN <adverbial-phrase>
+    THEN <noun> TAKES required-case FOR <postposition>
+    ELSE ERROR "Postposition governs specific case"
+
+@CONTEXT_RULE[modal-infinitive]:
+    IF <modal-verb> IN <sentence>
+    THEN FOLLOWED-BY <infinitive> IN ma-infinitive
+    ELSE ERROR "Modal requires infinitive"
+
+@CONTEXT_RULE[aspectual-infinitive]:
+    IF <aspectual-verb> IN <sentence>
+    THEN FOLLOWED-BY <infinitive> IN ma-infinitive
+    ELSE ERROR "Aspectual verb requires infinitive"
+
+@CONTEXT_RULE[subject-verb-agreement]:
+    IF <subject> AND <finite-verb> IN <clause>
+    THEN <finite-verb> AGREES-WITH <subject> IN person AND number
+    ELSE ERROR "Verb must agree with subject"

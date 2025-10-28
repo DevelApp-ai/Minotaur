@@ -1,0 +1,20 @@
+Grammar: Latvian
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+SymbolTableSharing: hierarchical
+Keywords: un, vai, bet, ka, kurš, kas, kad, kur, kā, kāpēc, ja, ne, uz, no, ar, bez, par, šis, tas, mans, tavs, es, tu, viņš, viņa, mēs, jūs, viņi, viņas
+<sentence> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> <object>? <punctuation>?
+<subject> ::= <pronoun> | <noun>
+<pronoun> ::= "es" | "tu" | "viņš" | "viņa" | "mēs" | "jūs" | "viņi" | "viņas"
+<noun> ::= /[a-zāčēģīķļņšūž]+/ <case-ending>?
+<case-ending> ::= "s" | "a" | "as" | "am" | "ā" | "iem" | "u" | "i"
+<verb> ::= /[a-zāčēģīķļņšūž]+/ ( "u" | "i" | "a" | "am" | "at" )
+<object> ::= <noun>
+<punctuation> ::= "." | "?" | "!"
+<whitespace> ::= /[ \t\n\r]+/
+<opt-whitespace> ::= /[ \t\n\r]*/
+@CONTEXT_RULE[case-agreement]:
+    IF <adjective> MODIFIES <noun>
+    THEN <adjective>.@CASE == <noun>.@CASE
+    ELSE ERROR "Case agreement required"
