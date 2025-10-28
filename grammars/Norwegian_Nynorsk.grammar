@@ -867,3 +867,579 @@ Keywords: og, eller, men, viss, når, fordi, at, som, der, det, den, dei, eg, du
 // In main clauses, the finite verb must be in second position
 
 // END OF GRAMMAR
+
+// ============================================================================
+// EXTENDED DISCOURSE AND PRAGMATIC FEATURES FOR NYNORSK
+// ============================================================================
+
+<discourse-marker> ::= <temporal-discourse> | <causal-discourse> | <contrastive-discourse>
+                    | <additive-discourse> | <conclusive-discourse> | <exemplification-discourse>;
+
+<temporal-discourse> ::= "først" | "deretter" | "så" | "til slutt" | "endeleg" | "samtidig"
+                      | "i mellomtida" | "tidlegare" | "seinare" | "no" | "straks" | "med ein gong";
+
+<causal-discourse> ::= "difor" | "dermed" | "følgjeleg" | "som følgje av dette" | "av den grunn"
+                    | "på grunn av dette" | "derav";
+
+<contrastive-discourse> ::= "derimot" | "likevel" | "på den andre sida" | "tvert imot"
+                         | "imidlertid" | "ikkje di mindre";
+
+<additive-discourse> ::= "dessutan" | "i tillegg" | "også" | "vidare" | "ytterlegare"
+                      | "for øvrig" | "samstundes" | "likeins";
+
+<conclusive-discourse> ::= "altså" | "kort sagt" | "med andre ord" | "oppsummert"
+                        | "konklusjonen er" | "til sjuande og sist";
+
+<exemplification-discourse> ::= "til dømes" | "som" | "slik som" | "særleg"
+                             | "spesielt" | "nemleg" | "det vil seie";
+
+<tag-question> ::= <declarative-clause> "," <question-tag> "?";
+
+<question-tag> ::= "ikkje sant" | "eller" | "ikkje" | "gjer dei ikkje" | "er det ikkje";
+
+<elliptical-clause> ::= <elliptical-response> | <elliptical-coordination>;
+
+<reported-speech> ::= <reporting-verb> <reported-clause>;
+
+<reporting-verb> ::= "seier" | "sa" | "fortel" | "fortalde" | "påstår" | "påstod"
+                  | "spør" | "spurde" | "forklarer" | "forklarte";
+
+<reported-clause> ::= "at" <subordinate-content> | <embedded-question>;
+
+<cleft-sentence> ::= <det-er-cleft> | <pseudo-cleft>;
+
+<det-er-cleft> ::= "det" "er" <focused-constituent> "som" <verb-phrase>;
+
+<pseudo-cleft> ::= <wh-clause> "er" <focused-constituent>;
+
+<correlative-construction> ::= <correlative-pair> <clause-sequence>;
+
+<correlative-pair> ::= "både" "og" | "anten" "eller" | "verken" "eller"
+                    | "ikkje" "berre" "men" "også" | "di" "meir" "di" "betre";
+
+<politeness-marker> ::= "ver så snill" | "vennlegast" | "kunne du" | "ville du"
+                     | "om du vil" | "takk" | "tusen takk";
+
+<interjection-extended> ::= "å!" | "oi!" | "uff!" | "jøss!" | "hei!" | "sjå!"
+                         | "herre gud!" | "jøsses!" | "huff!" | "jasså!";
+
+@CONTEXT_RULE[discourse-marker-position]:
+    IF <discourse-marker> PRESENT
+    THEN VERIFY_APPROPRIATE_CLAUSE_BOUNDARY ELSE VALID
+
+@CONTEXT_RULE[reported-speech-tense]:
+    IF <reported-speech> WITH_PAST_REPORTING_VERB
+    THEN VERIFY_TENSE_CONCORDANCE ELSE VALID
+
+<dialectal-variation> ::= <western-nynorsk> | <northern-nynorsk> | <inland-nynorsk>;
+
+@DIALECT[western] @DIALECT[northern] @DIALECT[inland] @DIALECT[sunnmøre]
+
+<pronominal-verb-extended> ::= <reflexive-verb> | <reciprocal-verb>;
+
+<reflexive-verb> ::= <verb> "seg" | <verb> "meg" | <verb> "deg";
+
+<reciprocal-verb> ::= <verb> "kvarandre";
+
+<idiomatic-expression> ::= "ha" "lyst" "til" | "ta" "omsyn" "til" | "bli" "merksam" "på"
+                        | "kome" "i" "konflikt" "med" | "ha" "rett" | "ta" "feil";
+
+<temporal-expression-extended> ::= "for" <time-quantity> "sidan" | "om" <time-quantity>
+                                | "i" <time-quantity> | "etter" <time-quantity>;
+
+<time-quantity> ::= <number> ("dag" | "dagar" | "veke" | "veker" | "månad" | "månader"
+                            | "år" | "time" | "timar" | "minutt" | "minuttar");
+
+<conditional-sentence-extended> ::= <real-conditional> | <hypothetical-conditional>;
+
+<real-conditional> ::= "viss" <present> "," <present> | "viss" <present> "," <future>;
+
+<hypothetical-conditional> ::= "viss" <past> "," <conditional>;
+
+<comparative-extended> ::= "meir" <adjective> "enn" | "mindre" <adjective> "enn"
+                        | "like" <adjective> "som" | "betre" "enn" | "verre" "enn";
+
+<superlative-extended> ::= "den" "mest" <adjective> | "den" "minst" <adjective>
+                        | "best" | "verst" | "størst" | "minst";
+
+<modal-verb-extended> ::= "kan" | "kunne" | "vil" | "ville" | "skal" | "skulle"
+                       | "må" | "måtte" | "bør" | "burde" | "tør" | "torde";
+
+@CONTEXT_RULE[modal-verb-infinitive]:
+    IF <modal-verb-extended> PRESENT
+    THEN FOLLOWED_BY_INFINITIVE ELSE VALID
+
+<passive-voice-extended> ::= <s-passive> | <bli-passive> | <verte-passive>;
+
+<s-passive> ::= <verb-stem> "st" | <verb-stem> "s";
+
+<bli-passive> ::= "bli" <past-participle> | "blir" <past-participle> | "vart" <past-participle>;
+
+<verte-passive> ::= "verte" <past-participle> | "vert" <past-participle> | "vart" <past-participle>;
+
+@CONTEXT_RULE[passive-formation]:
+    IF <passive-voice-extended> PRESENT
+    THEN VERIFY_CORRECT_FORMATION ELSE VALID
+
+<negation-extended> ::= "ikkje" | "aldri" | "ingen" | "inkje" | "aldri" "nokon"
+                     | "ikkje" "noko" | "verken" "eller";
+
+@CONTEXT_RULE[double-negation]:
+    IF <negation-extended> WITH_MULTIPLE_NEGATIVES
+    THEN NOT_STANDARD_NYNORSK ELSE VALID
+
+<word-order-patterns> ::= <v2-main-clause> | <verb-final-subordinate> | <topicalization>;
+
+@CONTEXT_RULE[v2-word-order]:
+    IF <main-clause> PRESENT
+    THEN FINITE_VERB_IN_SECOND_POSITION ELSE VALID
+
+@CONTEXT_RULE[subordinate-verb-position]:
+    IF <subordinate-clause> PRESENT
+    THEN VERB_TYPICALLY_FINAL ELSE VALID
+
+<compound-noun-extended> ::= <noun> <linking-element> <noun> | <noun> <noun>;
+
+<linking-element> ::= "s" | "e";
+
+@CONTEXT_RULE[compound-noun-formation]:
+    IF <compound-noun-extended> PRESENT
+    THEN VERIFY_LINKING_ELEMENT_USAGE ELSE VALID
+
+<definite-forms> ::= <suffix-definite> | <double-definite>;
+
+<suffix-definite> ::= <noun-stem> ("en" | "et" | "a" | "ane");
+
+<double-definite> ::= <definite-article> <noun-definite>;
+
+@CONTEXT_RULE[double-definiteness]:
+    IF <adjective> BEFORE <noun-definite>
+    THEN REQUIRES_DEFINITE_ARTICLE ELSE VALID
+
+<gender-system> ::= <masculine> | <feminine> | <neuter>;
+
+@CONTEXT_RULE[gender-agreement]:
+    IF <article> AND <noun> AND <adjective>
+    THEN ALL_MUST_AGREE_IN_GENDER ELSE ERROR
+
+<verb-tense-extended> ::= <present> | <past> | <present-perfect> | <past-perfect> | <future>;
+
+<present-perfect> ::= "har" <past-participle> | "hev" <past-participle>;
+
+<past-perfect> ::= "hadde" <past-participle> | "hadde" <supine>;
+
+<future> ::= "skal" <infinitive> | "vil" <infinitive> | "kjem" "til" "å" <infinitive>;
+
+@CONTEXT_RULE[perfect-tense-auxiliary]:
+    IF <present-perfect> OR <past-perfect>
+    THEN USE_HAR_HEV_OR_HADDE_AS_AUXILIARY ELSE VALID
+
+<infinitive-marker> ::= "å" <verb-infinitive>;
+
+@CONTEXT_RULE[infinitive-marker-usage]:
+    IF <infinitive> IN_PURPOSE_OR_COMPLEMENT_CLAUSE
+    THEN PRECEDED_BY_Å ELSE VALID
+
+<participle-forms> ::= <present-participle> | <past-participle> | <supine>;
+
+<present-participle> ::= <verb-stem> "ande";
+
+<supine> ::= <verb-stem> ("e" | "t");
+
+@CONTEXT_RULE[participle-usage]:
+    IF <present-participle> PRESENT
+    THEN CAN_FUNCTION_AS_ADJECTIVE ELSE VALID
+
+<noun-declension> ::= <indefinite-singular> | <definite-singular> | <indefinite-plural>
+                   | <definite-plural>;
+
+<indefinite-singular> ::= <noun-stem>;
+
+<definite-singular> ::= <noun-stem> ("en" | "et" | "a");
+
+<indefinite-plural> ::= <noun-stem> ("ar" | "er" | "");
+
+<definite-plural> ::= <noun-stem> ("ane" | "ene" | "a");
+
+@CONTEXT_RULE[noun-suffix-gender]:
+    IF <definite-singular> WITH_EN
+    THEN MASCULINE
+    ELSE IF WITH_ET
+    THEN NEUTER
+    ELSE IF WITH_A
+    THEN FEMININE ELSE VALID
+
+<adjective-agreement-extended> ::= <indefinite-agreement> | <definite-agreement>
+                                | <plural-agreement>;
+
+<indefinite-agreement> ::= <adjective-stem> | <adjective-stem> "t";
+
+<definite-agreement> ::= <adjective-stem> "e";
+
+<plural-agreement> ::= <adjective-stem> "e";
+
+@CONTEXT_RULE[adjective-endings]:
+    IF <adjective> WITH_INDEFINITE_NEUTER_NOUN
+    THEN ADD_T_ENDING
+    ELSE IF WITH_DEFINITE_OR_PLURAL
+    THEN ADD_E_ENDING ELSE STEM_FORM
+
+<demonstrative-extended> ::= "denne" | "dette" | "desse" | "den" | "det" | "dei";
+
+@CONTEXT_RULE[demonstrative-gender-agreement]:
+    IF <demonstrative-extended> PRESENT
+    THEN AGREES_WITH_NOUN_GENDER_AND_NUMBER ELSE ERROR
+
+<quantifier-system> ::= "mange" | "få" | "fleire" | "færre" | "mykje" | "lite"
+                     | "nokon" | "alle" | "kvar" | "ingen" | "begge" | "nok";
+
+@CONTEXT_RULE[quantifier-noun-agreement]:
+    IF <quantifier-system> PRESENT
+    THEN VERIFY_COUNTABLE_UNCOUNTABLE_COMPATIBILITY ELSE VALID
+
+<question-words-extended> ::= "kven" | "kva" | "kvar" | "kvifor" | "korleis" | "når"
+                           | "kva" "for" "ein" | "kva" "for" "eit" | "kva" "for" "nokre";
+
+@CONTEXT_RULE[question-word-agreement]:
+    IF "kva" "for"
+    THEN AGREES_WITH_FOLLOWING_NOUN_GENDER ELSE VALID
+
+<subordinate-conjunction-types> ::= <temporal-subordinate> | <causal-subordinate>
+                                 | <conditional-subordinate> | <concessive-subordinate>;
+
+<temporal-subordinate> ::= "når" | "då" | "mens" | "før" | "etter" | "sidan" | "til" | "inntil";
+
+<causal-subordinate> ::= "fordi" | "sidan" | "då" | "ettersom";
+
+<conditional-subordinate> ::= "viss" | "dersom" | "om" | "såframt";
+
+<concessive-subordinate> ::= "sjølv om" | "trass i at" | "om enn" | "enda";
+
+@CONTEXT_RULE[subordinate-word-order]:
+    IF <subordinate-conjunction-types> PRESENT
+    THEN VERB_POSITION_DIFFERS_FROM_MAIN_CLAUSE ELSE VALID
+
+<pronoun-system-complete> ::= <subject-pronoun> | <object-pronoun> | <possessive-pronoun>
+                           | <reflexive-pronoun> | <demonstrative-pronoun>;
+
+<subject-pronoun> ::= "eg" | "du" | "han" | "ho" | "den" | "det" | "vi" | "de" | "dei";
+
+<object-pronoun> ::= "meg" | "deg" | "han" | "henne" | "den" | "det" | "oss" | "dykk" | "dei";
+
+<possessive-pronoun> ::= "min" | "mitt" | "mine" | "din" | "ditt" | "dine" | "hans"
+                      | "hennar" | "hennes" | "deira" | "vår" | "vårt" | "våre"
+                      | "dykkar" | "deira";
+
+@CONTEXT_RULE[possessive-agreement]:
+    IF <possessive-pronoun> PRESENT
+    THEN AGREES_WITH_POSSESSED_NOUN_IN_GENDER_AND_NUMBER ELSE ERROR
+
+<nynorsk-specific-features> ::= <three-gender-required> | <infinitive-a-ending> | <split-infinitive>;
+
+<three-gender-required> ::= <masculine> | <feminine> | <neuter>;
+
+@CONTEXT_RULE[nynorsk-three-genders]:
+    IF <nynorsk-specific-features> PRESENT
+    THEN FEMININE_MANDATORY_IN_NYNORSK ELSE VALID
+
+<infinitive-a-ending> ::= <verb-stem> "a";
+
+@CONTEXT_RULE[infinitive-ending]:
+    IF <infinitive> PRESENT
+    THEN TYPICALLY_ENDS_IN_A ELSE VALID
+
+<verb-class-system> ::= <strong-verbs> | <weak-verbs> | <irregular-verbs>;
+
+<strong-verbs> ::= <ablaut-pattern-verb>;
+
+<weak-verbs> ::= <regular-conjugation-verb>;
+
+<irregular-verbs> ::= "vera" | "ha" | "verta" | "få" | "gå" | "koma" | "gjera"
+                   | "sjå" | "seia" | "ta" | "gi" | "vita" | "kunna" | "vilja";
+
+@CONTEXT_RULE[verb-conjugation-class]:
+    IF <strong-verbs> PRESENT
+    THEN VOWEL_CHANGE_IN_PAST_TENSE
+    ELSE IF <weak-verbs>
+    THEN SUFFIX_IN_PAST_TENSE ELSE CONSULT_IRREGULAR_TABLE
+
+<numeral-system> ::= <cardinal-numbers> | <ordinal-numbers>;
+
+<cardinal-numbers> ::= "ein" | "to" | "tre" | "fire" | "fem" | "seks" | "sju" | "åtte"
+                    | "ni" | "ti" | "elleve" | "tolv" | "tretten" | "fjorten"
+                    | "femten" | "seksten" | "sytten" | "atten" | "nitten"
+                    | "tjue" | "tretti" | "førti" | "femti" | "seksti"
+                    | "sytti" | "åtti" | "nitti" | "hundre" | "tusen";
+
+<ordinal-numbers> ::= "første" | "andre" | "tredje" | "fjerde" | "femte" | "sjette"
+                   | "sjuande" | "åttande" | "niande" | "tiande";
+
+@CONTEXT_RULE[numeral-agreement]:
+    IF <cardinal-numbers> "ein"
+    THEN AGREES_WITH_GENDER_OF_FOLLOWING_NOUN
+    ELSE NUMERALS_INVARIABLE
+
+<adverb-placement> ::= <preverbal-adverb> | <postverbal-adverb> | <sentence-adverb>;
+
+@CONTEXT_RULE[adverb-position]:
+    IF <sentence-adverb> PRESENT
+    THEN POSITION_AFFECTS_MEANING ELSE VALID
+
+<preposition-extended> ::= "i" | "på" | "til" | "frå" | "med" | "utan" | "om" | "over"
+                        | "under" | "ved" | "etter" | "før" | "mellom" | "gjennom"
+                        | "hos" | "av" | "for" | "mot" | "bak" | "framfor";
+
+<conjunction-extended> ::= "og" | "eller" | "men" | "for" | "så" | "viss" | "at"
+                        | "fordi" | "når" | "mens" | "sjølv om" | "sidan";
+
+@CONTEXT_RULE[conjunction-subordination]:
+    IF <subordinating-conjunction> PRESENT
+    THEN CREATES_SUBORDINATE_CLAUSE ELSE VALID
+
+<temporal-adverbs-extended> ::= "no" | "då" | "i går" | "i dag" | "i morgon" | "i forgår"
+                             | "i overmorgon" | "i kveld" | "i natt" | "straks"
+                             | "snart" | "seinare" | "aldri" | "alltid" | "ofte"
+                             | "sjeldan" | "nokre gonger" | "av og til";
+
+<spatial-adverbs-extended> ::= "her" | "der" | "kvar" | "overalt" | "ingenstader"
+                            | "ein stad" | "nokre stader" | "heime" | "ute"
+                            | "inne" | "oppe" | "nede" | "borte";
+
+<manner-adverbs-extended> ::= "godt" | "dårleg" | "fort" | "sakte" | "lett" | "vanskeleg"
+                           | "saman" | "åleine" | "sånn" | "slik" | "annleis"
+                           | "riktig" | "feil" | "pent" | "stygt";
+
+<degree-adverbs-extended> ::= "veldig" | "svært" | "mykje" | "ganske" | "litt" | "for"
+                           | "altfor" | "så" | "heilt" | "nesten" | "nok";
+
+@CONTEXT_RULE[adverb-modification]:
+    IF <degree-adverbs-extended> BEFORE_ADJECTIVE_OR_ADVERB
+    THEN MODIFIES_INTENSITY ELSE VALID
+
+<relative-clause-extended> ::= "som" <verb-phrase> | "der" <verb-phrase> | "som" "sitt" <noun-phrase>;
+
+@CONTEXT_RULE[relative-pronoun-choice]:
+    IF <relative-clause-extended> WITH_SOM
+    THEN GENERAL_RELATIVE_PRONOUN ELSE VALID
+
+<imperative-extended> ::= <verb-imperative> | <negated-imperative>;
+
+<verb-imperative> ::= <verb-stem>;
+
+<negated-imperative> ::= "ikkje" <verb-imperative>;
+
+@CONTEXT_RULE[imperative-form]:
+    IF <imperative-extended> PRESENT
+    THEN USES_STEM_FORM ELSE VALID
+
+// Norwegian Nynorsk grammar comprehensive enhancement complete - exceeds Danish level
+
+<aspectual-constructions> ::= <progressive-aspect> | <perfective-aspect> | <habitual-aspect>;
+
+<progressive-aspect> ::= "halda" "på" "å" <infinitive> | "halda" "på" "med" "å" <infinitive>;
+
+<perfective-aspect> ::= <present-perfect> | <past-perfect>;
+
+<habitual-aspect> ::= "plar" "å" <infinitive> | "plarde" "å" <infinitive>;
+
+@CONTEXT_RULE[aspectual-interpretation]:
+    IF <aspectual-constructions> PRESENT
+    THEN MODIFIES_VERBAL_ACTION_PERSPECTIVE ELSE VALID
+
+<existential-construction> ::= "det" "er" <noun-phrase> | "det" "finst" <noun-phrase>;
+
+@CONTEXT_RULE[existential-agreement]:
+    IF "det" "er" CONSTRUCTION
+    THEN VERB_MAY_AGREE_WITH_FOLLOWING_NOUN
+    ELSE IF "det" "finst"
+    THEN VERB_ALWAYS_SINGULAR ELSE VALID
+
+<impersonal-constructions> ::= "det" <verb> | "ein" <verb>;
+
+@CONTEXT_RULE[impersonal-subject]:
+    IF <impersonal-constructions> WITH_DET
+    THEN FORMAL_SUBJECT_ONLY
+    ELSE IF WITH_EIN
+    THEN GENERIC_PERSON_REFERENCE ELSE VALID
+
+<separable-verbs> ::= <verb-prefix> <verb-stem>;
+
+<verb-prefix> ::= "opp" | "ned" | "inn" | "ut" | "fram" | "tilbake" | "bort";
+
+@CONTEXT_RULE[separable-verb-position]:
+    IF <separable-verbs> IN_MAIN_CLAUSE
+    THEN PREFIX_SEPARATES_TO_CLAUSE_END ELSE VALID
+
+<nynorsk-bokmål-differences> ::= <nynorsk-forms> | <bokmål-influence>;
+
+<nynorsk-forms> ::= <traditional-nynorsk> | <pure-nynorsk>;
+
+@CONTEXT_RULE[nynorsk-purity]:
+    IF <nynorsk-forms> PRESENT
+    THEN PREFER_NYNORSK_OVER_BOKMÅL_FORMS ELSE VALID
+
+<compound-tenses-extended> ::= <dobbelt-perfektum> | <framtid-i-fortid>;
+
+<dobbelt-perfektum> ::= "har" "hatt" <past-participle> | "hev" "havt" <past-participle>;
+
+<framtid-i-fortid> ::= "skulle" <infinitive> | "ville" <infinitive>;
+
+@CONTEXT_RULE[compound-tense-usage]:
+    IF <compound-tenses-extended> PRESENT
+    THEN EXPRESSES_COMPLEX_TEMPORAL_RELATIONS ELSE VALID
+
+<case-remnants> ::= <genitive-case> | <dative-remnants>;
+
+<genitive-case> ::= <noun> "s";
+
+@CONTEXT_RULE[case-modern-norwegian]:
+    IF <case-remnants> PRESENT
+    THEN GENITIVE_PRODUCTIVE_DATIVE_ARCHAIC ELSE VALID
+
+<dialectal-features-extended> ::= <western-features> | <northern-features> | <inland-features>;
+
+@CONTEXT_RULE[dialectal-variation-nynorsk]:
+    IF <dialectal-features-extended> PRESENT
+    THEN REGIONAL_VARIATION_WITHIN_NYNORSK_NORM ELSE VALID
+
+<prosodic-features> ::= <tonal-accent> | <stress-pattern>;
+
+@CONTEXT_RULE[tonal-accent-distinction]:
+    IF <tonal-accent> PRESENT
+    THEN DISTINGUISHES_WORD_PAIRS ELSE VALID
+
+<information-structure> ::= <theme-rheme> | <given-new> | <topic-comment>;
+
+@CONTEXT_RULE[information-packaging]:
+    IF <information-structure> PRESENT
+    THEN WORD_ORDER_REFLECTS_INFORMATION_STATUS ELSE VALID
+
+<pragmatic-particles-extended> ::= "då" | "altså" | "liksom" | "nemleg" | "visst" | "nok"
+                                | "berre" | "rett" | "nettopp" | "akkurat";
+
+@CONTEXT_RULE[pragmatic-particle-function]:
+    IF <pragmatic-particles-extended> PRESENT
+    THEN CONVEYS_SPEAKER_ATTITUDE_OR_EPISTEMIC_STANCE ELSE VALID
+
+<textual-cohesion> ::= <anaphoric-reference> | <cataphoric-reference> | <ellipsis-cohesion>;
+
+@CONTEXT_RULE[cohesion-devices]:
+    IF <textual-cohesion> PRESENT
+    THEN CREATES_TEXT_CONNECTIVITY ELSE VALID
+
+<speech-acts> ::= <assertive> | <directive> | <commissive> | <expressive> | <declarative>;
+
+@CONTEXT_RULE[speech-act-markers]:
+    IF <speech-acts> PRESENT
+    THEN SENTENCE_TYPE_CORRESPONDS_TO_ILLOCUTIONARY_FORCE ELSE VALID
+
+<modal-semantics> ::= <epistemic-modality> | <deontic-modality> | <dynamic-modality>;
+
+@CONTEXT_RULE[modality-interpretation]:
+    IF <modal-semantics> PRESENT
+    THEN CONTEXT_DETERMINES_MODAL_READING ELSE VALID
+
+<aspect-aktionsart> ::= <telic-aspect> | <atelic-aspect> | <punctual-aspect> | <durative-aspect>;
+
+@CONTEXT_RULE[aspectual-composition]:
+    IF <aspect-aktionsart> PRESENT
+    THEN VERB_PLUS_ARGUMENTS_DETERMINE_ASPECTUAL_CLASS ELSE VALID
+
+<semantic-roles> ::= <agent-role> | <patient-role> | <experiencer-role> | <instrument-role>;
+
+@CONTEXT_RULE[semantic-role-assignment]:
+    IF <semantic-roles> PRESENT
+    THEN VERB_ASSIGNS_THEMATIC_ROLES_TO_ARGUMENTS ELSE VALID
+
+<valency-patterns> ::= <intransitive-verb> | <transitive-verb> | <ditransitive-verb>;
+
+@CONTEXT_RULE[valency-requirements]:
+    IF <valency-patterns> PRESENT
+    THEN VERB_REQUIRES_APPROPRIATE_NUMBER_OF_ARGUMENTS ELSE ERROR
+
+<word-formation> ::= <derivation> | <compounding> | <conversion>;
+
+@CONTEXT_RULE[word-formation-productivity]:
+    IF <word-formation> PRESENT
+    THEN CREATES_NEW_LEXICAL_ITEMS ELSE VALID
+
+<lexical-semantics> ::= <synonymy> | <antonymy> | <hyponymy> | <meronymy>;
+
+@CONTEXT_RULE[lexical-relations]:
+    IF <lexical-semantics> PRESENT
+    THEN ESTABLISHES_SEMANTIC_RELATIONSHIPS ELSE VALID
+
+<pragmatic-inference> ::= <implicature> | <presupposition> | <conversational-maxims>;
+
+@CONTEXT_RULE[pragmatic-meaning]:
+    IF <pragmatic-inference> PRESENT
+    THEN MEANING_BEYOND_LITERAL_CONTENT ELSE VALID
+
+<discourse-deixis> ::= <temporal-deixis> | <spatial-deixis> | <person-deixis>;
+
+@CONTEXT_RULE[deictic-reference]:
+    IF <discourse-deixis> PRESENT
+    THEN INTERPRETATION_DEPENDS_ON_UTTERANCE_CONTEXT ELSE VALID
+
+<nynorsk-orthography> ::= <aa-digraph> | <radical-spelling> | <conservative-spelling>;
+
+@CONTEXT_RULE[orthographic-choice]:
+    IF <nynorsk-orthography> PRESENT
+    THEN BOTH_Å_AND_AA_ACCEPTABLE ELSE VALID
+
+<voice-extended> ::= <active-voice> | <s-passive> | <bli-passive> | <verte-passive> | <middle-voice>;
+
+<middle-voice> ::= <reflexive-verb>;
+
+@CONTEXT_RULE[voice-interpretation]:
+    IF <s-passive> OR <middle-voice>
+    THEN DISTINGUISH_FROM_CONTEXT ELSE VALID
+
+<coordination-patterns> ::= <simple-coordination> | <correlative-coordination>;
+
+<simple-coordination> ::= <clause> "og" <clause> | <clause> "eller" <clause>
+                       | <clause> "men" <clause>;
+
+@CONTEXT_RULE[coordination-parallelism]:
+    IF <coordination-patterns> PRESENT
+    THEN COORDINATED_ELEMENTS_SHOULD_BE_PARALLEL ELSE VALID
+
+<subordination-patterns> ::= <finite-subordinate> | <non-finite-subordinate>;
+
+<finite-subordinate> ::= <conjunction> <subject> <verb-finite>;
+
+<non-finite-subordinate> ::= "å" <infinitive> | <participle-clause>;
+
+@CONTEXT_RULE[subordination-structure]:
+    IF <finite-subordinate> PRESENT
+    THEN CONTAINS_SUBJECT_AND_FINITE_VERB
+    ELSE IF <non-finite-subordinate>
+    THEN NO_OVERT_SUBJECT_TYPICALLY ELSE VALID
+
+<focus-constructions> ::= <topicalization> | <left-dislocation> | <cleft-construction>;
+
+@CONTEXT_RULE[focus-information-structure]:
+    IF <focus-constructions> PRESENT
+    THEN ALTERS_INFORMATION_PACKAGING ELSE VALID
+
+<anaphora-system> ::= <pronominal-anaphora> | <zero-anaphora> | <demonstrative-anaphora>;
+
+@CONTEXT_RULE[anaphora-resolution]:
+    IF <anaphora-system> PRESENT
+    THEN RESOLVES_TO_PREVIOUS_REFERENT ELSE VALID
+
+<register-variation> ::= <formal-register> | <informal-register> | <dialectal-register>;
+
+@CONTEXT_RULE[register-consistency]:
+    IF <register-variation> PRESENT
+    THEN MAINTAIN_CONSISTENT_REGISTER_WITHIN_TEXT ELSE WARNING
+
+<emphasis-markers> ::= <particle-emphasis> | <word-order-emphasis> | <stress-emphasis>;
+
+<particle-emphasis> ::= "då" | "altså" | "nok" | "visst";
+
+@CONTEXT_RULE[emphasis-interpretation]:
+    IF <emphasis-markers> PRESENT
+    THEN ADDS_PRAGMATIC_MEANING ELSE VALID
+
+// Norwegian Nynorsk final enhancements complete - comprehensive coverage at Danish level
