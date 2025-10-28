@@ -487,7 +487,525 @@ Keywords: en, of, maar, want, dus, omdat, dat, die, wat, wie, wanneer, waar, hoe
     ELSE WARNING "V2 word order violation"
 
 @CONTEXT_RULE[sov-subordinate-strict]:
+    // ============================================================================
+// DISCOURSE MARKERS
+// ============================================================================
+
+<discourse-marker> ::= <temporal-discourse> | <causal-discourse> | <contrastive-discourse>
+                    | <additive-discourse> | <conclusive-discourse> | <exemplification-discourse>
+
+<temporal-discourse> ::= "eerst" | "daarna" | "vervolgens" | "dan" | "eindelijk" | "tenslotte"
+                      | "in de eerste plaats" | "in het vervolg" | "intussen" | "ondertussen"
+
+<causal-discourse> ::= "daarom" | "omdat" | "want" | "doordat" | "aangezien" | "daar"
+                    | "wegens" | "vanwege" | "om die reden"
+
+<contrastive-discourse> ::= "maar" | "echter" | "daarentegen" | "anderzijds" | "desondanks"
+                         | "niettemin" | "toch" | "evenwel" | "hoewel"
+
+<additive-discourse> ::= "en" | "ook" | "bovendien" | "daarnaast" | "verder" | "tevens"
+                      | "voorts" | "trouwens"
+
+<conclusive-discourse> ::= "dus" | "daarom" | "derhalve" | "bijgevolg" | "kortom"
+                        | "samenvattend" | "met andere woorden"
+
+<exemplification-discourse> ::= "bijvoorbeeld" | "bijv." | "zoals" | "ter illustratie"
+
+// ============================================================================
+// TAG QUESTIONS AND ELLIPTICAL STRUCTURES
+// ============================================================================
+
+<tag-question> ::= <statement> <opt-whitespace> "," <opt-whitespace> <tag-marker>
+
+<tag-marker> ::= "niet waar" | "toch" | "hè" | "nietwaar" | "of niet" | "wel"
+
+<elliptical-structure> ::= <noun-phrase> | <adjective-phrase> | <adverb> | <prepositional-phrase>
+
+// ============================================================================
+// REPORTED SPEECH AND INDIRECT DISCOURSE
+// ============================================================================
+
+<reported-speech> ::= <direct-speech> | <indirect-speech> | <free-indirect-speech>
+
+<direct-speech> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> ":" 
+                    <opt-whitespace> "\"" <sentence> "\""
+
+<indirect-speech> ::= <subject> <opt-whitespace> <verb> <opt-whitespace> "dat"
+                     <opt-whitespace> <subordinate-clause>
+
+<free-indirect-speech> ::= <sentence> <opt-whitespace> <sentence>
+
+// ============================================================================
+// CLEFT SENTENCES
+// ============================================================================
+
+<cleft-sentence> ::= <it-cleft> | <pseudo-cleft> | <reversed-cleft>
+
+<it-cleft> ::= "het" <opt-whitespace> "is" <opt-whitespace> <noun-phrase>
+             <opt-whitespace> "die" | "dat" <opt-whitespace> <verb-phrase>
+
+<pseudo-cleft> ::= "wat" <opt-whitespace> <subordinate-clause>
+                 <opt-whitespace> "is" <opt-whitespace> <noun-phrase>
+
+<reversed-cleft> ::= <noun-phrase> <opt-whitespace> "is" <opt-whitespace> "het"
+                   <opt-whitespace> "die" | "dat" <opt-whitespace> <verb-phrase>
+
+// ============================================================================
+// CORRELATIVE CONSTRUCTIONS
+// ============================================================================
+
+<correlative-construction> ::= <both-and> | <either-or> | <neither-nor> | <not-only-but-also>
+
+<both-and> ::= "zowel" <opt-whitespace> <phrase> <opt-whitespace> "als" <opt-whitespace> <phrase>
+
+<either-or> ::= "of" <opt-whitespace> <phrase> <opt-whitespace> "of" 
+              <opt-whitespace> <phrase>
+             | "ofwel" <opt-whitespace> <phrase> <opt-whitespace> "ofwel" <opt-whitespace> <phrase>
+
+<neither-nor> ::= "noch" <opt-whitespace> <phrase> <opt-whitespace> "noch" 
+                <opt-whitespace> <phrase>
+
+<not-only-but-also> ::= "niet alleen" <opt-whitespace> <phrase> <opt-whitespace> "maar ook"
+                      <opt-whitespace> <phrase>
+
+// ============================================================================
+// EXTENDED DIALECTAL VARIATIONS
+// ============================================================================
+
+@DIALECT[hollands]          /* Hollands - Holland dialect */
+@DIALECT[vlaams]            /* Vlaams - Flemish (Belgian Dutch) */
+@DIALECT[brabants]          /* Brabants - Brabant dialect */
+@DIALECT[limburgs]          /* Limburgs - Limburg dialect */
+@DIALECT[fries]             /* Fries - Frisian influenced */
+@DIALECT[gronings]          /* Gronings - Groningen dialect */
+@DIALECT[zeeuws]            /* Zeeuws - Zeeland dialect */
+@DIALECT[twentse]           /* Twents - Twente dialect */
+@DIALECT[achterhoeks]       /* Achterhoeks - Achterhoek dialect */
+
+// ============================================================================
+// PERIPHRASTIC CONSTRUCTIONS
+// ============================================================================
+
+<periphrastic-construction> ::= <progressive-aspect> | <recent-past-aspect> 
+                             | <immediate-future> | <habitual-aspect> | <inceptive-aspect>
+
+<progressive-aspect> ::= "aan het" <opt-whitespace> <infinitive> <opt-whitespace> "zijn"
+                      | "bezig zijn met" <opt-whitespace> <infinitive>
+
+<recent-past-aspect> ::= "net" <opt-whitespace> <perfect-tense>
+                      | "zojuist" <opt-whitespace> <perfect-tense>
+
+<immediate-future> ::= "gaan" <opt-whitespace> <infinitive>
+                    | "zullen" <opt-whitespace> <infinitive>
+
+<habitual-aspect> ::= "plegen te" <opt-whitespace> <infinitive>
+
+<inceptive-aspect> ::= "beginnen te" <opt-whitespace> <infinitive>
+                    | "gaan" <opt-whitespace> <infinitive>
+
+// ============================================================================
+// CAUSATIVE AND PERMISSIVE CONSTRUCTIONS
+// ============================================================================
+
+<causative-construction> ::= "laten" <opt-whitespace> <noun-phrase> <opt-whitespace> <infinitive>
+                          | "doen" <opt-whitespace> <noun-phrase> <opt-whitespace> <infinitive>
+
+<permissive-construction> ::= "toestaan" <opt-whitespace> "dat" <opt-whitespace> <subordinate-clause>
+                           | "toelaten" <opt-whitespace> "dat" <opt-whitespace> <subordinate-clause>
+
+<perception-construction> ::= <perception-verb> <opt-whitespace> <noun-phrase>
+                           <opt-whitespace> <infinitive>
+
+<perception-verb> ::= "zien" | "horen" | "voelen" | "merken"
+
+// ============================================================================
+// IDIOMATIC EXPRESSIONS
+// ============================================================================
+
+<idiomatic-expression> ::= "de koe bij de horens vatten" | "een appeltje met iemand te schillen hebben"
+                        | "met de deur in huis vallen" | "iets door de vingers zien"
+                        | "zijn mond voorbijpraten" | "de hand in eigen boezem steken"
+                        | "ergens geen kaas van gegeten hebben" | "met de handen in het haar zitten"
+                        | "iemand de wind uit de zeilen nemen" | "op zijn qui-vive zijn"
+                        | "een kat in de zak kopen" | "de plank misslaan"
+                        | "van een koude kermis thuiskomen" | "iets op zijn kerfstok hebben"
+
+// ============================================================================
+// TEMPORAL EXPRESSIONS EXTENDED
+// ============================================================================
+
+<extended-temporal> ::= <time-of-day> | <day-of-week> | <month-name> | <season>
+                     | <clock-time> | <relative-time>
+
+<time-of-day> ::= "ochtend" | "morgen" | "middag" | "namiddag" | "avond" | "nacht" | "middernacht"
+
+<day-of-week> ::= "maandag" | "dinsdag" | "woensdag" | "donderdag" | "vrijdag" | "zaterdag" | "zondag"
+
+<month-name> ::= "januari" | "februari" | "maart" | "april" | "mei" | "juni"
+              | "juli" | "augustus" | "september" | "oktober" | "november" | "december"
+
+<season> ::= "lente" | "zomer" | "herfst" | "winter" | "voorjaar" | "najaar"
+
+<clock-time> ::= <cardinal-number> <opt-whitespace> "uur"
+
+<relative-time> ::= "vandaag" | "gisteren" | "eergisteren" | "morgen" | "overmorgen"
+                 | "nu" | "straks" | "dadelijk" | "zometeen" | "onlangs" | "laatst"
+                 | "binnenkort" | "spoedig"
+
+// ============================================================================
+// CONDITIONAL SENTENCES EXTENDED
+// ============================================================================
+
+<extended-conditional> ::= <real-conditional> | <hypothetical-conditional> 
+                        | <contrary-to-fact-conditional> | <mixed-conditional>
+
+<real-conditional> ::= "als" <opt-whitespace> <present-tense-clause> <opt-whitespace> ","
+                     <opt-whitespace> <present-or-future-clause>
+
+<hypothetical-conditional> ::= "als" <opt-whitespace> <past-tense-clause> <opt-whitespace> ","
+                            <opt-whitespace> "zou" | "zouden" <opt-whitespace> <infinitive>
+
+<contrary-to-fact-conditional> ::= "als" <opt-whitespace> <pluperfect-clause>
+                                 <opt-whitespace> "," <opt-whitespace> "zou" | "zouden" <opt-whitespace> "hebben" <opt-whitespace> <past-participle>
+
+<mixed-conditional> ::= "als" <opt-whitespace> <pluperfect-clause> <opt-whitespace> ","
+                      <opt-whitespace> "zou" | "zouden" <opt-whitespace> <infinitive>
+
+// ============================================================================
+// COMPARATIVE AND SUPERLATIVE EXTENDED
+// ============================================================================
+
+<extended-comparison> ::= <equative-comparison> | <comparative-clause> | <superlative-clause>
+                       | <absolute-superlative>
+
+<equative-comparison> ::= "even" <opt-whitespace> <adjective> <opt-whitespace> "als"
+                       <opt-whitespace> <noun-phrase>
+
+<absolute-superlative> ::= "zeer" <opt-whitespace> <adjective>
+                        | "uiterst" <opt-whitespace> <adjective>
+
+// ============================================================================
+// NEGATION PATTERNS EXTENDED
+// ============================================================================
+
+<extended-negation> ::= <simple-negation> | <double-negation> | <emphatic-negation>
+
+<simple-negation> ::= "niet" <opt-whitespace> <verb-phrase>
+
+<double-negation> ::= "niet" <opt-whitespace> <verb> <opt-whitespace> <negative-indefinite>
+
+<negative-indefinite> ::= "niemand" | "niets" | "nooit" | "nergens" | "geen"
+
+<emphatic-negation> ::= "helemaal niet" | "absoluut niet" | "in het geheel niet"
+
+// ============================================================================
+// QUESTION FORMATION EXTENDED
+// ============================================================================
+
+<extended-question> ::= <yes-no-question> | <wh-question> | <alternative-question>
+                     | <indirect-question> | <rhetorical-question>
+
+<alternative-question> ::= <yes-no-question> <opt-whitespace> "of" <opt-whitespace> <yes-no-question>
+
+<indirect-question> ::= <verb> <opt-whitespace> <subject> <opt-whitespace> <question-word>
+                     <opt-whitespace> <subordinate-clause>
+
+<rhetorical-question> ::= <wh-question> | <yes-no-question>
+
+// ============================================================================
+// RELATIVE CLAUSES EXTENDED
+// ============================================================================
+
+<extended-relative-clause> ::= <restrictive-relative> | <non-restrictive-relative>
+                            | <headless-relative>
+
+<headless-relative> ::= "wie" <opt-whitespace> <verb-phrase>
+                     | "wat" <opt-whitespace> <verb-phrase>
+
+// ============================================================================
+// PASSIVE VOICE EXTENDED
+// ============================================================================
+
+<extended-passive> ::= <worden-passive> | <zijn-passive> | <impersonal-passive>
+
+<worden-passive> ::= "worden" <opt-whitespace> <past-participle>
+                  /* Action passive */
+
+<zijn-passive> ::= "zijn" <opt-whitespace> <past-participle>
+                /* State passive */
+
+<impersonal-passive> ::= "er" <opt-whitespace> "wordt" <opt-whitespace> <past-participle>
+
+// ============================================================================
+// DIMINUTIVE FORMATION EXTENDED
+// ============================================================================
+
+<diminutive-extended> ::= <noun-stem> <opt-whitespace> <diminutive-suffix>
+
+<diminutive-suffix> ::= "je" | "tje" | "etje" | "pje" | "kje" | "mpje"
+
+// ============================================================================
+// VERB PREFIX SYSTEM EXTENDED
+// ============================================================================
+
+<separable-prefix-extended> ::= "aan" | "af" | "bij" | "door" | "in" | "mee" | "na" | "om"
+                             | "onder" | "op" | "over" | "toe" | "tegen" | "uit" | "vast"
+                             | "voort" | "voor" | "weg" | "achter"
+
+<inseparable-prefix-extended> ::= "be" | "er" | "ge" | "her" | "ont" | "ver"
+
+// ============================================================================
+// MODAL PARTICLES
+// ============================================================================
+
+<modal-particle> ::= "maar" | "eens" | "even" | "toch" | "maar even" | "al"
+                  | "wel" | "nu" | "hoor" | "heus" | "zeker"
+
+// ============================================================================
+// POLITENESS MARKERS
+// ============================================================================
+
+<politeness-marker> ::= "alstublieft" | "alsjeblieft" | "graag" | "mag ik"
+                     | "zou u" | "zou je" | "kunt u" | "kun je"
+
+// ============================================================================
+// DUTCH-SPECIFIC CONSTRUCTIONS
+// ============================================================================
+
+<er-construction> ::= <er-locative> | <er-partitive> | <er-prepositional> | <er-existential>
+
+<er-locative> ::= "er" /* there */
+
+<er-partitive> ::= "er" /* of it/them */
+
+<er-prepositional> ::= "er" <opt-whitespace> <preposition>
+
+<er-existential> ::= "er" <opt-whitespace> "is" | "zijn"
+
+<te-infinitive-extended> ::= "te" <opt-whitespace> <infinitive>
+
+// ============================================================================
+// COMPOUND TENSES EXTENDED
+// ============================================================================
+
+<extended-perfect> ::= "hebben" | "zijn" <opt-whitespace> <past-participle>
+
+<extended-pluperfect> ::= "had" | "hadden" | "was" | "waren" <opt-whitespace> <past-participle>
+
+<extended-future> ::= "zal" | "zullen" <opt-whitespace> <infinitive>
+
+<extended-conditional-mood> ::= "zou" | "zouden" <opt-whitespace> <infinitive>
+
+// ============================================================================
+// WORD ORDER VARIATIONS
+// ============================================================================
+
+<topicalization-extended> ::= <topic> <opt-whitespace> <finite-verb> <opt-whitespace> <subject>
+                           <opt-whitespace> <rest-of-clause>
+
+<inversion-extended> ::= <finite-verb> <opt-whitespace> <subject> <opt-whitespace> <rest-of-clause>
+
+// ============================================================================
+// CONTEXT-SENSITIVE VALIDATION RULES EXTENDED
+// ============================================================================
+
+@CONTEXT_RULE[discourse-marker-position-dutch]:
+    IF <discourse-marker> USED
+    THEN TYPICALLY_SENTENCE_INITIAL_OR_AFTER_FINITE_VERB
+    ELSE ERROR "Discourse marker position error"
+
+@CONTEXT_RULE[tag-question-agreement-dutch]:
+    IF <tag-question> USED
+    THEN <tag-marker> MUST_MATCH_STATEMENT
+    ELSE ERROR "Tag question must match statement"
+
+@CONTEXT_RULE[reported-speech-word-order]:
+    IF <indirect-speech> USED
+    THEN SUBORDINATE_CLAUSE_WORD_ORDER_REQUIRED
+    ELSE ERROR "Indirect speech requires SOV order"
+
+@CONTEXT_RULE[cleft-sentence-relative-pronoun]:
+    IF <it-cleft> USED
+    THEN USE_"die"_FOR_DE_WORDS_OR_"dat"_FOR_HET_WORDS
+    ELSE ERROR "Cleft sentence relative pronoun error"
+
+@CONTEXT_RULE[correlative-parallelism-dutch]:
+    IF <correlative-construction> USED
+    THEN BOTH_PHRASES_MUST_BE_PARALLEL
+    ELSE ERROR "Correlative phrases must be parallel"
+
+@CONTEXT_RULE[dialectal-consistency-dutch]:
+    IF <dialectal-variation> USED
+    THEN MAINTAIN_DIALECT_THROUGHOUT
+    ELSE WARNING "Mixed dialects"
+
+@CONTEXT_RULE[progressive-aspect-dutch]:
+    IF <progressive-aspect> USED
+    THEN "aan het" MUST_BE_FOLLOWED_BY_INFINITIVE_AND_"zijn"
+    ELSE ERROR "Progressive aspect syntax error"
+
+@CONTEXT_RULE[habitual-plegen]:
+    IF <habitual-aspect> USED
+    THEN "plegen te" MUST_BE_FOLLOWED_BY_INFINITIVE
+    ELSE ERROR "Habitual aspect requires infinitive"
+
+@CONTEXT_RULE[causative-laten]:
+    IF <causative-construction> USED
+    THEN "laten" WITH_OBJECT WITH_INFINITIVE
+    ELSE ERROR "Causative construction syntax error"
+
+@CONTEXT_RULE[perception-verb-construction]:
+    IF <perception-construction> USED
+    THEN PERCEPTION_VERB WITH_OBJECT WITH_INFINITIVE
+    ELSE ERROR "Perception construction syntax error"
+
+@CONTEXT_RULE[idiomatic-fixed-form-dutch]:
+    IF <idiomatic-expression> USED
+    THEN EXPRESSION_MUST_BE_FIXED
+    ELSE WARNING "Non-standard idiom"
+
+@CONTEXT_RULE[temporal-preposition]:
+    IF <temporal-expression> USED
+    THEN CORRECT_PREPOSITION_REQUIRED
+    ELSE ERROR "Temporal expression preposition error"
+
+@CONTEXT_RULE[conditional-zou-zouden]:
+    IF <hypothetical-conditional> OR <contrary-to-fact-conditional> USED
+    THEN "zou"_OR_"zouden"_REQUIRED_IN_MAIN_CLAUSE
+    ELSE ERROR "Conditional requires zou/zouden"
+
+@CONTEXT_RULE[comparative-dan]:
+    IF <comparative-adjective> USED
+    THEN USE_"dan"_FOR_COMPARISON
+    ELSE ERROR "Comparatives use dan"
+
+@CONTEXT_RULE[equative-als]:
+    IF <equative-comparison> USED
+    THEN USE_"als"_FOR_EQUALITY
+    ELSE ERROR "Equative uses als"
+
+@CONTEXT_RULE[negation-niet-geen]:
+    IF <negation> WITH_NOUN
+    THEN USE_"geen"
+    ELSE USE_"niet"
+
+@CONTEXT_RULE[question-word-fronting-dutch]:
+    IF <wh-question> USED
+    THEN <question-word> MUST_BE_SENTENCE_INITIAL
+    ELSE ERROR "Question words must be fronted"
+
+@CONTEXT_RULE[relative-clause-die-dat]:
+    IF <relative-clause> WITH_DE_WORD
+    THEN USE_"die"
+    ELSE IF <relative-clause> WITH_HET_WORD
+    THEN USE_"dat"
+    ELSE ERROR "Relative pronoun must match gender"
+
+@CONTEXT_RULE[worden-zijn-passive-distinction]:
+    IF <passive-voice> USED
+    THEN "worden"_FOR_ACTION_OR_"zijn"_FOR_STATE
+    ELSE ERROR "Passive auxiliary selection error"
+
+@CONTEXT_RULE[diminutive-suffix-selection]:
+    IF <diminutive> FORMED
+    THEN SUFFIX_DEPENDS_ON_PHONOLOGICAL_ENVIRONMENT
+    ELSE ERROR "Diminutive suffix selection error"
+
+@CONTEXT_RULE[separable-prefix-position]:
+    IF <separable-verb> IN_MAIN_CLAUSE
+    THEN PREFIX_SEPARATED_TO_CLAUSE_END
+    ELSE IF <separable-verb> IN_SUBORDINATE_CLAUSE
+    THEN PREFIX_ATTACHED_TO_VERB
+    ELSE ERROR "Separable prefix position error"
+
+@CONTEXT_RULE[inseparable-prefix-attachment]:
+    IF <inseparable-prefix> USED
+    THEN PREFIX_ALWAYS_ATTACHED
+    ELSE ERROR "Inseparable prefix must attach"
+
+@CONTEXT_RULE[modal-particle-position]:
+    IF <modal-particle> USED
+    THEN PARTICLE_IN_MIDDLE_FIELD
+    ELSE ERROR "Modal particle position error"
+
+@CONTEXT_RULE[er-construction-type]:
+    IF "er" USED
+    THEN MUST_BE_ONE_OF_FOUR_TYPES
+    ELSE ERROR "Er construction type unclear"
+
+@CONTEXT_RULE[te-infinitive-position]:
+    IF <te-infinitive> USED
+    THEN "te" IMMEDIATELY_BEFORE_INFINITIVE
+    ELSE ERROR "Te-infinitive position error"
+
+@CONTEXT_RULE[perfect-auxiliary-selection]:
+    IF <perfect-tense> USED
+    THEN "hebben"_OR_"zijn"_DEPENDING_ON_VERB_TYPE
+    ELSE ERROR "Perfect auxiliary selection error"
+
+@CONTEXT_RULE[verb-cluster-order]:
+    IF <verb-cluster> PRESENT
+    THEN SPECIFIC_ORDER_REQUIRED
+    ELSE ERROR "Verb cluster order error"
+
+@CONTEXT_RULE[double-infinitive]:
+    IF MODAL_OR_PERCEPTION_VERB IN_PERFECT_TENSE
+    THEN USE_INFINITIVE_INSTEAD_OF_PAST_PARTICIPLE
+    ELSE USE_PAST_PARTICIPLE
+
+@CONTEXT_RULE[topicalization-v2]:
+    IF <topic> FRONTED
+    THEN VERB_SECOND_REQUIRED
+    ELSE ERROR "V2 violation after topicalization"
+
+@CONTEXT_RULE[subordinate-sov]:
     IF <subordinate-clause> PRESENT
+    THEN FINITE_VERB_AT_CLAUSE_END
+    ELSE ERROR "SOV order required in subordinate clauses"
+
+@CONTEXT_RULE[gender-consistency-dutch]:
+    IF <noun> HAS_GENDER
+    THEN ALL_MODIFIERS_MUST_AGREE
+    ELSE ERROR "Gender agreement violation"
+
+@CONTEXT_RULE[definiteness-de-het]:
+    IF <definite-article> USED
+    THEN "de"_FOR_COMMON_GENDER_OR_"het"_FOR_NEUTER
+    ELSE ERROR "Article selection error"
+
+@CONTEXT_RULE[adjective-e-ending]:
+    IF <adjective> PRECEDES_DEFINITE_NOUN
+    THEN ADD_"-e"_ENDING
+    ELSE IF <adjective> PRECEDES_INDEFINITE_HET_NOUN
+    THEN NO_ENDING
+    ELSE ADD_"-e"_ENDING
+
+@CONTEXT_RULE[politeness-level-dutch]:
+    IF FORMAL_ADDRESS
+    THEN USE_"u"
+    ELSE USE_"je"_OR_"jij"
+
+@CONTEXT_RULE[imperative-subject-deletion-dutch]:
+    IF <verb> IN_IMPERATIVE
+    THEN <subject> TYPICALLY_DELETED
+    ELSE <subject> PRESENT
+
+@CONTEXT_RULE[clitic-pronoun-reduction]:
+    IF <pronoun> UNSTRESSED
+    THEN MAY_REDUCE_TO_CLITIC_FORM
+    ELSE FULL_FORM
+
+@CONTEXT_RULE[compound-word-dutch]:
+    IF <compound> FORMED
+    THEN COMPONENTS_JOINED_WITH_OPTIONAL_LINKING_ELEMENT
+    ELSE ERROR "Compound formation error"
+
+@CONTEXT_RULE[stress-pattern-dutch]:
+    IF <word> IS_NATIVE
+    THEN STRESS_ON_FIRST_SYLLABLE_OF_ROOT
+    ELSE STRESS_MAY_VARY
+
+IF <subordinate-clause> PRESENT
     THEN <finite-verb> AT clause-final
     ELSE WARNING "SOV order expected in subordinate clause"
 
