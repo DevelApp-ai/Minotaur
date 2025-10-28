@@ -1,0 +1,70 @@
+{
+  "name": "minotaur-grammar-tool",
+  "version": "1.0.0",
+  "description": "Minotaur Grammar Development Tool for Linux",
+  "main": "main.js",
+  "scripts": {
+    "start": "concurrently \"npm run start-blazor\" \"wait-on http://localhost:5000 && electron .\"",
+    "start-blazor": "cd ../Minotaur.UI.Blazor && dotnet run --urls=http://localhost:5000",
+    "dev": "npm run start",
+    "build": "electron-builder",
+    "build-linux": "electron-builder --linux",
+    "pack": "electron-builder --dir",
+    "dist": "npm run build",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": ["grammar", "parser", "antlr", "railroad", "diagram"],
+  "author": "DevelApp AI",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.6.4",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "electron-log": "^5.0.1",
+    "electron-updater": "^6.1.7"
+  },
+  "build": {
+    "appId": "com.develapp.minotaur",
+    "productName": "Minotaur Grammar Tool",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "rpm",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "Development",
+      "icon": "assets/icon.png",
+      "desktop": {
+        "StartupWMClass": "minotaur-grammar-tool"
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "repo": "Minotaur",
+      "owner": "DevelApp-ai"
+    }
+  }
+}
