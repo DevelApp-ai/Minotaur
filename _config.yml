@@ -10,11 +10,19 @@ show_downloads: true
 # Repository information
 repository: DevelApp-ai/Minotaur
 
+# Site URL for sitemap generation
+url: https://develapp-ai.github.io
+baseurl: /Minotaur
+
 # Build settings
 markdown: kramdown
 kramdown:
   input: GFM
   syntax_highlighter: rouge
+
+# Plugins
+plugins:
+  - jekyll-sitemap
 
 # Exclude files from processing
 exclude:
