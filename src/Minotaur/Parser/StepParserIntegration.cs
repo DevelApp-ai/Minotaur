@@ -592,17 +592,20 @@ public partial class StepParserIntegration : IDisposable
             object? parser = null;
             try
             {
-                // Try to create with language and version parameters (v1.12.0+)
+                // Try to create with language and version parameters (StepParser 1.12.0+)
+                // Falls back to language-only or default constructor for older versions
                 parser = Activator.CreateInstance(parserType, _config.Language, (int)version);
             }
             catch
             {
                 try
                 {
+                    // Fallback for versions without version parameter
                     parser = Activator.CreateInstance(parserType, _config.Language);
                 }
                 catch
                 {
+                    // Fallback for versions without any parameters
                     parser = Activator.CreateInstance(parserType);
                 }
             }
@@ -613,6 +616,9 @@ public partial class StepParserIntegration : IDisposable
             }
 
             // Set cognitive graph version if property exists
+            // Different versions of StepParser may use different property names:
+            // - "CognitiveGraphVersion" (StepParser 1.12.0+)
+            // - "GraphVersion" (older versions)
             try
             {
                 var versionProperty = parserType.GetProperty("CognitiveGraphVersion") ?? 

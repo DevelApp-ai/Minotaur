@@ -114,12 +114,15 @@ public class ProjectSizeAnalyzer
         if (string.IsNullOrEmpty(sourceCode))
             return 0;
 
-        int count = 1;
+        int count = 0;
         for (int i = 0; i < sourceCode.Length; i++)
         {
             if (sourceCode[i] == '\n')
                 count++;
         }
+        // Add 1 for the last line if source is not empty and doesn't end with newline
+        if (sourceCode.Length > 0 && sourceCode[sourceCode.Length - 1] != '\n')
+            count++;
         return count;
     }
 }
