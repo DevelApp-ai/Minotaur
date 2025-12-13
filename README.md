@@ -58,6 +58,36 @@ var csharpPlugin = integration.PluginManager.GetPlugin("csharp");
 var regeneratedCode = await csharpPlugin.UnparseAsync(cognitiveGraph);
 ```
 
+### Cognitive Graph V2 Support
+
+Minotaur supports both V1 and V2 cognitive graphs:
+- **V1**: Optimized for small to medium projects
+- **V2**: Optimized for large-scale project analysis (CognitiveGraph 1.1.0+)
+
+```csharp
+using Minotaur.Parser;
+
+// Automatic version selection (default)
+var autoConfig = new ParserConfiguration
+{
+    GraphVersion = CognitiveGraphVersion.Auto  // Selects V1 or V2 based on project size
+};
+using var autoIntegration = new StepParserIntegration(autoConfig);
+
+// Force V2 for large projects
+var v2Config = new ParserConfiguration
+{
+    GraphVersion = CognitiveGraphVersion.V2  // Always use V2
+};
+using var v2Integration = new StepParserIntegration(v2Config);
+
+// Customize thresholds for auto-detection
+var integration = new StepParserIntegration();
+integration.SizeAnalyzer.LargeProjectLineThreshold = 5000;  // Lines of code
+integration.SizeAnalyzer.LargeProjectCharThreshold = 250000;  // Characters
+integration.SizeAnalyzer.LargeProjectFileThreshold = 50;  // Number of files
+```
+
 ### Plugin System
 
 ```csharp
@@ -150,10 +180,10 @@ See [Phase 2 & 3 Implementation](./PHASE_2_3_IMPLEMENTATION.md) for details.
 ## 🔗 Dependencies
 
 ### Core Dependencies
-- [DevelApp.CognitiveGraph 1.0.2](https://www.nuget.org/packages/DevelApp.CognitiveGraph/) - Includes simplified GraphQL and fluid interface for high-speed integrations
-- [DevelApp.StepLexer 1.9.0](https://www.nuget.org/packages/DevelApp.StepLexer/)
-- [DevelApp.StepParser 1.9.0](https://www.nuget.org/packages/DevelApp.StepParser/)
-- [DevelApp.RuntimePluggableClassFactory 2.0.1](https://www.nuget.org/packages/DevelApp.RuntimePluggableClassFactory/)
+- [DevelApp.CognitiveGraph 1.1.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph/) - Includes V2 cognitive graph support for massive project analysis with simplified GraphQL and fluid interface
+- [DevelApp.StepLexer 1.12.0](https://www.nuget.org/packages/DevelApp.StepLexer/) - Advanced lexical analysis with improved performance
+- [DevelApp.StepParser 1.12.0](https://www.nuget.org/packages/DevelApp.StepParser/) - GLR parser with V2 cognitive graph integration
+- [DevelApp.RuntimePluggableClassFactory 2.0.1](https://www.nuget.org/packages/DevelApp.RuntimePluggableClassFactory/) - Dynamic plugin system
 
 ## 📄 License
 
