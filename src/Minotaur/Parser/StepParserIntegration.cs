@@ -48,17 +48,27 @@ public class ParserConfiguration
     /// Whether to include whitespace tokens
     /// </summary>
     public bool IncludeWhitespace { get; set; } = false;
+
+    /// <summary>
+    /// The cognitive graph version to use.
+    /// Auto: automatically selects based on project size (small projects use V1, large projects use V2).
+    /// V1: optimized for small to medium projects.
+    /// V2: optimized for large-scale project analysis (requires CognitiveGraph 1.1.0+).
+    /// </summary>
+    public CognitiveGraphVersion GraphVersion { get; set; } = CognitiveGraphVersion.Auto;
 }
 
 /// <summary>
-/// Integrates with DevelApp.StepLexer and DevelApp.StepParser NuGet packages (1.0.1).
+/// Integrates with DevelApp.StepLexer and DevelApp.StepParser NuGet packages (1.12.0).
 /// Provides seamless conversion between source code and cognitive graphs for editing.
 /// Uses the RuntimePluggableClassFactory system for extensible language support.
+/// Supports both V1 and V2 cognitive graphs based on project size.
 /// </summary>
 public partial class StepParserIntegration : IDisposable
 {
     private readonly ParserConfiguration _config;
     private readonly LanguagePluginManager _pluginManager;
+    private readonly ProjectSizeAnalyzer _sizeAnalyzer;
     private bool _disposed;
 
     /// <summary>
@@ -70,6 +80,7 @@ public partial class StepParserIntegration : IDisposable
     {
         _config = config ?? new ParserConfiguration();
         _pluginManager = pluginManager ?? new LanguagePluginManager();
+        _sizeAnalyzer = new ProjectSizeAnalyzer();
     }
 
     /// <summary>
@@ -78,16 +89,41 @@ public partial class StepParserIntegration : IDisposable
     public LanguagePluginManager PluginManager => _pluginManager;
 
     /// <summary>
+    /// Gets the project size analyzer for determining appropriate cognitive graph version
+    /// </summary>
+    public ProjectSizeAnalyzer SizeAnalyzer => _sizeAnalyzer;
+
+    /// <summary>
     /// Parses source code and returns the raw cognitive graph without editor wrapper.
     /// Uses DevelApp.StepParser for all parsing operations.
+    /// Automatically selects V1 or V2 based on configuration and project size.
     /// </summary>
     public async Task<CognitiveGraphNode> ParseToCognitiveGraphAsync(string sourceCode)
     {
         if (string.IsNullOrEmpty(sourceCode))
             throw new ArgumentException("Source code cannot be null or empty", nameof(sourceCode));
 
-        // Parse using DevelApp.StepParser - this is the authoritative parser
-        return await ParseWithStepParserAsync(sourceCode);
+        // Determine which version to use
+        var effectiveVersion = DetermineGraphVersion(sourceCode);
+
+        // Parse using DevelApp.StepParser with the appropriate version
+        return await ParseWithStepParserAsync(sourceCode, effectiveVersion);
+    }
+
+    /// <summary>
+    /// Determines the cognitive graph version to use based on configuration and source code analysis.
+    /// </summary>
+    /// <param name="sourceCode">The source code to analyze.</param>
+    /// <returns>The cognitive graph version to use (V1 or V2).</returns>
+    private CognitiveGraphVersion DetermineGraphVersion(string sourceCode)
+    {
+        if (_config.GraphVersion == CognitiveGraphVersion.Auto)
+        {
+            // Automatically determine based on project size
+            return _sizeAnalyzer.GetRecommendedVersion(sourceCode);
+        }
+
+        return _config.GraphVersion;
     }
 
     /// <summary>
@@ -495,7 +531,9 @@ public partial class StepParserIntegration : IDisposable
     /// <summary>
     /// Invokes the StepParser using reflection to handle unknown API structure.
     /// </summary>
-    private async Task<(object? lexResult, object? parseResult)> InvokeStepParserAsync(string sourceCode)
+    /// <param name="sourceCode">The source code to parse.</param>
+    /// <param name="version">The cognitive graph version to use (V1 or V2).</param>
+    private async Task<(object? lexResult, object? parseResult)> InvokeStepParserAsync(string sourceCode, CognitiveGraphVersion version)
     {
         try
         {
@@ -550,20 +588,49 @@ public partial class StepParserIntegration : IDisposable
                 lexResult = tokenizeMethod.Invoke(lexer, new[] { sourceCode });
             }
 
-            // Create parser instance
+            // Create parser instance with version support
             object? parser = null;
             try
             {
-                parser = Activator.CreateInstance(parserType, _config.Language);
+                // Try to create with language and version parameters (StepParser 1.12.0+)
+                // Falls back to language-only or default constructor for older versions
+                parser = Activator.CreateInstance(parserType, _config.Language, (int)version);
             }
             catch
             {
-                parser = Activator.CreateInstance(parserType);
+                try
+                {
+                    // Fallback for versions without version parameter
+                    parser = Activator.CreateInstance(parserType, _config.Language);
+                }
+                catch
+                {
+                    // Fallback for versions without any parameters
+                    parser = Activator.CreateInstance(parserType);
+                }
             }
 
             if (parser == null || lexResult == null)
             {
                 return (lexResult, null);
+            }
+
+            // Set cognitive graph version if property exists
+            // Different versions of StepParser may use different property names:
+            // - "CognitiveGraphVersion" (StepParser 1.12.0+)
+            // - "GraphVersion" (older versions)
+            try
+            {
+                var versionProperty = parserType.GetProperty("CognitiveGraphVersion") ??
+                                     parserType.GetProperty("GraphVersion");
+                if (versionProperty != null && versionProperty.CanWrite)
+                {
+                    versionProperty.SetValue(parser, (int)version);
+                }
+            }
+            catch
+            {
+                // Property doesn't exist or can't be set - continue without it
             }
 
             // Get tokens from lexResult
@@ -894,19 +961,22 @@ public partial class StepParserIntegration
     /// Parses source code using DevelApp.StepParser NuGet package.
     /// This is the authoritative parsing method - plugins are NOT used for parsing.
     /// </summary>
-    private async Task<CognitiveGraphNode> ParseWithStepParserAsync(string sourceCode)
+    /// <param name="sourceCode">The source code to parse.</param>
+    /// <param name="version">The cognitive graph version to use (V1 or V2).</param>
+    private async Task<CognitiveGraphNode> ParseWithStepParserAsync(string sourceCode, CognitiveGraphVersion version)
     {
         try
         {
-            // Integrate with DevelApp.StepParser 1.0.1 NuGet package using reflection
+            // Integrate with DevelApp.StepParser 1.12.0 NuGet package using reflection
             // This approach allows us to work with the actual API structure
-            var (lexResult, parseResult) = await InvokeStepParserAsync(sourceCode);
+            var (lexResult, parseResult) = await InvokeStepParserAsync(sourceCode, version);
 
             if (lexResult == null || parseResult == null)
             {
                 // If StepParser integration fails, use fallback parsing
                 var fallbackRoot = CreateFallbackCognitiveGraph(sourceCode);
                 fallbackRoot.Metadata["parsingMethod"] = "Fallback";
+                fallbackRoot.Metadata["cognitiveGraphVersion"] = version.ToString();
                 return fallbackRoot;
             }
 
@@ -917,7 +987,8 @@ public partial class StepParserIntegration
             root.Metadata["sourceCode"] = sourceCode;
             root.Metadata["language"] = _config.Language;
             root.Metadata["parserType"] = "DevelApp.StepParser";
-            root.Metadata["parserVersion"] = "1.0.1";
+            root.Metadata["parserVersion"] = "1.12.0";
+            root.Metadata["cognitiveGraphVersion"] = version.ToString();
             var tokens = GetPropertyValue<object>(lexResult, "Tokens", "TokenList", "Results");
             var tokenCount = 0;
             if (tokens is System.Collections.ICollection collection)
@@ -948,7 +1019,7 @@ public partial class StepParserIntegration
             errorNode.Metadata["error"] = ex.Message;
             errorNode.Metadata["errorType"] = ex.GetType().Name;
             errorNode.Metadata["parserType"] = "DevelApp.StepParser";
-            errorNode.Metadata["parserVersion"] = "1.0.1";
+            errorNode.Metadata["parserVersion"] = "1.12.0";
             errorNode.Metadata["sourceCode"] = sourceCode;
             errorNode.Metadata["parseSuccess"] = false;
             return errorNode;
@@ -963,8 +1034,11 @@ public partial class StepParserIntegration
     {
         try
         {
-            // Integrate with DevelApp.StepParser 1.0.1 validation using reflection
-            var (lexResult, parseResult) = await InvokeStepParserAsync(sourceCode);
+            // Determine which version to use
+            var effectiveVersion = DetermineGraphVersion(sourceCode);
+
+            // Integrate with DevelApp.StepParser 1.12.0 validation using reflection
+            var (lexResult, parseResult) = await InvokeStepParserAsync(sourceCode, effectiveVersion);
 
             var errors = new List<ParseError>();
             int tokenCount = 0;
