@@ -3,7 +3,8 @@ next-version: 1.0.0
 branches:
   main:
     regex: ^master$|^main$
-    mode: ContinuousDeployment
+    mode: ContinuousDelivery
+    tag: ''
     increment: Patch
     source-branches: ['develop', 'feature', 'support', 'hotfix']
   develop:
