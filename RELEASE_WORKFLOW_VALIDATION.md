@@ -229,11 +229,14 @@ dotnet add package DevelApp.Minotaur --version X.Y.Z-beta.PR123 \
 ### First NuGet.org Release
 - **Symptom**: First release to NuGet.org may fail due to package validation
 - **Cause**: NuGet.org requires manual verification for the first release of a new package
-- **Solution**: This is expected behavior. After the automated release fails, manually:
-  1. Go to [NuGet.org](https://www.nuget.org)
-  2. Upload the package manually using the web interface
-  3. Complete the package verification process
-  4. Subsequent automated releases will work normally
+- **Solution**: This is expected behavior. After the automated release workflow completes, manually:
+  1. Download the `.nupkg` file from the GitHub Release artifacts (e.g., `DevelApp.Minotaur.1.0.0.nupkg`)
+  2. Go to [NuGet.org](https://www.nuget.org) and sign in
+  3. Click "Upload" and select the `.nupkg` file
+  4. Complete the package verification process and publish
+  5. Subsequent automated releases from the CI/CD workflow will work normally
+  
+  **Note**: The `.nupkg` file can also be found in the GitHub Actions workflow artifacts under "nuget-packages"
 
 ## Success Criteria
 
