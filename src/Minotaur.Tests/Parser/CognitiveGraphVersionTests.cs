@@ -71,7 +71,7 @@ public class CognitiveGraphVersionTests
         // Arrange
         var analyzer = new ProjectSizeAnalyzer();
         var files = new Dictionary<string, string>();
-        
+
         // Create 120 files (more than default 100 file threshold)
         for (int i = 0; i < 120; i++)
         {

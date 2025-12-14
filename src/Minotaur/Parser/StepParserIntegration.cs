@@ -621,7 +621,7 @@ public partial class StepParserIntegration : IDisposable
             // - "GraphVersion" (older versions)
             try
             {
-                var versionProperty = parserType.GetProperty("CognitiveGraphVersion") ?? 
+                var versionProperty = parserType.GetProperty("CognitiveGraphVersion") ??
                                      parserType.GetProperty("GraphVersion");
                 if (versionProperty != null && versionProperty.CanWrite)
                 {
@@ -1036,7 +1036,7 @@ public partial class StepParserIntegration
         {
             // Determine which version to use
             var effectiveVersion = DetermineGraphVersion(sourceCode);
-            
+
             // Integrate with DevelApp.StepParser 1.12.0 validation using reflection
             var (lexResult, parseResult) = await InvokeStepParserAsync(sourceCode, effectiveVersion);
 
