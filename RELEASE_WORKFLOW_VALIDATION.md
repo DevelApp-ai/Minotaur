@@ -12,7 +12,26 @@ The CI/CD workflow (`ci-cd-enhanced.yml`) implements the following release strat
 
 ## Workflow Changes
 
-### Change Made
+### GitVersion Configuration Fix (December 2025)
+
+Fixed the semantic versioning calculation for main branch releases by updating `GitVersion.yml`:
+
+**Problem:** When PRs were merged to main, GitVersion in `ContinuousDeployment` mode generated prerelease versions (e.g., `1.0.0-ci.1`), preventing the stable release job from triggering (which requires `prerelease == ''`).
+
+**Solution:** Changed the main branch configuration in `GitVersion.yml`:
+
+```yaml
+main:
+  regex: ^master$|^main$
+  mode: ContinuousDelivery  # Changed from ContinuousDeployment
+  tag: ''                   # Added to prevent prerelease tags
+  increment: Patch
+  source-branches: ['develop', 'feature', 'support', 'hotfix']
+```
+
+This ensures that merges to main generate clean version numbers (e.g., `1.0.0`) without prerelease metadata, allowing the stable release workflow to execute properly.
+
+### Package Job Fix (Previous)
 
 Removed the `if: github.event_name != 'pull_request'` condition from the `package` job in `.github/workflows/ci-cd-enhanced.yml`.
 
@@ -81,13 +100,13 @@ package:
 ### Scenario 3: Merge to Main (Full Release)
 
 **Expected Behavior:**
-1. Version calculated as `X.Y.Z` (e.g., `1.0.1` - stable release, no prerelease tag)
+1. Version calculated as `X.Y.Z` (e.g., `1.0.0` or `1.0.1` - stable release, no prerelease tag)
 2. Build and test jobs run successfully
 3. Package job creates NuGet package with stable version
 4. `release` job runs and:
    - Creates a GitHub Release with tag `vX.Y.Z`
    - Publishes to GitHub Packages
-   - Publishes to NuGet.org
+   - Publishes to NuGet.org (may fail on first release - see Troubleshooting)
 5. `publish-pr-package` job does NOT run (event is push, not PR)
 6. `prerelease` job does NOT run (ref is main, not develop/copilot/feature)
 
@@ -100,8 +119,10 @@ package:
 6. Verify GitHub Release is created at `https://github.com/DevelApp-ai/Minotaur/releases`
    - Check that release has tag `vX.Y.Z`
    - Check that release has attached `.nupkg` files
+   - Check that release is marked as "Latest" (not pre-release)
 7. Verify package is published to GitHub Packages
 8. Verify package is published to NuGet.org at `https://www.nuget.org/packages/DevelApp.Minotaur/`
+   - **Note**: First release may require manual upload to NuGet.org (see Troubleshooting section)
 
 ## Version Calculation Logic
 
@@ -190,6 +211,11 @@ dotnet add package DevelApp.Minotaur --version X.Y.Z-beta.PR123 \
 - **Cause**: GitVersion configuration or branch reference issue
 - **Solution**: Check GitVersion.yml configuration and ensure PR base branch is correctly detected
 
+### Main Branch Creates Prerelease Instead of Stable Release
+- **Symptom**: Merge to main creates a prerelease (e.g., `1.0.0-ci.1`) instead of stable version
+- **Cause**: GitVersion was using `ContinuousDeployment` mode which adds prerelease metadata
+- **Solution**: This is now fixed - main branch uses `ContinuousDelivery` mode with `tag: ''`
+
 ### Publishing Fails
 - **Symptom**: Package creation succeeds but publishing fails
 - **Cause**: Missing or invalid secrets (GITHUB_TOKEN or NUGET_API_KEY)
@@ -199,6 +225,18 @@ dotnet add package DevelApp.Minotaur --version X.Y.Z-beta.PR123 \
 - **Symptom**: Merge to main doesn't create a GitHub release
 - **Cause**: Version may have a prerelease tag (condition requires empty prerelease tag)
 - **Solution**: Verify GitVersion outputs empty PreReleaseTag for main branch
+
+### First NuGet.org Release
+- **Symptom**: First release to NuGet.org may fail due to package validation
+- **Cause**: NuGet.org requires manual verification for the first release of a new package
+- **Solution**: This is expected behavior. After the automated release workflow completes, manually:
+  1. Download the `.nupkg` file from the GitHub Release artifacts (e.g., `DevelApp.Minotaur.1.0.0.nupkg`)
+  2. Go to [NuGet.org](https://www.nuget.org) and sign in
+  3. Click "Upload" and select the `.nupkg` file
+  4. Complete the package verification process and publish
+  5. Subsequent automated releases from the CI/CD workflow will work normally
+  
+  **Note**: The `.nupkg` file can also be found in the GitHub Actions workflow artifacts under "nuget-packages"
 
 ## Success Criteria
 
