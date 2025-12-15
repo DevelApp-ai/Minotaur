@@ -9,7 +9,7 @@
     
     <!-- NuGet Package Properties -->
     <PackageId>DevelApp.Minotaur</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <!-- PackageVersion is controlled by GitVersion - set via build arguments -->
     <Title>Minotaur Cognitive Graph Editor</Title>
     <Description>A zero-copy cognitive graph unparser framework with StepParser integration, extensible plugin system, and advanced location tracking capabilities.</Description>
     <Authors>DevelApp AI</Authors>
