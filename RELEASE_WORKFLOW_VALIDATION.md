@@ -24,7 +24,7 @@ Fixed the semantic versioning calculation for main branch releases by updating `
 main:
   regex: ^master$|^main$
   mode: ContinuousDelivery  # Changed from ContinuousDeployment
-  tag: ''                   # Added to prevent prerelease tags
+  label: ''                 # Added to prevent prerelease tags
   increment: Patch
   source-branches: ['develop', 'feature', 'support', 'hotfix']
 ```
