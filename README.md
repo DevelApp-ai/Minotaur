@@ -168,14 +168,19 @@ See [Phase 2 & 3 Implementation](./PHASE_2_3_IMPLEMENTATION.md) for details.
 
 ## 📚 Documentation
 
-- [Grammar Generation Guide](./src/Minotaur/GrammarGeneration/README.md)
+### User Guides
 - [UI Flow Documentation](./docs/ui-screenshots/UI_FLOW.md) - Comprehensive guide to all UI pages with screenshots
 - [Code Development Guide](./docs/ui-screenshots/CODE_DEVELOPMENT_GUIDE.md) - Using Minotaur for application code analysis
 - [Implementation Status](./docs/ui-screenshots/IMPLEMENTATION_STATUS.md) - Track progress of visualization features
-- [Phase 2 & 3 Implementation](./PHASE_2_3_IMPLEMENTATION.md) - Desktop application implementation
-- [Electron Integration Guide](./src/Minotaur.UI.Electron/INTEGRATION_GUIDE.md) - Blazor-Electron integration
-- [GAP Analysis](./GAP_Analysis_StepParser_Implementation.md)
-- [Technical Design Documents](./docs/)
+
+### Feature Documentation
+- [Grammar Generation Guide](./src/Minotaur/GrammarGeneration/README.md) - Automated grammar generation and refinement
+- [Electron Desktop App](./src/Minotaur.UI.Electron/README.md) - Native Linux desktop application
+- [Electron Integration Guide](./src/Minotaur.UI.Electron/INTEGRATION_GUIDE.md) - Blazor-Electron integration details
+- [Examples](./examples/README.md) - Grammar configuration and usage examples
+
+### Historical Documentation
+- [Old Documentation](./old_docs/) - Outdated design documents and analysis reports
 
 ## 🔗 Dependencies
 
