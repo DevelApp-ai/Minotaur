@@ -164,7 +164,7 @@ Features:
 - Native file dialogs for grammar files
 - Cross-platform support (x64, arm64)
 
-See [Phase 2 & 3 Implementation](./PHASE_2_3_IMPLEMENTATION.md) for details.
+See [Electron Desktop App documentation](./src/Minotaur.UI.Electron/README.md) for details.
 
 ## 📚 Documentation
 
