@@ -179,7 +179,7 @@ public class BoundaryConditionTests
 
         // Assert
         Assert.IsNotNull(result);
-        Assert.IsTrue(result.Contains("-42") || result.Contains("-") && result.Contains("42"));
+        Assert.IsTrue(result.Contains("-42") || (result.Contains("-") && result.Contains("42")));
     }
 
     [TestMethod]
