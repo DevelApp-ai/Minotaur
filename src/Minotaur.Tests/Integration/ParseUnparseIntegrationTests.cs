@@ -174,8 +174,8 @@ public class ParseUnparseIntegrationTests
         var clonedChild = cloned!.Children[0];
 
         // Assert - Metadata preserved
-        Assert.IsTrue(clonedChild.Metadata.ContainsKey("type"));
-        Assert.AreEqual("string", clonedChild.Metadata["type"]);
+        Assert.IsTrue(clonedChild.Metadata.TryGetValue("type", out var typeValue));
+        Assert.AreEqual("string", typeValue);
         Assert.IsTrue(clonedChild.Metadata.ContainsKey("nullable"));
     }
 
