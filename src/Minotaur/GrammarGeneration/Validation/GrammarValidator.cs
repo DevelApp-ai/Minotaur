@@ -346,6 +346,12 @@ public class GrammarValidator
     {
         var score = 1.0;
 
+        // Return default score if no rules
+        if (!grammar.ProductionRules.Rules.Any())
+        {
+            return score;
+        }
+
         // Penalize very long rule names
         var averageNameLength = grammar.ProductionRules.Rules.Average(r => r.Name.Length);
         if (averageNameLength > 20)

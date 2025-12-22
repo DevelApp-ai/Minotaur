@@ -1,16 +1,16 @@
 /*
  * This file is part of Minotaur.
- * 
+ *
  * Minotaur is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Minotaur is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -234,7 +234,7 @@ public class TestLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string DisplayName => "Test Language";
     public string[] SupportedExtensions => new[] { ".test" };
 
-    public async Task<string> UnparseAsync(Core.CognitiveGraphNode graph)
+    public async Task<string> UnparseAsync(Minotaur.Core.CognitiveGraphNode graph)
     {
         await Task.CompletedTask;
         return "test code";
@@ -251,7 +251,7 @@ public class TestLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         return new CodeFormattingOptions();
     }
 
-    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph)
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Minotaur.Core.CognitiveGraphNode graph)
     {
         await Task.CompletedTask;
         return new UnparseValidationResult { CanUnparse = true };
