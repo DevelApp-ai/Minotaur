@@ -155,7 +155,7 @@ public class UnparserAdvancedTests
     public void GraphUnparser_Dispose_CanBeCalledMultipleTimes()
     {
         // Arrange
-        var unparser = new GraphUnparser();
+        using var unparser = new GraphUnparser();
         var root = new TerminalNode("test", "value");
 
         // Act
