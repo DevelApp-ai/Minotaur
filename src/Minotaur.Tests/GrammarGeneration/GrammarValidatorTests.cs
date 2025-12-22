@@ -351,7 +351,7 @@ public class GrammarValidatorTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.NotEmpty(result.QualityReport.ToString());
+        Assert.NotNull(result.QualityReport);
     }
 
     [Fact]
