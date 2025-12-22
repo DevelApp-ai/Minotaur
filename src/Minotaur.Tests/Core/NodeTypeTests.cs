@@ -56,8 +56,6 @@ public class NodeTypeTests
         var node = new TerminalNode("value", "string");
 
         // Assert
-        Assert.IsTrue(node.Metadata.ContainsKey("text"));
-        Assert.IsTrue(node.Metadata.ContainsKey("tokenType"));
         Assert.AreEqual("value", node.Metadata["text"]);
         Assert.AreEqual("string", node.Metadata["tokenType"]);
     }
