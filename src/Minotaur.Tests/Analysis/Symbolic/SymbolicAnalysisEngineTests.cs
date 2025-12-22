@@ -234,7 +234,7 @@ public class TestLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string DisplayName => "Test Language";
     public string[] SupportedExtensions => new[] { ".test" };
 
-    public async Task<string> UnparseAsync(Core.CognitiveGraphNode graph)
+    public async Task<string> UnparseAsync(Minotaur.Core.CognitiveGraphNode graph)
     {
         await Task.CompletedTask;
         return "test code";
@@ -251,7 +251,7 @@ public class TestLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         return new CodeFormattingOptions();
     }
 
-    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph)
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Minotaur.Core.CognitiveGraphNode graph)
     {
         await Task.CompletedTask;
         return new UnparseValidationResult { CanUnparse = true };

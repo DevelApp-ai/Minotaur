@@ -159,7 +159,7 @@ public class LanguagePluginManagerTests
         public string DisplayName => "Test Language";
         public string[] SupportedExtensions => new[] { ".test" };
 
-        public Task<string> UnparseAsync(Core.CognitiveGraphNode graph)
+        public Task<string> UnparseAsync(Minotaur.Core.CognitiveGraphNode graph)
         {
             return Task.FromResult("test code");
         }
@@ -174,7 +174,7 @@ public class LanguagePluginManagerTests
             return new CodeFormattingOptions();
         }
 
-        public Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Core.CognitiveGraphNode graph)
+        public Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(Minotaur.Core.CognitiveGraphNode graph)
         {
             return Task.FromResult(new UnparseValidationResult { CanUnparse = true });
         }
