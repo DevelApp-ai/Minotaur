@@ -181,8 +181,8 @@ public class TokenPatternAnalyzerTests
     {
         // Arrange
         var analyzer = new TokenPatternAnalyzer();
-        var file1 = Path.Combine(Path.GetTempPath(), $"test1_{Guid.NewGuid()}.txt");
-        var file2 = Path.Combine(Path.GetTempPath(), $"test2_{Guid.NewGuid()}.txt");
+        var file1 = Path.Join(Path.GetTempPath(), $"test1_{Guid.NewGuid()}.txt");
+        var file2 = Path.Join(Path.GetTempPath(), $"test2_{Guid.NewGuid()}.txt");
 
         try
         {
