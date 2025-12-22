@@ -87,12 +87,12 @@ public class GrammarValidatorTests
         var sourceFiles = Array.Empty<string>();
 
         // Act
-        // Note: This will fail in GenerateQualityReport due to Average() on empty list
-        // Skip this test or add a dummy rule to avoid the bug in GrammarValidator
-        var result = await _validator.ValidateGrammarAsync(CreateValidGrammar(), sourceFiles);
+        // Note: This may fail in GenerateQualityReport due to Average() on empty list
+        // If needed, adjust GrammarValidator or add a dummy rule to avoid that bug
+        var result = await _validator.ValidateGrammarAsync(grammar, sourceFiles);
 
-        // Assert - Just verify the validator works with valid grammar
-        Assert.True(result.IsValid);
+        // Assert
+        Assert.False(result.IsValid);
     }
 
     [Fact]
