@@ -1,16 +1,16 @@
 /*
  * This file is part of Minotaur.
- * 
+ *
  * Minotaur is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Minotaur is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -133,7 +133,7 @@ public class VisitorPatternTests
         // Arrange
         var visitor = new TestVisitor();
         var root = new NonTerminalNode("root");
-        
+
         // Add 20 children
         for (int i = 0; i < 20; i++)
         {
@@ -188,7 +188,7 @@ public class VisitorPatternTests
         var visitor = new TestVisitor();
         var root = new NonTerminalNode("root");
         var current = root;
-        
+
         // Create chain of 50 nested nodes
         for (int i = 0; i < 50; i++)
         {
@@ -196,7 +196,7 @@ public class VisitorPatternTests
             current.AddChild(child);
             current = child;
         }
-        
+
         current.AddChild(new TerminalNode("leaf", "value"));
 
         // Act

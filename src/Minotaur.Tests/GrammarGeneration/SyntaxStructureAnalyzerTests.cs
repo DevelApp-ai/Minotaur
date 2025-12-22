@@ -1,16 +1,16 @@
 /*
  * This file is part of Minotaur.
- * 
+ *
  * Minotaur is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Minotaur is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -31,7 +31,7 @@ public class SyntaxStructureAnalyzerTests
     public void Setup()
     {
         _testFilePath = Path.Combine(Path.GetTempPath(), $"test_{Guid.NewGuid()}.txt");
-        
+
         // Create basic token definitions for testing
         _basicTokens = new TokenDefinitions(new List<TokenPattern>
         {
@@ -247,7 +247,7 @@ public class SyntaxStructureAnalyzerTests
         var analyzer = new SyntaxStructureAnalyzer();
         var file1 = Path.Combine(Path.GetTempPath(), $"test1_{Guid.NewGuid()}.txt");
         var file2 = Path.Combine(Path.GetTempPath(), $"test2_{Guid.NewGuid()}.txt");
-        
+
         try
         {
             File.WriteAllText(file1, "function test1() {}");

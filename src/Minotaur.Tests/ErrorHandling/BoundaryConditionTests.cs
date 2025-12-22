@@ -1,16 +1,16 @@
 /*
  * This file is part of Minotaur.
- * 
+ *
  * Minotaur is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Minotaur is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -110,14 +110,14 @@ public class BoundaryConditionTests
         // Arrange - Create deeply nested structure (100 levels)
         var root = new NonTerminalNode("root");
         var current = root;
-        
+
         for (int i = 0; i < 100; i++)
         {
             var child = new NonTerminalNode($"level{i}");
             current.AddChild(child);
             current = child;
         }
-        
+
         current.AddChild(new TerminalNode("leaf", "value"));
 
         using var unparser = new GraphUnparser();
@@ -133,7 +133,7 @@ public class BoundaryConditionTests
     {
         // Arrange - Node with 1000 children
         var root = new NonTerminalNode("parent");
-        
+
         for (int i = 0; i < 1000; i++)
         {
             root.AddChild(new TerminalNode($"child{i}", "item"));
