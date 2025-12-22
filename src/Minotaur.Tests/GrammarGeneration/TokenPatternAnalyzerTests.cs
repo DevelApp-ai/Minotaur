@@ -30,7 +30,7 @@ public class TokenPatternAnalyzerTests
     public void Setup()
     {
         // Create a temporary test file
-        _testFilePath = Path.Combine(Path.GetTempPath(), $"test_{Guid.NewGuid()}.txt");
+        _testFilePath = Path.Join(Path.GetTempPath(), $"test_{Guid.NewGuid()}.txt");
     }
 
     [TestCleanup]
