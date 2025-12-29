@@ -32,9 +32,3 @@ public interface IGSSMEngineExtended : IGSSMEngine
         CancellationToken cancellationToken = default
     );
 }
-
-public record ValidationContext
-{
-    public required string ContextId { get; init; }
-    public Dictionary<string, object>? Properties { get; init; }
-}
