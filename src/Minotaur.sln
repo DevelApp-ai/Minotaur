@@ -4,6 +4,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur", "Minotaur\Minotaur.csproj", "{C1FB5F7A-6F73-4D8E-9B85-2A1E8B4F7557}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelApp.StepLexer", "../../github__DevelApp-ai__ENFAStepLexer-StepPerser/src/DevelApp.StepLexer/DevelApp.StepLexer.csproj", "{C74394FC-C10D-47F8-9604-8FF2A5315D77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevelApp.StepParser", "../../github__DevelApp-ai__ENFAStepLexer-StepPerser/src/DevelApp.StepParser/DevelApp.StepParser.csproj", "{C7AAD239-327D-47D0-9DE1-D6F61263A023}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Tests", "Minotaur.Tests\Minotaur.Tests.csproj", "{EC2949FF-CFF7-430F-B27E-427A08EF94D2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Demo", "Minotaur.Demo\Minotaur.Demo.csproj", "{4863017D-411F-4F41-8BAC-03EA17DF696A}"
@@ -29,5 +33,13 @@ Global
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C74394FC-C10D-47F8-9604-8FF2A5315D77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C74394FC-C10D-47F8-9604-8FF2A5315D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C74394FC-C10D-47F8-9604-8FF2A5315D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C74394FC-C10D-47F8-9604-8FF2A5315D77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7AAD239-327D-47D0-9DE1-D6F61263A023}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7AAD239-327D-47D0-9DE1-D6F61263A023}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7AAD239-327D-47D0-9DE1-D6F61263A023}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7AAD239-327D-47D0-9DE1-D6F61263A023}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
