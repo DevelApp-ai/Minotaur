@@ -476,3 +476,106 @@ public class PythonLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
     }
 }
+/// <summary>
+/// Built-in Java language plugin for unparsing and compiler backend generation
+/// </summary>
+public class JavaLanguagePluginWrapper : ILanguagePlugin, ISymbolicAnalysisPlugin
+{
+    private readonly Plugins.Java.JavaLanguagePlugin _javaPlugin = new();
+
+    public string LanguageId => _javaPlugin.LanguageId;
+    public string DisplayName => _javaPlugin.DisplayName;
+    public string[] SupportedExtensions => _javaPlugin.SupportedExtensions;
+
+    public async Task<string> UnparseAsync(CognitiveGraphNode graph)
+    {
+        return await _javaPlugin.UnparseAsync(graph);
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        return await _javaPlugin.GenerateCompilerBackendRulesAsync();
+    }
+
+    public CodeFormattingOptions GetFormattingOptions()
+    {
+        return _javaPlugin.GetFormattingOptions();
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        return await _javaPlugin.ValidateGraphForUnparsingAsync(graph);
+    }
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _javaPlugin.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _javaPlugin.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _javaPlugin.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _javaPlugin.GenerateTestCases(error, sourceCode);
+    }
+}
+
+/// <summary>
+/// Built-in TypeScript language plugin for unparsing and compiler backend generation
+/// </summary>
+public class TypeScriptLanguagePluginWrapper : ILanguagePlugin, ISymbolicAnalysisPlugin
+{
+    private readonly Plugins.TypeScript.TypeScriptLanguagePlugin _tsPlugin = new();
+
+    public string LanguageId => _tsPlugin.LanguageId;
+    public string DisplayName => _tsPlugin.DisplayName;
+    public string[] SupportedExtensions => _tsPlugin.SupportedExtensions;
+
+    public async Task<string> UnparseAsync(CognitiveGraphNode graph)
+    {
+        return await _tsPlugin.UnparseAsync(graph);
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        return await _tsPlugin.GenerateCompilerBackendRulesAsync();
+    }
+
+    public CodeFormattingOptions GetFormattingOptions()
+    {
+        return _tsPlugin.GetFormattingOptions();
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        return await _tsPlugin.ValidateGraphForUnparsingAsync(graph);
+    }
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _tsPlugin.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _tsPlugin.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _tsPlugin.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _tsPlugin.GenerateTestCases(error, sourceCode);
+    }
+}

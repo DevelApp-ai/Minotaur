@@ -160,6 +160,8 @@ public class LanguagePluginManager : IDisposable
         RegisterPlugin(new JavaScriptLanguagePlugin());
         RegisterPlugin(new PythonLanguagePlugin());
         RegisterPlugin(new LLVMLanguagePlugin());
+        RegisterPlugin(new JavaLanguagePluginWrapper());
+        RegisterPlugin(new TypeScriptLanguagePluginWrapper());
     }
 
     /// <summary>
