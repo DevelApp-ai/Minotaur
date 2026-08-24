@@ -815,7 +815,7 @@ public class TypeScriptUnparseVisitor : CognitiveGraphVisitorBase
         {
             case '\\': return "\\\\";
             case '"': return "\\\"";
-            case '\'': return "\\'"";
+            case '\': return "\\'";
             case '\n': return "\\n";
             case '\r': return "\\r";
             case '\t': return "\\t";
