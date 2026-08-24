@@ -1,0 +1,479 @@
+@* Installed Plugins Component *@
+@* 
+ * Component for managing installed plugins.
+ * Allows users to enable, disable, configure, and uninstall plugins.
+ * *@
+
+@using Microsoft.AspNetCore.Components
+@using Minotaur.Core.Models.Plugins
+
+<div class="installed-plugins">
+    <div class="plugins-header">
+        <h5><i class="bi bi-puzzle-fill"></i> Installed Plugins</h5>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-primary" @onclick="RefreshPlugins">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="CheckForUpdates">
+                <i class="bi bi-arrow-down-up"></i> Check Updates
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter/Sort -->
+    <div class="plugins-filter">
+        <div class="filter-left">
+            <div class="input-group input-group-sm" style="width: 200px;">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" 
+                       placeholder="Search..." 
+                       @bind="searchText" 
+                       @bind:event="oninput">
+            </div>
+        </div>
+        <div class="filter-right">
+            <select class="form-select form-select-sm" @bind="sortBy" style="width: 150px;">
+                <option value="name">Sort by Name</option>
+                <option value="version">Sort by Version</option>
+                <option value="date">Sort by Install Date</option>
+                <option value="status">Sort by Status</option>
+            </select>
+            <select class="form-select form-select-sm" @bind="filterStatus" style="width: 150px;">
+                <option value="">All Statuses</option>
+                <option value="enabled">Enabled</option>
+                <option value="disabled">Disabled</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Plugin List -->
+    <div class="plugins-list">
+        @if (filteredPlugins.Count == 0)
+        {
+            <div class="empty-state">
+                <i class="bi bi-puzzle-fill fs-1"></i>
+                <p>No plugins installed</p>
+                <small>Install plugins from the gallery to extend Minotaur's functionality</small>
+            </div>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var plugin in filteredPlugins)
+                {
+                    <div class="list-group-item plugin-item">
+                        <div class="plugin-main">
+                            <div class="plugin-icon">
+                                <i class="bi @GetPluginIcon(plugin)"></i>
+                            </div>
+                            <div class="plugin-info">
+                                <div class="plugin-name">@plugin.Name</div>
+                                <div class="plugin-version">v@plugin.Version</div>
+                            </div>
+                        </div>
+                        <div class="plugin-status">
+                            <span class="status-badge @GetStatusClass(plugin)">
+                                @GetStatusText(plugin)
+                            </span>
+                        </div>
+                        <div class="plugin-actions">
+                            @if (plugin.IsEnabled)
+                            {
+                                <button class="btn btn-sm btn-outline-warning" @onclick="() => TogglePlugin(plugin)">
+                                    <i class="bi bi-pause-fill"></i> Disable
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-outline-success" @onclick="() => TogglePlugin(plugin)">
+                                    <i class="bi bi-play-fill"></i> Enable
+                                </button>
+                            }
+                            <button class="btn btn-sm btn-outline-primary" @onclick="() => ConfigurePlugin(plugin)">
+                                <i class="bi bi-gear"></i> Configure
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => UninstallPlugin(plugin)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Bulk Actions -->
+    @if (filteredPlugins.Count > 0)
+    {
+        <div class="bulk-actions">
+            <div class="actions-left">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" 
+                           @bind="selectAll" 
+                           id="selectAll">
+                    <label class="form-check-label" for="selectAll">
+                        Select All
+                    </label>
+                </div>
+            </div>
+            <div class="actions-right">
+                <button class="btn btn-sm btn-outline-primary" @onclick="EnableSelected">
+                    <i class="bi bi-play-fill"></i> Enable Selected
+                </button>
+                <button class="btn btn-sm btn-outline-warning" @onclick="DisableSelected">
+                    <i class="bi bi-pause-fill"></i> Disable Selected
+                </button>
+                <button class="btn btn-sm btn-outline-danger" @onclick="UninstallSelected">
+                    <i class="bi bi-trash"></i> Uninstall Selected
+                </button>
+            </div>
+        </div>
+    }
+
+    <!-- Update Notifications -->
+    @if (updatesAvailable.Count > 0)
+    {
+        <div class="update-notifications">
+            <h6><i class="bi bi-arrow-up-circle"></i> Updates Available (@updatesAvailable.Count)</h6>
+            <div class="updates-list">
+                @foreach (var update in updatesAvailable)
+                {
+                    <div class="update-item">
+                        <div class="update-info">
+                            <strong>@update.Name</strong>
+                            <small>v@update.AvailableVersion</small>
+                        </div>
+                        <div class="update-actions">
+                            <button class="btn btn-sm btn-primary" @onclick="() => UpdatePlugin(update)">
+                                <i class="bi bi-arrow-up"></i> Update
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.installed-plugins {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.plugins-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.plugins-header h5 {
+    margin: 0;
+    color: #495057;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.plugins-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.filter-left, .filter-right {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.plugins-list {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6c757d;
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-state i {
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.plugin-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.plugin-item:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.plugin-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.plugin-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e3f2fd;
+    border-radius: 0.375rem;
+    color: #1976d2;
+    font-size: 1.25rem;
+}
+
+.plugin-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.plugin-name {
+    font-weight: 500;
+    color: #495057;
+    font-size: 0.875rem;
+}
+
+.plugin-version {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.plugin-status {
+    min-width: 100px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.enabled {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.disabled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.plugin-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.bulk-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-top: 1px solid #dee2e6;
+}
+
+.update-notifications {
+    padding: 1rem;
+    background: #e7f3ff;
+    border-top: 1px solid #b3d9ff;
+}
+
+.update-notifications h6 {
+    margin-bottom: 0.75rem;
+    color: #004085;
+    font-size: 0.875rem;
+}
+
+.updates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.update-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.update-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+</style>
+
+@code {
+    [Parameter]
+    public List<PluginInfo> Plugins { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<PluginInfo> OnPluginToggle { get; set; }
+
+    [Parameter]
+    public EventCallback<PluginInfo> OnPluginConfigure { get; set; }
+
+    [Parameter]
+    public EventCallback<PluginInfo> OnPluginUninstall { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    private string searchText = string.Empty;
+    private string sortBy = "name";
+    private string filterStatus = string.Empty;
+    private bool selectAll = false;
+    private List<PluginUpdateInfo> updatesAvailable = new();
+
+    private List<PluginInfo> filteredPlugins =>
+        Plugins
+        .Where(p => string.IsNullOrWhiteSpace(searchText) || 
+                   p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                   p.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                   p.Author.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        .Where(p => string.IsNullOrEmpty(filterStatus) || 
+                   (filterStatus == "enabled" && p.IsEnabled) ||
+                   (filterStatus == "disabled" && !p.IsEnabled))
+        .OrderBy(p => sortBy switch
+        {
+            "name" => p.Name,
+            "version" => p.Version,
+            "date" => p.InstallDate,
+            "status" => p.IsEnabled ? 0 : 1,
+            _ => p.Name
+        })
+        .ToList();
+
+    private void TogglePlugin(PluginInfo plugin)
+    {
+        plugin.IsEnabled = !plugin.IsEnabled;
+        OnPluginToggle.InvokeAsync(plugin);
+    }
+
+    private void ConfigurePlugin(PluginInfo plugin)
+    {
+        OnPluginConfigure.InvokeAsync(plugin);
+    }
+
+    private void UninstallPlugin(PluginInfo plugin)
+    {
+        OnPluginUninstall.InvokeAsync(plugin);
+    }
+
+    private void RefreshPlugins()
+    {
+        OnRefresh.InvokeAsync();
+    }
+
+    private void CheckForUpdates()
+    {
+        // TODO: Implement update checking
+        // For now, just clear any existing updates
+        updatesAvailable.Clear();
+    }
+
+    private void EnableSelected()
+    {
+        foreach (var plugin in filteredPlugins)
+        {
+            if (plugin.IsEnabled) continue;
+            plugin.IsEnabled = true;
+            OnPluginToggle.InvokeAsync(plugin);
+        }
+    }
+
+    private void DisableSelected()
+    {
+        foreach (var plugin in filteredPlugins)
+        {
+            if (!plugin.IsEnabled) continue;
+            plugin.IsEnabled = false;
+            OnPluginToggle.InvokeAsync(plugin);
+        }
+    }
+
+    private void UninstallSelected()
+    {
+        foreach (var plugin in filteredPlugins)
+        {
+            OnPluginUninstall.InvokeAsync(plugin);
+        }
+    }
+
+    private void UpdatePlugin(PluginUpdateInfo update)
+    {
+        // TODO: Implement update logic
+    }
+
+    private string GetPluginIcon(PluginInfo plugin)
+    {
+        return plugin.Category switch
+        {
+            "language" => "bi-translate",
+            "visualization" => "bi-diagram-3",
+            "export" => "bi-box-arrow-up-right",
+            "analysis" => "bi-graph-up",
+            "theme" => "bi-palette",
+            _ => "bi-puzzle"
+        };
+    }
+
+    private string GetStatusClass(PluginInfo plugin)
+    {
+        return plugin.IsEnabled ? "enabled" : "disabled";
+    }
+
+    private string GetStatusText(PluginInfo plugin)
+    {
+        return plugin.IsEnabled ? "Enabled" : "Disabled";
+    }
+
+    public class PluginUpdateInfo
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string CurrentVersion { get; set; } = string.Empty;
+        public string AvailableVersion { get; set; } = string.Empty;
+    }
+}

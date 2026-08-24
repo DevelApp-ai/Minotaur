@@ -1,0 +1,440 @@
+@* Plugin Gallery Component *@
+@* 
+ * Component for browsing and installing plugins.
+ * Shows available plugins from the Minotaur plugin repository.
+ * *@
+
+@using Microsoft.AspNetCore.Components
+@using Minotaur.Core.Models.Plugins
+
+<div class="plugin-gallery">
+    <div class="gallery-header">
+        <h5><i class="bi bi-puzzle"></i> Plugin Gallery</h5>
+        <div class="header-actions">
+            <div class="input-group input-group-sm" style="width: 200px;">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" 
+                       placeholder="Search plugins..." 
+                       @bind="searchText" 
+                       @bind:event="oninput">
+            </div>
+            <select class="form-select form-select-sm" @bind="selectedCategory" style="width: 150px;">
+                <option value="">All Categories</option>
+                <option value="language">Language Support</option>
+                <option value="visualization">Visualization</option>
+                <option value="export">Export</option>
+                <option value="analysis">Analysis</option>
+                <option value="theme">Theme</option>
+            </select>
+            <button class="btn btn-sm btn-primary" @onclick="RefreshGallery">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Categories Navigation -->
+    <div class="categories-nav">
+        <div class="nav-scroller">
+            <button class="btn btn-sm @(selectedCategory == "" ? "btn-primary" : "btn-outline-secondary")" 
+                    @onclick="() => selectedCategory = """>
+                All
+            </button>
+            <button class="btn btn-sm @(selectedCategory == "language" ? "btn-primary" : "btn-outline-secondary")" 
+                    @onclick="() => selectedCategory = "language"">
+                <i class="bi bi-translate"></i> Language
+            </button>
+            <button class="btn btn-sm @(selectedCategory == "visualization" ? "btn-primary" : "btn-outline-secondary")" 
+                    @onclick="() => selectedCategory = "visualization"">
+                <i class="bi bi-diagram-3"></i> Visualization
+            </button>
+            <button class="btn btn-sm @(selectedCategory == "export" ? "btn-primary" : "btn-outline-secondary")" 
+                    @onclick="() => selectedCategory = "export"">
+                <i class="bi bi-box-arrow-up-right"></i> Export
+            </button>
+            <button class="btn btn-sm @(selectedCategory == "analysis" ? "btn-primary" : "btn-outline-secondary")" 
+                    @onclick="() => selectedCategory = "analysis"">
+                <i class="bi bi-graph-up"></i> Analysis
+            </button>
+            <button class="btn btn-sm @(selectedCategory == "theme" ? "btn-primary" : "btn-outline-secondary")" 
+                    @onclick="() => selectedCategory = "theme"">
+                <i class="bi bi-palette"></i> Theme
+            </button>
+        </div>
+    </div>
+
+    <!-- Plugin Cards -->
+    <div class="plugin-cards">
+        @if (filteredPlugins.Count == 0)
+        {
+            <div class="empty-state">
+                <i class="bi bi-puzzle fs-1"></i>
+                <p>No plugins found</p>
+                <small>Try adjusting your search criteria or refresh the gallery</small>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                @foreach (var plugin in filteredPlugins)
+                {
+                    <div class="col">
+                        <div class="card plugin-card h-100">
+                            <div class="card-header">
+                                <div class="plugin-icon">
+                                    <i class="bi @GetPluginIcon(plugin)"></i>
+                                </div>
+                                <div class="plugin-info">
+                                    <h6 class="plugin-name">@plugin.Name</h6>
+                                    <span class="plugin-version">v@plugin.Version</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">@plugin.Description</p>
+                                <div class="plugin-meta">
+                                    <span class="meta-item">
+                                        <i class="bi bi-person"></i> @plugin.Author
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="bi bi-download"></i> @plugin.Downloads
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="bi bi-star"></i> @plugin.Rating
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="plugin-tags">
+                                    @foreach (var tag in plugin.Tags)
+                                    {
+                                        <span class="badge bg-secondary">@tag</span>
+                                    }
+                                </div>
+                                <div class="plugin-actions">
+                                    @if (IsInstalled(plugin))
+                                    {
+                                        <button class="btn btn-sm btn-success" disabled>
+                                            <i class="bi bi-check"></i> Installed
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => ViewDetails(plugin)">
+                                            <i class="bi bi-info-circle"></i>
+                                        </button>
+                                    }
+                                    else if (IsInstalling(plugin))
+                                    {
+                                        <button class="btn btn-sm btn-primary" disabled>
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Installing...
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-primary" @onclick="() => InstallPlugin(plugin)">
+                                            <i class="bi bi-plus"></i> Install
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => ViewDetails(plugin)">
+                                            <i class="bi bi-info-circle"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (filteredPlugins.Count > 0)
+    {
+        <div class="gallery-pagination">
+            <nav aria-label="Plugin gallery pagination">
+                <ul class="pagination pagination-sm justify-content-center">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => PreviousPage()">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                    </li>
+                    @for (int i = 1; i <= TotalPages; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <button class="page-link" @onclick="() => GoToPage(i)">
+                                @i
+                            </button>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == TotalPages ? "disabled" : "")">
+                        <button class="page-link" @onclick="() => NextPage()">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+<style>
+.plugin-gallery {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.gallery-header h5 {
+    margin: 0;
+    color: #495057;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.categories-nav {
+    padding: 0.75rem 1rem;
+    background: white;
+    border-bottom: 1px solid #dee2e6;
+    overflow-x: auto;
+}
+
+.nav-scroller {
+    display: flex;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.plugin-cards {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6c757d;
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-state i {
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.plugin-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.plugin-card:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.plugin-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e3f2fd;
+    border-radius: 0.375rem;
+    color: #1976d2;
+    font-size: 1.25rem;
+}
+
+.plugin-info {
+    flex: 1;
+}
+
+.plugin-name {
+    margin: 0;
+    font-size: 1rem;
+    color: #495057;
+}
+
+.plugin-version {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.card-body {
+    padding: 0.75rem;
+    background: white;
+}
+
+.card-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.plugin-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.plugin-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.plugin-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.gallery-pagination {
+    padding: 0.75rem;
+    background: white;
+    border-top: 1px solid #dee2e6;
+}
+</style>
+
+@code {
+    [Parameter]
+    public List<PluginInfo> AvailablePlugins { get; set; } = new();
+
+    [Parameter]
+    public List<PluginInfo> InstalledPlugins { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<PluginInfo> OnPluginInstall { get; set; }
+
+    [Parameter]
+    public EventCallback<PluginInfo> OnPluginDetails { get; set; }
+
+    private string searchText = string.Empty;
+    private string selectedCategory = string.Empty;
+    private int currentPage = 1;
+    private const int ItemsPerPage = 12;
+    private HashSet<string> installingPlugins = new();
+
+    private List<PluginInfo> filteredPlugins =>
+        AvailablePlugins
+        .Where(p => string.IsNullOrWhiteSpace(searchText) || 
+                   p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                   p.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                   p.Author.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+        .Where(p => string.IsNullOrEmpty(selectedCategory) || p.Category == selectedCategory)
+        .ToList();
+
+    private int TotalPages => (int)Math.Ceiling(filteredPlugins.Count / (double)ItemsPerPage);
+
+    private List<PluginInfo> PagedPlugins =>
+        filteredPlugins
+        .Skip((currentPage - 1) * ItemsPerPage)
+        .Take(ItemsPerPage)
+        .ToList();
+
+    private bool IsInstalled(PluginInfo plugin)
+    {
+        return InstalledPlugins.Any(p => p.Id == plugin.Id);
+    }
+
+    private bool IsInstalling(PluginInfo plugin)
+    {
+        return installingPlugins.Contains(plugin.Id);
+    }
+
+    private void InstallPlugin(PluginInfo plugin)
+    {
+        installingPlugins.Add(plugin.Id);
+        OnPluginInstall.InvokeAsync(plugin);
+    }
+
+    private void ViewDetails(PluginInfo plugin)
+    {
+        OnPluginDetails.InvokeAsync(plugin);
+    }
+
+    private void RefreshGallery()
+    {
+        // TODO: Implement refresh logic
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+        }
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < TotalPages)
+        {
+            currentPage++;
+        }
+    }
+
+    private void GoToPage(int page)
+    {
+        currentPage = page;
+    }
+
+    private string GetPluginIcon(PluginInfo plugin)
+    {
+        return plugin.Category switch
+        {
+            "language" => "bi-translate",
+            "visualization" => "bi-diagram-3",
+            "export" => "bi-box-arrow-up-right",
+            "analysis" => "bi-graph-up",
+            "theme" => "bi-palette",
+            _ => "bi-puzzle"
+        };
+    }
+}

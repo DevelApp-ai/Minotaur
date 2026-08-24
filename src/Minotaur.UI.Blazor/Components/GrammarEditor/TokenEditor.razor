@@ -1,0 +1,419 @@
+@* Token Editor Component *@
+@* 
+ * Component for editing grammar tokens.
+ * Allows users to define, modify, and manage tokens for language grammars.
+ * *@
+
+@using Microsoft.AspNetCore.Components
+@using Minotaur.Core.Models.Grammar
+
+<div class="token-editor">
+    <div class="editor-header">
+        <h5><i class="bi bi-fonts"></i> Token Editor</h5>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-secondary" @onclick="AddToken">
+                <i class="bi bi-plus"></i> Add Token
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="ImportTokens">
+                <i class="bi bi-upload"></i> Import
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="ExportTokens">
+                <i class="bi bi-download"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Token Search/Filter -->
+    <div class="token-search">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" 
+                   placeholder="Search tokens..." 
+                   @bind="searchText" 
+                   @bind:event="oninput">
+        </div>
+    </div>
+
+    <!-- Token List -->
+    <div class="token-list">
+        @if (filteredTokens.Count == 0)
+        {
+            <div class="empty-state">
+                <i class="bi bi-fonts fs-1"></i>
+                <p>No tokens defined</p>
+                <small>Add tokens to define the lexemes of your language</small>
+            </div>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var token in filteredTokens)
+                {
+                    <div class="list-group-item token-item @(selectedToken?.Id == token.Id ? "active" : "")" 
+                         @onclick="() => SelectToken(token)">
+                        <div class="token-header">
+                            <span class="token-name">@token.Name</span>
+                            @if (token.IsTerminal)
+                            {
+                                <span class="badge bg-primary">Terminal</span>
+                            }
+                            @if (token.IsSkippable)
+                            {
+                                <span class="badge bg-warning text-dark">Skippable</span>
+                            }
+                        </div>
+                        <div class="token-preview">
+                            <code>@token.Pattern</code>
+                            <small class="text-muted">@token.Description</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Token Editor Panel -->
+    @if (selectedToken != null)
+    {
+        <div class="token-editor-panel">
+            <div class="panel-header">
+                <h6>Edit Token: @selectedToken.Name</h6>
+                <button class="btn btn-sm btn-outline-danger" @onclick="DeleteToken">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" 
+                           @bind="selectedToken.Name" 
+                           @bind:event="oninput">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Pattern (Regex)</label>
+                    <input type="text" class="form-control" 
+                           placeholder="e.g., [a-zA-Z_][a-zA-Z0-9_]*" 
+                           @bind="selectedToken.Pattern" 
+                           @bind:event="oninput">
+                    <div class="form-text">Regular expression pattern for matching this token</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" rows="2" 
+                              @bind="selectedToken.Description" 
+                              @bind:event="oninput"></textarea>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   @bind="selectedToken.IsTerminal" 
+                                   id="isTerminal">
+                            <label class="form-check-label" for="isTerminal">
+                                Is Terminal
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   @bind="selectedToken.IsSkippable" 
+                                   id="isSkippable">
+                            <label class="form-check-label" for="isSkippable">
+                                Is Skippable
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Priority</label>
+                    <input type="number" class="form-control" 
+                           @bind="selectedToken.Priority" 
+                           @bind:event="oninput">
+                    <div class="form-text">Higher priority tokens are matched first</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" @bind="selectedToken.Category">
+                        <option value="">None</option>
+                        <option value="keyword">Keyword</option>
+                        <option value="identifier">Identifier</option>
+                        <option value="literal">Literal</option>
+                        <option value="operator">Operator</option>
+                        <option value="punctuation">Punctuation</option>
+                        <option value="whitespace">Whitespace</option>
+                        <option value="comment">Comment</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Color</label>
+                    <div class="input-group">
+                        <input type="color" class="form-control form-control-color" 
+                               @bind="selectedToken.Color" 
+                               @bind:event="oninput">
+                        <span class="input-group-text">@selectedToken.Color</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <button class="btn btn-primary btn-sm" @onclick="SaveToken">
+                    <i class="bi bi-check"></i> Save
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="CancelEdit">
+                    <i class="bi bi-x"></i> Cancel
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.token-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.token-search {
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.token-list {
+    flex: 1;
+    overflow-y: auto;
+    background: white;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6c757d;
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-state i {
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.token-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.token-item:hover {
+    background-color: #f8f9fa;
+}
+
+.token-item.active {
+    background-color: #e3f2fd;
+    border-left: 3px solid #2196f3;
+}
+
+.token-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.token-name {
+    font-weight: 500;
+    color: #495057;
+}
+
+.token-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.token-preview code {
+    font-size: 0.875rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+}
+
+.token-editor-panel {
+    border-top: 1px solid #dee2e6;
+    background: white;
+    padding: 1rem;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.panel-header h6 {
+    margin: 0;
+    color: #495057;
+}
+
+.panel-body {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.panel-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+</style>
+
+@code {
+    [Parameter]
+    public List<TokenDefinition> Tokens { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<List<TokenDefinition>> TokensChanged { get; set; }
+
+    [Parameter]
+    public TokenDefinition? SelectedToken { get; set; }
+
+    [Parameter]
+    public EventCallback<TokenDefinition?> SelectedTokenChanged { get; set; }
+
+    private string searchText = string.Empty;
+    private TokenDefinition? editingToken;
+    private TokenDefinition? originalToken;
+
+    private List<TokenDefinition> filteredTokens =>
+        string.IsNullOrWhiteSpace(searchText)
+            ? Tokens
+            : Tokens.Where(t => 
+                t.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                t.Pattern.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                t.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+              .ToList();
+
+    private void SelectToken(TokenDefinition token)
+    {
+        SelectedToken = token;
+        SelectedTokenChanged.InvokeAsync(token);
+    }
+
+    private void AddToken()
+    {
+        var newToken = new TokenDefinition
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "NewToken",
+            Pattern = "",
+            Description = "",
+            Priority = 100,
+            Color = "#000000"
+        };
+        
+        Tokens.Add(newToken);
+        SelectToken(newToken);
+        TokensChanged.InvokeAsync(Tokens);
+    }
+
+    private void DeleteToken()
+    {
+        if (SelectedToken == null) return;
+        
+        Tokens.Remove(SelectedToken);
+        SelectedToken = null;
+        SelectedTokenChanged.InvokeAsync(null);
+        TokensChanged.InvokeAsync(Tokens);
+    }
+
+    private void SaveToken()
+    {
+        if (SelectedToken == null) return;
+        
+        TokensChanged.InvokeAsync(Tokens);
+    }
+
+    private void CancelEdit()
+    {
+        if (originalToken != null && SelectedToken != null)
+        {
+            // Restore original values
+            SelectedToken.Name = originalToken.Name;
+            SelectedToken.Pattern = originalToken.Pattern;
+            SelectedToken.Description = originalToken.Description;
+            SelectedToken.IsTerminal = originalToken.IsTerminal;
+            SelectedToken.IsSkippable = originalToken.IsSkippable;
+            SelectedToken.Priority = originalToken.Priority;
+            SelectedToken.Category = originalToken.Category;
+            SelectedToken.Color = originalToken.Color;
+        }
+        
+        SelectedToken = null;
+        SelectedTokenChanged.InvokeAsync(null);
+    }
+
+    private void ImportTokens()
+    {
+        // TODO: Implement import functionality
+    }
+
+    private void ExportTokens()
+    {
+        // TODO: Implement export functionality
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+        if (SelectedToken != null && originalToken == null)
+        {
+            // Save original values for cancel
+            originalToken = new TokenDefinition
+            {
+                Id = SelectedToken.Id,
+                Name = SelectedToken.Name,
+                Pattern = SelectedToken.Pattern,
+                Description = SelectedToken.Description,
+                IsTerminal = SelectedToken.IsTerminal,
+                IsSkippable = SelectedToken.IsSkippable,
+                Priority = SelectedToken.Priority,
+                Category = SelectedToken.Category,
+                Color = SelectedToken.Color
+            };
+        }
+    }
+}
