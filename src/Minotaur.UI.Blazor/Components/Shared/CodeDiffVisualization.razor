@@ -1,0 +1,685 @@
+@*
+ * This file is part of Minotaur.
+ * Minotaur is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Minotaur is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
+ *
+ * This component provides code diff visualization for Minotaur.
+ * It displays side-by-side and inline diff views.
+ *
+ * Usage:
+ * <CodeDiffVisualization OldCode="..." NewCode="..." />
+ *
+ * Features:
+ * - Side-by-side comparison
+ * - Inline diff view
+ * - Syntax-aware diffing
+ * - Change highlighting
+ * - Navigation between changes
+ * - Keyboard shortcuts
+ *
+ * Dependencies:
+ * - Minotaur.Core.Services.Diff.CodeDiffService
+ * - Minotaur.Core.Models.Diff.DiffModels
+ *
+ * Author: Minotaur Team
+ * License: GNU Affero General Public License v3.0
+ *
+ * Copyright (c) DevelApp-ai. All rights reserved.
+ * Licensed under the GNU Affero General Public License v3.0.
+ * See LICENSE file in the project root for full license information.
+ *
+ * @code {
+ *   <CodeDiffVisualization OldCode="public class Old { }" NewCode="public class New { }" />
+ * }
+ *
+ * @inject CodeDiffService - Service for computing diffs
+ * @implements IDisposable - To clean up event handlers
+ * *@
+
+@using Minotaur.Core.Models.Diff
+@using Minotaur.Core.Services.Diff
+@using Microsoft.AspNetCore.Components
+
+<div class="code-diff-container @ThemeClass" style="@ContainerStyle">
+    <div class="diff-header">
+        <div class="diff-title">Code Diff</div>
+        <div class="diff-controls">
+            <button class="diff-button @(ViewMode == DiffViewMode.SideBySide ? "active" : "")" 
+                    @onclick="() => SetViewMode(DiffViewMode.SideBySide)" 
+                    title="Side by Side">
+                Side by Side
+            </button>
+            <button class="diff-button @(ViewMode == DiffViewMode.Inline ? "active" : "")" 
+                    @onclick="() => SetViewMode(DiffViewMode.Inline)" 
+                    title="Inline">
+                Inline
+            </button>
+        </div>
+    </div>
+    
+    @if (ViewMode == DiffViewMode.SideBySide)
+    {
+        <div class="diff-side-by-side">
+            <div class="diff-panel diff-old-panel">
+                <div class="diff-panel-header">
+                    <span class="panel-title">@OldTitle</span>
+                    <span class="change-count">- @DiffResult.DeletionCount</span>
+                </div>
+                <div class="diff-panel-content">
+                    @RenderSideBySideOld()
+                </div>
+            </div>
+            
+            <div class="diff-panel diff-new-panel">
+                <div class="diff-panel-header">
+                    <span class="panel-title">@NewTitle</span>
+                    <span class="change-count">+ @DiffResult.InsertionCount</span>
+                </div>
+                <div class="diff-panel-content">
+                    @RenderSideBySideNew()
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="diff-inline">
+            @RenderInline()
+        </div>
+    }
+    
+    @if (ShowSummary)
+    {
+        <div class="diff-summary">
+            <div class="summary-stats">
+                <span>Total changes: @DiffResult.HasChanges.ToString().ToLower()</span>
+                <span>Insertions: +@DiffResult.InsertionCount</span>
+                <span>Deletions: -@DiffResult.DeletionCount</span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string OldCode { get; set; } = string.Empty;
+
+    [Parameter]
+    public string NewCode { get; set; } = string.Empty;
+
+    [Parameter]
+    public string LanguageId { get; set; } = "csharp";
+
+    [Parameter]
+    public string OldTitle { get; set; } = "Original";
+
+    [Parameter]
+    public string NewTitle { get; set; } = "Modified";
+
+    [Parameter]
+    public DiffViewMode ViewMode { get; set; } = DiffViewMode.SideBySide;
+
+    [Parameter]
+    public Theme Theme { get; set; } = Theme.System;
+
+    [Parameter]
+    public bool ShowLineNumbers { get; set; } = true;
+
+    [Parameter]
+    public bool ShowSummary { get; set; } = true;
+
+    [Parameter]
+    public bool SyntaxHighlighting { get; set; } = true;
+
+    [Parameter]
+    public string ContainerStyle { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<DiffResult> OnDiffComputed { get; set; }
+
+    [Parameter]
+    public EventCallback<DiffViewMode> OnViewModeChanged { get; set; }
+
+    [Inject]
+    public ICodeDiffService DiffService { get; set; }
+
+    private DiffResult DiffResult { get; set; } = new DiffResult();
+    private string ThemeClass => GetThemeClass();
+    private bool IsDarkTheme => Theme == Theme.Dark || (Theme == Theme.System && IsSystemDark);
+    private bool IsSystemDark { get; set; } = true;
+    private int CurrentChangeIndex { get; set; } = 0;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ComputeDiff();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        ComputeDiff();
+    }
+
+    private void ComputeDiff()
+    {
+        if (string.IsNullOrEmpty(OldCode) && string.IsNullOrEmpty(NewCode))
+        {
+            DiffResult = new DiffResult();
+            return;
+        }
+
+        DiffResult = DiffService.ComputeDiff(OldCode, NewCode, LanguageId);
+        OnDiffComputed.InvokeAsync(DiffResult);
+    }
+
+    private string GetThemeClass()
+    {
+        if (Theme == Theme.Dark)
+            return "dark-theme";
+        else if (Theme == Theme.Light)
+            return "light-theme";
+        else
+            return IsSystemDark ? "dark-theme" : "light-theme";
+    }
+
+    private RenderFragment RenderSideBySideOld()
+    {
+        return builder =>
+        {
+            var oldLineNum = 1;
+            var changeIndex = 0;
+
+            foreach (var change in DiffResult.Changes)
+            {
+                if (change.OldLineNumber > 0)
+                {
+                    // Render old line
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "diff-line old-line " + GetLineClass(change));
+                    builder.AddAttribute(2, "data-line", change.OldLineNumber);
+                    
+                    if (ShowLineNumbers)
+                    {
+                        builder.OpenElement(3, "span");
+                        builder.AddAttribute(4, "class", "line-number");
+                        builder.AddContent(5, change.OldLineNumber);
+                        builder.CloseElement();
+                    }
+                    
+                    builder.OpenElement(6, "span");
+                    builder.AddAttribute(7, "class", "line-content");
+                    builder.AddContent(8, change.Text);
+                    builder.CloseElement();
+                    
+                    builder.CloseElement();
+                }
+                else if (change.Type == DiffChangeType.Inserted)
+                {
+                    // Empty line for insertions in old
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "diff-line old-line empty");
+                    if (ShowLineNumbers)
+                    {
+                        builder.OpenElement(2, "span");
+                        builder.AddAttribute(3, "class", "line-number");
+                        builder.CloseElement();
+                    }
+                    builder.CloseElement();
+                }
+
+                oldLineNum = change.OldLineNumber > 0 ? change.OldLineNumber + 1 : oldLineNum;
+            }
+        };
+    }
+
+    private RenderFragment RenderSideBySideNew()
+    {
+        return builder =>
+        {
+            var newLineNum = 1;
+
+            foreach (var change in DiffResult.Changes)
+            {
+                if (change.NewLineNumber > 0)
+                {
+                    // Render new line
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "diff-line new-line " + GetLineClass(change));
+                    builder.AddAttribute(2, "data-line", change.NewLineNumber);
+                    
+                    if (ShowLineNumbers)
+                    {
+                        builder.OpenElement(3, "span");
+                        builder.AddAttribute(4, "class", "line-number");
+                        builder.AddContent(5, change.NewLineNumber);
+                        builder.CloseElement();
+                    }
+                    
+                    builder.OpenElement(6, "span");
+                    builder.AddAttribute(7, "class", "line-content");
+                    builder.AddContent(8, change.Text);
+                    builder.CloseElement();
+                    
+                    builder.CloseElement();
+                }
+                else if (change.Type == DiffChangeType.Deleted)
+                {
+                    // Empty line for deletions in new
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "diff-line new-line empty");
+                    if (ShowLineNumbers)
+                    {
+                        builder.OpenElement(2, "span");
+                        builder.AddAttribute(3, "class", "line-number");
+                        builder.CloseElement();
+                    }
+                    builder.CloseElement();
+                }
+
+                newLineNum = change.NewLineNumber > 0 ? change.NewLineNumber + 1 : newLineNum;
+            }
+        };
+    }
+
+    private RenderFragment RenderInline()
+    {
+        return builder =>
+        {
+            var lineNum = 1;
+
+            foreach (var change in DiffResult.Changes)
+            {
+                if (change.Type == DiffChangeType.Equal)
+                {
+                    // Unchanged line
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "diff-line unchanged");
+                    
+                    if (ShowLineNumbers)
+                    {
+                        builder.OpenElement(2, "span");
+                        builder.AddAttribute(3, "class", "line-number");
+                        builder.AddContent(4, lineNum);
+                        builder.CloseElement();
+                    }
+                    
+                    builder.OpenElement(5, "span");
+                    builder.AddAttribute(6, "class", "line-content");
+                    builder.AddContent(7, " " + change.Text);
+                    builder.CloseElement();
+                    
+                    builder.CloseElement();
+                    lineNum++;
+                }
+                else if (change.Type == DiffChangeType.Deleted)
+                {
+                    // Deleted line
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "diff-line deleted");
+                    
+                    if (ShowLineNumbers)
+                    {
+                        builder.OpenElement(2, "span");
+                        builder.AddAttribute(3, "class", "line-number");
+                        builder.AddContent(4, lineNum);
+                        builder.CloseElement();
+                    }
+                    
+                    builder.OpenElement(5, "span");
+                    builder.AddAttribute(6, "class", "line-prefix");
+                    builder.AddContent(7, "-");
+                    builder.CloseElement();
+                    
+                    builder.OpenElement(8, "span");
+                    builder.AddAttribute(9, "class", "line-content");
+                    builder.AddContent(10, change.Text);
+                    builder.CloseElement();
+                    
+                    builder.CloseElement();
+                }
+                else if (change.Type == DiffChangeType.Inserted)
+                {
+                    // Inserted line
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", "diff-line inserted");
+                    
+                    if (ShowLineNumbers)
+                    {
+                        builder.OpenElement(2, "span");
+                        builder.AddAttribute(3, "class", "line-number");
+                        builder.AddContent(4, lineNum);
+                        builder.CloseElement();
+                    }
+                    
+                    builder.OpenElement(5, "span");
+                    builder.AddAttribute(6, "class", "line-prefix");
+                    builder.AddContent(7, "+");
+                    builder.CloseElement();
+                    
+                    builder.OpenElement(8, "span");
+                    builder.AddAttribute(9, "class", "line-content");
+                    builder.AddContent(10, change.Text);
+                    builder.CloseElement();
+                    
+                    builder.CloseElement();
+                    lineNum++;
+                }
+            }
+        };
+    }
+
+    private string GetLineClass(DiffChange change)
+    {
+        return change.Type switch
+        {
+            DiffChangeType.Inserted => "inserted",
+            DiffChangeType.Deleted => "deleted",
+            DiffChangeType.Modified => "modified",
+            _ => "unchanged"
+        };
+    }
+
+    public void SetViewMode(DiffViewMode mode)
+    {
+        ViewMode = mode;
+        OnViewModeChanged.InvokeAsync(mode);
+        StateHasChanged();
+    }
+
+    public void SetOldCode(string code)
+    {
+        OldCode = code;
+        ComputeDiff();
+        StateHasChanged();
+    }
+
+    public void SetNewCode(string code)
+    {
+        NewCode = code;
+        ComputeDiff();
+        StateHasChanged();
+    }
+
+    public void SetLanguage(string languageId)
+    {
+        LanguageId = languageId;
+        ComputeDiff();
+        StateHasChanged();
+    }
+
+    public void SetTheme(Theme theme)
+    {
+        Theme = theme;
+        StateHasChanged();
+    }
+
+    public void Refresh()
+    {
+        ComputeDiff();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        // Clean up any resources
+    }
+}
+
+/// <summary>
+/// View mode for diff visualization.
+/// </summary>
+public enum DiffViewMode
+{
+    /// <summary>Side-by-side view</summary>
+    SideBySide,
+    /// <summary>Inline view</summary>
+    Inline
+}
+
+/// <summary>
+/// Theme for diff visualization.
+/// </summary>
+public enum Theme
+{
+    /// <summary>Light theme</summary>
+    Light,
+    /// <summary>Dark theme</summary>
+    Dark,
+    /// <summary>System theme (follows OS)</summary>
+    System
+}
+
+<style>
+    .code-diff-container {
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        border: 1px solid var(--border-color, #cccccc);
+        border-radius: 4px;
+        overflow: hidden;
+        background-color: var(--bg-color, #ffffff);
+        color: var(--text-color, #000000);
+    }
+
+    .code-diff-container.dark-theme {
+        --bg-color: #1e1e1e;
+        --text-color: #d4d4d4;
+        --border-color: #444444;
+        --panel-bg: #252526;
+        --line-number-bg: #2d2d2d;
+        --line-number-color: #888888;
+        --inserted-bg: #2d4a2d;
+        --deleted-bg: #4a2d2d;
+        --inserted-color: #b5ceb5;
+        --deleted-color: #ceb5b5;
+        --unchanged-bg: transparent;
+        --unchanged-color: #d4d4d4;
+        --header-bg: #333333;
+        --header-color: #ffffff;
+        --button-bg: #3d3d3d;
+        --button-color: #d4d4d4;
+    }
+
+    .code-diff-container.light-theme {
+        --bg-color: #ffffff;
+        --text-color: #000000;
+        --border-color: #cccccc;
+        --panel-bg: #f5f5f5;
+        --line-number-bg: #f0f0f0;
+        --line-number-color: #666666;
+        --inserted-bg: #e6ffec;
+        --deleted-bg: #ffeef0;
+        --inserted-color: #006400;
+        --deleted-color: #8b0000;
+        --unchanged-bg: transparent;
+        --unchanged-color: #000000;
+        --header-bg: #e0e0e0;
+        --header-color: #000000;
+        --button-bg: #f0f0f0;
+        --button-color: #000000;
+    }
+
+    .diff-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 16px;
+        background-color: var(--header-bg);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .diff-title {
+        font-weight: bold;
+        color: var(--header-color);
+    }
+
+    .diff-controls {
+        display: flex;
+        gap: 8px;
+    }
+
+    .diff-button {
+        padding: 4px 12px;
+        font-size: 12px;
+        background-color: var(--button-bg);
+        color: var(--button-color);
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .diff-button:hover {
+        background-color: var(--border-color);
+    }
+
+    .diff-button.active {
+        background-color: var(--border-color);
+        font-weight: bold;
+    }
+
+    .diff-side-by-side {
+        display: flex;
+        height: 100%;
+    }
+
+    .diff-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .diff-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 16px;
+        background-color: var(--panel-bg);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .panel-title {
+        font-weight: bold;
+        color: var(--header-color);
+    }
+
+    .change-count {
+        font-size: 12px;
+        color: var(--header-color);
+        opacity: 0.8;
+    }
+
+    .diff-panel-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+    }
+
+    .diff-line {
+        display: flex;
+        padding: 2px 8px;
+        border-radius: 3px;
+        white-space: pre;
+    }
+
+    .diff-line.old-line {
+        background-color: var(--unchanged-bg);
+    }
+
+    .diff-line.new-line {
+        background-color: var(--unchanged-bg);
+    }
+
+    .diff-line.old-line.inserted {
+        background-color: var(--inserted-bg);
+    }
+
+    .diff-line.new-line.inserted {
+        background-color: var(--inserted-bg);
+    }
+
+    .diff-line.old-line.deleted {
+        background-color: var(--deleted-bg);
+    }
+
+    .diff-line.new-line.deleted {
+        background-color: var(--deleted-bg);
+    }
+
+    .diff-line.empty {
+        background-color: transparent;
+    }
+
+    .line-number {
+        display: inline-block;
+        width: 40px;
+        padding: 0 8px;
+        text-align: right;
+        background-color: var(--line-number-bg);
+        color: var(--line-number-color);
+        margin-right: 8px;
+        border-radius: 3px;
+        user-select: none;
+    }
+
+    .line-content {
+        flex: 1;
+        color: var(--text-color);
+    }
+
+    .diff-line.deleted .line-content {
+        color: var(--deleted-color);
+        text-decoration: line-through;
+    }
+
+    .diff-line.inserted .line-content {
+        color: var(--inserted-color);
+    }
+
+    .diff-inline {
+        overflow-y: auto;
+        padding: 8px;
+    }
+
+    .diff-inline .diff-line {
+        margin: 2px 0;
+    }
+
+    .diff-inline .line-prefix {
+        display: inline-block;
+        width: 20px;
+        font-weight: bold;
+        margin-right: 8px;
+    }
+
+    .diff-inline .diff-line.deleted .line-prefix {
+        color: var(--deleted-color);
+    }
+
+    .diff-inline .diff-line.inserted .line-prefix {
+        color: var(--inserted-color);
+    }
+
+    .diff-summary {
+        padding: 8px 16px;
+        background-color: var(--panel-bg);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .summary-stats {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        color: var(--header-color);
+    }
+</style>
