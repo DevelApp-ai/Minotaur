@@ -318,7 +318,7 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "text_block",
-            GenerationTemplate = """{content}"""\n",
+            GenerationTemplate = "\"\"\"{content}\"\"\"\\n",
             GenerationHints = new Dictionary<string, object> { ["MinJavaVersion"] = 15 }
         });
 
