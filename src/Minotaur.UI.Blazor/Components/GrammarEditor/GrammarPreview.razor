@@ -1,0 +1,524 @@
+@* Grammar Preview Component *@
+@* 
+ * Component for previewing grammar definitions.
+ * Shows a summary of tokens, rules, and provides quick navigation.
+ * *@
+
+@using Microsoft.AspNetCore.Components
+@using Minotaur.Core.Models.Grammar
+
+<div class="grammar-preview">
+    <div class="preview-header">
+        <h5><i class="bi bi-file-earmark-text"></i> Grammar Preview</h5>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-primary" @onclick="RefreshPreview">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Grammar Info -->
+    <div class="grammar-info">
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="card-icon bg-primary">
+                    <i class="bi bi-fonts"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-value">@Grammar?.Tokens.Count</div>
+                    <div class="card-label">Tokens</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="card-icon bg-success">
+                    <i class="bi bi-diagram-2"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-value">@Grammar?.Rules.Count</div>
+                    <div class="card-label">Rules</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="card-icon bg-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-value">@GetAmbiguousRulesCount()</div>
+                    <div class="card-label">Ambiguous</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="card-icon bg-info">
+                    <i class="bi bi-percent"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-value">@GetCoveragePercentage()%</div>
+                    <div class="card-label">Coverage</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grammar Summary -->
+    <div class="grammar-summary">
+        <div class="summary-section">
+            <h6><i class="bi bi-info-circle"></i> Grammar Information</h6>
+            <div class="summary-content">
+                <div class="summary-item">
+                    <span class="item-label">Name:</span>
+                    <span class="item-value">@Grammar?.Name</span>
+                </div>
+                <div class="summary-item">
+                    <span class="item-label">Description:</span>
+                    <span class="item-value">@Grammar?.Description</span>
+                </div>
+                <div class="summary-item">
+                    <span class="item-label">Version:</span>
+                    <span class="item-value">@Grammar?.Version</span>
+                </div>
+                <div class="summary-item">
+                    <span class="item-label">Language:</span>
+                    <span class="item-value">@Grammar?.Language</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <h6><i class="bi bi-diagram-3"></i> Structure</h6>
+            <div class="summary-content">
+                <div class="structure-chart">
+                    <div class="chart-bar" style="--width: @GetTerminalPercentage()%; --color: #0d6efd;">
+                        <span>Terminals: @GetTerminalCount()</span>
+                    </div>
+                    <div class="chart-bar" style="--width: @GetNonTerminalPercentage()%; --color: #6c757d;">
+                        <span>Non-Terminals: @GetNonTerminalCount()</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="quick-nav">
+        <h6><i class="bi bi-compass"></i> Quick Navigation</h6>
+        <div class="nav-tabs">
+            <ul class="nav nav-tabs nav-tabs-sm">
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == "tokens" ? "active" : "")" 
+                            @onclick="() => SetActiveTab("tokens")">
+                        Tokens
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == "rules" ? "active" : "")" 
+                            @onclick="() => SetActiveTab("rules")">
+                        Rules
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == "ambiguous" ? "active" : "")" 
+                            @onclick="() => SetActiveTab("ambiguous")">
+                        Ambiguous
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="nav-content">
+            @if (activeTab == "tokens")
+            {
+                <div class="token-quick-list">
+                    @foreach (var token in Grammar?.Tokens.OrderBy(t => t.Name) ?? new List<TokenDefinition>())
+                    {
+                        <div class="token-quick-item" @onclick="() => NavigateToToken(token)">
+                            <span class="token-symbol" style="color: @token.Color;">@GetTokenSymbol(token)</span>
+                            <span class="token-name">@token.Name</span>
+                            <span class="token-count">@token.Pattern.Length</span>
+                        </div>
+                    }
+                </div>
+            }
+            else if (activeTab == "rules")
+            {
+                <div class="rule-quick-list">
+                    @foreach (var rule in Grammar?.Rules.OrderBy(r => r.Name) ?? new List<RuleDefinition>())
+                    {
+                        <div class="rule-quick-item" @onclick="() => NavigateToRule(rule)">
+                            <span class="rule-name">@rule.Name</span>
+                            <span class="rule-type">@rule.Category</span>
+                        </div>
+                    }
+                </div>
+            }
+            else if (activeTab == "ambiguous")
+            {
+                <div class="ambiguous-list">
+                    @foreach (var rule in GetAmbiguousRules())
+                    {
+                        <div class="ambiguous-item" @onclick="() => NavigateToRule(rule)">
+                            <span class="ambiguous-icon"><i class="bi bi-exclamation-triangle-fill text-warning"></i></span>
+                            <span class="ambiguous-name">@rule.Name</span>
+                            <span class="ambiguous-count">@rule.Pattern.Count(c => c == '|') + 1 alternatives</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Validation Results -->
+    @if (validationResults.Count > 0)
+    {
+        <div class="validation-results">
+            <h6><i class="bi bi-exclamation-circle"></i> Validation Results (@validationResults.Count)</h6>
+            <div class="results-list">
+                @foreach (var result in validationResults)
+                {
+                    <div class="result-item @GetResultSeverity(result)">
+                        <span class="result-icon">@GetResultIcon(result)</span>
+                        <span class="result-message">@result.Message</span>
+                        <span class="result-location">@result.Location</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.grammar-preview {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.grammar-info {
+    padding: 1rem;
+    background: white;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    color: white;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.card-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.grammar-summary {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.summary-section {
+    margin-bottom: 1rem;
+}
+
+.summary-section h6 {
+    margin-bottom: 0.5rem;
+    color: #495057;
+    font-size: 0.875rem;
+}
+
+.summary-content {
+    padding-left: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.item-label {
+    color: #6c757d;
+    min-width: 80px;
+}
+
+.item-value {
+    color: #495057;
+}
+
+.structure-chart {
+    margin-top: 0.5rem;
+}
+
+.chart-bar {
+    height: 20px;
+    background: var(--color);
+    color: white;
+    padding: 0 0.5rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.25rem;
+    width: var(--width);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.quick-nav {
+    flex: 1;
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #dee2e6;
+    overflow-y: auto;
+}
+
+.quick-nav h6 {
+    margin-bottom: 0.75rem;
+    color: #495057;
+    font-size: 0.875rem;
+}
+
+.nav-tabs {
+    margin-bottom: 0.75rem;
+}
+
+.nav-content {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.token-quick-list, .rule-quick-list, .ambiguous-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.token-quick-item, .rule-quick-item, .ambiguous-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.token-quick-item:hover, .rule-quick-item:hover, .ambiguous-item:hover {
+    background: #f8f9fa;
+}
+
+.token-symbol {
+    font-size: 1.25rem;
+    width: 30px;
+    text-align: center;
+}
+
+.token-name, .rule-name, .ambiguous-name {
+    flex: 1;
+    font-size: 0.875rem;
+}
+
+.token-count, .rule-type, .ambiguous-count {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.ambiguous-icon {
+    color: #ffc107;
+}
+
+.validation-results {
+    padding: 1rem;
+    background: #fff3cd;
+    border-top: 1px solid #ffc107;
+}
+
+.validation-results h6 {
+    margin-bottom: 0.75rem;
+    color: #856404;
+    font-size: 0.875rem;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.result-item.error {
+    background: #f8d7da;
+}
+
+.result-item.warning {
+    background: #fff3cd;
+}
+
+.result-item.info {
+    background: #d1ecf1;
+}
+
+.result-icon {
+    width: 20px;
+    text-align: center;
+}
+
+.result-message {
+    flex: 1;
+}
+
+.result-location {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+</style>
+
+@code {
+    [Parameter]
+    public GrammarDefinition? Grammar { get; set; }
+
+    [Parameter]
+    public EventCallback<GrammarDefinition> GrammarChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> NavigateToToken { get; set; }
+
+    [Parameter]
+    public EventCallback<string> NavigateToRule { get; set; }
+
+    private string activeTab = "tokens";
+    private List<ValidationResult> validationResults = new();
+
+    private int GetAmbiguousRulesCount()
+    {
+        return Grammar?.Rules.Count(r => r.IsAmbiguous) ?? 0;
+    }
+
+    private int GetCoveragePercentage()
+    {
+        if (Grammar == null || Grammar.Rules.Count == 0) return 0;
+        
+        var covered = Grammar.Rules.Count(r => !string.IsNullOrEmpty(r.Pattern));
+        return (int)((covered / (double)Grammar.Rules.Count) * 100);
+    }
+
+    private int GetTerminalCount()
+    {
+        return Grammar?.Tokens.Count(t => t.IsTerminal) ?? 0;
+    }
+
+    private int GetNonTerminalCount()
+    {
+        return Grammar?.Rules.Count(r => !r.IsTerminal) ?? 0;
+    }
+
+    private int GetTerminalPercentage()
+    {
+        var total = GetTerminalCount() + GetNonTerminalCount();
+        return total == 0 ? 0 : (int)((GetTerminalCount() / (double)total) * 100);
+    }
+
+    private int GetNonTerminalPercentage()
+    {
+        return 100 - GetTerminalPercentage();
+    }
+
+    private List<RuleDefinition> GetAmbiguousRules()
+    {
+        return Grammar?.Rules.Where(r => r.IsAmbiguous).ToList() ?? new List<RuleDefinition>();
+    }
+
+    private string GetTokenSymbol(TokenDefinition token)
+    {
+        if (string.IsNullOrEmpty(token.Pattern)) return "?";
+        if (token.Pattern.Length <= 3) return token.Pattern;
+        return token.Pattern[..2] + "...";
+    }
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    private void RefreshPreview()
+    {
+        // TODO: Implement refresh logic
+    }
+
+    private string GetResultSeverity(ValidationResult result)
+    {
+        return result.Severity.ToString().ToLower();
+    }
+
+    private string GetResultIcon(ValidationResult result)
+    {
+        return result.Severity switch
+        {
+            ValidationSeverity.Error => "❌",
+            ValidationSeverity.Warning => "⚠️",
+            ValidationSeverity.Info => "ℹ️",
+            _ => ""
+        };
+    }
+
+    public class ValidationResult
+    {
+        public ValidationSeverity Severity { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+    }
+
+    public enum ValidationSeverity
+    {
+        Info,
+        Warning,
+        Error
+    }
+}

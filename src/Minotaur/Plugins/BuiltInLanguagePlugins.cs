@@ -579,3 +579,211 @@ public class TypeScriptLanguagePluginWrapper : ILanguagePlugin, ISymbolicAnalysi
         return _tsPlugin.GenerateTestCases(error, sourceCode);
     }
 }
+
+/// <summary>
+/// Built-in COBOL language plugin wrapper for unparsing and compiler backend generation
+/// </summary>
+public class COBOLLanguagePluginWrapper : ILanguagePlugin, ISymbolicAnalysisPlugin
+{
+    private readonly Plugins.COBOL.COBOLLanguagePlugin _cobolPlugin = new();
+
+    public string LanguageId => _cobolPlugin.LanguageId;
+    public string DisplayName => _cobolPlugin.DisplayName;
+    public string[] SupportedExtensions => _cobolPlugin.SupportedExtensions;
+
+    public async Task<string> UnparseAsync(CognitiveGraphNode graph)
+    {
+        return await _cobolPlugin.UnparseAsync(graph);
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        return await _cobolPlugin.GenerateCompilerBackendRulesAsync();
+    }
+
+    public CodeFormattingOptions GetFormattingOptions()
+    {
+        return _cobolPlugin.GetFormattingOptions();
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        return await _cobolPlugin.ValidateGraphForUnparsingAsync(graph);
+    }
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _cobolPlugin.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _cobolPlugin.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _cobolPlugin.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _cobolPlugin.GenerateTestCases(error, sourceCode);
+    }
+}
+
+/// <summary>
+/// Built-in PL/I language plugin wrapper for unparsing and compiler backend generation
+/// </summary>
+public class PLILanguagePluginWrapper : ILanguagePlugin, ISymbolicAnalysisPlugin
+{
+    private readonly Plugins.PLI.PLILanguagePlugin _pliPlugin = new();
+
+    public string LanguageId => _pliPlugin.LanguageId;
+    public string DisplayName => _pliPlugin.DisplayName;
+    public string[] SupportedExtensions => _pliPlugin.SupportedExtensions;
+
+    public async Task<string> UnparseAsync(CognitiveGraphNode graph)
+    {
+        return await _pliPlugin.UnparseAsync(graph);
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        return await _pliPlugin.GenerateCompilerBackendRulesAsync();
+    }
+
+    public CodeFormattingOptions GetFormattingOptions()
+    {
+        return _pliPlugin.GetFormattingOptions();
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        return await _pliPlugin.ValidateGraphForUnparsingAsync(graph);
+    }
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _pliPlugin.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _pliPlugin.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _pliPlugin.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _pliPlugin.GenerateTestCases(error, sourceCode);
+    }
+}
+
+/// <summary>
+/// Built-in Rust language plugin wrapper for unparsing and compiler backend generation
+/// </summary>
+public class RustLanguagePluginWrapper : ILanguagePlugin, ISymbolicAnalysisPlugin
+{
+    private readonly Plugins.Rust.RustLanguagePlugin _rustPlugin = new();
+
+    public string LanguageId => _rustPlugin.LanguageId;
+    public string DisplayName => _rustPlugin.DisplayName;
+    public string[] SupportedExtensions => _rustPlugin.SupportedExtensions;
+
+    public async Task<string> UnparseAsync(CognitiveGraphNode graph)
+    {
+        return await _rustPlugin.UnparseAsync(graph);
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        return await _rustPlugin.GenerateCompilerBackendRulesAsync();
+    }
+
+    public CodeFormattingOptions GetFormattingOptions()
+    {
+        return _rustPlugin.GetFormattingOptions();
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        return await _rustPlugin.ValidateGraphForUnparsingAsync(graph);
+    }
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _rustPlugin.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _rustPlugin.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _rustPlugin.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _rustPlugin.GenerateTestCases(error, sourceCode);
+    }
+}
+
+/// <summary>
+/// Built-in Go language plugin wrapper for unparsing and compiler backend generation
+/// </summary>
+public class GoLanguagePluginWrapper : ILanguagePlugin, ISymbolicAnalysisPlugin
+{
+    private readonly Plugins.Go.GoLanguagePlugin _goPlugin = new();
+
+    public string LanguageId => _goPlugin.LanguageId;
+    public string DisplayName => _goPlugin.DisplayName;
+    public string[] SupportedExtensions => _goPlugin.SupportedExtensions;
+
+    public async Task<string> UnparseAsync(CognitiveGraphNode graph)
+    {
+        return await _goPlugin.UnparseAsync(graph);
+    }
+
+    public async Task<CompilerBackendRules> GenerateCompilerBackendRulesAsync()
+    {
+        return await _goPlugin.GenerateCompilerBackendRulesAsync();
+    }
+
+    public CodeFormattingOptions GetFormattingOptions()
+    {
+        return _goPlugin.GetFormattingOptions();
+    }
+
+    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    {
+        return await _goPlugin.ValidateGraphForUnparsingAsync(graph);
+    }
+
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return _goPlugin.AnalyzeSymbolic(sourceCode, constraints);
+    }
+
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return _goPlugin.GetErrorPatterns();
+    }
+
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return _goPlugin.GetErrorConfidence(errorType);
+    }
+
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return _goPlugin.GenerateTestCases(error, sourceCode);
+    }
+}

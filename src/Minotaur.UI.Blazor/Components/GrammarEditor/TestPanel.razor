@@ -1,0 +1,550 @@
+@* Test Panel Component *@
+@* 
+ * Component for testing grammar with sample input.
+ * Allows users to parse test code and view results.
+ * *@
+
+@using Microsoft.AspNetCore.Components
+@using Minotaur.Core.Models.Grammar
+@using Minotaur.Core.Models.Visualization
+
+<div class="test-panel">
+    <div class="panel-header">
+        <h5><i class="bi bi-beaker"></i> Test Panel</h5>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-primary" @onclick="RunTest">
+                <i class="bi bi-play-fill"></i> Run
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="ClearTest">
+                <i class="bi bi-trash"></i> Clear
+            </button>
+        </div>
+    </div>
+
+    <!-- Test Input -->
+    <div class="test-input">
+        <div class="input-header">
+            <span>Input Code</span>
+            <div class="input-actions">
+                <select class="form-select form-select-sm" @bind="selectedTemplate" style="width: 150px;">
+                    <option value="">Custom Input</option>
+                    <option value="template1">Simple Expression</option>
+                    <option value="template2">Complex Expression</option>
+                    <option value="template3">Function Definition</option>
+                </select>
+                <button class="btn btn-sm btn-outline-primary" @onclick="LoadTemplate">
+                    <i class="bi bi-folder-open"></i> Load
+                </button>
+            </div>
+        </div>
+        <div class="code-editor">
+            <textarea class="form-control" rows="10" 
+                      placeholder="Enter code to test..." 
+                      @bind="testInput" 
+                      @bind:event="oninput"></textarea>
+        </div>
+    </div>
+
+    <!-- Test Options -->
+    <div class="test-options">
+        <div class="options-row">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" 
+                       @bind="showAllInterpretations" 
+                       id="showAllInterpretations">
+                <label class="form-check-label" for="showAllInterpretations">
+                    Show All Interpretations
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" 
+                       @bind="highlightAmbiguities" 
+                       id="highlightAmbiguities">
+                <label class="form-check-label" for="highlightAmbiguities">
+                    Highlight Ambiguities
+                </label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" 
+                       @bind="showTokens" 
+                       id="showTokens">
+                <label class="form-check-label" for="showTokens">
+                    Show Tokens
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Results -->
+    @if (testResults != null)
+    {
+        <div class="test-results">
+            <!-- Summary -->
+            <div class="results-summary">
+                <div class="summary-grid">
+                    <div class="summary-item @GetStatusClass(testResults.ParseSuccess)">
+                        <div class="item-icon">
+                            @if (testResults.ParseSuccess)
+                            {
+                                <i class="bi bi-check-circle-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                            }
+                        </div>
+                        <div class="item-content">
+                            <div class="item-value">@(testResults.ParseSuccess ? "Success" : "Failed")</div>
+                            <div class="item-label">Parse Result</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="item-icon"><i class="bi bi-nodes"></i></div>
+                        <div class="item-content">
+                            <div class="item-value">@testResults.NodeCount</div>
+                            <div class="item-label">Nodes</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="item-icon"><i class="bi bi-link"></i></div>
+                        <div class="item-content">
+                            <div class="item-value">@testResults.EdgeCount</div>
+                            <div class="item-label">Edges</div>
+                        </div>
+                    </div>
+                    <div class="summary-item @(testResults.AmbiguityCount > 0 ? "text-warning" : "")">
+                        <div class="item-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                        <div class="item-content">
+                            <div class="item-value">@testResults.AmbiguityCount</div>
+                            <div class="item-label">Ambiguities</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="item-icon"><i class="bi bi-clock"></i></div>
+                        <div class="item-content">
+                            <div class="item-value">@testResults.ParseTimeMs</div>
+                            <div class="item-label">Time (ms)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Toggle -->
+            <div class="visualization-toggle">
+                <ul class="nav nav-tabs nav-tabs-sm">
+                    <li class="nav-item">
+                        <button class="nav-link @(activeView == "graph" ? "active" : "")" 
+                                @onclick="() => SetActiveView("graph")">
+                            <i class="bi bi-diagram-3"></i> Graph
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeView == "tree" ? "active" : "")" 
+                                @onclick="() => SetActiveView("tree")">
+                            <i class="bi bi-tree"></i> Tree
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeView == "tokens" ? "active" : "")" 
+                                @onclick="() => SetActiveView("tokens")">
+                            <i class="bi bi-fonts"></i> Tokens
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link @(activeView == "log" ? "active" : "")" 
+                                @onclick="() => SetActiveView("log")">
+                            <i class="bi bi-terminal"></i> Log
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Visualization Area -->
+            @if (activeView == "graph" && testResults.Visualization != null)
+            {
+                <div class="visualization-area">
+                    <CognitiveGraphVisualizer 
+                        Visualization="testResults.Visualization" 
+                        GrammarName="@GrammarName" 
+                        Mode="@GetVisualizationMode()" 
+                        OnModeChanged="HandleModeChanged" 
+                        OnPackedNodeSelected="HandlePackedNodeSelected" />
+                </div>
+            }
+            else if (activeView == "tree")
+            {
+                <div class="tree-view">
+                    <pre>@GetTreeView()</pre>
+                </div>
+            }
+            else if (activeView == "tokens")
+            {
+                <div class="tokens-view">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Token</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var token in testResults.Tokens)
+                            {
+                                <tr>
+                                    <td>@token.Line:@token.Column</td>
+                                    <td><code>@token.Name</code></td>
+                                    <td><span class="badge bg-secondary">@token.Type</span></td>
+                                    <td>"@token.Value"</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else if (activeView == "log")
+            {
+                <div class="log-view">
+                    <pre>@testResults.ParseLog</pre>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+.test-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.panel-header h5 {
+    margin: 0;
+    color: #495057;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.test-input {
+    padding: 1rem;
+    background: white;
+}
+
+.input-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.input-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.code-editor {
+    margin-top: 0.5rem;
+}
+
+.code-editor textarea {
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.test-options {
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.options-row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.test-results {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.results-summary {
+    padding: 1rem;
+    background: white;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+.summary-item.error {
+    background: #f8d7da;
+}
+
+.summary-item.text-warning {
+    background: #fff3cd;
+}
+
+.summary-item.success {
+    background: #d4edda;
+}
+
+.item-icon {
+    font-size: 1.25rem;
+}
+
+.item-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.item-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.visualization-toggle {
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.visualization-area, .tree-view, .tokens-view, .log-view {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: white;
+}
+
+.tree-view pre, .log-view pre {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.tokens-view {
+    max-height: 400px;
+}
+
+.tokens-view table {
+    margin: 0;
+}
+
+.tokens-view th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+</style>
+
+@code {
+    [Parameter]
+    public string GrammarName { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> OnTestRun { get; set; }
+
+    [Parameter]
+    public EventCallback<(string NodeId, PackedNodeInfo PackedNode)> OnPackedNodeSelected { get; set; }
+
+    private string testInput = "a + b * c";
+    private string selectedTemplate = string.Empty;
+    private bool showAllInterpretations = true;
+    private bool highlightAmbiguities = true;
+    private bool showTokens = true;
+    private string activeView = "graph";
+    private TestResults? testResults;
+
+    private void RunTest()
+    {
+        // TODO: Implement actual parsing
+        // For now, create mock results
+        testResults = new TestResults
+        {
+            ParseSuccess = true,
+            NodeCount = 5,
+            EdgeCount = 4,
+            AmbiguityCount = 1,
+            ParseTimeMs = 15,
+            ParseLog = "Parsing started...\nParsing completed successfully\nFound 1 ambiguity point",
+            Tokens = new List<TokenInfo>
+            {
+                new TokenInfo { Line = 1, Column = 1, Name = "identifier", Type = "identifier", Value = "a" },
+                new TokenInfo { Line = 1, Column = 3, Name = "+", Type = "operator", Value = "+" },
+                new TokenInfo { Line = 1, Column = 5, Name = "identifier", Type = "identifier", Value = "b" },
+                new TokenInfo { Line = 1, Column = 7, Name = "*", Type = "operator", Value = "*" },
+                new TokenInfo { Line = 1, Column = 9, Name = "identifier", Type = "identifier", Value = "c" }
+            },
+            Visualization = CreateMockVisualization()
+        };
+
+        OnTestRun.InvokeAsync(testInput);
+    }
+
+    private void ClearTest()
+    {
+        testInput = string.Empty;
+        testResults = null;
+    }
+
+    private void LoadTemplate()
+    {
+        testInput = selectedTemplate switch
+        {
+            "template1" => "a + b",
+            "template2" => "(a + b) * (c - d)",
+            "template3" => "function test(a, b) { return a + b; }",
+            _ => "a + b * c"
+        };
+    }
+
+    private void SetActiveView(string view)
+    {
+        activeView = view;
+    }
+
+    private VisualizationMode GetVisualizationMode()
+    {
+        return showAllInterpretations 
+            ? VisualizationMode.ShowAllInterpretations 
+            : VisualizationMode.ShowSelectedInterpretation;
+    }
+
+    private void HandleModeChanged(VisualizationMode mode)
+    {
+        showAllInterpretations = mode == VisualizationMode.ShowAllInterpretations;
+    }
+
+    private void HandlePackedNodeSelected((string NodeId, PackedNodeInfo PackedNode) args)
+    {
+        OnPackedNodeSelected.InvokeAsync(args);
+    }
+
+    private string GetTreeView()
+    {
+        if (testResults == null) return string.Empty;
+        
+        return "compilation_unit
+  └── expression
+      ├── identifier (a)
+      ├── operator (+)
+      └── expression
+          ├── identifier (b)
+          ├── operator (*)
+          └── identifier (c)";
+    }
+
+    private CognitiveGraphVisualization CreateMockVisualization()
+    {
+        return new CognitiveGraphVisualization
+        {
+            GraphData = new GraphData
+            {
+                SourceCode = testInput,
+                GrammarName = GrammarName,
+                Nodes = new List<GraphNode>
+                {
+                    new GraphNode { Id = "1", Type = "compilation_unit", Name = "root", Size = 15 },
+                    new GraphNode { Id = "2", Type = "expression", Name = "a+b*c", Size = 12 },
+                    new GraphNode { Id = "3", Type = "identifier", Name = "a", Size = 8 },
+                    new GraphNode { Id = "4", Type = "operator", Name = "+", Size = 8 },
+                    new GraphNode { Id = "5", Type = "expression", Name = "b*c", Size = 10, IsAmbiguous = true, AlternativeCount = 2 },
+                    new GraphNode { Id = "6", Type = "identifier", Name = "b", Size = 8 },
+                    new GraphNode { Id = "7", Type = "operator", Name = "*", Size = 8 },
+                    new GraphNode { Id = "8", Type = "identifier", Name = "c", Size = 8 }
+                },
+                Edges = new List<GraphEdge>
+                {
+                    new GraphEdge { Id = "1-2", Source = "1", Target = "2", Type = "hierarchy" },
+                    new GraphEdge { Id = "2-3", Source = "2", Target = "3", Type = "hierarchy" },
+                    new GraphEdge { Id = "2-4", Source = "2", Target = "4", Type = "hierarchy" },
+                    new GraphEdge { Id = "2-5", Source = "2", Target = "5", Type = "hierarchy" },
+                    new GraphEdge { Id = "5-6-0", Source = "5", Target = "6", Type = "alternative", IsAlternative = true, PackedNodeIndex = 0, RuleId = 101 },
+                    new GraphEdge { Id = "5-7-0", Source = "5", Target = "7", Type = "alternative", IsAlternative = true, PackedNodeIndex = 0, RuleId = 101 },
+                    new GraphEdge { Id = "5-8-1", Source = "5", Target = "8", Type = "alternative", IsAlternative = true, PackedNodeIndex = 1, RuleId = 102 }
+                }
+            },
+            Ambiguities = new Dictionary<string, NodeAmbiguityInfo>
+            {
+                ["5"] = new NodeAmbiguityInfo
+                {
+                    NodeId = "5",
+                    IsAmbiguous = true,
+                    AlternativeCount = 2,
+                    PackedNodes = new List<PackedNodeInfo>
+                    {
+                        new PackedNodeInfo { Index = 0, RuleId = 101, RuleName = "binary_expression", ChildNodeIds = new List<string> { "6", "7" } },
+                        new PackedNodeInfo { Index = 1, RuleId = 102, RuleName = "unary_expression", ChildNodeIds = new List<string> { "8" } }
+                    }
+                }
+            },
+            Mode = VisualizationMode.ShowAllInterpretations
+        };
+    }
+
+    private string GetStatusClass(bool success)
+    {
+        return success ? "success" : "error";
+    }
+
+    public class TestResults
+    {
+        public bool ParseSuccess { get; set; }
+        public int NodeCount { get; set; }
+        public int EdgeCount { get; set; }
+        public int AmbiguityCount { get; set; }
+        public int ParseTimeMs { get; set; }
+        public string ParseLog { get; set; } = string.Empty;
+        public List<TokenInfo> Tokens { get; set; } = new();
+        public CognitiveGraphVisualization? Visualization { get; set; }
+    }
+
+    public class TokenInfo
+    {
+        public int Line { get; set; }
+        public int Column { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
+    }
+}

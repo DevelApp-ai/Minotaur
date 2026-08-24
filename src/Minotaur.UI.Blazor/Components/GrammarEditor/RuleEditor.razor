@@ -1,0 +1,505 @@
+@* Rule Editor Component *@
+@* 
+ * Component for editing grammar rules.
+ * Allows users to define production rules for language grammars.
+ * *@
+
+@using Microsoft.AspNetCore.Components
+@using Minotaur.Core.Models.Grammar
+
+<div class="rule-editor">
+    <div class="editor-header">
+        <h5><i class="bi bi-diagram-2"></i> Rule Editor</h5>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-secondary" @onclick="AddRule">
+                <i class="bi bi-plus"></i> Add Rule
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" @onclick="AddRuleFromTemplate">
+                <i class="bi bi-file-earmark-plus"></i> From Template
+            </button>
+        </div>
+    </div>
+
+    <!-- Rule Search/Filter -->
+    <div class="rule-search">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" 
+                   placeholder="Search rules..." 
+                   @bind="searchText" 
+                   @bind:event="oninput">
+        </div>
+        <div class="form-check form-check-inline ms-2">
+            <input class="form-check-input" type="checkbox" 
+                   @bind="showOnlyTerminals" 
+                   id="showTerminals">
+            <label class="form-check-label" for="showTerminals">Terminals only</label>
+        </div>
+    </div>
+
+    <!-- Rule List -->
+    <div class="rule-list">
+        @if (filteredRules.Count == 0)
+        {
+            <div class="empty-state">
+                <i class="bi bi-diagram-2 fs-1"></i>
+                <p>No rules defined</p>
+                <small>Add rules to define the grammar of your language</small>
+            </div>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var rule in filteredRules)
+                {
+                    <div class="list-group-item rule-item @(selectedRule?.Id == rule.Id ? "active" : "")" 
+                         @onclick="() => SelectRule(rule)">
+                        <div class="rule-header">
+                            <span class="rule-name">@rule.Name</span>
+                            @if (rule.IsTerminal)
+                            {
+                                <span class="badge bg-primary">Terminal</span>
+                            }
+                            @if (rule.IsAmbiguous)
+                            {
+                                <span class="badge bg-warning text-dark">Ambiguous</span>
+                            }
+                        </div>
+                        <div class="rule-preview">
+                            <code>@rule.Pattern</code>
+                            <small class="text-muted">@rule.Description</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Rule Editor Panel -->
+    @if (selectedRule != null)
+    {
+        <div class="rule-editor-panel">
+            <div class="panel-header">
+                <h6>Edit Rule: @selectedRule.Name</h6>
+                <button class="btn btn-sm btn-outline-danger" @onclick="DeleteRule">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" 
+                           @bind="selectedRule.Name" 
+                           @bind:event="oninput">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Pattern</label>
+                    <input type="text" class="form-control" 
+                           placeholder="e.g., expression = expression '+' expression" 
+                           @bind="selectedRule.Pattern" 
+                           @bind:event="oninput">
+                    <div class="form-text">Rule pattern in StepParser syntax</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" rows="2" 
+                              @bind="selectedRule.Description" 
+                              @bind:event="oninput"></textarea>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   @bind="selectedRule.IsTerminal" 
+                                   id="isTerminal">
+                            <label class="form-check-label" for="isTerminal">
+                                Is Terminal
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   @bind="selectedRule.IsAmbiguous" 
+                                   id="isAmbiguous">
+                            <label class="form-check-label" for="isAmbiguous">
+                                Allow Ambiguity
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Priority</label>
+                    <input type="number" class="form-control" 
+                           @bind="selectedRule.Priority" 
+                           @bind:event="oninput">
+                    <div class="form-text">Higher priority rules are applied first</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" @bind="selectedRule.Category">
+                        <option value="">None</option>
+                        <option value="expression">Expression</option>
+                        <option value="statement">Statement</option>
+                        <option value="declaration">Declaration</option>
+                        <option value="type">Type</option>
+                        <option value="literal">Literal</option>
+                        <option value="operator">Operator</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Return Type</label>
+                    <input type="text" class="form-control" 
+                           placeholder="e.g., Expression" 
+                           @bind="selectedRule.ReturnType" 
+                           @bind:event="oninput">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Parameters</label>
+                    <div class="parameters-list">
+                        @foreach (var param in selectedRule.Parameters)
+                        {
+                            <div class="parameter-item">
+                                <input type="text" class="form-control form-control-sm" 
+                                       placeholder="Parameter name" 
+                                       @bind="param.Name" 
+                                       @bind:event="oninput">
+                                <select class="form-select form-select-sm" @bind="param.Type">
+                                    <option value="">Any</option>
+                                    <option value="token">Token</option>
+                                    <option value="expression">Expression</option>
+                                    <option value="statement">Statement</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveParameter(param)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        }
+                        <button class="btn btn-sm btn-outline-primary mt-2" @onclick="AddParameter">
+                            <i class="bi bi-plus"></i> Add Parameter
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Action Code</label>
+                    <textarea class="form-control" rows="4" 
+                              placeholder="Custom code to execute when this rule is matched" 
+                              @bind="selectedRule.ActionCode" 
+                              @bind:event="oninput"></textarea>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <button class="btn btn-primary btn-sm" @onclick="SaveRule">
+                    <i class="bi bi-check"></i> Save
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="CancelEdit">
+                    <i class="bi bi-x"></i> Cancel
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.rule-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.rule-search {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.rule-list {
+    flex: 1;
+    overflow-y: auto;
+    background: white;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6c757d;
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-state i {
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.rule-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rule-item:hover {
+    background-color: #f8f9fa;
+}
+
+.rule-item.active {
+    background-color: #e3f2fd;
+    border-left: 3px solid #2196f3;
+}
+
+.rule-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.rule-name {
+    font-weight: 500;
+    color: #495057;
+}
+
+.rule-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rule-preview code {
+    font-size: 0.875rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+}
+
+.rule-editor-panel {
+    border-top: 1px solid #dee2e6;
+    background: white;
+    padding: 1rem;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.panel-header h6 {
+    margin: 0;
+    color: #495057;
+}
+
+.panel-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.panel-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.parameters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.parameter-item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.parameter-item input {
+    flex: 1;
+}
+
+.parameter-item select {
+    width: 120px;
+}
+</style>
+
+@code {
+    [Parameter]
+    public List<RuleDefinition> Rules { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<List<RuleDefinition>> RulesChanged { get; set; }
+
+    [Parameter]
+    public RuleDefinition? SelectedRule { get; set; }
+
+    [Parameter]
+    public EventCallback<RuleDefinition?> SelectedRuleChanged { get; set; }
+
+    private string searchText = string.Empty;
+    private bool showOnlyTerminals = false;
+    private RuleDefinition? editingRule;
+    private RuleDefinition? originalRule;
+
+    private List<RuleDefinition> filteredRules =>
+        (string.IsNullOrWhiteSpace(searchText) ? Rules : 
+            Rules.Where(r => 
+                r.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                r.Pattern.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                r.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+         .ToList())
+        .Where(r => !showOnlyTerminals || r.IsTerminal)
+        .ToList();
+
+    private void SelectRule(RuleDefinition rule)
+    {
+        SelectedRule = rule;
+        SelectedRuleChanged.InvokeAsync(rule);
+    }
+
+    private void AddRule()
+    {
+        var newRule = new RuleDefinition
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "NewRule",
+            Pattern = "",
+            Description = "",
+            Priority = 100,
+            Parameters = new List<RuleParameter>()
+        };
+        
+        Rules.Add(newRule);
+        SelectRule(newRule);
+        RulesChanged.InvokeAsync(Rules);
+    }
+
+    private void AddRuleFromTemplate()
+    {
+        // TODO: Implement template selection
+        AddRule();
+    }
+
+    private void DeleteRule()
+    {
+        if (SelectedRule == null) return;
+        
+        Rules.Remove(SelectedRule);
+        SelectedRule = null;
+        SelectedRuleChanged.InvokeAsync(null);
+        RulesChanged.InvokeAsync(Rules);
+    }
+
+    private void AddParameter()
+    {
+        if (SelectedRule == null) return;
+        
+        SelectedRule.Parameters.Add(new RuleParameter
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "param",
+            Type = ""
+        });
+    }
+
+    private void RemoveParameter(RuleParameter parameter)
+    {
+        if (SelectedRule == null) return;
+        
+        SelectedRule.Parameters.Remove(parameter);
+    }
+
+    private void SaveRule()
+    {
+        if (SelectedRule == null) return;
+        
+        RulesChanged.InvokeAsync(Rules);
+    }
+
+    private void CancelEdit()
+    {
+        if (originalRule != null && SelectedRule != null)
+        {
+            SelectedRule.Name = originalRule.Name;
+            SelectedRule.Pattern = originalRule.Pattern;
+            SelectedRule.Description = originalRule.Description;
+            SelectedRule.IsTerminal = originalRule.IsTerminal;
+            SelectedRule.IsAmbiguous = originalRule.IsAmbiguous;
+            SelectedRule.Priority = originalRule.Priority;
+            SelectedRule.Category = originalRule.Category;
+            SelectedRule.ReturnType = originalRule.ReturnType;
+            SelectedRule.ActionCode = originalRule.ActionCode;
+            SelectedRule.Parameters = originalRule.Parameters.Select(p => new RuleParameter
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Type = p.Type
+            }).ToList();
+        }
+        
+        SelectedRule = null;
+        SelectedRuleChanged.InvokeAsync(null);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        
+        if (SelectedRule != null && originalRule == null)
+        {
+            originalRule = new RuleDefinition
+            {
+                Id = SelectedRule.Id,
+                Name = SelectedRule.Name,
+                Pattern = SelectedRule.Pattern,
+                Description = SelectedRule.Description,
+                IsTerminal = SelectedRule.IsTerminal,
+                IsAmbiguous = SelectedRule.IsAmbiguous,
+                Priority = SelectedRule.Priority,
+                Category = SelectedRule.Category,
+                ReturnType = SelectedRule.ReturnType,
+                ActionCode = SelectedRule.ActionCode,
+                Parameters = SelectedRule.Parameters.Select(p => new RuleParameter
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Type = p.Type
+                }).ToList()
+            };
+        }
+    }
+}

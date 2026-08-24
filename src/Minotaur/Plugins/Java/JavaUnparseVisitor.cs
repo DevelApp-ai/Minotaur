@@ -1,981 +1,740 @@
 /*
  * This file is part of Minotaur.
- * 
  * Minotaur is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
  * Minotaur is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- * 
  * You should have received a copy of the GNU Affero General Public License
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
  */
 
+using CognitiveGraph;
 using Minotaur.Core;
-using Minotaur.Visitors;
-using System.Text;
 
 namespace Minotaur.Plugins.Java;
 
 /// <summary>
-/// Visitor for generating Java source code from cognitive graph.
-/// Handles all Java-specific constructs including classes, interfaces, methods,
-/// generics, lambda expressions, and more.
+/// Visitor for unparsing Java code from a CognitiveGraph.
+/// Handles Java-specific syntax including classes, interfaces, methods, and modern features.
 /// </summary>
-public class JavaUnparseVisitor : CognitiveGraphVisitorBase
+public class JavaUnparseVisitor : UnparseVisitorBase
 {
-    private readonly StringBuilder _code = new();
+    private readonly System.Text.StringBuilder _builder = new();
     private int _indentLevel = 0;
-    private bool _needsNewline = false;
-    private bool _inClass = false;
-    private bool _inMethod = false;
-    private bool _inInterface = false;
-    private bool _inEnum = false;
-    private readonly Stack<string> _contextStack = new();
+    private bool _atLineStart = true;
+    private bool _needsSemicolon = false;
+    private bool _inString = false;
+    private bool _inComment = false;
+    
+    private readonly System.Collections.Generic.Stack<bool> _needsSemicolonStack = new();
 
     /// <summary>
-    /// Gets the generated Java source code.
+    /// Initializes a new instance.
     /// </summary>
-    /// <returns>The generated source code as a string.</returns>
-    public string GetGeneratedCode() => _code.ToString().Trim();
-
-    /// <summary>
-    /// Visits a cognitive graph node before traversing its children.
-    /// </summary>
-    /// <param name="node">The cognitive graph node to visit and process.</param>
-    protected override void BeforeVisitNode(CognitiveGraphNode node)
+    public JavaUnparseVisitor()
     {
-        // Handle different node types
-        switch (node)
+    }
+
+    /// <summary>
+    /// Initializes the visitor.
+    /// </summary>
+    public override void Initialize()
+    {
+        base.Initialize();
+        _builder.Clear();
+        _indentLevel = 0;
+        _atLineStart = true;
+        _needsSemicolon = false;
+        _inString = false;
+        _inComment = false;
+        _needsSemicolonStack.Clear();
+    }
+
+    /// <summary>
+    /// Resets the visitor state.
+    /// </summary>
+    public override void Reset()
+    {
+        Initialize();
+    }
+
+    /// <summary>
+    /// Gets the generated code.
+    /// </summary>
+    public override string GetGeneratedCode()
+    {
+        var code = _builder.ToString();
+        
+        // Ensure proper formatting
+        if (_needsSemicolon)
         {
-            case IdentifierNode identifier:
-                VisitIdentifierNode(identifier);
-                break;
-            case LiteralNode literal:
-                VisitLiteralNode(literal);
-                break;
-            case TerminalNode terminal:
-                VisitTerminalNode(terminal);
-                break;
-            case NonTerminalNode nonTerminal:
-                VisitNonTerminalNode(nonTerminal);
-                break;
+            _builder.Append(";");
+        }
+        
+        return code;
+    }
+
+    /// <summary>
+    /// Visits the specified node.
+    /// </summary>
+    public override void Visit(CognitiveGraphNode node)
+    {
+        if (node == null)
+            return;
+
+        // Check if this is a SymbolNode with PackedNode alternatives
+        if (node is CognitiveGraph.SymbolNode symbolNode)
+        {
+            VisitSymbolNode(symbolNode);
+        }
+        else
+        {
+            // Fallback to base visit
+            base.Visit(node);
         }
     }
 
     /// <summary>
-    /// Visits a cognitive graph node after traversing its children.
+    /// Visits a SymbolNode and handles its PackedNodes.
     /// </summary>
-    /// <param name="node">The cognitive graph node that was visited.</param>
-    protected override void AfterVisitNode(CognitiveGraphNode node)
+    private void VisitSymbolNode(CognitiveGraph.SymbolNode node)
     {
-        // Handle closing braces and other post-children processing
-        if (node is NonTerminalNode nonTerminal)
+        var packedNodes = node.GetPackedNodes();
+        
+        if (packedNodes.Count == 0)
         {
-            switch (nonTerminal.RuleName.ToLowerInvariant())
+            // No PackedNodes, just output the node
+            WriteNode(node);
+            return;
+        }
+        
+        // Multiple PackedNodes means ambiguity
+        // For unparsing, we need to select one interpretation
+        // Here we select the first valid PackedNode
+        foreach (var packedNode in packedNodes)
+        {
+            if (IsValidPackedNode(packedNode))
             {
-                case "class_declaration":
-                case "class_body":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _inClass = false;
-                    _contextStack.Pop();
-                    break;
-                    
-                case "interface_declaration":
-                case "interface_body":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _inInterface = false;
-                    _contextStack.Pop();
-                    break;
-                    
-                case "enum_declaration":
-                case "enum_body":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _inEnum = false;
-                    _contextStack.Pop();
-                    break;
-                    
-                case "method_declaration":
-                case "method_body":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _inMethod = false;
-                    _contextStack.Pop();
-                    break;
-                    
-                case "constructor_declaration":
-                case "constructor_body":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _inMethod = false;
-                    _contextStack.Pop();
-                    break;
-                    
-                case "block":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _contextStack.Pop();
-                    break;
-                    
-                case "if_statement":
-                case "then_statement":
-                case "else_statement":
-                    if (_contextStack.Count > 0 && _contextStack.Peek() == "if")
-                    {
-                        // Closing if block
-                    }
-                    break;
-                    
-                case "switch_statement":
-                case "switch_block":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _contextStack.Pop();
-                    break;
-                    
-                case "for_statement":
-                case "for_body":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _contextStack.Pop();
-                    break;
-                    
-                case "while_statement":
-                case "while_body":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _contextStack.Pop();
-                    break;
-                    
-                case "do_while_statement":
-                    Append(" ");
-                    break;
-                    
-                case "try_statement":
-                    _indentLevel--;
-                    AppendIndentedLine("}");
-                    _contextStack.Pop();
-                    break;
+                VisitPackedNode(packedNode);
+                return;
             }
         }
+        
+        // If no valid PackedNode, output the node anyway
+        WriteNode(node);
     }
 
-    private void VisitTerminalNode(TerminalNode node)
+    /// <summary>
+    /// Visits a PackedNode.
+    /// </summary>
+    private void VisitPackedNode(CognitiveGraph.PackedNode packedNode)
     {
-        // Handle Java keywords and operators
-        var text = node.Text;
+        var ruleId = packedNode.RuleID;
+        var childNodes = packedNode.GetChildNodes();
         
-        // Check if this is a Java keyword
-        if (IsJavaKeyword(text))
+        // Handle based on rule ID or node type
+        var nodeType = GetNodeType(packedNode);
+        
+        switch (nodeType)
         {
-            // Add space before keyword if needed
-            if (_needsNewline && !IsControlKeyword(text))
-            {
-                Append(" ");
-            }
-            Append(text);
-            
-            // Some keywords need space after
-            if (NeedsSpaceAfter(text))
-            {
-                Append(" ");
-            }
-            
-            // Track context
-            if (text == "class") _inClass = true;
-            if (text == "interface") _inInterface = true;
-            if (text == "enum") _inEnum = true;
-            
-            return;
-        }
-        
-        // Handle operators
-        if (IsJavaOperator(text))
-        {
-            // Add spaces around operators
-            if (!string.IsNullOrEmpty(_code.ToString()) && _code.ToString().Last() != ' ')
-            {
-                Append(" ");
-            }
-            Append(text);
-            Append(" ");
-            return;
-        }
-        
-        // Handle separators
-        if (IsSeparator(text))
-        {
-            Append(text);
-            
-            // Add space after comma
-            if (text == ",")
-            {
-                Append(" ");
-            }
-            return;
-        }
-        
-        // Default: just append
-        Append(text);
-    }
-
-    private void VisitNonTerminalNode(NonTerminalNode node)
-    {
-        var ruleName = node.RuleName.ToLowerInvariant();
-        
-        switch (ruleName)
-        {
-            // Package and imports
+            case "compilation_unit":
+                VisitCompilationUnit(packedNode, childNodes);
+                break;
             case "package_declaration":
-                Append("package ");
-                _contextStack.Push("package");
+                VisitPackageDeclaration(packedNode, childNodes);
                 break;
-                
             case "import_declaration":
-                Append("import ");
-                _contextStack.Push("import");
+                VisitImportDeclaration(packedNode, childNodes);
                 break;
-                
-            // Class declarations
             case "class_declaration":
-                AppendModifiers(node);
-                Append("class ");
-                _contextStack.Push("class");
-                _inClass = true;
+                VisitClassDeclaration(packedNode, childNodes);
                 break;
-                
-            case "class_header":
-                break;
-                
-            case "class_body":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("class_body");
-                break;
-                
-            // Interface declarations
             case "interface_declaration":
-                AppendModifiers(node);
-                Append("interface ");
-                _contextStack.Push("interface");
-                _inInterface = true;
+                VisitInterfaceDeclaration(packedNode, childNodes);
                 break;
-                
-            case "interface_header":
-                break;
-                
-            case "interface_body":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("interface_body");
-                break;
-                
-            // Enum declarations
             case "enum_declaration":
-                AppendModifiers(node);
-                Append("enum ");
-                _contextStack.Push("enum");
-                _inEnum = true;
+                VisitEnumDeclaration(packedNode, childNodes);
                 break;
-                
-            case "enum_header":
+            case "record_declaration":
+                VisitRecordDeclaration(packedNode, childNodes);
                 break;
-                
-            case "enum_body":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("enum_body");
-                break;
-                
-            case "enum_constant":
-                break;
-                
-            // Method declarations
             case "method_declaration":
-                AppendModifiers(node);
-                _contextStack.Push("method");
-                _inMethod = true;
+                VisitMethodDeclaration(packedNode, childNodes);
                 break;
-                
-            case "method_header":
-                break;
-                
-            case "method_body":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("method_body");
-                break;
-                
-            // Constructor declarations
-            case "constructor_declaration":
-                AppendModifiers(node);
-                _contextStack.Push("constructor");
-                _inMethod = true;
-                break;
-                
-            case "constructor_header":
-                break;
-                
-            case "constructor_body":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("constructor_body");
-                break;
-                
-            // Field declarations
             case "field_declaration":
-                AppendModifiers(node);
-                _contextStack.Push("field");
+                VisitFieldDeclaration(packedNode, childNodes);
                 break;
-                
-            // Local variable declarations
-            case "local_variable_declaration":
-                AppendModifiers(node);
-                _contextStack.Push("local_variable");
-                break;
-                
-            // Type declarations
-            case "type_declaration":
-                break;
-                
-            // Modifiers
-            case "modifiers":
-                AppendModifiers(node);
-                break;
-                
-            // Type parameters (generics)
-            case "type_parameters":
-                Append("<");
-                _contextStack.Push("type_parameters");
-                break;
-                
-            case "type_parameter":
-                break;
-                
-            case "type_parameter_list":
-                break;
-                
-            // Type arguments
-            case "type_arguments":
-                Append("<");
-                _contextStack.Push("type_arguments");
-                break;
-                
-            case "type_argument":
-                break;
-                
-            case "type_argument_list":
-                break;
-                
-            // Parameters
-            case "formal_parameters":
-                Append("(");
-                _contextStack.Push("formal_parameters");
-                break;
-                
-            case "formal_parameter":
-                break;
-                
-            case "formal_parameter_list":
-                break;
-                
-            // Method calls
-            case "method_invocation":
-                _contextStack.Push("method_invocation");
-                break;
-                
-            case "argument_list":
-                Append("(");
-                _contextStack.Push("argument_list");
-                break;
-                
-            // Array declarations
-            case "array_declarator":
-                break;
-                
-            case "dimensions":
-                break;
-                
-            // Initializers
-            case "array_initializer":
-                Append("{");
-                _contextStack.Push("array_initializer");
-                break;
-                
-            case "variable_initializer":
-                Append(" = ");
-                _contextStack.Push("variable_initializer");
-                break;
-                
-            // Control flow
             case "if_statement":
-                Append("if (");
-                _contextStack.Push("if");
+                VisitIfStatement(packedNode, childNodes);
                 break;
-                
-            case "then_statement":
-                Append(") ");
-                _contextStack.Push("then");
-                break;
-                
-            case "else_statement":
-                Append(" else ");
-                _contextStack.Push("else");
-                break;
-                
-            case "switch_statement":
-                Append("switch (");
-                _contextStack.Push("switch");
-                break;
-                
-            case "switch_expression":
-                Append("switch (");
-                _contextStack.Push("switch_expression");
-                break;
-                
-            case "switch_block":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("switch_block");
-                break;
-                
-            case "case_label":
-                AppendIndented("case ");
-                _contextStack.Push("case");
-                break;
-                
-            case "default_label":
-                AppendIndented("default:");
-                _contextStack.Push("default");
-                break;
-                
-            // Loops
             case "for_statement":
-                Append("for (");
-                _contextStack.Push("for");
+                VisitForStatement(packedNode, childNodes);
                 break;
-                
-            case "for_init":
-                break;
-                
-            case "for_condition":
-                Append("; ");
-                break;
-                
-            case "for_update":
-                Append("; ");
-                break;
-                
-            case "for_body":
-                Append(") ");
-                _contextStack.Push("for_body");
-                break;
-                
-            case "enhanced_for_statement":
-                Append("for (");
-                _contextStack.Push("enhanced_for");
-                break;
-                
-            case "enhanced_for_header":
-                break;
-                
-            case "enhanced_for_body":
-                Append(") ");
-                _contextStack.Push("enhanced_for_body");
-                break;
-                
             case "while_statement":
-                Append("while (");
-                _contextStack.Push("while");
+                VisitWhileStatement(packedNode, childNodes);
                 break;
-                
-            case "while_condition":
+            case "do_statement":
+                VisitDoStatement(packedNode, childNodes);
                 break;
-                
-            case "while_body":
-                Append(") ");
-                _contextStack.Push("while_body");
-                break;
-                
-            case "do_while_statement":
-                Append("do ");
-                _contextStack.Push("do_while");
-                break;
-                
-            case "do_body":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("do_body");
-                break;
-                
-            case "while_condition_at_end":
-                _indentLevel--;
-                AppendIndented("} while (");
-                _contextStack.Push("while_condition_end");
-                break;
-                
-            // Try-catch-finally
             case "try_statement":
-                Append("try ");
-                _contextStack.Push("try");
+                VisitTryStatement(packedNode, childNodes);
                 break;
-                
-            case "try_block":
-                Append("{\n");
-                _indentLevel++;
-                _contextStack.Push("try_block");
+            case "switch_statement":
+                VisitSwitchStatement(packedNode, childNodes);
                 break;
-                
-            case "catch_clause":
-                _indentLevel--;
-                AppendIndented(" } catch (");
-                _contextStack.Push("catch");
-                break;
-                
-            case "catch_formal_parameter":
-                break;
-                
-            case "catch_block":
-                Append(" {\n");
-                _indentLevel++;
-                _contextStack.Push("catch_block");
-                break;
-                
-            case "finally_block":
-                _indentLevel--;
-                AppendIndented(" } finally {\n");
-                _indentLevel++;
-                _contextStack.Push("finally");
-                break;
-                
-            // Try-with-resources
-            case "try_with_resources_statement":
-                Append("try (");
-                _contextStack.Push("try_with_resources");
-                break;
-                
-            case "resource_specification":
-                break;
-                
-            case "resource":
-                break;
-                
-            // Synchronized
-            case "synchronized_statement":
-                Append("synchronized (");
-                _contextStack.Push("synchronized");
-                break;
-                
-            case "synchronized_block":
-                Append(") {\n");
-                _indentLevel++;
-                _contextStack.Push("synchronized_block");
-                break;
-                
-            // Lambda expressions
-            case "lambda_expression":
-                Append("(");
-                _contextStack.Push("lambda");
-                break;
-                
-            case "lambda_parameters":
-                break;
-                
-            case "lambda_body":
-                Append(") -> ");
-                _contextStack.Push("lambda_body");
-                break;
-                
-            // Method reference
-            case "method_reference":
-                _contextStack.Push("method_reference");
-                break;
-                
-            // Array creation
-            case "array_creation_expression":
-                Append("new ");
-                _contextStack.Push("array_creation");
-                break;
-                
-            // Object creation
-            case "object_creation_expression":
-                Append("new ");
-                _contextStack.Push("object_creation");
-                break;
-                
-            // Static initializer
-            case "static_initializer":
-                AppendIndented("static {\n");
-                _indentLevel++;
-                _contextStack.Push("static_initializer");
-                break;
-                
-            // Instance initializer
-            case "instance_initializer":
-                AppendIndented("{\n");
-                _indentLevel++;
-                _contextStack.Push("instance_initializer");
-                break;
-                
-            // Annotations
-            case "annotation":
-                Append("@");
-                _contextStack.Push("annotation");
-                break;
-                
-            case "annotation_name":
-                break;
-                
-            case "element_value_pairs":
-                Append("(");
-                _contextStack.Push("element_value_pairs");
-                break;
-                
-            case "element_value_pair":
-                break;
-                
-            // Types
-            case "type":
-                break;
-                
-            case "reference_type":
-                break;
-                
-            case "primitive_type":
-                break;
-                
-            // Statements
-            case "statement":
-                break;
-                
-            case "statement_expression":
-                break;
-                
-            case "expression_statement":
-                break;
-                
-            case "empty_statement":
-                Append(";\n");
-                break;
-                
-            case "labeled_statement":
-                break;
-                
-            case "break_statement":
-                AppendIndented("break");
-                break;
-                
-            case "continue_statement":
-                AppendIndented("continue");
-                break;
-                
             case "return_statement":
-                AppendIndented("return");
-                _contextStack.Push("return");
+                VisitReturnStatement(packedNode, childNodes);
                 break;
-                
             case "throw_statement":
-                AppendIndented("throw ");
-                _contextStack.Push("throw");
+                VisitThrowStatement(packedNode, childNodes);
                 break;
-                
-            // Blocks
             case "block":
-                Append("{\n");
-                _indentLevel++;
-                _contextStack.Push("block");
+                VisitBlock(packedNode, childNodes);
                 break;
-                
-            // Expressions
-            case "expression":
+            case "expression_statement":
+                VisitExpressionStatement(packedNode, childNodes);
                 break;
-                
-            case "primary_expression":
-                break;
-                
-            case "assignment_expression":
-                break;
-                
-            case "conditional_expression":
-                break;
-                
-            case "binary_expression":
-                break;
-                
-            case "unary_expression":
-                break;
-                
-            case "cast_expression":
-                Append("(");
-                _contextStack.Push("cast");
-                break;
-                
-            case "instanceof_expression":
-                Append(" instanceof ");
-                _contextStack.Push("instanceof");
-                break;
-                
-            // Literals
-            case "string_literal":
-                break;
-                
-            case "integer_literal":
-                break;
-                
-            case "floating_point_literal":
-                break;
-                
-            case "boolean_literal":
-                break;
-                
-            case "null_literal":
-                Append("null");
-                break;
-                
-            case "character_literal":
-                break;
-                
-            // Names
-            case "qualified_name":
-                break;
-                
-            case "simple_name":
-                break;
-                
-            // Comments (preserve if present)
-            case "comment":
-                Append("// ");
-                _contextStack.Push("comment");
-                break;
-                
-            case "block_comment":
-                Append("/* ");
-                _contextStack.Push("block_comment");
-                break;
-                
-            case "javadoc_comment":
-                Append("/**\n");
-                _indentLevel++;
-                _contextStack.Push("javadoc");
-                break;
-                
             default:
-                // Unknown node type - just continue
+                // Visit children
+                foreach (var child in childNodes)
+                {
+                    Visit(child);
+                }
                 break;
         }
     }
 
-    private void VisitIdentifierNode(IdentifierNode node)
+    /// <summary>
+    /// Gets the node type from a PackedNode.
+    /// </summary>
+    private string GetNodeType(CognitiveGraph.PackedNode packedNode)
     {
-        Append(node.Text);
+        // Try to get the node type from the packed node
+        // This would come from the SymbolNode's NodeType
+        return "unknown";
     }
 
-    private void VisitLiteralNode(LiteralNode node)
+    /// <summary>
+    /// Checks if a PackedNode is valid for unparsing.
+    /// </summary>
+    private bool IsValidPackedNode(CognitiveGraph.PackedNode packedNode)
     {
-        if (node.Value == null)
+        // Basic validation - check if it has children or is a leaf
+        var childNodes = packedNode.GetChildNodes();
+        return childNodes.Count > 0 || packedNode.RuleID > 0;
+    }
+
+    /// <summary>
+    /// Writes a node directly.
+    /// </summary>
+    private void WriteNode(CognitiveGraph.SymbolNode node)
+    {
+        var text = node.GetSourceText();
+        if (!string.IsNullOrEmpty(text))
         {
-            Append("null");
+            Write(text.ToString());
+        }
+    }
+
+    /// <summary>
+    /// Writes text to the output.
+    /// </summary>
+    private void Write(string text)
+    {
+        if (string.IsNullOrEmpty(text))
             return;
+
+        if (_atLineStart)
+        {
+            WriteIndent();
+            _atLineStart = false;
+        }
+
+        _builder.Append(text);
+        
+        // Check if we need a semicolon after this
+        if (!text.EndsWith(";") && !text.EndsWith("{") && !text.EndsWith("}") && 
+            !text.EndsWith("(") && !text.EndsWith(")") && !text.EndsWith(","))
+        {
+            _needsSemicolon = true;
+        }
+        else
+        {
+            _needsSemicolon = false;
         }
         
-        switch (node.Value)
+        // Check for newlines
+        if (text.Contains("\n"))
         {
-            case string stringValue:
-                // Escape special characters in string
-                var escaped = stringValue
-                    .Replace("\\", "\\\\")
-                    .Replace("\"", "\\\"")
-                    .Replace("\n", "\\n")
-                    .Replace("\r", "\\r")
-                    .Replace("\t", "\\t");
-                Append($"\"{escaped}\"");
-                break;
-                
-            case int intValue:
-                Append(intValue.ToString());
-                break;
-                
-            case long longValue:
-                Append(longValue.ToString() + "L");
-                break;
-                
-            case float floatValue:
-                Append(floatValue.ToString() + "f");
-                break;
-                
-            case double doubleValue:
-                Append(doubleValue.ToString());
-                break;
-                
-            case bool boolValue:
-                Append(boolValue ? "true" : "false");
-                break;
-                
-            case char charValue:
-                Append($"'{EscapeChar(charValue)}'");
-                break;
-                
-            default:
-                Append(node.Value.ToString());
-                break;
+            _atLineStart = true;
         }
     }
 
-    private void AppendModifiers(NonTerminalNode node)
+    /// <summary>
+    /// Writes a newline.
+    /// </summary>
+    private void WriteLine()
     {
-        // Find modifier children and append them
-        foreach (var child in node.Children)
+        _builder.AppendLine();
+        _atLineStart = true;
+    }
+
+    /// <summary>
+    /// Writes the current indentation.
+    /// </summary>
+    private void WriteIndent()
+    {
+        for (int i = 0; i < _indentLevel; i++)
         {
-            if (child is TerminalNode terminal && IsJavaModifier(terminal.Text))
+            _builder.Append("    ");
+        }
+    }
+
+    /// <summary>
+    /// Increases the indentation level.
+    /// </summary>
+    private void Indent()
+    {
+        _indentLevel++;
+    }
+
+    /// <summary>
+    /// Decreases the indentation level.
+    /// </summary>
+    private void Unindent()
+    {
+        if (_indentLevel > 0)
+            _indentLevel--;
+    }
+
+    /// <summary>
+    /// Visits a compilation unit.
+    /// </summary>
+    private void VisitCompilationUnit(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        // Visit all children of the compilation unit
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+    }
+
+    /// <summary>
+    /// Visits a package declaration.
+    /// </summary>
+    private void VisitPackageDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("package ");
+        
+        // Visit package name
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+        
+        Write(";");
+        WriteLine();
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits an import declaration.
+    /// </summary>
+    private void VisitImportDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("import ");
+        
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+        
+        Write(";");
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a class declaration.
+    /// </summary>
+    private void VisitClassDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        // Visit modifiers
+        // Visit class keyword
+        // Visit class name
+        // Visit type parameters
+        // Visit extends
+        // Visit implements
+        // Visit body
+        
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+    }
+
+    /// <summary>
+    /// Visits an interface declaration.
+    /// </summary>
+    private void VisitInterfaceDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+    }
+
+    /// <summary>
+    /// Visits an enum declaration.
+    /// </summary>
+    private void VisitEnumDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+    }
+
+    /// <summary>
+    /// Visits a record declaration (Java 14+).
+    /// </summary>
+    private void VisitRecordDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+    }
+
+    /// <summary>
+    /// Visits a method declaration.
+    /// </summary>
+    private void VisitMethodDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+    }
+
+    /// <summary>
+    /// Visits a field declaration.
+    /// </summary>
+    private void VisitFieldDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+        
+        Write(";");
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits an if statement.
+    /// </summary>
+    private void VisitIfStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("if ");
+        
+        // Visit condition (first child)
+        if (childNodes.Count > 0)
+        {
+            Visit(childNodes[0]);
+        }
+        
+        // Visit then statement
+        if (childNodes.Count > 1)
+        {
+            var thenStatement = childNodes[1];
+            if (thenStatement is CognitiveGraph.SymbolNode symbolNode && 
+                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
             {
-                Append(terminal.Text);
-                Append(" ");
+                Write(" ");
+                Visit(thenStatement);
+            }
+            else
+            {
+                Write(" { ");
+                Visit(thenStatement);
+                Write(" }");
             }
         }
-    }
-
-    private void Append(string text)
-    {
-        _code.Append(text);
-        _needsNewline = false;
-    }
-
-    private void AppendIndented(string text)
-    {
-        Append(new string(' ', _indentLevel * 4));
-        Append(text);
-    }
-
-    private void AppendIndentedLine(string text)
-    {
-        AppendIndented(text);
-        AppendLine();
-    }
-
-    private void AppendLine()
-    {
-        Append("\n");
-        _needsNewline = false;
-    }
-
-    private void AppendLine(string text)
-    {
-        Append(text);
-        AppendLine();
-    }
-
-    private bool IsJavaKeyword(string text)
-    {
-        var keywords = new HashSet<string>(StringComparer.Ordinal)
-        {
-            // Modifiers
-            "public", "private", "protected", "static", "final", "abstract", 
-            "synchronized", "native", "strictfp", "transient", "volatile",
-            
-            // Class/interface/enum
-            "class", "interface", "enum", "record", "sealed", "non-sealed",
-            
-            // Method
-            "void", "return", "this", "super",
-            
-            // Control flow
-            "if", "else", "switch", "case", "default", "for", "while", "do",
-            "break", "continue", "try", "catch", "finally", "throw", "throws",
-            
-            // Types
-            "byte", "short", "int", "long", "char", "float", "double", "boolean",
-            "String", "Object", "Class", "Void",
-            
-            // Object-oriented
-            "new", "extends", "implements", "instanceof", "import", "package",
-            
-            // Generics
-            "<", ">",
-            
-            // Annotations
-            "@interface",
-            
-            // Other
-            "var", "yield"
-        };
         
-        return keywords.Contains(text);
-    }
-
-    private bool IsControlKeyword(string text)
-    {
-        var controlKeywords = new HashSet<string>(StringComparer.Ordinal)
+        // Visit else clause if present
+        if (childNodes.Count > 2)
         {
-            "if", "else", "for", "while", "do", "switch", "case", "default",
-            "try", "catch", "finally", "return", "throw", "break", "continue"
-        };
-        
-        return controlKeywords.Contains(text);
-    }
-
-    private bool NeedsSpaceAfter(string text)
-    {
-        var keywords = new HashSet<string>(StringComparer.Ordinal)
-        {
-            "public", "private", "protected", "static", "final", "abstract",
-            "synchronized", "native", "class", "interface", "enum",
-            "void", "int", "long", "double", "float", "char", "boolean",
-            "byte", "short", "String", "if", "else", "for", "while", "do",
-            "switch", "case", "default", "try", "catch", "finally", "return",
-            "throw", "new", "extends", "implements"
-        };
-        
-        return keywords.Contains(text);
-    }
-
-    private bool IsJavaOperator(string text)
-    {
-        var operators = new HashSet<string>
-        {
-            "+", "-", "*", "/", "%", "=", "+=", "-=", "*=", "/=", "%=",
-            "==", "!=", ">", "<", ">=", "<=", "&&", "||", "!", "&", "|",
-            "^", "~", "<<", ">>", ">>>", "<<<", ">>>", "->", "::", ".", "?", ":"
-        };
-        
-        return operators.Contains(text);
-    }
-
-    private bool IsSeparator(string text)
-    {
-        return text == "(" || text == ")" || text == "{" || text == "}" || 
-               text == "[" || text == "]" || text == ";" || text == "," || 
-               text == "." || text == ":" || text == "?";
-    }
-
-    private bool IsJavaModifier(string text)
-    {
-        var modifiers = new HashSet<string>(StringComparer.Ordinal)
-        {
-            "public", "private", "protected", "static", "final", "abstract",
-            "synchronized", "native", "strictfp", "transient", "volatile"
-        };
-        
-        return modifiers.Contains(text);
-    }
-
-    private string EscapeChar(char c)
-    {
-        switch (c)
-        {
-            case '\\': return "\\\\";
-            case '"': return "\\\"";
-            case '\'': return "\\'"";
-            case '\n': return "\\n";
-            case '\r': return "\\r";
-            case '\t': return "\\t";
-            default: return c.ToString();
+            Write(" else ");
+            var elseStatement = childNodes[2];
+            if (elseStatement is CognitiveGraph.SymbolNode symbolNode && 
+                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
+            {
+                Visit(elseStatement);
+            }
+            else
+            {
+                Write("{ ");
+                Visit(elseStatement);
+                Write(" }");
+            }
         }
+        
+        WriteLine();
     }
+
+    /// <summary>
+    /// Visits a for statement.
+    /// </summary>
+    private void VisitForStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("for ");
+        
+        // Visit initialization, condition, update, body
+        for (int i = 0; i < Math.Min(4, childNodes.Count); i++)
+        {
+            Visit(childNodes[i]);
+            if (i < 2) // After initialization and condition
+            {
+                Write("; ");
+            }
+        }
+        
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a while statement.
+    /// </summary>
+    private void VisitWhileStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("while ");
+        
+        // Visit condition
+        if (childNodes.Count > 0)
+        {
+            Visit(childNodes[0]);
+        }
+        
+        // Visit body
+        if (childNodes.Count > 1)
+        {
+            var body = childNodes[1];
+            if (body is CognitiveGraph.SymbolNode symbolNode && 
+                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
+            {
+                Write(" ");
+                Visit(body);
+            }
+            else
+            {
+                Write(" { ");
+                Visit(body);
+                Write(" }");
+            }
+        }
+        
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a do statement.
+    /// </summary>
+    private void VisitDoStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("do ");
+        
+        // Visit body
+        if (childNodes.Count > 0)
+        {
+            var body = childNodes[0];
+            if (body is CognitiveGraph.SymbolNode symbolNode && 
+                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
+            {
+                Visit(body);
+            }
+            else
+            {
+                Write("{ ");
+                Visit(body);
+                Write(" }");
+            }
+        }
+        
+        Write(" while ");
+        
+        // Visit condition
+        if (childNodes.Count > 1)
+        {
+            Visit(childNodes[1]);
+        }
+        
+        Write(";");
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a try statement.
+    /// </summary>
+    private void VisitTryStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("try ");
+        
+        // Visit try block
+        if (childNodes.Count > 0)
+        {
+            Visit(childNodes[0]);
+        }
+        
+        // Visit catch clauses
+        for (int i = 1; i < childNodes.Count; i++)
+        {
+            Visit(childNodes[i]);
+        }
+        
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a switch statement.
+    /// </summary>
+    private void VisitSwitchStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("switch ");
+        
+        // Visit expression
+        if (childNodes.Count > 0)
+        {
+            Visit(childNodes[0]);
+        }
+        
+        Write(" { ");
+        WriteLine();
+        Indent();
+        
+        // Visit case groups
+        for (int i = 1; i < childNodes.Count; i++)
+        {
+            Visit(childNodes[i]);
+        }
+        
+        Unindent();
+        Write("}");
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a return statement.
+    /// </summary>
+    private void VisitReturnStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("return ");
+        
+        // Visit expression if present
+        if (childNodes.Count > 0)
+        {
+            Visit(childNodes[0]);
+        }
+        
+        Write(";");
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a throw statement.
+    /// </summary>
+    private void VisitThrowStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("throw ");
+        
+        // Visit expression
+        if (childNodes.Count > 0)
+        {
+            Visit(childNodes[0]);
+        }
+        
+        Write(";");
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Visits a block.
+    /// </summary>
+    private void VisitBlock(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        Write("{ ");
+        WriteLine();
+        Indent();
+        
+        // Visit all statements in the block
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+        
+        Unindent();
+        Write("}");
+    }
+
+    /// <summary>
+    /// Visits an expression statement.
+    /// </summary>
+    private void VisitExpressionStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    {
+        foreach (var child in childNodes)
+        {
+            Visit(child);
+        }
+        
+        Write(";");
+        WriteLine();
+    }
+
+    /// <summary>
+    /// Disposes the visitor.
+    /// </summary>
+    public override void Dispose()
+    {
+        _builder.Clear();
+        _needsSemicolonStack.Clear();
+    }
+}
+
+/// <summary>
+/// Base class for unparse visitors.
+/// </summary>
+public abstract class UnparseVisitorBase : IDisposable
+{
+    /// <summary>
+    /// Initializes the visitor.
+    /// </summary>
+    public virtual void Initialize() { }
+
+    /// <summary>
+    /// Resets the visitor state.
+    /// </summary>
+    public virtual void Reset() { }
+
+    /// <summary>
+    /// Gets the generated code.
+    /// </summary>
+    public abstract string GetGeneratedCode();
+
+    /// <summary>
+    /// Visits the specified node.
+    /// </summary>
+    public virtual void Visit(CognitiveGraphNode node) { }
+
+    /// <summary>
+    /// Visits the specified symbol node.
+    /// </summary>
+    public virtual void Visit(CognitiveGraph.SymbolNode node) { }
+
+    /// <summary>
+    /// Disposes the visitor.
+    /// </summary>
+    public virtual void Dispose() { }
 }

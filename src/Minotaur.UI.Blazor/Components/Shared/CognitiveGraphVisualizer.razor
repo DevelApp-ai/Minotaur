@@ -1,0 +1,253 @@
+@* CognitiveGraph Visualizer Component *@
+@* Visualizes CognitiveGraph with full PackedNode ambiguity support *@
+
+@using Microsoft.JSInterop
+@using Minotaur.Core.Models.Visualization
+@inject IJSRuntime JSRuntime
+
+<div class="cognitive-graph-visualizer">
+    <!-- Header -->
+    <div class="visualizer-header">
+        <div class="header-left">
+            <h5><i class="bi bi-diagram-3"></i> CognitiveGraph Visualizer</h5>
+            @if (!string.IsNullOrEmpty(GrammarName))
+            {
+                <span class="grammar-badge badge bg-secondary">@GrammarName</span>
+            }
+        </div>
+        <div class="header-right">
+            <div class="btn-group btn-group-sm" role="group">
+                <button class="btn @(Mode == VisualizationMode.ShowAllInterpretations ? "btn-primary" : "btn-outline-primary")" 
+                        @onclick="() => SetMode(VisualizationMode.ShowAllInterpretations)">
+                    <i class="bi bi-diagram-3"></i> All PackedNodes
+                </button>
+                <button class="btn @(Mode == VisualizationMode.ShowSelectedInterpretation ? "btn-primary" : "btn-outline-primary")" 
+                        @onclick="() => SetMode(VisualizationMode.ShowSelectedInterpretation)">
+                    <i class="bi bi-tree"></i> Single Path
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Bar -->
+    @if (Visualization != null)
+    {
+        <div class="info-bar">
+            <div class="info-left">
+                <span class="info-item"><i class="bi bi-nodes"></i> @Visualization.GraphData.Nodes.Count SymbolNodes</span>
+                <span class="info-item"><i class="bi bi-link"></i> @Visualization.GraphData.Edges.Count edges</span>
+            </div>
+            <div class="info-right">
+                @if (Visualization.HasAmbiguities)
+                {
+                    <span class="info-item text-warning">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @Visualization.AmbiguityCount ambiguity@(Visualization.AmbiguityCount != 1 ? " points" : " point")
+                    </span>
+                }
+                else
+                {
+                    <span class="info-item text-success"><i class="bi bi-check-circle"></i> Unambiguous</span>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Visualization Canvas -->
+    <div class="visualization-canvas" @ref="canvasRef">
+        @if (Visualization != null)
+        {
+            <svg id="@CanvasId" class="visualization-svg"></svg>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="bi bi-diagram-3 fs-1"></i>
+                <p>No visualization data available</p>
+                <small>Parse source code to visualize the CognitiveGraph</small>
+            </div>
+        }
+    </div>
+
+    <!-- Ambiguity Details -->
+    @if (Visualization != null && Visualization.HasAmbiguities && ShowAmbiguityDetails)
+    {
+        <div class="ambiguity-details">
+            <div class="details-header" @onclick="ToggleAmbiguityDetails">
+                <h6><i class="bi bi-exclamation-triangle"></i> PackedNode Ambiguities (@Visualization.AmbiguityCount)</h6>
+                <i class="bi @(ShowAmbiguityDetails ? "bi-chevron-up" : "bi-chevron-down")"></i>
+            </div>
+            @if (ShowAmbiguityDetails)
+            {
+                <div class="details-body">
+                    @foreach (var kvp in Visualization.Ambiguities)
+                    {
+                        var ambiguity = kvp.Value;
+                        <div class="ambiguity-item">
+                            <div class="item-header">
+                                <strong>SymbolNode @ambiguity.NodeId</strong>
+                                <span class="badge bg-warning">@ambiguity.AlternativeCount PackedNodes</span>
+                            </div>
+                            <div class="item-location">
+                                <small class="text-muted">
+                                    <i class="bi bi-geo-alt"></i> Line @ambiguity.Location.Start.Line, Column @ambiguity.Location.Start.Column
+                                </small>
+                            </div>
+                            <div class="packednodes-list">
+                                @foreach (var packedNode in ambiguity.PackedNodes)
+                                {
+                                    <div class="packednode @(ambiguity.SelectedPackedNode == packedNode.Index ? "selected" : "")" 
+                                         @onclick="() => SelectPackedNode(ambiguity.NodeId, packedNode)">
+                                        <div class="packednode-header">
+                                            <i class="bi bi-gem"></i>
+                                            <strong>PackedNode[@packedNode.Index]</strong>
+                                            <span class="badge bg-secondary">Rule @packedNode.RuleId</span>
+                                        </div>
+                                        <div class="packednode-info">
+                                            <small>Rule: <code>@packedNode.RuleName</code></small>
+                                            @if (packedNode.ChildNodeIds.Any())
+                                            {
+                                                <small class="ms-2">Children: @string.Join(", ", packedNode.ChildNodeIds)</small>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+.cognitive-graph-visualizer { height: 100%; display: flex; flex-direction: column; }
+.visualizer-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #dee2e6; background: #f8f9fa; }
+.header-left { display: flex; align-items: center; gap: 0.75rem; }
+.header-left h5 { margin: 0; color: #495057; }
+.grammar-badge { font-size: 0.875rem; }
+.info-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #e7f3ff; border-bottom: 1px solid #b3d9ff; font-size: 0.875rem; }
+.info-item { margin-right: 1rem; color: #495057; }
+.info-item:last-child { margin-right: 0; }
+.visualization-canvas { flex: 1; overflow: hidden; position: relative; background: #ffffff; }
+.visualization-svg { width: 100%; height: 100%; min-height: 400px; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #6c757d; text-align: center; padding: 2rem; }
+.empty-state i { margin-bottom: 1rem; opacity: 0.5; }
+.ambiguity-details { border-top: 1px solid #dee2e6; background: #f8f9fa; }
+.details-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; cursor: pointer; user-select: none; }
+.details-header h6 { margin: 0; color: #495057; }
+.details-body { padding: 0 1rem 1rem; }
+.ambiguity-item { padding: 0.75rem; margin-bottom: 0.75rem; background: white; border: 1px solid #dee2e6; border-radius: 0.375rem; }
+.item-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+.item-location { margin-bottom: 0.5rem; }
+.packednodes-list { margin-top: 0.5rem; padding-left: 1rem; }
+.packednode { padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid #e9ecef; border-radius: 0.25rem; cursor: pointer; transition: all 0.2s ease; }
+.packednode:hover { background-color: #f8f9fa; border-color: #adb5bd; }
+.packednode.selected { background-color: #e3f2fd; border-color: #2196f3; }
+.packednode-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+.packednode-info { font-size: 0.875rem; color: #6c757d; }
+</style>
+
+@code {
+    [Parameter]
+    public CognitiveGraphVisualization? Visualization { get; set; }
+
+    [Parameter]
+    public string GrammarName { get; set; } = string.Empty;
+
+    [Parameter]
+    public VisualizationMode Mode { get; set; } = VisualizationMode.ShowAllInterpretations;
+
+    [Parameter]
+    public EventCallback<VisualizationMode> OnModeChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<(string NodeId, PackedNodeInfo PackedNode)> OnPackedNodeSelected { get; set; }
+
+    private ElementReference canvasRef;
+    private DotNetObjectReference<CognitiveGraphVisualizer>? dotNetReference;
+    private IJSObjectReference? jsModule;
+    private bool ShowAmbiguityDetails = true;
+    private string CanvasId => $"cognitive-graph-canvas-{Guid.NewGuid()}";
+
+    private void SetMode(VisualizationMode mode)
+    {
+        Mode = mode;
+        OnModeChanged.InvokeAsync(mode);
+        _ = RenderVisualization();
+    }
+
+    private void ToggleAmbiguityDetails()
+    {
+        ShowAmbiguityDetails = !ShowAmbiguityDetails;
+    }
+
+    private void SelectPackedNode(string nodeId, PackedNodeInfo packedNode)
+    {
+        OnPackedNodeSelected.InvokeAsync((nodeId, packedNode));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetReference = DotNetObjectReference.Create(this);
+            
+            try
+            {
+                jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "/js/cognitiveGraphVisualization.js");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading visualization module: {ex.Message}");
+            }
+        }
+        
+        if (Visualization != null)
+        {
+            await RenderVisualization();
+        }
+    }
+
+    private async Task RenderVisualization()
+    {
+        if (jsModule == null || Visualization == null) return;
+
+        try
+        {
+            var jsonData = System.Text.Json.JsonSerializer.Serialize(Visualization);
+            await jsModule.InvokeVoidAsync("CognitiveGraphVisualizer.render", 
+                CanvasId, 
+                jsonData, 
+                Mode.ToString(),
+                dotNetReference);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error rendering visualization: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandlePackedNodeSelected(string nodeId, int packedNodeIndex)
+    {
+        if (Visualization?.Ambiguities.TryGetValue(nodeId, out var ambiguity) == true)
+        {
+            if (packedNodeIndex >= 0 && packedNodeIndex < ambiguity.PackedNodes.Count)
+            {
+                var packedNode = ambiguity.PackedNodes[packedNodeIndex];
+                await OnPackedNodeSelected.InvokeAsync((nodeId, packedNode));
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        dotNetReference?.Dispose();
+        if (jsModule != null)
+        {
+            await jsModule.DisposeAsync();
+        }
+    }
+}
