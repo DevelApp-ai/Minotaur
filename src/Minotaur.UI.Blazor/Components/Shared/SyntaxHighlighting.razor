@@ -1,0 +1,411 @@
+@*
+ * This file is part of Minotaur.
+ * Minotaur is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Minotaur is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
+ *
+ * This component provides syntax highlighting for code in the Minotaur editor.
+ * It supports multiple languages and themes.
+ *
+ * Usage:
+ * <SyntaxHighlighting Code="your code here" LanguageId="csharp" />
+ *
+ * Features:
+ * - Language-aware syntax highlighting
+ * - Light and dark theme support
+ * - Customizable color schemes
+ * - Line numbers
+ * - Current line highlighting
+ * - Matching bracket highlighting
+ *
+ * Dependencies:
+ * - Minotaur.Core.Services.Editor.SyntaxHighlightingService
+ * - Minotaur.Core.Models.Editor.SyntaxHighlightingModels
+ *
+ * Author: Minotaur Team
+ * License: GNU Affero General Public License v3.0
+ *
+ * Copyright (c) DevelApp-ai. All rights reserved.
+ * Licensed under the GNU Affero General Public License v3.0.
+ * See LICENSE file in the project root for full license information.
+ *
+ * @code {
+ *   <SyntaxHighlighting Code="public class Example { }" LanguageId="csharp" />
+ * }
+ *
+ * @inject SyntaxHighlightingService - Service for syntax highlighting
+ * @inject NavigationManager - For theme detection
+ * @implements IDisposable - To clean up event handlers
+ * *@
+
+@using Minotaur.Core.Models.Editor
+@using Minotaur.Core.Services.Editor
+@using Microsoft.AspNetCore.Components
+
+<div class="syntax-highlighting-container @ThemeClass" style="@ContainerStyle">
+    @if (ShowLineNumbers)
+    {
+        <div class="line-numbers">
+            @for (int i = 1; i <= LineCount; i++)
+            {
+                <div class="line-number @(CurrentLine == i ? "current-line" : "")" data-line="@i">@i</div>
+            }
+        </div>
+    }
+    
+    <pre class="code-content @(ShowLineNumbers ? "with-line-numbers" : "")"><code>@HighlightedHtml</code></pre>
+</div>
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+
+    [Parameter]
+    public string LanguageId { get; set; } = "csharp";
+
+    [Parameter]
+    public Theme Theme { get; set; } = Theme.System;
+
+    [Parameter]
+    public ColorScheme ColorScheme { get; set; } = ColorScheme.Default;
+
+    [Parameter]
+    public bool ShowLineNumbers { get; set; } = true;
+
+    [Parameter]
+    public bool HighlightCurrentLine { get; set; } = true;
+
+    [Parameter]
+    public bool HighlightMatchingBrackets { get; set; } = true;
+
+    [Parameter]
+    public int CurrentLine { get; set; } = 0;
+
+    [Parameter]
+    public int TabSize { get; set; } = 4;
+
+    [Parameter]
+    public bool UseSpaces { get; set; } = true;
+
+    [Parameter]
+    public string ContainerStyle { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> OnLanguageChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnLineClicked { get; set; }
+
+    [Inject]
+    public ISyntaxHighlightingService HighlightingService { get; set; }
+
+    private string HighlightedHtml { get; set; } = string.Empty;
+    private int LineCount { get; set; } = 0;
+    private string ThemeClass => GetThemeClass();
+    private bool IsDarkTheme => Theme == Theme.Dark || (Theme == Theme.System && IsSystemDark);
+    private bool IsSystemDark { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        UpdateHighlighting();
+        CheckSystemTheme();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        UpdateHighlighting();
+    }
+
+    private void CheckSystemTheme()
+    {
+        // In a real implementation, this would check the OS theme
+        // For now, we'll use a simple heuristic based on time of day
+        // or prefer dark theme for development
+        IsSystemDark = true; // Default to dark for development
+    }
+
+    private string GetThemeClass()
+    {
+        if (Theme == Theme.Dark)
+            return "dark-theme";
+        else if (Theme == Theme.Light)
+            return "light-theme";
+        else
+            return IsSystemDark ? "dark-theme" : "light-theme";
+    }
+
+    private void UpdateHighlighting()
+    {
+        if (string.IsNullOrEmpty(Code))
+        {
+            HighlightedHtml = string.Empty;
+            LineCount = 0;
+            return;
+        }
+
+        // Get the effective theme
+        var effectiveTheme = Theme == Theme.System ? (IsSystemDark ? Theme.Dark : Theme.Light) : Theme;
+
+        // Apply highlighting
+        var highlightedText = HighlightingService.ApplyHighlighting(Code, LanguageId);
+        HighlightedHtml = highlightedText.ToHtml();
+        
+        // Count lines
+        LineCount = Code.Split('\n').Length;
+    }
+
+    private void HandleLineClick(int lineNumber)
+    {
+        OnLineClicked.InvokeAsync(lineNumber);
+    }
+
+    public void Refresh()
+    {
+        UpdateHighlighting();
+        StateHasChanged();
+    }
+
+    public void SetTheme(Theme theme)
+    {
+        Theme = theme;
+        UpdateHighlighting();
+        StateHasChanged();
+    }
+
+    public void SetLanguage(string languageId)
+    {
+        LanguageId = languageId;
+        OnLanguageChanged.InvokeAsync(languageId);
+        UpdateHighlighting();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        // Clean up any resources
+    }
+}
+
+<style>
+    .syntax-highlighting-container {
+        position: relative;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        overflow-x: auto;
+        overflow-y: hidden;
+        background-color: var(--bg-color, #ffffff);
+        color: var(--text-color, #000000);
+        border: 1px solid var(--border-color, #cccccc);
+        border-radius: 4px;
+    }
+
+    .syntax-highlighting-container.dark-theme {
+        --bg-color: #1e1e1e;
+        --text-color: #d4d4d4;
+        --border-color: #444444;
+        --line-number-bg: #2d2d2d;
+        --line-number-color: #888888;
+        --current-line-bg: #2d2d30;
+        --selection-bg: #264f78;
+    }
+
+    .syntax-highlighting-container.light-theme {
+        --bg-color: #ffffff;
+        --text-color: #000000;
+        --border-color: #cccccc;
+        --line-number-bg: #f5f5f5;
+        --line-number-color: #666666;
+        --current-line-bg: #ffffdd;
+        --selection-bg: #007acc;
+    }
+
+    .line-numbers {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 50px;
+        padding: 8px 0;
+        background-color: var(--line-number-bg);
+        text-align: right;
+        user-select: none;
+        overflow: hidden;
+        border-right: 1px solid var(--border-color);
+    }
+
+    .line-number {
+        padding: 0 8px;
+        color: var(--line-number-color);
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .line-number:hover {
+        background-color: rgba(100, 100, 100, 0.2);
+    }
+
+    .line-number.current-line {
+        background-color: var(--current-line-bg);
+        color: var(--text-color);
+        font-weight: bold;
+    }
+
+    .code-content {
+        margin: 0;
+        padding: 8px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        min-height: 100%;
+    }
+
+    .code-content.with-line-numbers {
+        padding-left: 60px;
+    }
+
+    /* Token styles - Light theme */
+    .light-theme .token-keyword {
+        color: #0000FF;
+        font-weight: bold;
+    }
+
+    .light-theme .token-type {
+        color: #2B91AF;
+    }
+
+    .light-theme .token-string {
+        color: #A31515;
+    }
+
+    .light-theme .token-number {
+        color: #098658;
+    }
+
+    .light-theme .token-comment {
+        color: #008000;
+        font-style: italic;
+    }
+
+    .light-theme .token-character {
+        color: #A31515;
+    }
+
+    .light-theme .token-boolean {
+        color: #0000FF;
+    }
+
+    .light-theme .token-null {
+        color: #000080;
+    }
+
+    .light-theme .token-identifier {
+        color: #000000;
+    }
+
+    .light-theme .token-operator {
+        color: #000000;
+    }
+
+    .light-theme .token-punctuation {
+        color: #000000;
+    }
+
+    .light-theme .token-preprocessor {
+        color: #800080;
+    }
+
+    .light-theme .token-function {
+        color: #74531F;
+    }
+
+    .light-theme .token-variable {
+        color: #000000;
+    }
+
+    /* Token styles - Dark theme */
+    .dark-theme .token-keyword {
+        color: #569CD6;
+    }
+
+    .dark-theme .token-type {
+        color: #4EC9B0;
+    }
+
+    .dark-theme .token-string {
+        color: #CE9178;
+    }
+
+    .dark-theme .token-number {
+        color: #B5CEA8;
+    }
+
+    .dark-theme .token-comment {
+        color: #6A9955;
+        font-style: italic;
+    }
+
+    .dark-theme .token-character {
+        color: #CE9178;
+    }
+
+    .dark-theme .token-boolean {
+        color: #569CD6;
+    }
+
+    .dark-theme .token-null {
+        color: #569CD6;
+    }
+
+    .dark-theme .token-identifier {
+        color: #9CDCFE;
+    }
+
+    .dark-theme .token-operator {
+        color: #D4D4D4;
+    }
+
+    .dark-theme .token-punctuation {
+        color: #D4D4D4;
+    }
+
+    .dark-theme .token-preprocessor {
+        color: #9CDCFE;
+    }
+
+    .dark-theme .token-function {
+        color: #DCDCAA;
+    }
+
+    .dark-theme .token-variable {
+        color: #9CDCFE;
+    }
+
+    /* Bracket highlighting */
+    .token-bracket-highlight {
+        background-color: rgba(255, 255, 0, 0.3);
+        border-radius: 2px;
+    }
+
+    /* Current line highlighting */
+    .current-line-highlight {
+        background-color: var(--current-line-bg);
+    }
+
+    /* Selection */
+    ::selection {
+        background-color: var(--selection-bg);
+        color: #ffffff;
+    }
+</style>

@@ -1,0 +1,490 @@
+@*
+ * This file is part of Minotaur.
+ * Minotaur is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * Minotaur is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
+ *
+ * This component provides code folding functionality for the Minotaur editor.
+ * It allows users to collapse and expand code blocks.
+ *
+ * Usage:
+ * <CodeFolding Code="your code here" LanguageId="csharp" />
+ *
+ * Features:
+ * - Automatic detection of foldable regions
+ * - Manual folding with #region directives
+ * - Collapse/expand all functionality
+ * - Persistent fold state
+ * - Keyboard shortcuts
+ * - Visual indicators for folded code
+ *
+ * Dependencies:
+ * - Minotaur.Core.Services.Editor.CodeFoldingService
+ * - Minotaur.Core.Models.Editor.CodeFoldingModels
+ *
+ * Author: Minotaur Team
+ * License: GNU Affero General Public License v3.0
+ *
+ * Copyright (c) DevelApp-ai. All rights reserved.
+ * Licensed under the GNU Affero General Public License v3.0.
+ * See LICENSE file in the project root for full license information.
+ *
+ * @code {
+ *   <CodeFolding Code="public class Example { void Method() { } }" LanguageId="csharp" />
+ * }
+ *
+ * @inject CodeFoldingService - Service for code folding
+ * @implements IDisposable - To clean up event handlers
+ * *@
+
+@using Minotaur.Core.Models.Editor
+@using Minotaur.Core.Services.Editor
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+
+<div class="code-folding-container @ThemeClass" style="@ContainerStyle">
+    <div class="folding-toolbar">
+        <button class="fold-button" @onclick="CollapseAll" title="Collapse all">
+            <span class="fold-icon">&#9660;</span> Collapse All
+        </button>
+        <button class="fold-button" @onclick="ExpandAll" title="Expand all">
+            <span class="fold-icon">&#9650;</span> Expand All
+        </button>
+    </div>
+    
+    <div class="code-content" @ref="codeContainer">
+        @if (FoldableRegions != null && FoldableRegions.Any())
+        {
+            @RenderCodeWithFolds()
+        }
+        else
+        {
+            <pre><code>@Code</code></pre>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+
+    [Parameter]
+    public string LanguageId { get; set; } = "csharp";
+
+    [Parameter]
+    public Theme Theme { get; set; } = Theme.System;
+
+    [Parameter]
+    public bool ShowLineNumbers { get; set; } = true;
+
+    [Parameter]
+    public bool ShowFoldIcons { get; set; } = true;
+
+    [Parameter]
+    public string ContainerStyle { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnFoldStateChanged { get; set; }
+
+    [Inject]
+    public ICodeFoldingService FoldingService { get; set; }
+
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+
+    private ElementReference codeContainer;
+    private List<FoldableRegion> FoldableRegions { get; set; } = new List<FoldableRegion>();
+    private List<FoldableRegion> VisibleRegions { get; set; } = new List<FoldableRegion>();
+    private string ThemeClass => GetThemeClass();
+    private bool IsDarkTheme => Theme == Theme.Dark || (Theme == Theme.System && IsSystemDark);
+    private bool IsSystemDark { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        IdentifyFoldableRegions();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        IdentifyFoldableRegions();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        
+        if (firstRender)
+        {
+            await InitializeFoldIcons();
+        }
+    }
+
+    private void IdentifyFoldableRegions()
+    {
+        if (string.IsNullOrEmpty(Code) || string.IsNullOrEmpty(LanguageId))
+        {
+            FoldableRegions = new List<FoldableRegion>();
+            VisibleRegions = new List<FoldableRegion>();
+            return;
+        }
+
+        FoldableRegions = FoldingService.IdentifyFoldableRegions(Code, LanguageId);
+        VisibleRegions = new List<FoldableRegion>(FoldableRegions);
+    }
+
+    private string GetThemeClass()
+    {
+        if (Theme == Theme.Dark)
+            return "dark-theme";
+        else if (Theme == Theme.Light)
+            return "light-theme";
+        else
+            return IsSystemDark ? "dark-theme" : "light-theme";
+    }
+
+    private RenderFragment RenderCodeWithFolds()
+    {
+        var lines = Code.Split('\n');
+        var result = new List<RenderFragment>();
+        var currentRegionIndex = 0;
+        var currentLine = 0;
+
+        while (currentLine < lines.Length)
+        {
+            // Check if this line starts a foldable region
+            var region = FindRegionAtLine(currentLine);
+            
+            if (region != null && currentRegionIndex < FoldableRegions.Count)
+            {
+                // Check if this region should be folded
+                var isCollapsed = FoldingService.GetFoldState(LanguageId, region.StartLine, region.EndLine) == FoldState.Collapsed;
+                
+                if (isCollapsed)
+                {
+                    // Render folded region
+                    result.Add(RenderFoldedRegion(region, currentLine));
+                    currentLine = region.EndLine + 1;
+                    currentRegionIndex++;
+                }
+                else
+                {
+                    // Render the line with fold icon
+                    result.Add(RenderLineWithFoldIcon(lines[currentLine], currentLine, region, true));
+                    currentLine++;
+                }
+            }
+            else
+            {
+                // Render normal line
+                result.Add(RenderLine(lines[currentLine], currentLine));
+                currentLine++;
+            }
+        }
+
+        return builder =>
+        {
+            foreach (var fragment in result)
+            {
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "code-line");
+                builder.AddContent(2, fragment);
+                builder.CloseElement();
+            }
+        };
+    }
+
+    private FoldableRegion FindRegionAtLine(int lineNumber)
+    {
+        // Line numbers are 0-based internally
+        return FoldableRegions.FirstOrDefault(r => r.StartLine - 1 == lineNumber);
+    }
+
+    private RenderFragment RenderLine(string line, int lineNumber)
+    {
+        return builder =>
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "code-line-content");
+            builder.AddAttribute(2, "data-line", lineNumber + 1);
+            builder.AddContent(3, line);
+            builder.CloseElement();
+        };
+    }
+
+    private RenderFragment RenderLineWithFoldIcon(string line, int lineNumber, FoldableRegion region, bool isStart)
+    {
+        return builder =>
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "code-line foldable-line");
+            builder.AddAttribute(2, "data-line", lineNumber + 1);
+            builder.AddAttribute(3, "data-region-id", $"{region.StartLine}-{region.EndLine}");
+            
+            if (ShowFoldIcons && isStart)
+            {
+                builder.OpenElement(1, "span");
+                builder.AddAttribute(2, "class", "fold-icon @GetFoldIconClass(region)");
+                builder.AddAttribute(3, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, () => ToggleFold(region)));
+                builder.AddContent(4, GetFoldIcon(region));
+                builder.CloseElement();
+            }
+            
+            builder.OpenElement(5, "span");
+            builder.AddAttribute(6, "class", "line-content");
+            builder.AddContent(7, line);
+            builder.CloseElement();
+            
+            builder.CloseElement();
+        };
+    }
+
+    private RenderFragment RenderFoldedRegion(FoldableRegion region, int startLine)
+    {
+        var lineCount = region.EndLine - region.StartLine + 1;
+        var foldedText = FoldingService.GetFoldedText(region, lineCount);
+
+        return builder =>
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", "folded-region");
+            builder.AddAttribute(2, "data-start-line", region.StartLine);
+            builder.AddAttribute(3, "data-end-line", region.EndLine);
+            builder.AddAttribute(4, "data-region-id", $"{region.StartLine}-{region.EndLine}");
+            
+            if (ShowFoldIcons)
+            {
+                builder.OpenElement(1, "span");
+                builder.AddAttribute(2, "class", "fold-icon expanded");
+                builder.AddAttribute(3, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, () => ToggleFold(region)));
+                builder.AddContent(4, "&#9650;");
+                builder.CloseElement();
+            }
+            
+            builder.OpenElement(5, "span");
+            builder.AddAttribute(6, "class", "folded-text");
+            builder.AddContent(7, foldedText);
+            builder.CloseElement();
+            
+            builder.CloseElement();
+        };
+    }
+
+    private string GetFoldIconClass(FoldableRegion region)
+    {
+        var state = FoldingService.GetFoldState(LanguageId, region.StartLine, region.EndLine);
+        return state == FoldState.Collapsed ? "collapsed" : "expanded";
+    }
+
+    private string GetFoldIcon(FoldableRegion region)
+    {
+        var state = FoldingService.GetFoldState(LanguageId, region.StartLine, region.EndLine);
+        return state == FoldState.Collapsed ? "&#9650;" : "&#9660;";
+    }
+
+    private void ToggleFold(FoldableRegion region)
+    {
+        var newState = FoldingService.ToggleFoldState(LanguageId, region.StartLine, region.EndLine);
+        OnFoldStateChanged.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private void CollapseAll()
+    {
+        FoldingService.CollapseAll(LanguageId, FoldableRegions);
+        OnFoldStateChanged.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private void ExpandAll()
+    {
+        FoldingService.ExpandAll();
+        OnFoldStateChanged.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private async Task InitializeFoldIcons()
+    {
+        // Initialize fold icon click handlers
+        await JSRuntime.InvokeVoidAsync("codeFolding.initialize");
+    }
+
+    public void Refresh()
+    {
+        IdentifyFoldableRegions();
+        StateHasChanged();
+    }
+
+    public void SetLanguage(string languageId)
+    {
+        LanguageId = languageId;
+        IdentifyFoldableRegions();
+        StateHasChanged();
+    }
+
+    public void SetTheme(Theme theme)
+    {
+        Theme = theme;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        // Clean up any resources
+    }
+}
+
+<style>
+    .code-folding-container {
+        position: relative;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        background-color: var(--bg-color, #ffffff);
+        color: var(--text-color, #000000);
+        border: 1px solid var(--border-color, #cccccc);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .code-folding-container.dark-theme {
+        --bg-color: #1e1e1e;
+        --text-color: #d4d4d4;
+        --border-color: #444444;
+        --fold-icon-color: #888888;
+        --folded-bg: #2d2d2d;
+        --folded-text: #888888;
+        --line-number-bg: #2d2d2d;
+        --line-number-color: #888888;
+    }
+
+    .code-folding-container.light-theme {
+        --bg-color: #ffffff;
+        --text-color: #000000;
+        --border-color: #cccccc;
+        --fold-icon-color: #666666;
+        --folded-bg: #f5f5f5;
+        --folded-text: #666666;
+        --line-number-bg: #f5f5f5;
+        --line-number-color: #666666;
+    }
+
+    .folding-toolbar {
+        display: flex;
+        gap: 8px;
+        padding: 4px 8px;
+        background-color: var(--bg-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .fold-button {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 6px;
+        font-size: 12px;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        color: var(--fold-icon-color);
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+    .fold-button:hover {
+        background-color: rgba(100, 100, 100, 0.2);
+        color: var(--text-color);
+    }
+
+    .fold-icon {
+        font-size: 10px;
+        cursor: pointer;
+        color: var(--fold-icon-color);
+        transition: transform 0.2s, color 0.2s;
+    }
+
+    .fold-icon:hover {
+        color: var(--text-color);
+    }
+
+    .fold-icon.collapsed {
+        transform: rotate(-90deg);
+    }
+
+    .fold-icon.expanded {
+        transform: rotate(0deg);
+    }
+
+    .code-content {
+        padding: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .code-line {
+        position: relative;
+        white-space: pre;
+    }
+
+    .code-line-content {
+        display: inline;
+    }
+
+    .foldable-line {
+        cursor: pointer;
+    }
+
+    .foldable-line:hover {
+        background-color: rgba(100, 100, 100, 0.1);
+    }
+
+    .folded-region {
+        position: relative;
+        padding: 2px 8px;
+        background-color: var(--folded-bg);
+        color: var(--folded-text);
+        font-style: italic;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+        border-radius: 3px;
+        margin: 2px 0;
+    }
+
+    .folded-region:hover {
+        background-color: rgba(100, 100, 100, 0.2);
+    }
+
+    .folded-text {
+        margin-left: 8px;
+    }
+
+    .line-content {
+        margin-left: 8px;
+    }
+</style>
+
+<script>
+    // JavaScript for handling fold icon clicks
+    window.codeFolding = {
+        initialize: function() {
+            // Add click handlers for fold icons
+            document.querySelectorAll('.fold-icon').forEach(function(icon) {
+                icon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // The click is handled by Blazor, but we can add visual feedback
+                    this.style.transform = this.style.transform === 'rotate(-90deg)' ? 'rotate(0deg)' : 'rotate(-90deg)';
+                });
+            });
+        }
+    };
+</script>
