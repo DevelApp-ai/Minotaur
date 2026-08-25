@@ -108,18 +108,6 @@ public class GraphEdge
 /// </summary>
 public class CodeLocation
 {
-    /// <summary>Gets or sets the start position.</summary>
-    public Position Start { get; set; } = new();
-
-    /// <summary>Gets or sets the end position.</summary>
-    public Position End { get; set; } = new();
-}
-
-/// <summary>
-/// Represents a position in source code (line, column, offset).
-/// </summary>
-public class Position
-{
     /// <summary>Gets or sets the line number (1-based).</summary>
     public int Line { get; set; } = 1;
 
@@ -128,6 +116,9 @@ public class Position
 
     /// <summary>Gets or sets the character offset (0-based).</summary>
     public int Offset { get; set; } = 0;
+
+    /// <summary>Gets or sets the length of the span.</summary>
+    public int Length { get; set; } = 0;
 }
 
 /// <summary>
@@ -138,6 +129,12 @@ public class NodeAmbiguityInfo
     /// <summary>Gets or sets the node identifier.</summary>
     public string NodeId { get; set; } = string.Empty;
 
+    /// <summary>Gets or sets the node name.</summary>
+    public string NodeName { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the node type.</summary>
+    public string NodeType { get; set; } = string.Empty;
+
     /// <summary>Gets or sets whether this node is ambiguous.</summary>
     public bool IsAmbiguous { get; set; } = false;
 
@@ -147,32 +144,53 @@ public class NodeAmbiguityInfo
     /// <summary>Gets or sets the number of PackedNodes (alternatives).</summary>
     public int AlternativeCount { get; set; } = 0;
 
-    /// <summary>Gets or sets the PackedNode information for each alternative.</summary>
-    public List<PackedNodeInfo> PackedNodes { get; set; } = new();
+    /// <summary>Gets or sets the PackedNode alternatives.</summary>
+    public List<PackedNodeAlternative> Alternatives { get; set; } = new();
 
     /// <summary>Gets or sets the currently selected PackedNode index.</summary>
     public int? SelectedPackedNode { get; set; }
 }
 
 /// <summary>
-/// Information about a PackedNode (one interpretation of a SymbolNode).
+/// Information about a PackedNode alternative.
 /// </summary>
-public class PackedNodeInfo
+public class PackedNodeAlternative
 {
     /// <summary>Gets or sets the index of this PackedNode.</summary>
     public int Index { get; set; }
 
-    /// <summary>Gets or sets the Rule ID.</summary>
-    public uint RuleId { get; set; }
-
-    /// <summary>Gets or sets the rule name.</summary>
-    public string RuleName { get; set; } = string.Empty;
-
-    /// <summary>Gets or sets the child SymbolNode IDs.</summary>
-    public List<string> ChildNodeIds { get; set; } = new();
+    /// <summary>Gets or sets the child count.</summary>
+    public int ChildCount { get; set; }
 
     /// <summary>Gets or sets whether this PackedNode is valid.</summary>
     public bool IsValid { get; set; } = true;
+
+    /// <summary>Gets or sets whether this is the preferred interpretation.</summary>
+    public bool IsPreferred { get; set; } = false;
+}
+
+/// <summary>
+/// Represents a complete path through all ambiguities.
+/// Maps SymbolNode ID to the chosen PackedNode index.
+/// </summary>
+public class InterpretationPath
+{
+    /// <summary>Gets or sets the choices made at each ambiguous node (node ID -> PackedNode index).</summary>
+    public Dictionary<string, int> NodeChoices { get; set; } = new();
+
+    /// <summary>Gets or sets the total number of ambiguities in this path.</summary>
+    public int AmbiguityCount => NodeChoices.Count;
+
+    /// <summary>
+    /// Creates a copy of this interpretation path.
+    /// </summary>
+    public InterpretationPath Clone()
+    {
+        return new InterpretationPath
+        {
+            NodeChoices = new Dictionary<string, int>(NodeChoices)
+        };
+    }
 }
 
 /// <summary>
@@ -180,20 +198,35 @@ public class PackedNodeInfo
 /// </summary>
 public class CognitiveGraphVisualization
 {
+    /// <summary>Gets or sets the graph name.</summary>
+    public string GraphName { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the grammar name.</summary>
+    public string GrammarName { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the source code.</summary>
+    public string SourceCode { get; set; } = string.Empty;
+
     /// <summary>Gets or sets the graph data.</summary>
     public GraphData GraphData { get; set; } = new();
 
-    /// <summary>Gets or sets ambiguity information by node ID.</summary>
-    public Dictionary<string, NodeAmbiguityInfo> Ambiguities { get; set; } = new();
+    /// <summary>Gets or sets the list of ambiguity points.</summary>
+    public List<NodeAmbiguityInfo> AmbiguityPoints { get; set; } = new();
 
-    /// <summary>Gets or sets the visualization mode.</summary>
-    public VisualizationMode Mode { get; set; } = VisualizationMode.ShowAllInterpretations;
+    /// <summary>Gets or sets all possible interpretation paths.</summary>
+    public List<InterpretationPath> InterpretationPaths { get; set; } = new();
+
+    /// <summary>Gets or sets the selected interpretation path.</summary>
+    public InterpretationPath? SelectedPath { get; set; }
+
+    /// <summary>Gets or sets the visualization options.</summary>
+    public VisualizationOptions Options { get; set; } = new();
 
     /// <summary>Gets whether there are any ambiguities.</summary>
-    public bool HasAmbiguities => Ambiguities.Values.Any(a => a.IsAmbiguous);
+    public bool HasAmbiguities => AmbiguityPoints.Any(a => a.IsAmbiguous);
 
     /// <summary>Gets the ambiguity count.</summary>
-    public int AmbiguityCount => Ambiguities.Count;
+    public int AmbiguityCount => AmbiguityPoints.Count;
 }
 
 /// <summary>
@@ -209,4 +242,52 @@ public enum VisualizationMode
     
     /// <summary>Show only ambiguity points.</summary>
     ShowAmbiguityOnly
+}
+
+/// <summary>
+/// Options for visualization.
+/// </summary>
+public class VisualizationOptions
+{
+    /// <summary>Gets or sets whether to show all PackedNode alternatives.</summary>
+    public bool ShowAllAlternatives { get; set; } = true;
+
+    /// <summary>Gets or sets whether to highlight ambiguity points.</summary>
+    public bool HighlightAmbiguities { get; set; } = true;
+
+    /// <summary>Gets or sets the visualization mode.</summary>
+    public VisualizationMode Mode { get; set; } = VisualizationMode.ShowAllInterpretations;
+
+    /// <summary>Gets or sets the color scheme.</summary>
+    public string ColorScheme { get; set; } = "default";
+}
+
+/// <summary>
+/// Request for visualization.
+/// </summary>
+public class VisualizationRequest
+{
+    /// <summary>Gets or sets the source code to visualize.</summary>
+    public string SourceCode { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the grammar name.</summary>
+    public string GrammarName { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the visualization options.</summary>
+    public VisualizationOptions Options { get; set; } = new();
+}
+
+/// <summary>
+/// Error response for visualization API.
+/// </summary>
+public class ErrorResponse
+{
+    /// <summary>Gets or sets the error type.</summary>
+    public string Error { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the error message.</summary>
+    public string Message { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the error details.</summary>
+    public string? Details { get; set; }
 }
