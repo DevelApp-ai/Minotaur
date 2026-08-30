@@ -1,0 +1,371 @@
+Grammar: PL1
+TokenSplitter: Space
+FormatType: EBNF
+
+/*
+ * PL/I (Programming Language One) Grammar Specification
+ * 
+ * This grammar supports PL/I (F) standard as used on IBM mainframes
+ * including advanced features like data structures, exception handling,
+ * multitasking, and file I/O.
+ */
+
+/* ============================================
+ * Program Structure
+ * ============================================ */
+
+<pl1-program> ::= <program-declaration> <declarations>* <procedures>*
+
+<program-declaration> ::= <program-identifier> ":" "PROC" <program-options>? ";"
+
+<program-identifier> ::= <IDENTIFIER>
+
+<program-options> ::= "OPTIONS" "(" <program-option-list> ")"
+
+<program-option-list> ::= <program-option> ("," <program-option>)*
+
+<program-option> ::= "MAIN" | "RECURSIVE" | "REENTRANT" | "ORDER" | "PRIORITY" "=" <integer>
+
+/* ============================================
+ * Data Declarations
+ * ============================================ */
+
+<declarations> ::= <data-declaration> | <structure-declaration> | <array-declaration> | <file-declaration> | <label-declaration>
+
+<data-declaration> ::= "DCL" <data-identifier> <data-type> <data-attributes>? ";"
+
+<data-identifier> ::= <IDENTIFIER> | "(" <IDENTIFIER> "," <IDENTIFIER> ")" | "(" <IDENTIFIER> ")"
+
+<data-type> ::= <simple-type> | <qualified-type>
+
+<simple-type> ::= "BIT" "(" <integer> ")" 
+                | "CHAR" "(" <integer> ")" 
+                | "CHAR" "VARYING" "(" <integer> ")" 
+                | "FIXED" "DEC" "(" <integer> "," <integer> ")" 
+                | "FIXED" "BIN" "(" <integer> "," <integer> ")" 
+                | "FLOAT" "DEC" "(" <integer> ")" 
+                | "FLOAT" "BIN" "(" <integer> ")" 
+                | "FLOAT" 
+                | "DEC" "FLOAT" 
+                | "BIN" "FIXED" 
+                | "POINTER" 
+                | "OFFSET"
+
+<qualified-type> ::= <IDENTIFIER>
+
+<data-attributes> ::= <initialization>? <alignment>? <storage-class>?
+
+<initialization> ::= "INIT" "(" <initial-value> ")"
+
+<initial-value> ::= <literal> | <expression>
+
+<alignment> ::= "ALIGNED" | "UNALIGNED"
+
+<storage-class> ::= "STATIC" | "AUTOMATIC" | "EXTERNAL" | "DEFINED"
+
+/* Structure Declarations */
+
+<structure-declaration> ::= "DCL" <structure-identifier> <structure-specification> ";"
+
+<structure-identifier> ::= "1" <IDENTIFIER>
+
+<structure-specification> ::= <structure-level>+ 
+
+<structure-level> ::= <integer> <IDENTIFIER> <data-type> <data-attributes>? ","
+
+/* Array Declarations */
+
+<array-declaration> ::= "DCL" <array-identifier> <array-dimensions> <data-type> <data-attributes>? ";"
+
+<array-identifier> ::= <IDENTIFIER>
+
+<array-dimensions> ::= "(" <dimension-list> ")"
+
+<dimension-list> ::= <dimension> ("," <dimension>)*
+
+<dimension> ::= <integer> | <integer> ":" <integer> | "*"
+
+/* File Declarations */
+
+<file-declaration> ::= "DCL" <file-identifier> "FILE" <file-options>? ";"
+
+<file-identifier> ::= <IDENTIFIER>
+
+<file-options> ::= <file-option> ("," <file-option>)*
+
+<file-option> ::= "RECORD" | "STREAM" | "INPUT" | "OUTPUT" | "UPDATE" | "PRINT"
+
+/* Label Declarations */
+
+<label-declaration> ::= <label-identifier> ":" <label-type>? ";"
+
+<label-identifier> ::= <IDENTIFIER>
+
+<label-type> ::= "ENTRY" | "EXTERNAL"
+
+/* ============================================
+ * Data Types and Literals
+ * ============================================ */
+
+<numeric-literal> ::= <integer> | <decimal> | <binary-literal> | <hex-literal>
+
+<integer> ::= /[+-]?[0-9]+/
+
+<decimal> ::= /[+-]?[0-9]*\.[0-9]+/ | /[+-]?[0-9]+\.[0-9]*/
+
+<binary-literal> ::= /[01]+B/
+
+<hex-literal> ::= /[0-9A-Fa-f]+X/
+
+<string-literal> ::= "\"" <character>* "\"" | "'" <character>* "'"
+
+<character> ::= /[^"']/
+
+<literal> ::= <numeric-literal> | <string-literal> | <boolean-literal>
+
+<boolean-literal> ::= "'1'B" | "'0'B" | "TRUE" | "FALSE"
+
+/* ============================================
+ * Expressions
+ * ============================================ */
+
+<expression> ::= <arithmetic-expression> | <string-expression> | <boolean-expression> | <bit-expression>
+
+<arithmetic-expression> ::= <term> (("+" | "-") <term>)*
+
+<term> ::= <factor> (("*" | "/" | "//") <factor>)*
+
+<factor> ::= <primary> ("**" <primary>)*
+
+<primary> ::= <literal> | <identifier> | "(" <arithmetic-expression> ")" | <function-call>
+
+<string-expression> ::= <string-primary> ("||" <string-primary>)*
+
+<string-primary> ::= <literal> | <identifier> | "(" <string-expression> ")" | <function-call>
+
+<boolean-expression> ::= <boolean-primary> (("&" | "|") <boolean-primary>)*
+
+<boolean-primary> ::= <boolean-factor> (("=") <boolean-factor>)*
+
+<boolean-factor> ::= "~" <boolean-factor> | <boolean-term> | "(" <boolean-expression> ")"
+
+<boolean-term> ::= <relation> | <boolean-literal>
+
+<relation> ::= <arithmetic-expression> <relational-operator> <arithmetic-expression>
+
+<relational-operator> ::= "=" | "~=" | ">" | ">=" | "<" | "<="
+
+<bit-expression> ::= <bit-primary> (("|" | "&" | "^") <bit-primary>)*
+
+<bit-primary> ::= <bit-factor> ("<<" | ">>" <bit-factor>)*
+
+<bit-factor> ::= "~" <bit-factor> | <bit-term> | "(" <bit-expression> ")"
+
+<bit-term> ::= <literal> | <identifier> | <function-call>
+
+<identifier> ::= <IDENTIFIER>
+
+<function-call> ::= <identifier> "(" <argument-list>? ")"
+
+<argument-list> ::= <argument> ("," <argument>)*
+
+<argument> ::= <expression>
+
+/* ============================================
+ * Statements
+ * ============================================ */
+
+<procedures> ::= <procedure> | <begin-block>
+
+<procedure> ::= <procedure-declaration> | <statement>
+
+<procedure-declaration> ::= <procedure-identifier> ":" "PROC" <procedure-options>? ";" <procedure-body> "END" <procedure-identifier> ";"
+
+<procedure-identifier> ::= <IDENTIFIER>
+
+<procedure-options> ::= "(" <parameter-list> ")" | <procedure-option-list>
+
+<procedure-option-list> ::= "OPTIONS" "(" <procedure-option> ("," <procedure-option>)* ")"
+
+<procedure-option> ::= "RECURSIVE" | "REENTRANT" | "ORDER" | "PRIORITY" "=" <integer>
+
+<parameter-list> ::= <parameter> ("," <parameter>)*
+
+<parameter> ::= <IDENTIFIER> | <IDENTIFIER> "(" "*" ")"
+
+<procedure-body> ::= <statement>*
+
+<begin-block> ::= <begin-label> ":" <statement>* "END" <begin-label> ";"
+
+<begin-label> ::= <IDENTIFIER>
+
+<statement> ::= <assignment-statement> 
+            | <if-statement> 
+            | <do-statement> 
+            | <select-statement> 
+            | <call-statement> 
+            | <return-statement> 
+            | <go-to-statement> 
+            | <stop-statement> 
+            | <null-statement> 
+            | <put-statement> 
+            | <get-statement> 
+            | <open-statement> 
+            | <close-statement> 
+            | <read-statement> 
+            | <write-statement> 
+            | <signal-statement> 
+            | <wait-statement> 
+            | <allocate-statement> 
+            | <free-statement> 
+            | <on-statement>
+
+/* Assignment */
+<assignment-statement> ::= <identifier> "=" <expression> ";"
+
+/* Conditional */
+<if-statement> ::= "IF" <condition> "THEN" <statement> ("ELSE" <statement>)? ";"
+
+<condition> ::= <boolean-expression>
+
+/* Loops */
+<do-statement> ::= <do-while> | <do-foreach> | <do-group>
+
+<do-while> ::= "DO" "WHILE" "(" <condition> ")" ";" <statement>* "END" ";"
+
+<do-foreach> ::= "DO" <identifier> "=" <expression> "TO" <expression> <do-foreach-step>? ";" <statement>* "END" ";"
+
+<do-foreach-step> ::= "BY" <expression>
+
+<do-group> ::= "DO" ";" <statement>* "END" ";"
+
+/* Switch */
+<select-statement> ::= "SELECT" "(" <expression> ")" ";" <when-clause>* ("OTHER" ";" <statement>*)? "END" ";"
+
+<when-clause> ::= "WHEN" "(" <expression> ")" <statement>+
+
+/* Procedure Calls */
+<call-statement> ::= "CALL" <identifier> "(" <argument-list>? ")" ";"
+
+/* Return */
+<return-statement> ::= "RETURN" "(" <expression> ")" ";" | "RETURN" ";"
+
+/* Go To */
+<go-to-statement> ::= "GO" "TO" <identifier> ";"
+
+/* Stop */
+<stop-statement> ::= "STOP" ";"
+
+/* Null */
+<null-statement> ::= ";"
+
+/* File I/O */
+<put-statement> ::= "PUT" <file-reference> "(" <expression-list> ")" ";"
+
+<get-statement> ::= "GET" <file-reference> "(" <identifier-list> ")" ";"
+
+<open-statement> ::= "OPEN" <file-reference> <open-options>? ";"
+
+<close-statement> ::= "CLOSE" <file-reference> ";"
+
+<read-statement> ::= "READ" <file-reference> "(" <identifier> ")" ";"
+
+<write-statement> ::= "WRITE" <file-reference> "(" <expression> ")" ";"
+
+<file-reference> ::= <identifier>
+
+<open-options> ::= "INPUT" | "OUTPUT" | "UPDATE" | "PRINT"
+
+<expression-list> ::= <expression> ("," <expression>)*
+
+<identifier-list> ::= <identifier> ("," <identifier>)*
+
+/* Multitasking */
+<signal-statement> ::= "SIGNAL" <condition> ";"
+
+<wait-statement> ::= "WAIT" "(" <expression> ")" ";"
+
+/* Storage Management */
+<allocate-statement> ::= "ALLOCATE" <identifier> <allocate-options>? ";"
+
+<free-statement> ::= "FREE" <identifier> ";"
+
+<allocate-options> ::= "(" <allocate-option-list> ")"
+
+<allocate-option-list> ::= <allocate-option> ("," <allocate-option>)*
+
+<allocate-option> ::= "SIZE" "=" <expression> | "ALIGNED"
+
+/* Exception Handling */
+<on-statement> ::= "ON" <on-condition> <on-action> ";"
+
+<on-condition> ::= <condition-name> | "ENDFILE" "(" <file-reference> ")" | "ENDDATA" | "ERROR" | "FINISH" | "CONVERSION"
+
+<condition-name> ::= <IDENTIFIER>
+
+<on-action> ::= "SIGNAL" | "GO" "TO" <identifier> | "STOP" | <procedure-identifier> | "SYSTEM"
+
+/* ============================================
+ * Built-in Functions
+ * ============================================ */
+
+<builtin-function> ::= "ABS" | "ADDRESS" | "ALL" | "ANY" | "ARRAY" | "BIT" | "BOOL" | "BYTES" 
+                 | "CHAR" | "COMPLEX" | "DATATYPE" | "DATE" | "DAY" | "DIGITS" | "DIM" 
+                 | "EOF" | "ERROR" | "EXP" | "FORMAT" | "GRAPHIC" | "HBOUND" | "HIGHEST" 
+                 | "INDEX" | "LBOUND" | "LENGTH" | "LOG" | "LOWER" | "MAX" | "MIN" 
+                 | "MONTH" | "NULL" | "ONCODE" | "ONLOC" | "ONSOURCE" | "POINTER" | "POS" 
+                 | "POWER" | "RANDOM" | "REAL" | "REPEAT" | "REVERSE" | "SIGN" | "SIZE" 
+                 | "SQRT" | "STORAGE" | "STRING" | "SUBSTR" | "SUM" | "TIME" | "TRACE" 
+                 | "TRANSLATE" | "TRIM" | "TRUNC" | "UPPER" | "VERIFY" | "YEAR"
+
+/* ============================================
+ * Preprocessor Directives
+ * ============================================ */
+
+<preprocessor-directive> ::= "%" <directive-name> <directive-arguments>?
+
+<directive-name> ::= "INCLUDE" | "ACTIVATE" | "DEACTIVATE" | "IF" | "ELSE" | "ENDIF" | "DEFINE" | "UNDEF"
+
+<directive-arguments> ::= <directive-argument> ("," <directive-argument>)*
+
+<directive-argument> ::= <IDENTIFIER> | <literal> | <string-literal>
+
+/* ============================================
+ * Comments
+ * ============================================ */
+
+<comment> ::= "/*" <comment-text> "*/" | "--" <comment-text>
+
+<comment-text> ::= /[^*]*[^*/]*[^*]*/
+
+/* ============================================
+ * Identifiers and Reserved Words
+ * ============================================ */
+
+<IDENTIFIER> ::= /[A-Za-z][A-Za-z0-9_$]*/
+
+/* PL/I Reserved Words */
+<RESERVED_WORD> ::= "ADDRESS" | "ALL" | "ALLOCATE" | "AND" | "ANY" | "ARG" | "ARRAY" 
+                  | "ATTRIBUTES" | "BASED" | "BIN" | "BIT" | "BUFFERED" | "BY" 
+                  | "CALL" | "CHAR" | "CLOSE" | "COMPLEX" | "CONCAT" | "CONDITION" 
+                  | "DATA" | "DEC" | "DECLARE" | "DEFAULT" | "DEFINED" | "DELETE" 
+                  | "DO" | "DROP" | "DYNAMIC" | "ELSE" | "END" | "ENTRY" 
+                  | "ENVIRONMENT" | "ERROR" | "EVENT" | "EXCEPTION" | "EXCLUSIVE" | "EXIT" 
+                  | "EXTERNAL" | "FETCH" | "FILE" | "FINISH" | "FIXED" | "FLOAT" 
+                  | "FOR" | "FOREVER" | "FORMAT" | "FROM" | "GET" | "GO" 
+                  | "GOTO" | "GRAPHIC" | "IF" | "IMAGE" | "IN" | "INIT" 
+                  | "INPUT" | "INTERVAL" | "INTO" | "KEYED" | "LABEL" | "LIKE" 
+                  | "LIST" | "LOCK" | "MODULE" | "NAME" | "NOT" | "OFF" 
+                  | "OFFSET" | "ON" | "ONLY" | "OPEN" | "OR" | "ORDER" 
+                  | "OTHER" | "OUTPUT" | "OVERFLOW" | "PAGE" | "PARAMETER" | "POINT" 
+                  | "POINTER" | "PRINT" | "PRIORITY" | "PROC" | "PROCEDURE" | "PROGRAM" 
+                  | "PUT" | "READ" | "REAL" | "RECORD" | "RECURSIVE" | "REENTRANT" 
+                  | "REPEAT" | "RETURN" | "REVERSE" | "REWIND" | "RUN" | "SCAN" 
+                  | "SCHEDULE" | "SELECT" | "SET" | "SIGNAL" | "SIZE" | "SKIP" 
+                  | "SOURCE" | "STACK" | "START" | "STATIC" | "STEP" | "STOP" 
+                  | "STORAGE" | "STREAM" | "STRING" | "STRUCTURE" | "SUBSTR" | "SUM" 
+                  | "SYMBOL" | "SYNC" | "SYSTEM" | "TASK" | "TEMPORARY" | "TERMINATE" 
+                  | "THEN" | "TO" | "TRACE" | "TRANSLATE" | "TRIM" | "TRUNC" 
+                  | "TYPE" | "UNALIGNED" | "UNDEFINED" | "UNLOCK" | "UNSIGNED" | "UNTIL" 
+                  | "UPDATE" | "UPPER" | "USING" | "VALUE" | "VALUES" | "VARYING" 
+                  | "VIRTUAL" | "WAIT" | "WHEN" | "WHILE" | "WITH" | "WRITE"
