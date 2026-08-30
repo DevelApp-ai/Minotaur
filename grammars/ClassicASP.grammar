@@ -6,7 +6,15 @@ FormatType: EBNF
  * Classic ASP Grammar Specification
  * 
  * This grammar supports Classic ASP (Active Server Pages) with both VBScript and JScript
- * server-side scripting languages, HTML markup, and ASP directives.
+ * server-side scripting languages, HTML markup, ASP directives, and built-in objects.
+ * 
+ * Enhanced to support:
+ * - All built-in ASP objects (Request, Response, Session, Server, Application, ObjectContext)
+ * - COM object creation (Server.CreateObject)
+ * - ADO database access
+ * - Error handling (On Error Resume Next, Err object)
+ * - FileSystemObject operations
+ * - Embedded language context switching
  */
 
 <asp-document> ::= <asp-content>*
@@ -71,6 +79,55 @@ FormatType: EBNF
 
 <server-code> ::= <vbscript-code> | <jscript-code>
 
+/* ASP Built-in Objects */
+<asp-builtin-object> ::= <request-object>
+                     | <response-object>
+                     | <session-object>
+                     | <server-object>
+                     | <application-object>
+                     | <object-context>
+
+<request-object> ::= "Request" ("." <request-property>)+
+<request-property> ::= "QueryString" | "Form" | "Cookies" | "ServerVariables" | "Headers" | "TotalBytes" | "BinaryRead" | "ContentLength"
+
+<response-object> ::= "Response" ("." <response-property>)+
+<response-property> ::= "Write" | "Redirect" | "End" | "Clear" | "Flush" | "BinaryWrite" | "ContentType" | "Status" | "Charset" | "CacheControl" | "Expires" | "ExpiresAbsolute"
+
+<session-object> ::= "Session" ("." <session-property>)+
+<session-property> ::= "Contents" | "StaticObjects" | "Timeout" | "LCID" | "CodePage" | "SessionID" | "Abandon"
+
+<server-object> ::= "Server" ("." <server-property>)+
+<server-property> ::= "CreateObject" | "HTMLEncode" | "URLEncode" | "MapPath" | "Execute" | "Transfer" | "ScriptTimeout"
+
+<application-object> ::= "Application" ("." <application-property>)+
+<application-property> ::= "Contents" | "StaticObjects" | "Lock" | "Unlock"
+
+<object-context> ::= "ObjectContext" ("." <object-context-property>)+
+<object-context-property> ::= "CreateObject" | "GetObject" | "GetObjectContext" | "SetAbort" | "SetComplete"
+
+/* COM Object Creation */
+<com-creation> ::= "Server.CreateObject" "(" <com-progid> ")"
+<com-progid> ::= <string-literal>
+
+/* ADO Database Access */
+<ado-connection> ::= <IDENTIFIER> "=" "Server.CreateObject" "(" "\"ADODB.Connection\"" ")"
+<ado-recordset> ::= <IDENTIFIER> "=" "Server.CreateObject" "(" "\"ADODB.Recordset\"" ")"
+<ado-command> ::= <IDENTIFIER> "=" "Server.CreateObject" "(" "\"ADODB.Command\"" ")"
+
+/* Error Handling */
+<error-handling> ::= <on-error-statement> | <err-object>
+
+<on-error-statement> ::= "On Error Resume Next" | "On Error GoTo 0" | "On Error GoTo" <IDENTIFIER>
+
+<err-object> ::= "Err" ("." <err-property>)+
+<err-property> ::= "Number" | "Description" | "Source" | "HelpContext" | "HelpFile" | "LastDllError" | "Raise" | "Clear"
+
+/* FileSystemObject */
+<fso-creation> ::= <IDENTIFIER> "=" "Server.CreateObject" "(" "\"Scripting.FileSystemObject\"" ")"
+<fso-method> ::= "FileExists" | "FolderExists" | "CreateFolder" | "DeleteFolder" | "CreateTextFile" | "OpenTextFile" | "DeleteFile" | "CopyFile" | "MoveFile" | "GetFile" | "GetFolder" | "GetFileVersion"
+
+<server-code> ::= <vbscript-code> | <jscript-code>
+
 <vbscript-code> ::= <vb-statement>*
 
 <vb-statement> ::= <vb-variable-declaration>
@@ -107,6 +164,19 @@ FormatType: EBNF
 
 <vb-comment> ::= "'" /[^\r\n]*/
 
+/* Additional VBScript constructs */
+<vb-select-case> ::= "Select Case" <expression> <vb-case-clause>* "End Select"
+<vb-case-clause> ::= "Case" <expression> ("To" <expression>)? ":" <vb-statement>*
+                 | "Case Else" ":" <vb-statement>*
+
+<vb-with-statement> ::= "With" <expression> <vb-statement>* "End With"
+
+<vb-on-error> ::= "On Error Resume Next" | "On Error GoTo 0" | "On Error GoTo" <IDENTIFIER>
+
+<vb-call-statement> ::= "Call" <IDENTIFIER> ("(" <argument-list>? ")")?
+
+<vb-set-statement> ::= "Set" <IDENTIFIER> "=" <expression>
+
 <jscript-code> ::= <js-statement>*
 
 <js-statement> ::= <js-variable-declaration>
@@ -140,6 +210,13 @@ FormatType: EBNF
 <js-response-write> ::= "Response.Write(" <expression> ")" ";"
 
 <js-comment> ::= "//" /[^\r\n]*/ | "/*" /.*?/ "*/"
+
+/* Additional JScript constructs */
+<js-try-catch> ::= "try" "{" <js-statement>* "}" ("catch" "(" <IDENTIFIER> ")" "{" <js-statement>* "}")? ("finally" "{" <js-statement>* "}")?
+
+<js-switch> ::= "switch" "(" <expression> ")" "{" <js-case>* "}"
+<js-case> ::= "case" <expression> ":" <js-statement>*
+            | "default" ":" <js-statement>*
 
 <expression> ::= <primary-expression> (<binary-operator> <primary-expression>)*
 
@@ -178,3 +255,17 @@ FormatType: EBNF
 <null-literal> ::= "Nothing" | "null" | "Empty"
 
 <IDENTIFIER> ::= /[a-zA-Z_][a-zA-Z0-9_]*/
+
+/* ASP Date/Time literals */
+<date-literal> ::= "#" /[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4}/ "#"
+<time-literal> ::= "#" /[0-9]{1,2}:[0-9]{2}(:[0-9]{2})?/ "#"
+
+/* ASP Constants */
+<asp-constant> ::= "vbCrLf" | "vbCr" | "vbLf" | "vbTab" | "vbNullChar" | "vbEmpty" | "vbNull"
+
+/* VBScript Constants */
+<vb-constant> ::= <asp-constant> | "vbOK" | "vbCancel" | "vbYes" | "vbNo" | "vbTrue" | "vbFalse"
+
+/* Hex and Octal literals for VBScript */
+<hex-literal> ::= "&H" /[0-9A-Fa-f]+/
+<octal-literal> ::= "&O" /[0-7]+/
