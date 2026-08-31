@@ -1,0 +1,94 @@
+Grammar: Brazil_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+
+/*
+ * Correios Grammar (Brazil Postal Codes - CEP)
+ * 
+ * Comprehensive grammar for Brazilian postal addresses and CEP (Código de Endereçamento Postal)
+ * including:
+ * - 8-digit CEP format (12345-678)
+ * - 5-digit CEP format (legacy, 12345)
+ * - State and municipality codes
+ * - Address parsing in Portuguese
+ * - Special postal codes
+ * - Validation rules
+ * 
+ * Version: 2.0.0
+ * Country: Brazil (BR)
+ * Postal Authority: Empresa Brasileira de Correios e Telégrafos (Correios)
+ */
+
+<brazil-postal-address> ::= 
+    <brazil-name-part>? <EOL>
+    <brazil-street-address> <EOL>
+    <brazil-neighborhood-line> <EOL>
+    <brazil-city-state-line> <EOL>
+    <brazil-cep-line> <EOL>
+    <brazil-country-indicator>?
+
+<brazil-name-part> ::= <personal-name> | <company-name>
+<personal-name> ::= <first-name> <whitespace> <last-name>
+<company-name> ::= <text>
+
+<brazil-street-address> ::= 
+    <street-type>? <whitespace> <street-name> <opt-whitespace> ","? <opt-whitespace> <street-number>? <opt-whitespace> <street-complement>?
+
+<street-type> ::= "Rua" | "R." | "Avenida" | "Av." | "Estrada" | "Est." | "Travessa" | "Tv." | "Alameda" | "Al." | "Praça" | "Pça."
+<street-name> ::= <text>
+<street-number> ::= <digit>+ | "S/N" | "s/n"
+<street-complement> ::= "Apto" <digit>+ | "Ap" <digit>+ | "Casa" <digit>+ | "Casa" <digit>+ | "Loja" <digit>+ | "Conj." <digit>+
+
+<brazil-neighborhood-line> ::= <brazil-neighborhood> <opt-whitespace> ","? <opt-whitespace> <brazil-municipality>?
+<brazil-neighborhood> ::= <text>
+<brazil-municipality> ::= <text>
+
+<brazil-city-state-line> ::= <brazil-city> <opt-whitespace> "-" <opt-whitespace> <brazil-state-code>
+<brazil-city> ::= <text>
+
+/* Brazilian State Codes */
+<brazil-state-code> ::= 
+    "AC" | "Acre" | 
+    "AL" | "Alagoas" | 
+    "AM" | "Amazonas" | 
+    "AP" | "Amapa" | 
+    "BA" | "Bahia" | 
+    "CE" | "Ceara" | 
+    "DF" | "Distrito Federal" | 
+    "ES" | "Espirito Santo" | 
+    "GO" | "Goias" | 
+    "MA" | "Maranhao" | 
+    "MG" | "Minas Gerais" | 
+    "MS" | "Mato Grosso do Sul" | 
+    "MT" | "Mato Grosso" | 
+    "PA" | "Para" | 
+    "PB" | "Paraiba" | 
+    "PE" | "Pernambuco" | 
+    "PI" | "Piaui" | 
+    "PR" | "Parana" | 
+    "RJ" | "Rio de Janeiro" | 
+    "RN" | "Rio Grande do Norte" | 
+    "RO" | "Rondonia" | 
+    "RR" | "Roraima" | 
+    "RS" | "Rio Grande do Sul" | 
+    "SC" | "Santa Catarina" | 
+    "SE" | "Sergipe" | 
+    "SP" | "Sao Paulo" | 
+    "TO" | "Tocantins"
+
+/* Brazilian CEP (Postal Code) */
+<brazil-cep-line> ::= "CEP:" <whitespace> <brazil-cep> | <brazil-cep>
+<brazil-cep> ::= <brazil-cep-8digit> | <brazil-cep-5digit>
+<brazil-cep-8digit> ::= <digit><digit><digit><digit><digit> "-" <digit><digit><digit>
+<brazil-cep-5digit> ::= <digit><digit><digit><digit><digit>
+
+<brazil-country-indicator> ::= "Brazil" | "BR" | "Brasil"
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/" | "#" | "á" | "à" | "â" | "ã" | "é" | "ê" | "í" | "ó" | "ô" | "õ" | "ú" | "ü" | "ç"
+<text> ::= <character> | <character> <text>
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+<EOL> ::= "\n" | "\r\n" | "\r"

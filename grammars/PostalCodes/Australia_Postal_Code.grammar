@@ -1,0 +1,280 @@
+Grammar: Australia_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * Australia Post Grammar
+ * 
+ * Comprehensive grammar for Australian postal addresses and postcodes including:
+ * - 4-digit postcodes
+ * - State and territory codes
+ * - Street address parsing
+ * - PO Box and other special addresses
+ * - Validation rules
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Country: Australia (AU)
+ * Postal Authority: Australia Post
+ */
+
+/* ============================================================================
+ * MAIN RULES
+ * ============================================================================ */
+
+<australia-postal-address> ::= 
+    <australia-name-part>? <EOL>
+    <australia-street-address> <EOL>
+    <australia-suburb-line> <EOL>
+    <australia-state-postcode-line> <EOL>
+    <australia-country-indicator>?
+
+/* Complete Australian address */
+<australia-address> ::= 
+    <australia-name-part>? 
+    <australia-street-address> <EOL>
+    <australia-suburb-line> <EOL>
+    <australia-state-postcode-line> <EOL>
+    <australia-country-indicator>?
+
+/* ============================================================================
+ * NAME PART
+ * ============================================================================ */
+
+<australia-name-part> ::= <personal-name> | <company-name> | <personal-name> <EOL> <company-name>
+
+<personal-name> ::= 
+    <title>? <first-name> <whitespace> <last-name> <opt-whitespace> <name-suffix>?
+
+<title> ::= 
+    "Mr" | "Mrs" | "Ms" | "Miss" | "Dr" | "Prof" | "Rev" | "Sir" | "Dame"
+
+<first-name> ::= <text>
+<last-name> ::= <text>
+<name-suffix> ::= "Jr" | "Sr" | "II" | "III" | "IV" | "OAM" | "AM"
+
+<company-name> ::= <text> | "Pty Ltd" | "Ltd" | "Inc" | "Co"
+
+/* ============================================================================
+ * STREET ADDRESS
+ * ============================================================================ */
+
+<australia-street-address> ::= 
+    <street-number> <whitespace> <street-name> <opt-whitespace> <street-type>? <opt-whitespace> <street-suffix>?
+
+<street-number> ::= 
+    <digit>+ | 
+    <digit>+ <letter> | 
+    <digit>+ "-" <digit>+ | 
+    <text>  /* Some addresses use lot numbers like "Lot 123" */
+
+<street-name> ::= <text>
+
+/* Australian street types */
+<street-type> ::= 
+    "Ave" | "Avenue" | 
+    "Bvd" | "Boulevard" | 
+    "Cct" | "Circuit" | 
+    "Cl" | "Close" | 
+    "Cres" | "Crescent" | 
+    "Dr" | "Drive" | 
+    "Esplanade" | "Esp" | 
+    "Grove" | 
+    "Hwy" | "Highway" | 
+    "Ln" | "Lane" | 
+    "Pde" | "Parade" | 
+    "Pl" | "Place" | 
+    "Rd" | "Road" | 
+    "St" | "Street" | 
+    "Tce" | "Terrace" | 
+    "Way" | 
+    "Court" | "Ct" | 
+    "Loop" | 
+    "Mews" | 
+    "Pass" | 
+    "Path" | 
+    "Promenade" | 
+    "Row" | 
+    "Square" | "Sq" | 
+    "Track"
+
+<street-suffix> ::= "North" | "South" | "East" | "West" | "N" | "S" | "E" | "W" | "NE" | "NW" | "SE" | "SW"
+
+/* ============================================================================
+ * SUBURB LINE
+ * ============================================================================ */
+
+<australia-suburb-line> ::= <australia-suburb> <opt-whitespace> <australia-locality>?
+
+<australia-suburb> ::= <text>
+<australia-locality> ::= <text>
+
+/* ============================================================================
+ * STATE AND POSTCODE LINE
+ * ============================================================================ */
+
+<australia-state-postcode-line> ::= <australia-state-code> <whitespace> <australia-postcode>
+
+/* Australian postcode */
+<australia-postcode> ::= <digit><digit><digit><digit>
+
+/* Australian State and Territory Codes */
+<australia-state-code> ::= 
+    "ACT" | "Australian Capital Territory" | 
+    "NSW" | "New South Wales" | 
+    "NT" | "Northern Territory" | 
+    "QLD" | "Queensland" | 
+    "SA" | "South Australia" | 
+    "TAS" | "Tasmania" | 
+    "VIC" | "Victoria" | 
+    "WA" | "Western Australia"
+
+/* ============================================================================
+ * POSTCODE RANGES BY STATE
+ * ============================================================================ */
+
+/* Australian Capital Territory: 0200-0299, 2600-2620, 2900-2920 */
+<act-postcode> ::= 
+    "02" <digit><digit> | 
+    "26" <digit><digit> | 
+    "29" <digit><digit>
+
+/* New South Wales: 1000-1999, 2000-2599, 2621-2898, 2921-2999 */
+<nsw-postcode> ::= 
+    "1" <digit><digit><digit> | 
+    "20" <digit><digit> | 
+    "21" <digit><digit> | 
+    "22" <digit><digit> | 
+    "23" <digit><digit> | 
+    "24" <digit><digit> | 
+    "25" <digit><digit> | 
+    "262" <digit> | 
+    "263" <digit> | 
+    "264" <digit> | 
+    "27" <digit><digit> | 
+    "28" <digit><digit> | 
+    "292" <digit> | 
+    "29" <digit><digit>
+
+/* Northern Territory: 0800-0899, 0900-0999 */
+<nt-postcode> ::= 
+    "08" <digit><digit> | 
+    "09" <digit><digit>
+
+/* Queensland: 4000-4999, 9000-9999 */
+<qld-postcode> ::= 
+    "4" <digit><digit><digit> | 
+    "9" <digit><digit><digit>
+
+/* South Australia: 5000-5799, 5800-5999 */
+<sa-postcode> ::= 
+    "50" <digit><digit> | 
+    "51" <digit><digit> | 
+    "52" <digit><digit> | 
+    "53" <digit><digit> | 
+    "54" <digit><digit> | 
+    "55" <digit><digit> | 
+    "56" <digit><digit> | 
+    "57" <digit><digit> | 
+    "58" <digit><digit> | 
+    "59" <digit><digit>
+
+/* Tasmania: 7000-7999 */
+<tas-postcode> ::= "7" <digit><digit><digit>
+
+/* Victoria: 3000-3999, 8000-8999 */
+<vic-postcode> ::= 
+    "3" <digit><digit><digit> | 
+    "8" <digit><digit><digit>
+
+/* Western Australia: 6000-6999 */
+<wa-postcode> ::= "6" <digit><digit><digit>
+
+/* ============================================================================
+ * SPECIAL ADDRESS TYPES
+ * ============================================================================ */
+
+/* PO Box addresses */
+<australia-po-box> ::= 
+    <po-box-prefix> <whitespace> <digit>+ | 
+    <po-box-prefix><digit>+
+
+<po-box-prefix> ::= 
+    "PO Box" | "P.O. Box" | "POBox" | "P O Box" | 
+    "GPO Box" | "G.P.O. Box" | 
+    "Locked Bag" | 
+    "MS" | "Mail Service" | 
+    "RSD" | "Reply Paid"
+
+/* Rural addresses */
+<australia-rural> ::= 
+    "RR" <whitespace> <digit>+ | 
+    "RMB" <whitespace> <digit>+ |  /* Roadside Mail Box */
+    "Lot" <whitespace> <digit>+ | 
+    "Portion" <whitespace> <digit>+
+
+/* ============================================================================
+ * POSTCODE VALIDATION
+ * ============================================================================ */
+
+<australia-postal-validation> ::= 
+    <australia-postcode> <whitespace> "->" <whitespace> <australia-validation-result>
+
+<australia-validation-result> ::= 
+    "Valid Australia Postcode" | 
+    "Invalid Australia Postcode: Format" | 
+    "Invalid Australia Postcode: Range"
+
+/* ============================================================================
+ * COUNTRY INDICATOR
+ * ============================================================================ */
+
+<australia-country-indicator> ::= 
+    "Australia" | "AU" | "Commonwealth of Australia" | 
+    "Australia Post"
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/"
+<text> ::= <character> | <character> <text>
+
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* ============================================================================
+ * METADATA
+ * ============================================================================ */
+
+/*
+ * Australia Post Facts:
+ * - 4-digit postcodes introduced: 1967
+ * - Format: 4 digits (0200-9999)
+ * - First digit: State/territory
+ * - Second digit: Region within state
+ * - Third and fourth digits: Local delivery area
+ * 
+ * Validation Notes:
+ * - ACT: 02xx, 26xx, 29xx
+ * - NSW: 1xxx, 20xx-25xx, 262x-289x, 292x-299x
+ * - NT: 08xx, 09xx
+ * - QLD: 4xxx, 9xxx
+ * - SA: 50xx-59xx
+ * - TAS: 7xxx
+ * - VIC: 3xxx, 8xxx
+ * - WA: 6xxx
+ * - No postcodes start with 00, 01, or 10-19 (mostly)
+ * - Special postcodes for PO Boxes, GPO Boxes, etc.
+ */

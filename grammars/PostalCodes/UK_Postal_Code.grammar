@@ -1,0 +1,444 @@
+Grammar: UK_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * United Kingdom Postal Code Grammar (Royal Mail)
+ * 
+ * Comprehensive grammar for UK postcodes including:
+ * - Standard postcode formats (A9 9AA, A99 9AA, AA9 9AA, etc.)
+ * - Outward code and inward code parsing
+ * - Special postcodes (GIR 0AA, etc.)
+ * - London postal districts
+ * - Non-geographic postcodes
+ * - Validation rules
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Country: United Kingdom (UK/GB)
+ * Postal Authority: Royal Mail
+ */
+
+/* ============================================================================
+ * MAIN RULES
+ * ============================================================================ */
+
+<uk-postal-address> ::= 
+    <uk-name-part>? <EOL>
+    <uk-street-address> <EOL>
+    <uk-city-line> <EOL>
+    <uk-postcode-line> <EOL>
+    <uk-country-indicator>?
+
+/* Complete UK address */
+<uk-address> ::= 
+    <uk-name-part>? 
+    <uk-street-address> <EOL>
+    <uk-city-line> <EOL>
+    <uk-postcode> <EOL>
+    <uk-country-indicator>?
+
+/* ============================================================================
+ * NAME PART
+ * ============================================================================ */
+
+<uk-name-part> ::= <personal-name> | <company-name> | <personal-name> <EOL> <company-name>
+
+<personal-name> ::= 
+    <title>? <first-name> <whitespace> <last-name> <opt-whitespace> <name-suffix>?
+
+<title> ::= 
+    "Mr" | "Mrs" | "Ms" | "Miss" | "Dr" | "Prof" | "Rev" | "Sir" | "Dame" | "Lady"
+
+<first-name> ::= <text>
+<last-name> ::= <text>
+<name-suffix> ::= "Jr." | "Sr." | "II" | "III" | "IV" | "MBE" | "OBE" | "CBE"
+
+<company-name> ::= <text>
+
+/* ============================================================================
+ * STREET ADDRESS
+ * ============================================================================ */
+
+<uk-street-address> ::= 
+    <house-number> <whitespace> <street-name> <opt-whitespace> <street-type>? <opt-whitespace> <street-direction>?
+
+<house-number> ::= 
+    <digit>+ | 
+    <digit>+ <letter> | 
+    <digit>+ "-" <digit>+ | 
+    <text>  /* Some UK addresses use house names */
+
+<street-name> ::= <text>
+
+/* UK street types */
+<street-type> ::= 
+    "Ave" | "Avenue" | 
+    "Blvd" | "Boulevard" | 
+    "Close" | "Cl" | 
+    "Cres" | "Crescent" | 
+    "Dr" | "Drive" | 
+    "Grove" | 
+    "Ln" | "Lane" | 
+    "Mews" | 
+    "Pkwy" | "Parkway" | 
+    "Pl" | "Place" | 
+    "Rd" | "Road" | 
+    "St" | "Street" | 
+    "Sq" | "Square" | 
+    "Ter" | "Terrace" | 
+    "Way" | 
+    "Gardens" | "Gdns" | 
+    "Court" | "Ct" | 
+    "Hill" | 
+    "Mount" | "Mt" | 
+    "View" | 
+    "Row" | 
+    "Walk" | 
+    "Yards"
+
+<street-direction> ::= "N" | "S" | "E" | "W" | "NE" | "NW" | "SE" | "SW"
+
+/* ============================================================================
+ * CITY LINE
+ * ============================================================================ */
+
+<uk-city-line> ::= <uk-city> <opt-whitespace> "," <opt-whitespace> <uk-county>?
+
+<uk-city> ::= <text>
+
+/* UK Counties (optional in addresses) */
+<uk-county> ::= 
+    "Bedfordshire" | "Beds" | 
+    "Berkshire" | "Berks" | 
+    "Bristol" | 
+    "Buckinghamshire" | "Bucks" | 
+    "Cambridgeshire" | "Cambs" | 
+    "Cheshire" | "Ches" | 
+    "City of London" | 
+    "Cornwall" | 
+    "Cumbria" | 
+    "Derbyshire" | "Derbys" | 
+    "Devon" | 
+    "Dorset" | 
+    "Durham" | 
+    "East Riding of Yorkshire" | 
+    "East Sussex" | 
+    "Essex" | 
+    "Gloucestershire" | "Glos" | 
+    "Greater London" | 
+    "Greater Manchester" | 
+    "Hampshire" | 
+    "Herefordshire" | 
+    "Hertfordshire" | "Herts" | 
+    "Isle of Wight" | 
+    "Kent" | 
+    "Lancashire" | "Lancs" | 
+    "Leicestershire" | "Leics" | 
+    "Lincolnshire" | "Lincs" | 
+    "Merseyside" | 
+    "Norfolk" | 
+    "Northamptonshire" | "Northants" | 
+    "Northumberland" | 
+    "North Yorkshire" | 
+    "Nottinghamshire" | "Notts" | 
+    "Oxfordshire" | "Oxon" | 
+    "Rutland" | 
+    "Shropshire" | "Salop" | 
+    "Somerset" | 
+    "South Yorkshire" | 
+    "Staffordshire" | "Staffs" | 
+    "Suffolk" | 
+    "Surrey" | 
+    "Tyne and Wear" | 
+    "Warwickshire" | "Warks" | 
+    "West Midlands" | 
+    "West Sussex" | 
+    "West Yorkshire" | 
+    "Wiltshire" | 
+    "Worcestershire" | "Worcs" | 
+    /* Scotland */
+    "Aberdeenshire" | "Aberdeen" | 
+    "Angus" | 
+    "Argyll and Bute" | 
+    "Ayrshire" | 
+    "Banffshire" | 
+    "Berwickshire" | 
+    "Caithness" | 
+    "Clackmannanshire" | 
+    "Dumfriesshire" | 
+    "Dunbartonshire" | 
+    "East Lothian" | "Haddingtonshire" | 
+    "Fife" | 
+    "Inverness-shire" | 
+    "Kincardineshire" | 
+    "Kinross-shire" | 
+    "Kirkcudbrightshire" | 
+    "Lanarkshire" | 
+    "Midlothian" | 
+    "Moray" | 
+    "Nairnshire" | 
+    "Orkney" | 
+    "Peeblesshire" | 
+    "Perthshire" | 
+    "Renfrewshire" | 
+    "Ross-shire" | 
+    "Roxburghshire" | 
+    "Selkirkshire" | 
+    "Shetland" | 
+    "Stirlingshire" | 
+    "Sutherland" | 
+    "West Lothian" | "Linlithgowshire" | 
+    "Wigtownshire" | 
+    /* Wales */
+    "Anglesey" | "Ynys Mon" | 
+    "Brecknockshire" | 
+    "Caernarfonshire" | 
+    "Cardiganshire" | 
+    "Carmarthenshire" | 
+    "Denbighshire" | 
+    "Flintshire" | 
+    "Glamorgan" | 
+    "Merionethshire" | 
+    "Monmouthshire" | 
+    "Montgomeryshire" | 
+    "Pembrokeshire" | 
+    "Radnorshire" | 
+    /* Northern Ireland */
+    "Antrim" | 
+    "Armagh" | 
+    "Down" | 
+    "Fermanagh" | 
+    "Londonderry" | "Derry" | 
+    "Tyrone"
+
+/* ============================================================================
+ * POSTCODE FORMATS
+ * ============================================================================ */
+
+/* Main postcode rule */
+<uk-postcode> ::= 
+    <uk-standard-postcode> | 
+    <uk-special-postcode> | 
+    <uk-bfpo-postcode> | 
+    <uk-girobank-postcode> | 
+    <uk-overseas-postcode>
+
+/* Standard UK postcode formats */
+<uk-standard-postcode> ::= 
+    <uk-outward-code> <whitespace> <uk-inward-code> | 
+    <uk-outward-code><uk-inward-code>  /* Without space */
+
+/* Outward Code (Area + District) */
+<uk-outward-code> ::= <uk-postcode-area> <uk-postcode-district> <uk-postcode-sector>?
+
+/* Inward Code (Unit + Subdivision) */
+<uk-inward-code> ::= <uk-postcode-unit> <uk-postcode-subdivision>
+
+/* ============================================================================
+ * POSTCODE AREAS
+ * ============================================================================ */
+
+/* Postcode Area (1-2 characters) */
+<uk-postcode-area> ::= 
+    /* England */
+    "A" | "B" | "BA" | "BB" | "BD" | "BH" | "BL" | "BN" | "BR" | "BS" | 
+    "CA" | "CB" | "CF" | "CH" | "CM" | "CO" | "CR" | "CT" | "CV" | "CW" | 
+    "DA" | "DE" | "DG" | "DH" | "DL" | "DN" | "DT" | 
+    "E" | "EC" | "EH" | "EN" | "EX" | 
+    "FG" | 
+    "GL" | 
+    "GU" | 
+    "HA" | "HD" | "HG" | "HP" | "HR" | "HS" | 
+    "IG" | "IP" | 
+    "KT" | 
+    "L" | "LA" | "LD" | "LE" | "LL" | "LN" | "LS" | "LU" | 
+    "M" | "ME" | "MK" | 
+    "N" | "NE" | "NG" | "NN" | "NP" | "NR" | "NW" | 
+    "OL" | "OX" | 
+    "PE" | "PH" | "PL" | "PO" | "PR" | 
+    "RG" | "RH" | "RM" | 
+    "S" | "SA" | "SE" | "SG" | "SK" | "SL" | "SM" | "SN" | "SO" | "SP" | "SR" | "SS" | "ST" | "SW" | 
+    "SY" | 
+    "TA" | "TD" | "TF" | "TN" | "TQ" | "TR" | 
+    "UB" | "W" | "WA" | "WC" | "WD" | "WF" | "WN" | "WR" | "WS" | 
+    "WV" | 
+    "YO" | 
+    "ZE" | 
+    /* Scotland */
+    "AB" | "DD" | "DG" | "EH" | "FK" | "G" | "HS" | "IV" | "KA" | "KW" | 
+    "KY" | "ML" | "PA" | "PH" | "TD" | "ZE" | 
+    /* Wales */
+    "CF" | "LD" | "LL" | "NP" | "SA" | "SY" | 
+    /* Northern Ireland */
+    "BT" | 
+    /* Crown Dependencies */
+    "GY" | "IM" | "JE" | 
+    /* Overseas Territories */
+    "ASCN" | "BBND" | "BIQQ" | "FIQQ" | "GX" | "PCRN" | "SIQQ" | "STHL" | "TA" | 
+    "TDCU" | "TKCA" | "VQ" | "VIRG"
+
+/* Postcode District (1-2 digits after area) */
+<uk-postcode-district> ::= <digit> | <digit><digit> | <digit><digit><digit>
+
+/* Postcode Sector (single digit) */
+<uk-postcode-sector> ::= <digit>
+
+/* Postcode Unit (single digit) */
+<uk-postcode-unit> ::= <digit>
+
+/* Postcode Subdivision (2 letters) */
+<uk-postcode-subdivision> ::= <letter><letter>
+
+/* ============================================================================
+ * SPECIAL POSTCODES
+ * ============================================================================ */
+
+/* Special postcodes with unique formats */
+<uk-special-postcode> ::= 
+    "GIR 0AA" |  /* Girobank */
+    "CR2 6XH" |  /* Royal Mail special delivery */
+    "FY9 9AA" |  /* Fleetwood special */
+    "BX1 1LT" |  /* BFPO - British Forces Post Office */
+    "BX2 1LT" | 
+    "BX3 1LT" | 
+    "BX4 1LT" | 
+    "BX5 1LT" | 
+    "BX6 1LT" | 
+    "BX7 1LT" | 
+    "BX8 1LT" | 
+    "BX9 1LT" | 
+    "CR9 9XX" |  /* Croydon special */
+    "FY9 9ZZ" |  /* Fleetwood */
+    "JE1 1AA" |  /* Jersey */
+    "JE2 3AA" | 
+    "JE3 1AA" | 
+    "JE4 8AA" | 
+    "GY1 1AA" |  /* Guernsey */
+    "GY2 3AA" | 
+    "GY3 1AA" | 
+    "GY4 8AA" | 
+    "IM1 1AA" |  /* Isle of Man */
+    "IM2 3AA" | 
+    "IM3 1AA" | 
+    "IM4 8AA" | 
+    "QQ1 1QQ" |  /* Non-geographic */
+    "VX1 1VX" |  /* Non-geographic */
+    "VX2 2VX" | 
+    "VX3 3VX" | 
+    "VX4 4VX" | 
+    "VX5 5VX"
+
+/* BFPO Postcodes */
+<uk-bfpo-postcode> ::= "BFPO" <whitespace> <digit><digit><digit> | "BFPO" <digit><digit><digit>
+
+/* Girobank Postcode */
+<uk-girobank-postcode> ::= "GIR" <whitespace> "0AA"
+
+/* Overseas Territories */
+<uk-overseas-postcode> ::= 
+    <uk-overseas-prefix> <whitespace> <digit> <letter> <letter> | 
+    <uk-overseas-prefix> <digit> <letter> <letter>
+
+<uk-overseas-prefix> ::= 
+    "ASCN" | "BBND" | "BIQQ" | "FIQQ" | "GX" | "PCRN" | "SIQQ" | "STHL" | "TA" | 
+    "TDCU" | "TKCA" | "VQ" | "VIRG"
+
+/* ============================================================================
+ * LONDON POSTAL DISTRICTS
+ * ============================================================================ */
+
+/* London postal districts */
+<uk-london-district> ::= 
+    "EC1" | "EC2" | "EC3" | "EC4" |  /* East Central */
+    "WC1" | "WC2" |  /* West Central */
+    "N1" | "N2" | "N3" | "N4" | "N5" | "N6" | "N7" | "N8" | "N9" | "N10" | 
+    "N11" | "N12" | "N13" | "N14" | "N15" | "N16" | "N17" | "N18" | "N19" | "N20" | 
+    "N21" | "N22" |  /* North London */
+    "W1" | "W2" | "W3" | "W4" | "W5" | "W6" | "W7" | "W8" | "W9" | "W10" | 
+    "W11" | "W12" | "W13" | "W14" |  /* West London */
+    "SW1" | "SW2" | "SW3" | "SW4" | "SW5" | "SW6" | "SW7" | "SW8" | "SW9" | 
+    "SW10" | "SW11" | "SW12" | "SW13" | "SW14" | "SW15" | "SW16" | "SW17" | "SW18" | 
+    "SW19" | "SW20" |  /* South West London */
+    "SE1" | "SE2" | "SE3" | "SE4" | "SE5" | "SE6" | "SE7" | "SE8" | "SE9" | 
+    "SE10" | "SE11" | "SE12" | "SE13" | "SE14" | "SE15" | "SE16" | "SE17" | "SE18" | 
+    "SE19" | "SE20" | "SE21" | "SE22" | "SE23" | "SE24" | "SE25" | "SE26" | "SE27" | 
+    "SE28" |  /* South East London */
+    "E1" | "E2" | "E3" | "E4" | "E5" | "E6" | "E7" | "E8" | "E9" | "E10" | 
+    "E11" | "E12" | "E13" | "E14" | "E15" | "E16" | "E17" | "E18" | "E19" | "E20" | 
+    "E27" |  /* East London */
+    "SE" <digit>+ |  /* Special cases */
+    "SW" <digit>+ | 
+    "NW" <digit>+ | 
+    "NE" <digit>+
+
+/* ============================================================================
+ * POSTCODE VALIDATION
+ * ============================================================================ */
+
+<uk-postcode-validation> ::= 
+    <uk-postcode> <whitespace> "->" <whitespace> <uk-validation-result>
+
+<uk-validation-result> ::= 
+    "Valid UK Postcode" | 
+    "Invalid UK Postcode: Format" | 
+    "Invalid UK Postcode: Area" | 
+    "Invalid UK Postcode: District" | 
+    "Invalid UK Postcode: Sector" | 
+    "Invalid UK Postcode: Unit" | 
+    "Invalid UK Postcode: Subdivision" | 
+    "Valid UK Special Postcode" | 
+    "Valid UK BFPO Postcode" | 
+    "Valid UK Girobank Postcode"
+
+/* ============================================================================
+ * COUNTRY INDICATOR
+ * ============================================================================ */
+
+<uk-country-indicator> ::= 
+    "UK" | "United Kingdom" | "GB" | "Great Britain" | 
+    "Britain" | "England" | "Scotland" | "Wales" | "Northern Ireland" | 
+    "UK Post" | "Royal Mail"
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/"
+<text> ::= <character> | <character> <text>
+
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* ============================================================================
+ * METADATA
+ * ============================================================================ */
+
+/*
+ * UK Postcode Facts:
+ * - Introduced: 1959 (current format)
+ * - Format: A9 9AA, A99 9AA, AA9 9AA, AA99 9AA, A999 9AA, AA9A 9AA
+ * - Outward Code: Area + District + Sector (2-4 characters + 1-2 digits + 1 digit)
+ * - Inward Code: Unit + Subdivision (1 digit + 2 letters)
+ * - Total postcodes: ~1.7 million
+ * - Special postcodes: GIR 0AA (Girobank), BFPO (military), etc.
+ * 
+ * Validation Notes:
+ * - Letters Q, V, X are not used in some positions
+ * - Second character of outward code is usually a digit
+ * - Inward code always ends with 2 letters
+ * - Some postcodes are non-geographic (e.g., for large organizations)
+ * - London has special postal districts (EC, WC, N, S, E, W, etc.)
+ * - Scotland, Wales, and Northern Ireland have their own postcode areas
+ */

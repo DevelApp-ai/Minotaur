@@ -1,0 +1,373 @@
+Grammar: France_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * La Poste Grammar (France Postal Codes)
+ * 
+ * Comprehensive grammar for French postal addresses and code postal codes including:
+ * - 5-digit postal codes (current format)
+ * - Old 2-digit department codes (pre-1972, for reference)
+ * - Street address parsing
+ * - Department and region codes
+ * - Overseas departments and territories
+ * - Special postal codes (CEDEX, military, etc.)
+ * - Validation rules
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Country: France (FR)
+ * Postal Authority: La Poste
+ */
+
+/* ============================================================================
+ * MAIN RULES
+ * ============================================================================ */
+
+<france-postal-address> ::= 
+    <france-name-part>? <EOL>
+    <france-street-address> <EOL>
+    <france-postal-line> <EOL>
+    <france-country-indicator>?
+
+/* Complete French address */
+<france-address> ::= 
+    <france-name-part>? 
+    <france-street-address> <EOL>
+    <france-postal-line> <EOL>
+    <france-country-indicator>?
+
+/* ============================================================================
+ * NAME PART
+ * ============================================================================ */
+
+<france-name-part> ::= <personal-name> | <company-name> | <personal-name> <EOL> <company-name>
+
+<personal-name> ::= 
+    <title>? <first-name> <whitespace> <last-name> <opt-whitespace> <name-suffix>?
+
+<title> ::= 
+    "M." | "Mme" | "Mlle" | "Dr" | "Prof" | "Me" | "Maître"
+
+<first-name> ::= <text>
+<last-name> ::= <text>
+<name-suffix> ::= "Jr" | "Sr" | "II" | "III" | "IV"
+
+<company-name> ::= <text> | "SARL" | "SA" | "EURL" | "SCI" | "Association"
+
+/* ============================================================================
+ * STREET ADDRESS
+ * ============================================================================ */
+
+<france-street-address> ::= 
+    <street-number> <opt-whitespace> <street-complement>? <whitespace> <street-name> <opt-whitespace> <street-type>?
+
+<street-number> ::= 
+    <digit>+ | 
+    <digit>+ <letter> | 
+    <digit>+ "bis" | 
+    <digit>+ "ter" | 
+    <digit>+ "quater" | 
+    <letter>+  /* Some streets use letter-only numbers */
+
+<street-complement> ::= "bis" | "ter" | "quater" | "A" | "B" | "C" | "D"
+
+<street-name> ::= <text>
+
+/* French street types */
+<street-type> ::= 
+    "Allée" | "Al." | 
+    "Avenue" | "Av" | 
+    "Boulevard" | "Bd" | "Blvd" | 
+    "Carrefour" | 
+    "Chemin" | "Ch." | 
+    "Cité" | 
+    "Corniche" | 
+    "Cours" | 
+    "Descente" | 
+    "Escalier" | 
+    "Impasse" | "Imp." | 
+    "Montée" | 
+    "Parc" | 
+    "Passage" | 
+    "Place" | "Pl." | 
+    "Pont" | 
+    "Quai" | 
+    "Rond-Point" | "Rd-Pt" | 
+    "Rue" | "R." | 
+    "Sentier" | 
+    "Square" | 
+    "Traverse" | 
+    "Villa"
+
+/* ============================================================================
+ * POSTAL LINE
+ * ============================================================================ */
+
+<france-postal-line> ::= <france-postal-code> <whitespace> <france-city> <opt-whitespace> <france-cedex>?
+
+/* French Postal Code (Code Postal) */
+<france-postal-code> ::= 
+    <france-metropolitan-code> | 
+    <france-overseas-code> | 
+    <france-special-code> | 
+    <france-military-code>
+
+/* Metropolitan France: 5-digit codes */
+<france-metropolitan-code> ::= <france-department-digit><france-department-digit> <france-district-digit><france-district-digit><france-delivery-digit>
+
+/* Department digit (first 2 digits: 01-95, 97-98) */
+<france-department-digit> ::= 
+    "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+/* District digit (next 2 digits: 00-99) */
+<france-district-digit> ::= <digit>
+
+/* Delivery point digit (last digit: 0-9) */
+<france-delivery-digit> ::= <digit>
+
+/* ============================================================================
+ * DEPARTMENT CODES
+ * ============================================================================ */
+
+/* Metropolitan France departments (01-95, excluding 20, 2A, 2B) */
+<france-department> ::= 
+    "01" | "Ain" | 
+    "02" | "Aisne" | 
+    "03" | "Allier" | 
+    "04" | "Alpes-de-Haute-Provence" | 
+    "05" | "Hautes-Alpes" | 
+    "06" | "Alpes-Maritimes" | 
+    "07" | "Ardèche" | 
+    "08" | "Ardennes" | 
+    "09" | "Ariège" | 
+    "10" | "Aube" | 
+    "11" | "Aude" | 
+    "12" | "Aveyron" | 
+    "13" | "Bouches-du-Rhône" | 
+    "14" | "Calvados" | 
+    "15" | "Cantal" | 
+    "16" | "Charente" | 
+    "17" | "Charente-Maritime" | 
+    "18" | "Cher" | 
+    "19" | "Corrèze" | 
+    "21" | "Côte-d'Or" | 
+    "22" | "Côtes-d'Armor" | 
+    "23" | "Creuse" | 
+    "24" | "Dordogne" | 
+    "25" | "Doubs" | 
+    "26" | "Drôme" | 
+    "27" | "Eure" | 
+    "28" | "Eure-et-Loir" | 
+    "29" | "Finistère" | 
+    "30" | "Gard" | 
+    "31" | "Haute-Garonne" | 
+    "32" | "Gers" | 
+    "33" | "Gironde" | 
+    "34" | "Hérault" | 
+    "35" | "Ille-et-Vilaine" | 
+    "36" | "Indre" | 
+    "37" | "Indre-et-Loire" | 
+    "38" | "Isère" | 
+    "39" | "Jura" | 
+    "40" | "Landes" | 
+    "41" | "Loir-et-Cher" | 
+    "42" | "Loire" | 
+    "43" | "Haute-Loire" | 
+    "44" | "Loire-Atlantique" | 
+    "45" | "Loiret" | 
+    "46" | "Lot" | 
+    "47" | "Lot-et-Garonne" | 
+    "48" | "Lozère" | 
+    "49" | "Maine-et-Loire" | 
+    "50" | "Manche" | 
+    "51" | "Marne" | 
+    "52" | "Haute-Marne" | 
+    "53" | "Mayenne" | 
+    "54" | "Meurthe-et-Moselle" | 
+    "55" | "Meuse" | 
+    "56" | "Morbihan" | 
+    "57" | "Moselle" | 
+    "58" | "Nièvre" | 
+    "59" | "Nord" | 
+    "60" | "Oise" | 
+    "61" | "Orne" | 
+    "62" | "Pas-de-Calais" | 
+    "63" | "Puy-de-Dôme" | 
+    "64" | "Pyrénées-Atlantiques" | 
+    "65" | "Hautes-Pyrénées" | 
+    "66" | "Pyrénées-Orientales" | 
+    "67" | "Bas-Rhin" | 
+    "68" | "Haut-Rhin" | 
+    "69" | "Rhône" | 
+    "70" | "Haute-Saône" | 
+    "71" | "Saône-et-Loire" | 
+    "72" | "Sarthe" | 
+    "73" | "Savoie" | 
+    "74" | "Haute-Savoie" | 
+    "75" | "Paris" | 
+    "76" | "Seine-Maritime" | 
+    "77" | "Seine-et-Marne" | 
+    "78" | "Yvelines" | 
+    "79" | "Deux-Sèvres" | 
+    "80" | "Somme" | 
+    "81" | "Tarn" | 
+    "82" | "Tarn-et-Garonne" | 
+    "83" | "Var" | 
+    "84" | "Vaucluse" | 
+    "85" | "Vendée" | 
+    "86" | "Vienne" | 
+    "87" | "Haute-Vienne" | 
+    "88" | "Vosges" | 
+    "89" | "Yonne" | 
+    "90" | "Territoire de Belfort" | 
+    "91" | "Essonne" | 
+    "92" | "Hauts-de-Seine" | 
+    "93" | "Seine-Saint-Denis" | 
+    "94" | "Val-de-Marne" | 
+    "95" | "Val-d'Oise"
+
+/* Corsica departments */
+<france-corsica-department> ::= 
+    "2A" | "Corse-du-Sud" | 
+    "2B" | "Haute-Corse"
+
+/* ============================================================================
+ * OVERSEAS DEPARTMENTS AND TERRITORIES
+ * ============================================================================ */
+
+/* Overseas Departments (DOM) */
+<france-overseas-code> ::= 
+    <france-dom-code> | 
+    <france-com-code>
+
+/* DOM: 971-974, 976 */
+<france-dom-code> ::= 
+    "971" <digit><digit> |  /* Guadeloupe */
+    "972" <digit><digit> |  /* Martinique */
+    "973" <digit><digit> |  /* Guyane (French Guiana) */
+    "974" <digit><digit> |  /* La Réunion */
+    "976" <digit><digit>   /* Mayotte */
+
+/* COM: 975-978, 984-988 */
+<france-com-code> ::= 
+    "975" <digit><digit> |  /* Saint-Pierre-et-Miquelon */
+    "976" <digit><digit> |  /* Mayotte (also DOM) */
+    "977" <digit><digit> |  /* Saint-Barthélemy */
+    "978" <digit><digit> |  /* Saint-Martin */
+    "984" <digit><digit> |  /* Terres Australes et Antarctiques Françaises */
+    "986" <digit><digit> |  /* Wallis-et-Futuna */
+    "987" <digit><digit> |  /* Polynésie Française */
+    "988" <digit><digit>    /* Nouvelle-Calédonie */
+
+/* ============================================================================
+ * SPECIAL POSTAL CODES
+ * ============================================================================ */
+
+/* CEDEX (Courrier d'Entreprise à Distribution Exceptionnelle) */
+<france-cedex> ::= "CEDEX" <whitespace> <digit>+ | "CEDEX" <whitespace> <digit>+
+
+/* Military postal codes */
+<france-military-code> ::= 
+    "00" <digit><digit><digit> |  /* Army */
+    "08" <digit><digit><digit> |  /* Air Force */
+    "13" <digit><digit><digit>   /* Navy */
+
+/* Special codes */
+<france-special-code> ::= 
+    "75000" | "75001" | "75002" | "75003" | "75004" | "75005" | "75006" | "75007" |  /* Paris */
+    "75008" | "75009" | "75010" | "75011" | "75012" | "75013" | "75014" | "75015" | 
+    "75016" | "75017" | "75018" | "75019" | "75020" | 
+    "13000" | "13001" | "13002" | "13003" | "13004" | "13005" | "13006" | "13007" | "13008" | "13009"  /* Marseille */
+
+/* ============================================================================
+ * POSTCODE VALIDATION
+ * ============================================================================ */
+
+<france-postal-validation> ::= 
+    <france-postal-code> <whitespace> "->" <whitespace> <france-validation-result>
+
+<france-validation-result> ::= 
+    "Valid France Code Postal (Metropolitan)" | 
+    "Valid France Code Postal (Overseas Department)" | 
+    "Valid France Code Postal (Overseas Territory)" | 
+    "Valid France CEDEX Code" | 
+    "Valid France Military Code" | 
+    "Invalid France Code Postal: Format" | 
+    "Invalid France Code Postal: Range"
+
+/* ============================================================================
+ * CITY AND REGION
+ * ============================================================================ */
+
+<france-city> ::= <text>
+
+/* French regions (since 2016 reform) */
+<france-region> ::= 
+    "Auvergne-Rhône-Alpes" | 
+    "Bourgogne-Franche-Comté" | 
+    "Bretagne" | 
+    "Centre-Val de Loire" | 
+    "Corse" | 
+    "Grand Est" | 
+    "Hauts-de-France" | 
+    "Île-de-France" | 
+    "Normandie" | 
+    "Nouvelle-Aquitaine" | 
+    "Occitanie" | 
+    "Pays de la Loire" | 
+    "Provence-Alpes-Côte d'Azur" | "PACA"
+
+/* ============================================================================
+ * COUNTRY INDICATOR
+ * ============================================================================ */
+
+<france-country-indicator> ::= 
+    "France" | "FR" | "République Française" | "French Republic" | 
+    "La Poste" | "Poste Française"
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" |
+    "à" | "â" | "ä" | "ç" | "é" | "è" | "ê" | "ë" | "î" | "ï" | "ô" | "ö" | "ù" | "û" | "ü" | "ÿ"
+
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/"
+<text> ::= <character> | <character> <text>
+
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* ============================================================================
+ * METADATA
+ * ============================================================================ */
+
+/*
+ * La Poste Facts:
+ * - 5-digit postal codes introduced: 1972
+ * - Old 2-digit department codes: 1860-1972
+ * - Format: 5 digits (01000-95999 for metropolitan, 97xxx-98xxx for overseas)
+ * - First 2 digits: Department number
+ * - Last 3 digits: District and delivery point
+ * - CEDEX: Special codes for businesses (CEDEX 123)
+ * 
+ * Validation Notes:
+ * - Metropolitan France: 01-95 (excluding 20), 97-98
+ * - Corsica: 20, 2A, 2B
+ * - Overseas Departments (DOM): 971-974, 976
+ * - Overseas Collectivities (COM): 975-978, 984-988
+ * - Military codes: 00x, 08x, 13x
+ * - Paris arrondissements: 75001-75020
+ * - Marseille arrondissements: 13001-13016
+ * - Lyon arrondissements: 69001-69009
+ */

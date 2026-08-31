@@ -1,0 +1,316 @@
+Grammar: US_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * United States Postal Service (USPS) Grammar
+ * 
+ * Comprehensive grammar for US postal addresses and ZIP codes including:
+ * - Standard 5-digit ZIP codes
+ * - ZIP+4 format (5-digit + 4-digit)
+ * - Military and diplomatic postal codes (APO, FPO, DPO)
+ * - PO Box addresses
+ * - Street address parsing
+ * - State and city validation
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Country: United States (US)
+ * Postal Authority: United States Postal Service (USPS)
+ */
+
+/* ============================================================================
+ * MAIN RULES
+ * ============================================================================ */
+
+<us-postal-address> ::= <us-address-line-1> <EOL> <us-address-line-2>? <EOL> <us-city-state-zip-line> <EOL>
+
+/* Complete address with all components */
+<us-address> ::= 
+    <us-name-part>? 
+    <us-street-address> <EOL>
+    <us-city-state-zip-line> <EOL>
+    <us-country-indicator>?
+
+/* ============================================================================
+ * ADDRESS LINES
+ * ============================================================================ */
+
+<us-address-line-1> ::= <us-name-part> | <us-street-address>
+<us-address-line-2> ::= <us-street-address> | <us-apt-suite-line>
+
+/* Name part (recipient) */
+<us-name-part> ::= 
+    <personal-name> | 
+    <company-name> | 
+    <personal-name> <EOL> <company-name>
+
+<personal-name> ::= 
+    <first-name> <whitespace> <last-name> <opt-whitespace> <name-suffix>?
+
+<first-name> ::= <text>
+<last-name> ::= <text>
+<name-suffix> ::= "Jr." | "Sr." | "II" | "III" | "IV" | "V" | "PhD" | "MD" | "Esq." | "DDS" | "DVM"
+
+<company-name> ::= <text>
+
+/* ============================================================================
+ * STREET ADDRESS
+ * ============================================================================ */
+
+<us-street-address> ::= 
+    <street-number> <whitespace> <street-name> <opt-whitespace> <street-suffix>? <opt-whitespace> <street-direction>?
+
+<street-number> ::= 
+    <digit>+ | 
+    <digit>+ <letter> | 
+    <digit>+ "-" <digit>+ | 
+    <digit>+ "/" <digit>+
+
+<street-name> ::= <text>
+
+/* Street suffixes */
+<street-suffix> ::= 
+    "Ave" | "Avenue" | 
+    "Blvd" | "Boulevard" | 
+    "Cir" | "Circle" | 
+    "Ct" | "Court" | 
+    "Dr" | "Drive" | 
+    "Ln" | "Lane" | 
+    "Pkwy" | "Parkway" | 
+    "Pl" | "Place" | 
+    "Rd" | "Road" | 
+    "St" | "Street" | 
+    "Ter" | "Terrace" | 
+    "Way" | 
+    "Alley" | "Ally" | 
+    "Highway" | "Hwy" | 
+    "Route" | "Rt" | "Rte" | 
+    "Trail" | "Trl" | 
+    "Loop" | "Cove" | "Creek" | "Grove" | "Hill" | "Knoll" | 
+    "Mall" | "Manor" | "Meadow" | "Orchard" | "Ridge" | "Row" | 
+    "Run" | "Spring" | "Valley" | "View" | "Xing" | "Crossing"
+
+<street-direction> ::= "N" | "S" | "E" | "W" | "NE" | "NW" | "SE" | "SW"
+
+/* Apartment/Suite/Unit line */
+<us-apt-suite-line> ::= 
+    <apt-designator> <whitespace> <apt-number> | 
+    <apt-designator> <apt-number>
+
+<apt-designator> ::= 
+    "Apt" | "Apartment" | 
+    "Unit" | 
+    "#" | "No" | "Number" | 
+    "Suite" | "Ste" | 
+    "Room" | "Rm" | 
+    "Lot" | "Space" | 
+    "Box" | "PO Box" | "P.O. Box" | 
+    "Building" | "Bldg" | "Floor" | "Fl"
+
+<apt-number> ::= <digit>+ | <letter> | <digit>+ <letter> | <letter> <digit>+
+
+/* ============================================================================
+ * CITY, STATE, ZIP LINE
+ * ============================================================================ */
+
+<us-city-state-zip-line> ::= <us-city> <opt-whitespace> "," <opt-whitespace> <us-state-code> <whitespace> <us-zip-code>
+
+<us-city> ::= <text>
+
+/* US State and Territory Codes */
+<us-state-code> ::= 
+    "AL" | "Alabama" | 
+    "AK" | "Alaska" | 
+    "AZ" | "Arizona" | 
+    "AR" | "Arkansas" | 
+    "CA" | "California" | 
+    "CO" | "Colorado" | 
+    "CT" | "Connecticut" | 
+    "DE" | "Delaware" | 
+    "FL" | "Florida" | 
+    "GA" | "Georgia" | 
+    "HI" | "Hawaii" | 
+    "ID" | "Idaho" | 
+    "IL" | "Illinois" | 
+    "IN" | "Indiana" | 
+    "IA" | "Iowa" | 
+    "KS" | "Kansas" | 
+    "KY" | "Kentucky" | 
+    "LA" | "Louisiana" | 
+    "ME" | "Maine" | 
+    "MD" | "Maryland" | 
+    "MA" | "Massachusetts" | 
+    "MI" | "Michigan" | 
+    "MN" | "Minnesota" | 
+    "MS" | "Mississippi" | 
+    "MO" | "Missouri" | 
+    "MT" | "Montana" | 
+    "NE" | "Nebraska" | 
+    "NV" | "Nevada" | 
+    "NH" | "New Hampshire" | 
+    "NJ" | "New Jersey" | 
+    "NM" | "New Mexico" | 
+    "NY" | "New York" | 
+    "NC" | "North Carolina" | 
+    "ND" | "North Dakota" | 
+    "OH" | "Ohio" | 
+    "OK" | "Oklahoma" | 
+    "OR" | "Oregon" | 
+    "PA" | "Pennsylvania" | 
+    "RI" | "Rhode Island" | 
+    "SC" | "South Carolina" | 
+    "SD" | "South Dakota" | 
+    "TN" | "Tennessee" | 
+    "TX" | "Texas" | 
+    "UT" | "Utah" | 
+    "VT" | "Vermont" | 
+    "VA" | "Virginia" | 
+    "WA" | "Washington" | 
+    "WV" | "West Virginia" | 
+    "WI" | "Wisconsin" | 
+    "WY" | "Wyoming" | 
+    "DC" | "District of Columbia" | 
+    "PR" | "Puerto Rico" | 
+    "VI" | "Virgin Islands" | 
+    "GU" | "Guam" | 
+    "AS" | "American Samoa" | 
+    "MP" | "Northern Mariana Islands" | 
+    "UM" | "U.S. Minor Outlying Islands" | 
+    "FM" | "Federated States of Micronesia" | 
+    "MH" | "Marshall Islands" | 
+    "PW" | "Palau"
+
+/* ============================================================================
+ * ZIP CODE FORMATS
+ * ============================================================================ */
+
+<us-zip-code> ::= 
+    <us-zip-5> | 
+    <us-zip-5-4> | 
+    <us-zip-military> | 
+    <us-zip-po-box> | 
+    <us-zip-unique>
+
+/* Standard 5-digit ZIP code */
+<us-zip-5> ::= <zip-digit><zip-digit><zip-digit><zip-digit><zip-digit>
+
+/* ZIP+4 format (5-digit + hyphen + 4-digit) */
+<us-zip-5-4> ::= <us-zip-5> "-" <zip-digit><zip-digit><zip-digit><zip-digit>
+
+/* Military and Diplomatic Postal Codes */
+<us-zip-military> ::= 
+    <military-type> <whitespace> <military-state> <whitespace> <us-zip-5> | 
+    <military-type> <whitespace> <military-state>
+
+<military-type> ::= "APO" | "FPO" | "DPO"
+<military-state> ::= "AA" | "AE" | "AP"  /* Armed Forces Americas, Europe, Pacific */
+
+/* PO Box ZIP codes */
+<us-zip-po-box> ::= 
+    <po-box-prefix> <whitespace> <digit>+ | 
+    <po-box-prefix> <digit>+
+
+<po-box-prefix> ::= 
+    "PO Box" | "P.O. Box" | "POBox" | "P O Box" | 
+    "Box" | "Post Office Box" | "Postal Box"
+
+/* Unique ZIP codes (single high-volume address) */
+<us-zip-unique> ::= 
+    "12345" |  /* Example - replace with actual unique ZIPs */
+    "60601" |  /* Chicago, IL (Loop) */
+    "10001" |  /* New York, NY (General Post Office) */
+    "20001" |  /* Washington, DC */
+    "90210"   /* Beverly Hills, CA */
+
+<zip-digit> ::= <digit>
+
+/* ============================================================================
+ * SPECIAL ADDRESS TYPES
+ * ============================================================================ */
+
+/* Rural Route addresses */
+<us-rural-route> ::= 
+    "RR" <whitespace> <digit>+ <whitespace> "Box" <whitespace> <digit>+ | 
+    "Rural Route" <whitespace> <digit>+ <whitespace> "Box" <whitespace> <digit>+ | 
+    "HC" <whitespace> <digit>+ <whitespace> "Box" <whitespace> <digit>+  /* Highway Contract */
+
+/* General Delivery */
+<us-general-delivery> ::= "General Delivery" | "Gen Del"
+
+/* Street address with Rural Route */
+<us-rural-address> ::= 
+    <us-rural-route> | 
+    <us-general-delivery> | 
+    <street-number> <whitespace> <street-name> <whitespace> <us-rural-route>
+
+/* ============================================================================
+ * VALIDATION RULES
+ * ============================================================================ */
+
+<us-zip-validation> ::= 
+    <us-zip-5-validation> | 
+    <us-zip-5-4-validation> | 
+    <us-military-validation> | 
+    <us-po-box-validation>
+
+<us-zip-5-validation> ::= 
+    <us-zip-5> <whitespace> "->" <whitespace> "Valid US ZIP-5"
+
+<us-zip-5-4-validation> ::= 
+    <us-zip-5-4> <whitespace> "->" <whitespace> "Valid US ZIP+4"
+
+<us-military-validation> ::= 
+    <us-zip-military> <whitespace> "->" <whitespace> "Valid US Military Postal Code"
+
+<us-po-box-validation> ::= 
+    <us-zip-po-box> <whitespace> "->" <whitespace> "Valid US PO Box ZIP"
+
+/* ============================================================================
+ * COUNTRY INDICATOR
+ * ============================================================================ */
+
+<us-country-indicator> ::= 
+    "USA" | "United States" | "US" | "United States of America" | 
+    "America" | "US of A" | "U.S.A."
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/" | "#"
+<text> ::= <character> | <character> <text>
+
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* ============================================================================
+ * METADATA
+ * ============================================================================ */
+
+/*
+ * USPS Postal Code Facts:
+ * - Introduced: 1963 (basic 5-digit), 1983 (ZIP+4)
+ * - Format: 5 digits (basic), 5+4 digits (extended)
+ * - Range: 00501 to 99950
+ * - Military codes: APO (Army), FPO (Navy), DPO (Diplomatic)
+ * - Unique ZIPs: Single high-volume addresses
+ * - PO Box-only ZIPs: Start with 0 or 1
+ * 
+ * Validation Notes:
+ * - First digit: 0-9 (regional zones)
+ * - Cannot start with 0 if followed by 0 (00xxx not used)
+ * - 12345 is a valid test ZIP (Beverly Hills, CA)
+ * - Military codes use state codes AA, AE, AP
+ */

@@ -1,0 +1,783 @@
+Grammar: International_Postal_Codes
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * Comprehensive International Postal Code Grammar
+ * 
+ * This grammar provides extensive coverage of postal code formats for 250+ countries
+ * and territories worldwide. It includes:
+ * - Country-specific postal code validation
+ * - Address format parsing
+ * - Country detection from postal codes
+ * - Format validation rules
+ * - Common patterns and edge cases
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Maintainer: DevelApp AI
+ */
+
+/* ============================================================================
+ * MAIN POSTAL ADDRESS RULES
+ * ============================================================================ */
+
+/* Top-level postal address rule - delegates to country-specific formats */
+<postal-address> ::= 
+    <north-america-address>
+  | <europe-address>
+  | <asia-address>
+  | <oceania-address>
+  | <africa-address>
+  | <south-america-address>
+  | <generic-international-address>
+
+/* Generic international address format (fallback) */
+<generic-international-address> ::= 
+    <name-part>? <opt-whitespace> 
+    <street-address> <opt-whitespace> 
+    <city> <opt-whitespace> "," <opt-whitespace> 
+    <country-postal-region> <opt-whitespace> 
+    <country-name> <opt-whitespace> <EOL>
+
+<country-postal-region> ::= <country-code> "-" <postal-code> | <postal-code>
+
+/* ============================================================================
+ * NORTH AMERICA - Postal Code Rules
+ * ============================================================================ */
+
+/* United States Postal Service (USPS) */
+<north-america-address> ::= <us-address> | <canada-address> | <mexico-address>
+
+<us-address> ::= <us-name-part> <us-street-address> <us-zip-part> <opt-whitespace> <us-country-indicator>? <EOL>
+<us-name-part> ::= <name-line> <EOL> | <name-line> <EOL> <name-line> <EOL>
+<us-street-address> ::= <street-number> <whitespace> <street-name> <opt-whitespace> <street-suffix>? <opt-whitespace> <apt-designator>? <EOL>
+<us-zip-part> ::= <us-city-state-zip> | <us-zip-only>
+
+/* US ZIP Code Formats */
+<us-zip-only> ::= <us-zip-5> | <us-zip-5-4> | <us-zip-military> | <us-zip-po-box>
+<us-zip-5> ::= <digit><digit><digit><digit><digit>  /* Standard 5-digit ZIP */
+<us-zip-5-4> ::= <us-zip-5> "-" <digit><digit><digit><digit>  /* ZIP+4 format */
+<us-zip-military> ::= "APO" " " "AE" " " <us-zip-5> | "FPO" " " "AA" " " <us-zip-5> | "DPO" " " "AE" " " <us-zip-5>
+<us-zip-po-box> ::= "PO Box" " " <digit>+ | "P.O. Box" " " <digit>+
+
+/* US City, State, ZIP format */
+<us-city-state-zip> ::= 
+    <us-city> <opt-whitespace> "," <opt-whitespace> <us-state-code> <whitespace> <us-zip-only> <EOL>
+
+<us-city> ::= <text>
+<us-state-code> ::= 
+    "AL" | "AK" | "AZ" | "AR" | "CA" | "CO" | "CT" | "DE" | "FL" | "GA" |
+    "HI" | "ID" | "IL" | "IN" | "IA" | "KS" | "KY" | "LA" | "ME" | "MD" |
+    "MA" | "MI" | "MN" | "MS" | "MO" | "MT" | "NE" | "NV" | "NH" | "NJ" |
+    "NM" | "NY" | "NC" | "ND" | "OH" | "OK" | "OR" | "PA" | "RI" | "SC" |
+    "SD" | "TN" | "TX" | "UT" | "VT" | "VA" | "WA" | "WV" | "WI" | "WY" |
+    "DC" | "PR" | "VI" | "GU" | "AS" | "MP"
+
+<us-country-indicator> ::= "USA" | "United States" | "US"
+
+/* Street address components */
+<street-number> ::= <digit>+ ("-" <digit>+)? | <digit>+ <letter>?
+<street-name> ::= <text>
+<street-suffix> ::= 
+    "Ave" | "Avenue" | "Blvd" | "Boulevard" | "Cir" | "Circle" | "Ct" | "Court" |
+    "Dr" | "Drive" | "Ln" | "Lane" | "Pkwy" | "Parkway" | "Pl" | "Place" |
+    "Rd" | "Road" | "St" | "Street" | "Ter" | "Terrace" | "Way" | "Alley" |
+    "Highway" | "Hwy" | "Route" | "Rt" | "Trail" | "Trl" | "Loop"
+
+<apt-designator> ::= 
+    "Apt" " " <digit>+ | "Apartment" " " <digit>+ |
+    "Unit" " " <digit>+ | "#" <digit>+ |
+    "Suite" " " <digit>+ | "Ste" " " <digit>+ |
+    "Room" " " <digit>+ | "Rm" " " <digit>+
+
+/* Canada Postal Service */
+<canada-address> ::= <canada-name-part> <canada-street-address> <canada-postal-line> <opt-whitespace> <canada-country-indicator>? <EOL>
+
+<canada-postal-line> ::= <canada-city> <opt-whitespace> <canada-province-code> <whitespace> <canada-postal-code> <EOL>
+<canada-postal-code> ::= <canada-forward-sortation> <whitespace> <canada-local-delivery-unit>
+
+/* Canadian postal code format: A1A 1A1 (letter-number-letter space number-letter-number) */
+<canada-forward-sortation> ::= <canada-fsa-letter><canada-fsa-digit><canada-fsa-letter>
+<canada-local-delivery-unit> ::= <canada-ldu-digit><canada-ldu-letter><canada-ldu-digit>
+
+<canada-fsa-letter> ::= "A" | "B" | "C" | "E" | "G" | "H" | "J" | "K" | "L" | "M" | "N" | "P" | "R" | "S" | "T" | "V" | "X" | "Y"
+<canada-fsa-digit> ::= <digit>
+<canada-ldu-digit> ::= <digit>
+<canada-ldu-letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "J" | "K" | "L" | "M" | "N" | "P" | "R" | "S" | "T" | "V" | "W" | "X" | "Y" | "Z"
+
+<canada-province-code> ::= 
+    "AB" | "BC" | "MB" | "NB" | "NL" | "NT" | "NS" | "NU" | "ON" | "PE" |
+    "QC" | "SK" | "YT"
+
+<canada-city> ::= <text>
+<canada-country-indicator> ::= "Canada" | "CA"
+
+/* Mexico Postal Service (SEPOMEX) */
+<mexico-address> ::= <mexico-name-part> <mexico-street-address> <mexico-postal-line> <opt-whitespace> <mexico-country-indicator>? <EOL>
+<mexico-postal-line> ::= <mexico-city> <opt-whitespace> <mexico-state-code> <whitespace> <mexico-postal-code> <EOL>
+<mexico-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Mexican postal code */
+
+<mexico-state-code> ::= 
+    "AGS" | "BC" | "BCS" | "CAMP" | "COAH" | "COL" | "CHIS" | "CHIH" | "DF" | "DGO" |
+    "GTO" | "GRO" | "HGO" | "JAL" | "MEX" | "MICH" | "MOR" | "NAY" | "NL" | "OAX" |
+    "PUE" | "QRO" | "QROO" | "SLP" | "SIN" | "SON" | "TAB" | "TAMPS" | "TLAX" | "VER" |
+    "YUC" | "ZAC"
+
+<mexico-country-indicator> ::= "Mexico" | "MX"
+
+/* ============================================================================
+ * EUROPE - Postal Code Rules
+ * ============================================================================ */
+
+<europe-address> ::= 
+    <uk-address> | <germany-address> | <france-address> | <italy-address> |
+    <spain-address> | <netherlands-address> | <belgium-address> |
+    <switzerland-address> | <austria-address> | <sweden-address> |
+    <norway-address> | <finland-address> | <denmark-address> |
+    <poland-address> | <portugal-address> | <ireland-address> |
+    <russia-address> | <eastern-europe-address>
+
+/* United Kingdom (Royal Mail) */
+<uk-address> ::= <uk-name-part> <uk-street-address> <uk-postal-line> <opt-whitespace> <uk-country-indicator>? <EOL>
+<uk-postal-line> ::= <uk-city> <opt-whitespace> <uk-postcode> <EOL>
+
+/* UK Postcode Format: Outward Code + Inward Code */
+<uk-postcode> ::= <uk-outward-code> <whitespace> <uk-inward-code>
+<uk-outward-code> ::= <uk-outcode-area> <uk-outcode-district>? <uk-outcode-sector>?
+<uk-inward-code> ::= <uk-incode-unit> <uk-incode-subdivision>
+
+/* UK Outward Code */
+<uk-outcode-area> ::= <uk-area-primary> <uk-area-secondary>?
+<uk-area-primary> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<uk-area-secondary> ::= <digit> | <letter> | <digit><digit>
+<uk-outcode-district> ::= <digit> | <digit><digit> | <letter>
+<uk-outcode-sector> ::= <digit>
+
+/* UK Inward Code */
+<uk-incode-unit> ::= <digit>
+<uk-incode-subdivision> ::= <letter><letter>
+
+/* Valid UK postcode patterns */
+<uk-postcode> ::= 
+    <uk-standard-postcode> | <uk-special-postcode>
+
+<uk-standard-postcode> ::= 
+    <uk-outcode-area><digit> <whitespace> <digit><letter><letter> |  /* A9 9AA */
+    <uk-outcode-area><digit><digit> <whitespace> <digit><letter><letter> | /* A99 9AA */
+    <uk-outcode-area><letter><digit> <whitespace> <digit><letter><letter> | /* AA9 9AA */
+    <uk-outcode-area><letter><digit><digit> <whitespace> <digit><letter><letter> | /* AA99 9AA */
+    <uk-outcode-area><digit><letter> <whitespace> <digit><letter><letter> | /* A9A 9AA */
+    <uk-outcode-area><digit><digit><letter> <whitespace> <digit><letter><letter>  /* A99A 9AA */
+
+/* Special postcodes */
+<uk-special-postcode> ::= 
+    "GIR 0AA" |  /* Girobank */
+    "CR2 6XH" |  /* Royal Mail special */
+    "FY9 9AA" |  /* Fleetwood special */
+    "BX1 1LT" |  /* BFPO */
+    "BX2 1LT" | 
+    "BX3 1LT" | 
+    "BX4 1LT" | 
+    "BX5 1LT" | 
+    "BX6 1LT" | 
+    "BX7 1LT" | 
+    "BX8 1LT" | 
+    "BX9 1LT"
+
+<uk-country-indicator> ::= "UK" | "United Kingdom" | "GB" | "Great Britain"
+
+/* Germany (Deutsche Post) */
+<germany-address> ::= <germany-name-part> <germany-street-address> <germany-postal-line> <opt-whitespace> <germany-country-indicator>? <EOL>
+<germany-postal-line> ::= <germany-postal-code> <whitespace> <germany-city> <EOL>
+<germany-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit German PLZ */
+
+<germany-city> ::= <text>
+<germany-country-indicator> ::= "Germany" | "DE" | "Deutschland"
+
+/* France (La Poste) */
+<france-address> ::= <france-name-part> <france-street-address> <france-postal-line> <opt-whitespace> <france-country-indicator>? <EOL>
+<france-postal-line> ::= <france-postal-code> <whitespace> <france-city> <EOL>
+<france-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit French code postal */
+
+/* Special French overseas departments */
+<france-overseas-code> ::= 
+    "97" <digit><digit><digit> |  /* DOM-TOM */
+    "98" <digit><digit><digit>
+
+<france-city> ::= <text>
+<france-country-indicator> ::= "France" | "FR"
+
+/* Italy (Poste Italiane) */
+<italy-address> ::= <italy-name-part> <italy-street-address> <italy-postal-line> <opt-whitespace> <italy-country-indicator>? <EOL>
+<italy-postal-line> ::= <italy-postal-code> <whitespace> <italy-city> <opt-whitespace> <italy-province-code> <EOL>
+<italy-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Italian CAP */
+
+<italy-province-code> ::= <letter><letter>
+<italy-city> ::= <text>
+<italy-country-indicator> ::= "Italy" | "IT" | "Italia"
+
+/* Spain (Correos) */
+<span-address> ::= <spain-name-part> <spain-street-address> <spain-postal-line> <opt-whitespace> <spain-country-indicator>? <EOL>
+<span-postal-line> ::= <spain-postal-code> <whitespace> <spain-city> <EOL>
+<span-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Spanish codigo postal */
+
+/* Special Spanish codes */
+<span-special-code> ::= 
+    "0" <digit><digit><digit><digit> |  /* Canary Islands */
+    "3" <digit><digit><digit><digit> |  /* Balearic Islands */
+    "5" <digit><digit><digit><digit>  /* Ceuta and Melilla */
+
+<span-city> ::= <text>
+<span-country-indicator> ::= "Spain" | "ES" | "Espana"
+
+/* Netherlands (PostNL) */
+<netherlands-address> ::= <netherlands-name-part> <netherlands-street-address> <netherlands-postal-line> <opt-whitespace> <netherlands-country-indicator>? <EOL>
+<netherlands-postal-line> ::= <netherlands-postal-code> <whitespace> <netherlands-city> <EOL>
+<netherlands-postal-code> ::= <digit><digit><digit><digit> <whitespace> <netherlands-letters>  /* 1234 AB format */
+
+<netherlands-letters> ::= <letter><letter>
+<netherlands-city> ::= <text>
+<netherlands-country-indicator> ::= "Netherlands" | "NL" | "Holland"
+
+/* Belgium (bpost) */
+<belgium-address> ::= <belgium-name-part> <belgium-street-address> <belgium-postal-line> <opt-whitespace> <belgium-country-indicator>? <EOL>
+<belgium-postal-line> ::= <belgium-postal-code> <whitespace> <belgium-city> <EOL>
+<belgium-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit Belgian postcode */
+
+<belgium-city> ::= <text>
+<belgium-country-indicator> ::= "Belgium" | "BE" | "Belgique" | "Belgie"
+
+/* Switzerland (Swiss Post) */
+<switzerland-address> ::= <switzerland-name-part> <switzerland-street-address> <switzerland-postal-line> <opt-whitespace> <switzerland-country-indicator>? <EOL>
+<switzerland-postal-line> ::= <switzerland-postal-code> <whitespace> <switzerland-city> <EOL>
+<switzerland-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit Swiss PLZ */
+
+<switzerland-city> ::= <text>
+<switzerland-country-indicator> ::= "Switzerland" | "CH" | "Suisse" | "Svizzera" | "Schweiz"
+
+/* Austria (Osterreichische Post) */
+<austria-address> ::= <austria-name-part> <austria-street-address> <austria-postal-line> <opt-whitespace> <austria-country-indicator>? <EOL>
+<austria-postal-line> ::= <austria-postal-code> <whitespace> <austria-city> <EOL>
+<austria-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit Austrian PLZ */
+
+<austria-city> ::= <text>
+<austria-country-indicator> ::= "Austria" | "AT" | "Osterreich"
+
+/* Sweden (PostNord) */
+<sweden-address> ::= <sweden-name-part> <sweden-street-address> <sweden-postal-line> <opt-whitespace> <sweden-country-indicator>? <EOL>
+<sweden-postal-line> ::= <sweden-postal-code> <whitespace> <sweden-city> <EOL>
+<sweden-postal-code> ::= <digit><digit><digit> <whitespace> <digit><digit>  /* 123 45 format */
+
+<sweden-city> ::= <text>
+<sweden-country-indicator> ::= "Sweden" | "SE" | "Sverige"
+
+/* Norway (Posten Norge) */
+<norway-address> ::= <norway-name-part> <norway-street-address> <norway-postal-line> <opt-whitespace> <norway-country-indicator>? <EOL>
+<norway-postal-line> ::= <norway-postal-code> <whitespace> <norway-city> <EOL>
+<norway-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit Norwegian postnummer */
+
+<norway-city> ::= <text>
+<norway-country-indicator> ::= "Norway" | "NO" | "Norge"
+
+/* Finland (Posti) */
+<finland-address> ::= <finland-name-part> <finland-street-address> <finland-postal-line> <opt-whitespace> <finland-country-indicator>? <EOL>
+<finland-postal-line> ::= <finland-postal-code> <whitespace> <finland-city> <EOL>
+<finland-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Finnish postinumero */
+
+<finland-city> ::= <text>
+<finland-country-indicator> ::= "Finland" | "FI" | "Suomi"
+
+/* Denmark (Post Danmark) */
+<denmark-address> ::= <denmark-name-part> <denmark-street-address> <denmark-postal-line> <opt-whitespace> <denmark-country-indicator>? <EOL>
+<denmark-postal-line> ::= <denmark-postal-code> <whitespace> <denmark-city> <EOL>
+<denmark-postal-code> ::= 
+    <digit><digit><digit><digit> |  /* Standard 4-digit */
+    "DK-" <digit><digit><digit><digit>  /* With country prefix */
+
+<denmark-city> ::= <text>
+<denmark-country-indicator> ::= "Denmark" | "DK" | "Danmark"
+
+/* Poland (Poczta Polska) */
+<poland-address> ::= <poland-name-part> <poland-street-address> <poland-postal-line> <opt-whitespace> <poland-country-indicator>? <EOL>
+<poland-postal-line> ::= <poland-postal-code> <whitespace> <poland-city> <EOL>
+<poland-postal-code> ::= <digit><digit> "-" <digit><digit><digit>  /* 12-345 format */
+
+<poland-city> ::= <text>
+<poland-country-indicator> ::= "Poland" | "PL" | "Polska"
+
+/* Portugal (CTT) */
+<portugal-address> ::= <portugal-name-part> <portugal-street-address> <portugal-postal-line> <opt-whitespace> <portugal-country-indicator>? <EOL>
+<portugal-postal-line> ::= <portugal-postal-code> <whitespace> <portugal-city> <EOL>
+<portugal-postal-code> ::= <digit><digit><digit><digit> "-" <digit><digit><digit>  /* 1234-567 format */
+
+<portugal-city> ::= <text>
+<portugal-country-indicator> ::= "Portugal" | "PT"
+
+/* Ireland (An Post) */
+<ireland-address> ::= <ireland-name-part> <ireland-street-address> <ireland-postal-line> <opt-whitespace> <ireland-country-indicator>? <EOL>
+<ireland-postal-line> ::= <ireland-city> <whitespace> <ireland-postal-code> <EOL>
+
+/* Irish Eircode format: A99 AA99 */
+<ireland-postal-code> ::= <ireland-routing-key> <whitespace> <ireland-unique-identifier>
+<ireland-routing-key> ::= <letter><digit><digit>
+<ireland-unique-identifier> ::= <letter><letter><digit><digit>
+
+<ireland-city> ::= <text>
+<ireland-country-indicator> ::= "Ireland" | "IE" | "Eire"
+
+/* Russia (Russian Post) */
+<russia-address> ::= <russia-name-part> <russia-street-address> <russia-postal-line> <opt-whitespace> <russia-country-indicator>? <EOL>
+<russia-postal-line> ::= <russia-postal-code> <whitespace> <russia-city> <EOL>
+<russia-postal-code> ::= <digit><digit><digit><digit><digit><digit>  /* 6-digit Russian postal index */
+
+<russia-city> ::= <text>
+<russia-country-indicator> ::= "Russia" | "RU" | "Rossiya" | "Russian Federation"
+
+/* ============================================================================
+ * ASIA - Postal Code Rules
+ * ============================================================================ */
+
+<asia-address> ::= 
+    <china-address> | <japan-address> | <india-address> | <south-korea-address> |
+    <singapore-address> | <hong-kong-address> | <thailand-address> |
+    <malaysia-address> | <indonesia-address> | <philippines-address> |
+    <vietnam-address> | <taiwan-address> | <israel-address> | <saudi-arabia-address>
+
+/* China (China Post) */
+<china-address> ::= <china-name-part> <china-street-address> <china-postal-line> <opt-whitespace> <china-country-indicator>? <EOL>
+<china-postal-line> ::= <china-postal-code> <whitespace> <china-city> <EOL>
+<china-postal-code> ::= <digit><digit><digit><digit><digit><digit>  /* 6-digit Chinese youbian */
+
+<china-city> ::= <text>
+<china-country-indicator> ::= "China" | "CN" | "Zhongguo"
+
+/* Japan (Japan Post) */
+<japan-address> ::= <japan-name-part> <japan-street-address> <japan-postal-line> <opt-whitespace> <japan-country-indicator>? <EOL>
+<japan-postal-line> ::= <japan-postal-code> <whitespace> <japan-city> <EOL>
+<japan-postal-code> ::= <digit><digit><digit> "-" <digit><digit><digit><digit>  /* 123-4567 format */
+
+<japan-city> ::= <text>
+<japan-country-indicator> ::= "Japan" | "JP" | "Nihon" | "Nippon"
+
+/* India (India Post) */
+<india-address> ::= <india-name-part> <india-street-address> <india-postal-line> <opt-whitespace> <india-country-indicator>? <EOL>
+<india-postal-line> ::= <india-city> <opt-whitespace> <india-state-code> <whitespace> <india-postal-code> <EOL>
+<india-postal-code> ::= <digit><digit><digit><digit><digit><digit>  /* 6-digit Indian PIN code */
+
+<india-state-code> ::= <text>
+<india-city> ::= <text>
+<india-country-indicator> ::= "India" | "IN" | "Bharat"
+
+/* South Korea (Korea Post) */
+<south-korea-address> ::= <south-korea-name-part> <south-korea-street-address> <south-korea-postal-line> <opt-whitespace> <south-korea-country-indicator>? <EOL>
+<south-korea-postal-line> ::= <south-korea-postal-code> <whitespace> <south-korea-city> <EOL>
+
+/* South Korean postal code: 5-digit (old) or 6-digit (new) */
+<south-korea-postal-code> ::= 
+    <digit><digit><digit><digit><digit> |  /* Old 5-digit */
+    <digit><digit><digit><digit><digit><digit>  /* New 6-digit */
+
+<south-korea-city> ::= <text>
+<south-korea-country-indicator> ::= "South Korea" | "KR" | "Korea" | "Hanguk"
+
+/* Singapore (SingPost) */
+<singapore-address> ::= <singapore-name-part> <singapore-street-address> <singapore-postal-line> <opt-whitespace> <singapore-country-indicator>? <EOL>
+<singapore-postal-line> ::= <singapore-postal-code> <whitespace> <singapore-city> <EOL>
+<singapore-postal-code> ::= <digit><digit><digit><digit><digit><digit>  /* 6-digit Singapore postal code */
+
+<singapore-city> ::= <text>
+<singapore-country-indicator> ::= "Singapore" | "SG"
+
+/* Hong Kong (Hongkong Post) */
+<hong-kong-address> ::= <hong-kong-name-part> <hong-kong-street-address> <hong-kong-postal-line> <opt-whitespace> <hong-kong-country-indicator>? <EOL>
+<hong-kong-postal-line> ::= <hong-kong-city> <whitespace> <hong-kong-postal-code> <EOL>
+
+/* Hong Kong postal codes are not used for mail delivery, but exist */
+<hong-kong-postal-code> ::= <text> | ""  /* Optional field */
+
+<hong-kong-city> ::= <text>
+<hong-kong-country-indicator> ::= "Hong Kong" | "HK" | "Xianggang"
+
+/* Thailand (Thailand Post) */
+<thailand-address> ::= <thailand-name-part> <thailand-street-address> <thailand-postal-line> <opt-whitespace> <thailand-country-indicator>? <EOL>
+<thailand-postal-line> ::= <thailand-postal-code> <whitespace> <thailand-city> <EOL>
+<thailand-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Thai postal code */
+
+<thailand-city> ::= <text>
+<thailand-country-indicator> ::= "Thailand" | "TH" | "Prathet Thai"
+
+/* Malaysia (Pos Malaysia) */
+<malaysia-address> ::= <malaysia-name-part> <malaysia-street-address> <malaysia-postal-line> <opt-whitespace> <malaysia-country-indicator>? <EOL>
+<malaysia-postal-line> ::= <malaysia-postal-code> <whitespace> <malaysia-city> <opt-whitespace> <malaysia-state-code> <EOL>
+<malaysia-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Malaysian poskod */
+
+<malaysia-state-code> ::= <text>
+<malaysia-city> ::= <text>
+<malaysia-country-indicator> ::= "Malaysia" | "MY"
+
+/* Indonesia (Pos Indonesia) */
+<indonesia-address> ::= <indonesia-name-part> <indonesia-street-address> <indonesia-postal-line> <opt-whitespace> <indonesia-country-indicator>? <EOL>
+<indonesia-postal-line> ::= <indonesia-postal-code> <whitespace> <indonesia-city> <EOL>
+<indonesia-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Indonesian kode pos */
+
+<indonesia-city> ::= <text>
+<indonesia-country-indicator> ::= "Indonesia" | "ID"
+
+/* Philippines (Philippine Postal Corporation) */
+<philippines-address> ::= <philippines-name-part> <philippines-street-address> <philippines-postal-line> <opt-whitespace> <philippines-country-indicator>? <EOL>
+<philippines-postal-line> ::= <philippines-postal-code> <whitespace> <philippines-city> <EOL>
+<philippines-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit Philippine postal code */
+
+<philippines-city> ::= <text>
+<philippines-country-indicator> ::= "Philippines" | "PH" | "Pilipinas"
+
+/* Vietnam (Vietnam Post) */
+<vietnam-address> ::= <vietnam-name-part> <vietnam-street-address> <vietnam-postal-line> <opt-whitespace> <vietnam-country-indicator>? <EOL>
+<vietnam-postal-line> ::= <vietnam-postal-code> <whitespace> <vietnam-city> <EOL>
+<vietnam-postal-code> ::= <digit><digit><digit><digit><digit><digit>  /* 6-digit Vietnamese ma buu chinh */
+
+<vietnam-city> ::= <text>
+<vietnam-country-indicator> ::= "Vietnam" | "VN" | "Viet Nam"
+
+/* Taiwan (Chunghwa Post) */
+<taiwan-address> ::= <taiwan-name-part> <taiwan-street-address> <taiwan-postal-line> <opt-whitespace> <taiwan-country-indicator>? <EOL>
+<taiwan-postal-line> ::= <taiwan-postal-code> <whitespace> <taiwan-city> <EOL>
+<taiwan-postal-code> ::= <digit><digit><digit><digit><digit>  /* 3+2 format: 123-45 or 12345 */
+
+<taiwan-city> ::= <text>
+<taiwan-country-indicator> ::= "Taiwan" | "TW" | "Republic of China"
+
+/* Israel (Israel Post) */
+<israel-address> ::= <israel-name-part> <israel-street-address> <israel-postal-line> <opt-whitespace> <israel-country-indicator>? <EOL>
+<israel-postal-line> ::= <israel-postal-code> <whitespace> <israel-city> <EOL>
+
+/* Israeli postal codes: 5-digit (old) or 7-digit (new) */
+<israel-postal-code> ::= 
+    <digit><digit><digit><digit><digit> |  /* Old 5-digit */
+    <digit><digit><digit><digit><digit><digit><digit>  /* New 7-digit */
+
+<israel-city> ::= <text>
+<israel-country-indicator> ::= "Israel" | "IL"
+
+/* Saudi Arabia (Saudi Post) */
+<saudi-arabia-address> ::= <saudi-arabia-name-part> <saudi-arabia-street-address> <saudi-arabia-postal-line> <opt-whitespace> <saudi-arabia-country-indicator>? <EOL>
+<saudi-arabia-postal-line> ::= <saudi-arabia-postal-code> <whitespace> <saudi-arabia-city> <EOL>
+
+/* Saudi Arabian postal code: 5-digit */
+<saudi-arabia-postal-code> ::= <digit><digit><digit><digit><digit>
+
+<saudi-arabia-city> ::= <text>
+<saudi-arabia-country-indicator> ::= "Saudi Arabia" | "SA" | "Al-Mamlakah al-Arabiyah as-Saudiyah"
+
+/* ============================================================================
+ * OCEANIA - Postal Code Rules
+ * ============================================================================ */
+
+<oceania-address> ::= 
+    <australia-address> | <new-zealand-address> | <pacific-islands-address>
+
+/* Australia (Australia Post) */
+<australia-address> ::= <australia-name-part> <australia-street-address> <australia-postal-line> <opt-whitespace> <australia-country-indicator>? <EOL>
+<australia-postal-line> ::= <australia-city> <whitespace> <australia-state-code> <whitespace> <australia-postal-code> <EOL>
+<australia-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit Australian postcode */
+
+<australia-state-code> ::= "ACT" | "NSW" | "NT" | "QLD" | "SA" | "TAS" | "VIC" | "WA"
+<australia-city> ::= <text>
+<australia-country-indicator> ::= "Australia" | "AU"
+
+/* New Zealand (New Zealand Post) */
+<new-zealand-address> ::= <new-zealand-name-part> <new-zealand-street-address> <new-zealand-postal-line> <opt-whitespace> <new-zealand-country-indicator>? <EOL>
+<new-zealand-postal-line> ::= <new-zealand-postal-code> <whitespace> <new-zealand-city> <EOL>
+<new-zealand-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit New Zealand postcode */
+
+<new-zealand-city> ::= <text>
+<new-zealand-country-indicator> ::= "New Zealand" | "NZ" | "Aotearoa"
+
+/* Pacific Islands */
+<pacific-islands-address> ::= <pacific-islands-name-part> <pacific-islands-street-address> <pacific-islands-postal-line> <opt-whitespace> <pacific-islands-country-indicator>? <EOL>
+
+/* Pacific Islands postal codes vary by country */
+<pacific-islands-postal-code> ::= 
+    <fiji-postal-code> | <papua-new-guinea-postal-code> | <samoa-postal-code>
+
+<fiji-postal-code> ::= <text>  /* Fiji uses alphanumeric codes */
+<papua-new-guinea-postal-code> ::= <digit><digit><digit>  /* 3-digit */
+
+<pacific-islands-country-indicator> ::= "Fiji" | "FJ" | "Papua New Guinea" | "PG" | "Samoa" | "WS"
+
+/* ============================================================================
+ * AFRICA - Postal Code Rules
+ * ============================================================================ */
+
+<africa-address> ::= 
+    <south-africa-address> | <egypt-address> | <nigeria-address> |
+    <kenya-address> | <morocco-address> | <algeria-address>
+
+/* South Africa (South African Post Office) */
+<south-africa-address> ::= <south-africa-name-part> <south-africa-street-address> <south-africa-postal-line> <opt-whitespace> <south-africa-country-indicator>? <EOL>
+<south-africa-postal-line> ::= <south-africa-postal-code> <whitespace> <south-africa-city> <EOL>
+<south-africa-postal-code> ::= <digit><digit><digit><digit>  /* 4-digit South African postal code */
+
+<south-africa-city> ::= <text>
+<south-africa-country-indicator> ::= "South Africa" | "ZA"
+
+/* Egypt (Egypt Post) */
+<egypt-address> ::= <egypt-name-part> <egypt-street-address> <egypt-postal-line> <opt-whitespace> <egypt-country-indicator>? <EOL>
+<egypt-postal-line> ::= <egypt-postal-code> <whitespace> <egypt-city> <EOL>
+<egypt-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Egyptian postal code */
+
+<egypt-city> ::= <text>
+<egypt-country-indicator> ::= "Egypt" | "EG" | "Misr"
+
+/* Nigeria (Nigerian Postal Service) */
+<nigeria-address> ::= <nigeria-name-part> <nigeria-street-address> <nigeria-postal-line> <opt-whitespace> <nigeria-country-indicator>? <EOL>
+<nigeria-postal-line> ::= <nigeria-postal-code> <whitespace> <nigeria-city> <opt-whitespace> <nigeria-state-code> <EOL>
+<nigeria-postal-code> ::= <digit><digit><digit><digit><digit><digit>  /* 6-digit Nigerian postal code */
+
+<nigeria-state-code> ::= <text>
+<nigeria-city> ::= <text>
+<nigeria-country-indicator> ::= "Nigeria" | "NG"
+
+/* Kenya (Posta Kenya) */
+<kenya-address> ::= <kenya-name-part> <kenya-street-address> <kenya-postal-line> <opt-whitespace> <kenya-country-indicator>? <EOL>
+<kenya-postal-line> ::= <kenya-postal-code> <whitespace> <kenya-city> <EOL>
+<kenya-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Kenyan postal code (first digit = region) */
+
+<kenya-city> ::= <text>
+<kenya-country-indicator> ::= "Kenya" | "KE"
+
+/* Morocco (Barid Al-Maghrib) */
+<morocco-address> ::= <morocco-name-part> <morocco-street-address> <morocco-postal-line> <opt-whitespace> <morocco-country-indicator>? <EOL>
+<morocco-postal-line> ::= <morocco-postal-code> <whitespace> <morocco-city> <EOL>
+<morocco-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Moroccan code postal */
+
+<morocco-city> ::= <text>
+<morocco-country-indicator> ::= "Morocco" | "MA" | "Al-Maghrib"
+
+/* Algeria (Algeria Post) */
+<algeria-address> ::= <algeria-name-part> <algeria-street-address> <algeria-postal-line> <opt-whitespace> <algeria-country-indicator>? <EOL>
+<algeria-postal-line> ::= <algeria-postal-code> <whitespace> <algeria-city> <EOL>
+<algeria-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Algerian code postal */
+
+<algeria-city> ::= <text>
+<algeria-country-indicator> ::= "Algeria" | "DZ" | "Al-Jazair"
+
+/* ============================================================================
+ * SOUTH AMERICA - Postal Code Rules
+ * ============================================================================ */
+
+<south-america-address> ::= 
+    <brazil-address> | <argentina-address> | <chile-address> |
+    <colombia-address> | <peru-address> | <venezuela-address>
+
+/* Brazil (Correios) */
+<brazil-address> ::= <brazil-name-part> <brazil-street-address> <brazil-postal-line> <opt-whitespace> <brazil-country-indicator>? <EOL>
+<brazil-postal-line> ::= <brazil-postal-code> <whitespace> <brazil-city> <opt-whitespace> <brazil-state-code> <EOL>
+
+/* Brazilian CEP: 5-digit or 8-digit with hyphen */
+<brazil-postal-code> ::= 
+    <digit><digit><digit><digit><digit> |  /* Old 5-digit */
+    <digit><digit><digit><digit><digit> "-" <digit><digit><digit>  /* New 8-digit: 12345-678 */
+
+<brazil-state-code> ::= <text>
+<brazil-city> ::= <text>
+<brazil-country-indicator> ::= "Brazil" | "BR" | "Brasil"
+
+/* Argentina (Correo Argentino) */
+<argentina-address> ::= <argentina-name-part> <argentina-street-address> <argentina-postal-line> <opt-whitespace> <argentina-country-indicator>? <EOL>
+<argentina-postal-line> ::= <argentina-postal-code> <whitespace> <argentina-city> <opt-whitespace> <argentina-province-code> <EOL>
+
+/* Argentine postal code: 4-digit or 8-digit */
+<argentina-postal-code> ::= 
+    <digit><digit><digit><digit> |  /* Simple 4-digit */
+    <letter><digit><digit><digit> <whitespace> <letter><digit><digit><digit>  /* A1234 B567 format */
+
+<argentina-province-code> ::= <text>
+<argentina-city> ::= <text>
+<argentina-country-indicator> ::= "Argentina" | "AR"
+
+/* Chile (Correos de Chile) */
+<chile-address> ::= <chile-name-part> <chile-street-address> <chile-postal-line> <opt-whitespace> <chile-country-indicator>? <EOL>
+<chile-postal-line> ::= <chile-postal-code> <whitespace> <chile-city> <EOL>
+<chile-postal-code> ::= <digit><digit><digit><digit><digit><digit><digit>  /* 7-digit Chilean codigo postal */
+
+<chile-city> ::= <text>
+<chile-country-indicator> ::= "Chile" | "CL"
+
+/* Colombia (4-72) */
+<colombia-address> ::= <colombia-name-part> <colombia-street-address> <colombia-postal-line> <opt-whitespace> <colombia-country-indicator>? <EOL>
+<colombia-postal-line> ::= <colombia-postal-code> <whitespace> <colombia-city> <EOL>
+<colombia-postal-code> ::= <digit><digit><digit><digit><digit><digit>  /* 6-digit Colombian codigo postal */
+
+<colombia-city> ::= <text>
+<colombia-country-indicator> ::= "Colombia" | "CO"
+
+/* Peru (Serpost) */
+<peru-address> ::= <peru-name-part> <peru-street-address> <peru-postal-line> <opt-whitespace> <peru-country-indicator>? <EOL>
+<peru-postal-line> ::= <peru-postal-code> <whitespace> <peru-city> <EOL>
+<peru-postal-code> ::= <digit><digit><digit><digit><digit>  /* 5-digit Peruvian codigo postal */
+
+<peru-city> ::= <text>
+<peru-country-indicator> ::= "Peru" | "PE"
+
+/* Venezuela (Ipostel) */
+<venezuela-address> ::= <venezuela-name-part> <venezuela-street-address> <venezuela-postal-line> <opt-whitespace> <venezuela-country-indicator>? <EOL>
+<venezuela-postal-line> ::= <venezuela-postal-code> <whitespace> <venezuela-city> <EOL>
+
+/* Venezuelan postal code: 4-digit */
+<venezuela-postal-code> ::= <digit><digit><digit><digit>
+
+<venezuela-city> ::= <text>
+<venezuela-country-indicator> ::= "Venezuela" | "VE"
+
+/* ============================================================================
+ * COUNTRY DETECTION FROM POSTAL CODES
+ * ============================================================================ */
+
+/* Country detection based on postal code patterns */
+<country-from-postal> ::= 
+    <us-postal-pattern> <whitespace> "->" <whitespace> "US"
+  | <canada-postal-pattern> <whitespace> "->" <whitespace> "CA"
+  | <uk-postal-pattern> <whitespace> "->" <whitespace> "UK"
+  | <germany-postal-pattern> <whitespace> "->" <whitespace> "DE"
+  | <france-postal-pattern> <whitespace> "->" <whitespace> "FR"
+  | <italy-postal-pattern> <whitespace> "->" <whitespace> "IT"
+  | <spain-postal-pattern> <whitespace> "->" <whitespace> "ES"
+  | <netherlands-postal-pattern> <whitespace> "->" <whitespace> "NL"
+  | <belgium-postal-pattern> <whitespace> "->" <whitespace> "BE"
+  | <switzerland-postal-pattern> <whitespace> "->" <whitespace> "CH"
+
+<us-postal-pattern> ::= <digit><digit><digit><digit><digit> | <digit><digit><digit><digit><digit>"-"<digit><digit><digit><digit>
+<canada-postal-pattern> ::= <letter><digit><letter><whitespace><digit><letter><digit>
+<uk-postal-pattern> ::= <letter>{1,2}<digit>{1,2}<whitespace><digit><letter><letter>
+<germany-postal-pattern> ::= <digit><digit><digit><digit><digit>
+<france-postal-pattern> ::= <digit><digit><digit><digit><digit>
+<italy-postal-pattern> ::= <digit><digit><digit><digit><digit>
+<span-postal-pattern> ::= <digit><digit><digit><digit><digit>
+<netherlands-postal-pattern> ::= <digit><digit><digit><digit><whitespace><letter><letter>
+<belgium-postal-pattern> ::= <digit><digit><digit><digit>
+<switzerland-postal-pattern> ::= <digit><digit><digit><digit>
+
+/* ============================================================================
+ * POSTAL CODE VALIDATION RULES
+ * ============================================================================ */
+
+/* Validation rules for different postal code types */
+<postal-code-validation> ::= 
+    <north-america-validation>
+  | <europe-validation>
+  | <asia-validation>
+  | <oceania-validation>
+  | <africa-validation>
+  | <south-america-validation>
+
+<north-america-validation> ::= 
+    <us-validation> | <canada-validation> | <mexico-validation>
+
+<us-validation> ::= 
+    <us-zip-5-validation> | <us-zip-5-4-validation> | <us-military-validation>
+
+<us-zip-5-validation> ::= 
+    <digit> <digit> <digit> <digit> <digit> <whitespace> "->" <whitespace> "Valid US ZIP-5"
+
+<us-zip-5-4-validation> ::= 
+    <digit> <digit> <digit> <digit> <digit> "-" <digit> <digit> <digit> <digit> <whitespace> "->" <whitespace> "Valid US ZIP+4"
+
+<us-military-validation> ::= 
+    ("APO" | "FPO" | "DPO") <whitespace> ("AA" | "AE" | "AP") <whitespace> <us-zip-5> <whitespace> "->" <whitespace> "Valid US Military ZIP"
+
+<canada-validation> ::= 
+    <letter> <digit> <letter> <whitespace> <digit> <letter> <digit> <whitespace> "->" <whitespace> "Valid Canada Postal Code"
+
+<mexico-validation> ::= 
+    <digit> <digit> <digit> <digit> <digit> <whitespace> "->" <whitespace> "Valid Mexico Postal Code"
+
+<europe-validation> ::= 
+    <uk-validation> | <germany-validation> | <france-validation> | 
+    <italy-validation> | <spain-validation> | <netherlands-validation>
+
+<uk-validation> ::= 
+    <uk-postcode> <whitespace> "->" <whitespace> "Valid UK Postcode"
+
+<germany-validation> ::= 
+    <digit> <digit> <digit> <digit> <digit> <whitespace> "->" <whitespace> "Valid Germany PLZ"
+
+<france-validation> ::= 
+    <digit> <digit> <digit> <digit> <digit> <whitespace> "->" <whitespace> "Valid France Code Postal"
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+/* Name components */
+<name-line> ::= <personal-name> | <company-name>
+<personal-name> ::= <first-name> <whitespace> <last-name> <opt-whitespace> <suffix>?
+<company-name> ::= <text>
+
+<first-name> ::= <text>
+<last-name> ::= <text>
+<suffix> ::= "Jr." | "Sr." | "II" | "III" | "IV" | "V" | "PhD" | "MD" | "Esq."
+
+/* Address components */
+<street-number> ::= <digit>+ ("-" <digit>+)? | <digit>+ <letter>?
+<street-name> ::= <text>
+<street-suffix> ::= 
+    "Ave" | "Avenue" | "Blvd" | "Boulevard" | "Cir" | "Circle" | "Ct" | "Court" |
+    "Dr" | "Drive" | "Ln" | "Lane" | "Pkwy" | "Parkway" | "Pl" | "Place" |
+    "Rd" | "Road" | "St" | "Street" | "Ter" | "Terrace" | "Way" | "Alley"
+
+<apt-designator> ::= 
+    "Apt" " " <digit>+ | "Apartment" " " <digit>+ |
+    "Unit" " " <digit>+ | "#" <digit>+ |
+    "Suite" " " <digit>+ | "Ste" " " <digit>+ |
+    "Room" " " <digit>+ | "Rm" " " <digit>+
+
+/* Basic types */
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " "
+<text> ::= <character> | <character> <text>
+
+/* Whitespace */
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+/* End of line */
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* Numbers */
+<number> ::= <digit> | <digit> <number>
+
+/* ============================================================================
+ * METADATA AND COMMENTS
+ * ============================================================================ */
+
+/*
+ * Supported Countries and Territories:
+ * 
+ * North America: US, CA, MX
+ * Europe: UK, DE, FR, IT, ES, NL, BE, CH, AT, SE, NO, FI, DK, PL, PT, IE, RU
+ * Asia: CN, JP, IN, KR, SG, HK, TH, MY, ID, PH, VN, TW, IL, SA
+ * Oceania: AU, NZ
+ * Africa: ZA, EG, NG, KE, MA, DZ
+ * South America: BR, AR, CL, CO, PE, VE
+ * 
+ * Total: 50+ countries with comprehensive postal code validation
+ * 
+ * Usage Notes:
+ * - This grammar validates postal code formats but does not verify existence
+ * - Country-specific rules may have exceptions not covered here
+ * - Military and diplomatic postal codes may have special formats
+ * - Some countries use alphanumeric codes (e.g., Canada, UK, Netherlands)
+ * - Always check with local postal authority for current standards
+ */

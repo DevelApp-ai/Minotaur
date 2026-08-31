@@ -1,0 +1,308 @@
+Grammar: US_Postal_Code_Tests
+TokenSplitter: Space
+FormatType: CEBNF
+
+/*
+ * US Postal Code Test Cases
+ * 
+ * Comprehensive test cases for US ZIP code validation
+ * Includes valid and invalid examples for all US postal code formats
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ */
+
+/* ============================================================================
+ * VALID US ZIP CODES
+ * ============================================================================ */
+
+<us-valid-tests> ::= 
+    <us-zip-5-valid> | 
+    <us-zip-5-4-valid> | 
+    <us-military-valid> | 
+    <us-po-box-valid> | 
+    <us-unique-valid>
+
+/* Standard 5-digit ZIP codes */
+<us-zip-5-valid> ::= 
+    "00501" |  /* Holtsville, NY - lowest ZIP code */
+    "00544" |  /* Holtsville, NY */
+    "00601" |  /* Adjuntas, PR */
+    "00701" |  /* San Juan, PR */
+    "00901" |  /* San Juan, PR */
+    "01001" |  /* Agawam, MA */
+    "02108" |  /* Boston, MA */
+    "02138" |  /* Cambridge, MA */
+    "02478" |  /* Brookline, MA */
+    "03031" |  /* Hudson, NH */
+    "03032" |  /* Merrimack, NH */
+    "04001" |  /* Kittery, ME */
+    "04330" |  /* Augusta, ME */
+    "05001" |  /* White River Junction, VT */
+    "05401" |  /* Burlington, VT */
+    "05404" |  /* Burlington, VT */
+    "06001" |  /* Avon, CT */
+    "06101" |  /* Hartford, CT */
+    "07001" |  /* Bayonne, NJ */
+    "07010" |  /* Hoboken, NJ */
+    "07302" |  /* Jersey City, NJ */
+    "07306" |  /* Jersey City, NJ */
+    "08001" |  /* Camden, NJ */
+    "08540" |  /* Princeton, NJ */
+    "10001" |  /* New York, NY */
+    "10002" |  /* New York, NY */
+    "10003" |  /* New York, NY */
+    "10004" |  /* New York, NY */
+    "10005" |  /* New York, NY */
+    "10006" |  /* New York, NY */
+    "10007" |  /* New York, NY */
+    "10008" |  /* New York, NY */
+    "10009" |  /* New York, NY */
+    "10010" |  /* New York, NY */
+    "10011" |  /* New York, NY */
+    "10012" |  /* New York, NY */
+    "10013" |  /* New York, NY */
+    "10014" |  /* New York, NY */
+    "10016" |  /* New York, NY */
+    "10017" |  /* New York, NY */
+    "10018" |  /* New York, NY */
+    "10019" |  /* New York, NY */
+    "10021" |  /* New York, NY */
+    "10022" |  /* New York, NY */
+    "10023" |  /* New York, NY */
+    "10024" |  /* New York, NY */
+    "10025" |  /* New York, NY */
+    "10026" |  /* New York, NY */
+    "10027" |  /* New York, NY */
+    "10028" |  /* New York, NY */
+    "10029" |  /* New York, NY */
+    "10030" |  /* New York, NY */
+    "10031" |  /* New York, NY */
+    "10032" |  /* New York, NY */
+    "10033" |  /* New York, NY */
+    "10034" |  /* New York, NY */
+    "10035" |  /* New York, NY */
+    "10036" |  /* New York, NY */
+    "10037" |  /* New York, NY */
+    "10038" |  /* New York, NY */
+    "10039" |  /* New York, NY */
+    "10040" |  /* New York, NY */
+    "11001" |  /* Flushing, NY */
+    "11003" |  /* Flushing, NY */
+    "11004" |  /* Flushing, NY */
+    "11005" |  /* Flushing, NY */
+    "11101" |  /* Long Island City, NY */
+    "11102" |  /* Long Island City, NY */
+    "11104" |  /* Sunnyside, NY */
+    "11105" |  /* Long Island City, NY */
+    "11106" |  /* Long Island City, NY */
+    "11201" |  /* Brooklyn, NY */
+    "11215" |  /* Brooklyn, NY */
+    "11217" |  /* Brooklyn, NY */
+    "11238" |  /* Brooklyn, NY */
+    "11354" |  /* Flushing, NY */
+    "11355" |  /* Flushing, NY */
+    "11356" |  /* Flushing, NY */
+    "11357" |  /* Flushing, NY */
+    "11358" |  /* Flushing, NY */
+    "11360" |  /* Flushing, NY */
+    "11361" |  /* Flushing, NY */
+    "11362" |  /* Flushing, NY */
+    "11363" |  /* Flushing, NY */
+    "11364" |  /* Flushing, NY */
+    "11365" |  /* Flushing, NY */
+    "11366" |  /* Flushing, NY */
+    "11367" |  /* Flushing, NY */
+    "11368" |  /* Flushing, NY */
+    "11369" |  /* Flushing, NY */
+    "11370" |  /* Flushing, NY */
+    "11371" |  /* Flushing, NY */
+    "11372" |  /* Flushing, NY */
+    "11373" |  /* Flushing, NY */
+    "11377" |  /* Flushing, NY */
+    "11378" |  /* Flushing, NY */
+    "11379" |  /* Flushing, NY */
+    "11411" |  /* Cambria Heights, NY */
+    "11412" |  /* South Ozone Park, NY */
+    "11413" |  /* Springfield Gardens, NY */
+    "11414" |  /* Jamaica, NY */
+    "11415" |  /* Jamaica, NY */
+    "11416" |  /* Jamaica, NY */
+    "11417" |  /* Jamaica, NY */
+    "11418" |  /* Jamaica, NY */
+    "11419" |  /* Jamaica, NY */
+    "11420" |  /* Jamaica, NY */
+    "11421" |  /* Jamaica, NY */
+    "11422" |  /* Jamaica, NY */
+    "11423" |  /* Jamaica, NY */
+    "11426" |  /* Hollis, NY */
+    "11427" |  /* Queens Village, NY */
+    "11428" |  /* Queens Village, NY */
+    "11429" |  /* Queens Village, NY */
+    "11430" |  /* Jamaica, NY */
+    "11432" |  /* Jamaica, NY */
+    "11433" |  /* Jamaica, NY */
+    "11434" |  /* Jamaica, NY */
+    "11435" |  /* Jamaica, NY */
+    "11436" |  /* Jamaica, NY */
+    "11691" |  /* Far Rockaway, NY */
+    "11692" |  /* Far Rockaway, NY */
+    "11693" |  /* Far Rockaway, NY */
+    "11694" |  /* Far Rockaway, NY */
+    "11695" |  /* Far Rockaway, NY */
+    "11697" |  /* Far Rockaway, NY */
+    "12010" |  /* Amsterdam, NY */
+    "12180" |  /* Albany, NY */
+    "12201" |  /* Albany, NY */
+    "12202" |  /* Albany, NY */
+    "12203" |  /* Albany, NY */
+    "12204" |  /* Albany, NY */
+    "12205" |  /* Albany, NY */
+    "12206" |  /* Albany, NY */
+    "12207" |  /* Albany, NY */
+    "12208" |  /* Albany, NY */
+    "12210" |  /* Albany, NY */
+    "12222" |  /* Albany, NY */
+    "12301" |  /* Schenectady, NY */
+    "12302" |  /* Schenectady, NY */
+    "12303" |  /* Schenectady, NY */
+    "12304" |  /* Schenectady, NY */
+    "12305" |  /* Schenectady, NY */
+    "12306" |  /* Schenectady, NY */
+    "12307" |  /* Schenectady, NY */
+    "12308" |  /* Schenectady, NY */
+    "12309" |  /* Schenectady, NY */
+    "12311" |  /* Schenectady, NY */
+    "12325" |  /* Schenectady, NY */
+    "12345" |  /* Schenectady, NY */
+    "13027" |  /* Freeville, NY */
+    "13088" |  /* Moravia, NY */
+    "13201" |  /* Syracuse, NY */
+    "13202" |  /* Syracuse, NY */
+    "13204" |  /* Syracuse, NY */
+    "13205" |  /* Syracuse, NY */
+    "13210" |  /* Syracuse, NY */
+    "13224" |  /* Syracuse, NY */
+    "13601" |  /* Massena, NY */
+    "13602" |  /* Massena, NY */
+    "13617" |  /* Ogdensburg, NY */
+    "13660" |  /* Potsdam, NY */
+    "13669" |  /* Rensselaer Falls, NY */
+    "13750" |  /* Greene, NY */
+    "13760" |  /* Binghamton, NY */
+    "13787" |  /* Endicott, NY */
+    "13790" |  /* Endwell, NY */
+    "13850" |  /* Deposit, NY */
+    "13856" |  /* Johnson City, NY */
+    "13901" |  /* Binghamton, NY */
+    "13905" |  /* Binghamton, NY */
+    "14001" |  /* Buffalo, NY */
+    "14075" |  /* Buffalo, NY */
+    "14086" |  /* Cheektowaga, NY */
+    "14110" |  /* Lockport, NY */
+    "14120" |  /* North Tonawanda, NY */
+    "14150" |  /* Tonawanda, NY */
+    "14201" |  /* Buffalo, NY */
+    "14202" |  /* Buffalo, NY */
+    "14204" |  /* Buffalo, NY */
+    "14206" |  /* Buffalo, NY */
+    "14207" |  /* Buffalo, NY */
+    "14208" |  /* Buffalo, NY */
+    "14209" |  /* Buffalo, NY */
+    "14210" |  /* Buffalo, NY */
+    "14211" |  /* Buffalo, NY */
+    "14212" |  /* Buffalo, NY */
+    "14213" |  /* Buffalo, NY */
+    "14214" |  /* Buffalo, NY */
+    "14215" |  /* Buffalo, NY */
+    "14216" |  /* Buffalo, NY */
+    "14217" |  /* Buffalo, NY */
+    "14220" |  /* Buffalo, NY */
+    "14221" |  /* Buffalo, NY */
+    "14222" |  /* Buffalo, NY */
+    "14223" |  /* Buffalo, NY */
+    "14224" |  /* Buffalo, NY */
+    "14225" |  /* Buffalo, NY */
+    "14226" |  /* Buffalo, NY */
+    "14227" |  /* Buffalo, NY */
+    "14228" |  /* Buffalo, NY */
+    "14231" |  /* Buffalo, NY */
+    "14233" |  /* Buffalo, NY */
+    "14240" |  /* Buffalo, NY */
+    "14241" |  /* Buffalo, NY */
+    "14260" |  /* Buffalo, NY */
+    "14261" |  /* Buffalo, NY */
+    "14269" |  /* Buffalo, NY */
+    "14272" |  /* Buffalo, NY */
+    "14273" |  /* Buffalo, NY */
+    "14276" |  /* Buffalo, NY */
+    "14280" |  /* Buffalo, NY */
+    "14301" |  /* North Tonawanda, NY */
+    "14302" |  /* North Tonawanda, NY */
+    "14303" |  /* North Tonawanda, NY */
+    "14304" |  /* North Tonawanda, NY */
+    "14305" |  /* North Tonawanda, NY */
+    "14411" |  /* Arkport, NY */
+    "14420" |  /* Bath, NY */
+    "14424" |  /* Hammondsport, NY */
+    "14428" |  /* Canisteo, NY */
+    "14435" |  /* Dansville, NY */
+    "14437" |  /* Geneseo, NY */
+    "14450" |  /* Mount Morris, NY */
+    "14456" |  /* Warsaw, NY */
+    "14466" |  /* Le Roy, NY */
+    "14468" |  /* Pavilion, NY */
+    "14471" |  /* Perry, NY */
+    "14472" |  /* Castile, NY */
+    "14482" |  /* Wyoming, NY */
+    "14487" |  /* Silver Springs, NY */
+    "14513" |  /* Avon, NY */
+    "14520" |  /* Geneseo, NY */
+    "14525" |  /* Honeoye Falls, NY */
+    "14534" |  /* Lima, NY */
+    "14543" |  /* Mendon, NY */
+    "14550" |  /* Rush, NY */
+    "14560" |  /* Scottsville, NY */
+    "14564" |  /* Wheatland, NY */
+    "14601" |  /* Rochester, NY */
+    "19980" |  /* Dover, DE - highest ZIP code */
+    "20001" |  /* Washington, DC */
+    "20002" |  /* Washington, DC */
+    "20003" |  /* Washington, DC */
+    "20004" |  /* Washington, DC */
+    "20005" |  /* Washington, DC */
+    "20006" |  /* Washington, DC */
+    "20007" |  /* Washington, DC */
+    "20008" |  /* Washington, DC */
+    "20009" |  /* Washington, DC */
+    "20010" |  /* Washington, DC */
+    "20011" |  /* Washington, DC */
+    "20012" |  /* Washington, DC */
+    "20015" |  /* Washington, DC */
+    "20016" |  /* Washington, DC */
+    "20017" |  /* Washington, DC */
+    "20018" |  /* Washington, DC */
+    "20020" |  /* Washington, DC */
+    "20024" |  /* Washington, DC */
+    "20030" |  /* Washington, DC */
+    "20032" |  /* Washington, DC */
+    "20033" |  /* Washington, DC */
+    "20035" |  /* Washington, DC */
+    "20036" |  /* Washington, DC */
+    "20037" |  /* Washington, DC */
+    "20038" |  /* Washington, DC */
+    "20039" |  /* Washington, DC */
+    "20045" |  /* Washington, DC */
+    "20050" |  /* Washington, DC */
+    "20052" |  /* Washington, DC */
+    "20053" |  /* Washington, DC */
+    "20055" |  /* Washington, DC */
+    "20057" |  /* Washington, DC */
+    "20059" |  /* Washington, DC */
+    "20060" |  /* Washington, DC */
+    "20061" |  /* Washington, DC */
+    "20062" |  /* Washington, DC */
+    "20063" |  /* Washington, DC */
+    "20064" |  /* Washington, DC */
+    "20065" |  /* Washington, DC */
+    "20066" | 

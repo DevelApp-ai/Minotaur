@@ -1,0 +1,246 @@
+Grammar: PostalCode_Index
+TokenSplitter: Space
+FormatType: CEBNF
+
+/*
+ * Postal Code Grammar Index
+ * 
+ * Master index file for all postal code grammars in the Minotaur system.
+ * This file provides a centralized way to access all country-specific postal code grammars.
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Maintainer: DevelApp AI
+ */
+
+/* ============================================================================
+ * MAIN INDEX RULE
+ * ============================================================================ */
+
+<postal-code-grammar> ::= 
+    <postal-code-grammar-international> | 
+    <postal-code-grammar-north-america> | 
+    <postal-code-grammar-europe> | 
+    <postal-code-grammar-asia> | 
+    <postal-code-grammar-oceania> | 
+    <postal-code-grammar-africa> | 
+    <postal-code-grammar-south-america>
+
+/* ============================================================================
+ * INTERNATIONAL GRAMMARS
+ * ============================================================================ */
+
+<postal-code-grammar-international> ::= 
+    <include>International_Postal_Codes.grammar</include>
+
+/* ============================================================================
+ * NORTH AMERICA GRAMMARS
+ * ============================================================================ */
+
+<postal-code-grammar-north-america> ::= 
+    <include>US_Postal_Code.grammar</include> |
+    <include>Canada_Postal_Code.grammar</include> |
+    <include>Mexico_Postal_Code.grammar</include>
+
+/* ============================================================================
+ * EUROPE GRAMMARS
+ * ============================================================================ */
+
+<postal-code-grammar-europe> ::= 
+    <include>UK_Postal_Code.grammar</include> |
+    <include>Germany_Postal_Code.grammar</include> |
+    <include>France_Postal_Code.grammar</include> |
+    <include>Italy_Postal_Code.grammar</include> |
+    <include>Spain_Postal_Code.grammar</include> |
+    <include>Netherlands_Postal_Code.grammar</include> |
+    <include>Belgium_Postal_Code.grammar</include> |
+    <include>Switzerland_Postal_Code.grammar</include> |
+    <include>Austria_Postal_Code.grammar</include> |
+    <include>Sweden_Postal_Code.grammar</include> |
+    <include>Norway_Postal_Code.grammar</include> |
+    <include>Finland_Postal_Code.grammar</include> |
+    <include>Denmark_Postal_Code.grammar</include> |
+    <include>Poland_Postal_Code.grammar</include> |
+    <include>Portugal_Postal_Code.grammar</include> |
+    <include>Ireland_Postal_Code.grammar</include> |
+    <include>Russia_Postal_Code.grammar</include> |
+    <include>Greece_Postal_Code.grammar</include> |
+    <include>Turkey_Postal_Code.grammar</include>
+
+/* ============================================================================
+ * ASIA GRAMMARS
+ * ============================================================================ */
+
+<postal-code-grammar-asia> ::= 
+    <include>Japan_Postal_Code.grammar</include> |
+    <include>China_Postal_Code.grammar</include> |
+    <include>India_Postal_Code.grammar</include> |
+    <include>South_Korea_Postal_Code.grammar</include> |
+    <include>Singapore_Postal_Code.grammar</include> |
+    <include>Hong_Kong_Postal_Code.grammar</include> |
+    <include>Thailand_Postal_Code.grammar</include> |
+    <include>Malaysia_Postal_Code.grammar</include> |
+    <include>Indonesia_Postal_Code.grammar</include> |
+    <include>Philippines_Postal_Code.grammar</include> |
+    <include>Vietnam_Postal_Code.grammar</include> |
+    <include>Taiwan_Postal_Code.grammar</include> |
+    <include>Israel_Postal_Code.grammar</include> |
+    <include>Saudi_Arabia_Postal_Code.grammar</include> |
+    <include>UAE_Postal_Code.grammar</include> |
+    <include>South_Africa_Postal_Code.grammar</include>
+
+/* ============================================================================
+ * OCEANIA GRAMMARS
+ * ============================================================================ */
+
+<postal-code-grammar-oceania> ::= 
+    <include>Australia_Postal_Code.grammar</include> |
+    <include>New_Zealand_Postal_Code.grammar</include> |
+    <include>Pacific_Islands_Postal_Code.grammar</include>
+
+/* ============================================================================
+ * AFRICA GRAMMARS
+ * ============================================================================ */
+
+<postal-code-grammar-africa> ::= 
+    <include>South_Africa_Postal_Code.grammar</include> |
+    <include>Egypt_Postal_Code.grammar</include> |
+    <include>Nigeria_Postal_Code.grammar</include> |
+    <include>Kenya_Postal_Code.grammar</include> |
+    <include>Morocco_Postal_Code.grammar</include> |
+    <include>Algeria_Postal_Code.grammar</include> |
+    <include>Ghana_Postal_Code.grammar</include> |
+    <include>Tunisia_Postal_Code.grammar</include>
+
+/* ============================================================================
+ * SOUTH AMERICA GRAMMARS
+ * ============================================================================ */
+
+<postal-code-grammar-south-america> ::= 
+    <include>Brazil_Postal_Code.grammar</include> |
+    <include>Argentina_Postal_Code.grammar</include> |
+    <include>Chile_Postal_Code.grammar</include> |
+    <include>Colombia_Postal_Code.grammar</include> |
+    <include>Peru_Postal_Code.grammar</include> |
+    <include>Venezuela_Postal_Code.grammar</include> |
+    <include>Uruguay_Postal_Code.grammar</include> |
+    <include>Paraguay_Postal_Code.grammar</include>
+
+/* ============================================================================
+ * COUNTRY CODE TO GRAMMAR MAPPING
+ * ============================================================================ */
+
+<country-to-grammar> ::= 
+    /* North America */
+    <country-code-US> <whitespace> "->" <whitespace> <include>US_Postal_Code.grammar</include> |
+    <country-code-CA> <whitespace> "->" <whitespace> <include>Canada_Postal_Code.grammar</include> |
+    <country-code-MX> <whitespace> "->" <whitespace> <include>Mexico_Postal_Code.grammar</include> |
+    
+    /* Europe */
+    <country-code-GB> <whitespace> "->" <whitespace> <include>UK_Postal_Code.grammar</include> |
+    <country-code-UK> <whitespace> "->" <whitespace> <include>UK_Postal_Code.grammar</include> |
+    <country-code-DE> <whitespace> "->" <whitespace> <include>Germany_Postal_Code.grammar</include> |
+    <country-code-FR> <whitespace> "->" <whitespace> <include>France_Postal_Code.grammar</include> |
+    <country-code-IT> <whitespace> "->" <whitespace> <include>Italy_Postal_Code.grammar</include> |
+    <country-code-ES> <whitespace> "->" <whitespace> <include>Spain_Postal_Code.grammar</include> |
+    <country-code-NL> <whitespace> "->" <whitespace> <include>Netherlands_Postal_Code.grammar</include> |
+    <country-code-BE> <whitespace> "->" <whitespace> <include>Belgium_Postal_Code.grammar</include> |
+    <country-code-CH> <whitespace> "->" <whitespace> <include>Switzerland_Postal_Code.grammar</include> |
+    <country-code-AT> <whitespace> "->" <whitespace> <include>Austria_Postal_Code.grammar</include> |
+    <country-code-SE> <whitespace> "->" <whitespace> <include>Sweden_Postal_Code.grammar</include> |
+    <country-code-NO> <whitespace> "->" <whitespace> <include>Norway_Postal_Code.grammar</include> |
+    <country-code-FI> <whitespace> "->" <whitespace> <include>Finland_Postal_Code.grammar</include> |
+    <country-code-DK> <whitespace> "->" <whitespace> <include>Denmark_Postal_Code.grammar</include> |
+    <country-code-PL> <whitespace> "->" <whitespace> <include>Poland_Postal_Code.grammar</include> |
+    <country-code-PT> <whitespace> "->" <whitespace> <include>Portugal_Postal_Code.grammar</include> |
+    <country-code-IE> <whitespace> "->" <whitespace> <include>Ireland_Postal_Code.grammar</include> |
+    <country-code-RU> <whitespace> "->" <whitespace> <include>Russia_Postal_Code.grammar</include> |
+    
+    /* Asia */
+    <country-code-JP> <whitespace> "->" <whitespace> <include>Japan_Postal_Code.grammar</include> |
+    <country-code-CN> <whitespace> "->" <whitespace> <include>China_Postal_Code.grammar</include> |
+    <country-code-IN> <whitespace> "->" <whitespace> <include>India_Postal_Code.grammar</include> |
+    <country-code-KR> <whitespace> "->" <whitespace> <include>South_Korea_Postal_Code.grammar</include> |
+    <country-code-SG> <whitespace> "->" <whitespace> <include>Singapore_Postal_Code.grammar</include> |
+    <country-code-HK> <whitespace> "->" <whitespace> <include>Hong_Kong_Postal_Code.grammar</include> |
+    
+    /* Oceania */
+    <country-code-AU> <whitespace> "->" <whitespace> <include>Australia_Postal_Code.grammar</include> |
+    <country-code-NZ> <whitespace> "->" <whitespace> <include>New_Zealand_Postal_Code.grammar</include> |
+    
+    /* Africa */
+    <country-code-ZA> <whitespace> "->" <whitespace> <include>South_Africa_Postal_Code.grammar</include> |
+    <country-code-EG> <whitespace> "->" <whitespace> <include>Egypt_Postal_Code.grammar</include> |
+    
+    /* South America */
+    <country-code-BR> <whitespace> "->" <whitespace> <include>Brazil_Postal_Code.grammar</include> |
+    <country-code-AR> <whitespace> "->" <whitespace> <include>Argentina_Postal_Code.grammar</include>
+
+/* Country codes */
+<country-code-US> ::= "US" | "USA" | "United States"
+<country-code-CA> ::= "CA" | "CAN" | "Canada"
+<country-code-MX> ::= "MX" | "MEX" | "Mexico"
+<country-code-GB> ::= "GB" | "UK" | "United Kingdom"
+<country-code-UK> ::= "UK" | "GB" | "United Kingdom"
+<country-code-DE> ::= "DE" | "DEU" | "Germany"
+<country-code-FR> ::= "FR" | "FRA" | "France"
+<country-code-IT> ::= "IT" | "ITA" | "Italy"
+<country-code-ES> ::= "ES" | "ESP" | "Spain"
+<country-code-NL> ::= "NL" | "NLD" | "Netherlands"
+<country-code-BE> ::= "BE" | "BEL" | "Belgium"
+<country-code-CH> ::= "CH" | "CHE" | "Switzerland"
+<country-code-AT> ::= "AT" | "AUT" | "Austria"
+<country-code-SE> ::= "SE" | "SWE" | "Sweden"
+<country-code-NO> ::= "NO" | "NOR" | "Norway"
+<country-code-FI> ::= "FI" | "FIN" | "Finland"
+<country-code-DK> ::= "DK" | "DNK" | "Denmark"
+<country-code-PL> ::= "PL" | "POL" | "Poland"
+<country-code-PT> ::= "PT" | "PRT" | "Portugal"
+<country-code-IE> ::= "IE" | "IRL" | "Ireland"
+<country-code-RU> ::= "RU" | "RUS" | "Russia"
+<country-code-JP> ::= "JP" | "JPN" | "Japan"
+<country-code-CN> ::= "CN" | "CHN" | "China"
+<country-code-IN> ::= "IN" | "IND" | "India"
+<country-code-KR> ::= "KR" | "KOR" | "South Korea"
+<country-code-SG> ::= "SG" | "SGP" | "Singapore"
+<country-code-HK> ::= "HK" | "HKG" | "Hong Kong"
+<country-code-AU> ::= "AU" | "AUS" | "Australia"
+<country-code-NZ> ::= "NZ" | "NZL" | "New Zealand"
+<country-code-ZA> ::= "ZA" | "ZAF" | "South Africa"
+<country-code-EG> ::= "EG" | "EGY" | "Egypt"
+<country-code-BR> ::= "BR" | "BRA" | "Brazil"
+<country-code-AR> ::= "AR" | "ARG" | "Argentina"
+
+/* ============================================================================
+ * GRAMMAR METADATA
+ * ============================================================================ */
+
+/*
+ * Postal Code Grammar Collection
+ * 
+ * This index file provides access to 50+ country-specific postal code grammars
+ * covering all major countries and territories worldwide.
+ * 
+ * Total Countries Covered: 50+
+ * Total Grammars: 50+ (plus international comprehensive grammar)
+ * 
+ * Regions Covered:
+ * - North America: 3 countries
+ * - Europe: 15+ countries
+ * - Asia: 12+ countries
+ * - Oceania: 3+ countries
+ * - Africa: 7+ countries
+ * - South America: 8+ countries
+ * 
+ * Features:
+ * - Country-specific validation rules
+ * - Address parsing and formatting
+ * - Postal code format validation
+ * - Special postal code handling (military, diplomatic, etc.)
+ * - Geographic region detection
+ * 
+ * Usage:
+ * - Use <postal-code-grammar> for comprehensive international coverage
+ * - Use <country-to-grammar> for country-specific validation
+ * - Use individual grammar files for specific country processing
+ */
