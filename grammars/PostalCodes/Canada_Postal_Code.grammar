@@ -1,0 +1,265 @@
+Grammar: Canada_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * Canada Post Grammar
+ * 
+ * Comprehensive grammar for Canadian postal addresses and postal codes including:
+ * - Standard 6-character postal codes (A1A 1A1 format)
+ * - Forward Sortation Areas (FSA)
+ * - Local Delivery Units (LDU)
+ * - Street address parsing
+ * - Province and territory codes
+ * - Rural and PO Box addresses
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Country: Canada (CA)
+ * Postal Authority: Canada Post Corporation
+ */
+
+/* ============================================================================
+ * MAIN RULES
+ * ============================================================================ */
+
+<canada-postal-address> ::= 
+    <canada-name-part>? <EOL>
+    <canada-street-address> <EOL>
+    <canada-city-province-postal-line> <EOL>
+    <canada-country-indicator>?
+
+/* ============================================================================
+ * NAME PART
+ * ============================================================================ */
+
+<canada-name-part> ::= <personal-name> | <company-name> | <personal-name> <EOL> <company-name>
+
+<personal-name> ::= <first-name> <whitespace> <last-name> <opt-whitespace> <name-suffix>?
+<first-name> ::= <text>
+<last-name> ::= <text>
+<name-suffix> ::= "Jr." | "Sr." | "II" | "III" | "IV" | "PhD" | "MD"
+
+<company-name> ::= <text>
+
+/* ============================================================================
+ * STREET ADDRESS
+ * ============================================================================ */
+
+<canada-street-address> ::= 
+    <street-number> <whitespace> <street-name> <opt-whitespace> <street-type>? <opt-whitespace> <street-direction>?
+
+<street-number> ::= 
+    <digit>+ | 
+    <digit>+ <letter> | 
+    <digit>+ "-" <digit>+ | 
+    <digit>+ "/" <digit>+
+
+<street-name> ::= <text>
+
+/* Street types in English and French */
+<street-type> ::= 
+    /* English */
+    "Ave" | "Avenue" | 
+    "Blvd" | "Boulevard" | 
+    "Cir" | "Circle" | 
+    "Ct" | "Court" | 
+    "Dr" | "Drive" | 
+    "Ln" | "Lane" | 
+    "Pkwy" | "Parkway" | 
+    "Pl" | "Place" | 
+    "Rd" | "Road" | 
+    "St" | "Street" | 
+    "Ter" | "Terrace" | 
+    "Way" | 
+    /* French */
+    "Rue" | 
+    "Avenue" | "Av" | 
+    "Boulevard" | "Boul" | 
+    "Chemin" | "Ch" | 
+    "Cote" | "Cote" | 
+    "Place" | "Pl" | 
+    "Route" | "Rte" | 
+    "Rang"
+
+<street-direction> ::= "N" | "S" | "E" | "W" | "NE" | "NW" | "SE" | "SW" | "Nord" | "Sud" | "Est" | "Ouest"
+
+/* ============================================================================
+ * CITY, PROVINCE, POSTAL CODE LINE
+ * ============================================================================ */
+
+<canada-city-province-postal-line> ::= 
+    <canada-city> <opt-whitespace> "," <opt-whitespace> <canada-province-code> <whitespace> <canada-postal-code>
+
+<canada-city> ::= <text>
+
+/* Canadian Province and Territory Codes */
+<canada-province-code> ::= 
+    "AB" | "Alberta" | 
+    "BC" | "British Columbia" | 
+    "MB" | "Manitoba" | 
+    "NB" | "New Brunswick" | "Nouveau-Brunswick" | 
+    "NL" | "Newfoundland and Labrador" | "Terre-Neuve-et-Labrador" | 
+    "NT" | "Northwest Territories" | "Territoires du Nord-Ouest" | 
+    "NS" | "Nova Scotia" | "Nouvelle-Ecosse" | 
+    "NU" | "Nunavut" | 
+    "ON" | "Ontario" | 
+    "PE" | "Prince Edward Island" | "Ile-du-Prince-Edouard" | 
+    "QC" | "Quebec" | "Quebec" | 
+    "SK" | "Saskatchewan" | 
+    "YT" | "Yukon"
+
+/* ============================================================================
+ * POSTAL CODE FORMAT
+ * ============================================================================ */
+
+/* Canadian postal code: A1A 1A1 format */
+<canada-postal-code> ::= 
+    <canada-forward-sortation-area> <whitespace> <canada-local-delivery-unit> | 
+    <canada-forward-sortation-area><canada-local-delivery-unit>  /* Without space */
+
+/* Forward Sortation Area (FSA) - First 3 characters */
+<canada-forward-sortation-area> ::= 
+    <canada-fsa-letter><canada-fsa-digit><canada-fsa-letter>
+
+/* Local Delivery Unit (LDU) - Last 3 characters */
+<canada-local-delivery-unit> ::= 
+    <canada-ldu-digit><canada-ldu-letter><canada-ldu-digit>
+
+/* Valid FSA letters (excludes D, F, I, O, Q, U) */
+<canada-fsa-letter> ::= 
+    "A" | "B" | "C" | "E" | "G" | "H" | "J" | "K" | "L" | "M" | 
+    "N" | "P" | "R" | "S" | "T" | "V" | "W" | "X" | "Y"
+
+<canada-fsa-digit> ::= <digit>
+
+/* Valid LDU letters (excludes D, F, I, O, Q, U) */
+<canada-ldu-letter> ::= 
+    "A" | "B" | "C" | "E" | "G" | "H" | "J" | "K" | "L" | "M" | 
+    "N" | "P" | "R" | "S" | "T" | "V" | "W" | "X" | "Y" | "Z"
+
+<canada-ldu-digit> ::= <digit>
+
+/* ============================================================================
+ * POSTAL CODE VALIDATION
+ * ============================================================================ */
+
+<canada-postal-validation> ::= 
+    <canada-postal-code> <whitespace> "->" <whitespace> <canada-validation-result>
+
+<canada-validation-result> ::= 
+    "Valid Canada Postal Code" | 
+    "Invalid Canada Postal Code: FSA letter" | 
+    "Invalid Canada Postal Code: LDU letter" | 
+    "Invalid Canada Postal Code: Format"
+
+/* ============================================================================
+ * SPECIAL ADDRESS TYPES
+ * ============================================================================ */
+
+/* PO Box addresses */
+<canada-po-box> ::= 
+    <po-box-prefix> <whitespace> <digit>+ | 
+    <po-box-prefix><digit>+
+
+<po-box-prefix> ::= 
+    "PO Box" | "P.O. Box" | "POBox" | "P O Box" | 
+    "Case Postale" | "C.P." | "Boite Postale" | "BP" | 
+    "Box"
+
+/* Rural Route addresses */
+<canada-rural-route> ::= 
+    "RR" <whitespace> <digit>+ | 
+    "Route" <whitespace> <digit>+ | 
+    "Rte" <whitespace> <digit>+ | 
+    "Rang" <whitespace> <text> | 
+    "Concession" <whitespace> <text>
+
+/* General Delivery */
+<canada-general-delivery> ::= 
+    "General Delivery" | "Gen Del" | "Livraison Generale"
+
+/* ============================================================================
+ * GEOGRAPHIC REGIONS
+ * ============================================================================ */
+
+/* FSA regions by first letter */
+<canada-fsa-region> ::= 
+    <newfoundland-fsa> | 
+    <nova-scotia-fsa> | 
+    <prince-edward-island-fsa> | 
+    <new-brunswick-fsa> | 
+    <quebec-fsa> | 
+    <ontario-fsa> | 
+    <manitoba-fsa> | 
+    <saskatchewan-fsa> | 
+    <alberta-fsa> | 
+    <british-columbia-fsa> | 
+    <yukon-fsa> | 
+    <northwest-territories-fsa> | 
+    <nunavut-fsa>
+
+<newfoundland-fsa> ::= "A" <canada-fsa-digit> <canada-fsa-letter>
+<nova-scotia-fsa> ::= "B" <canada-fsa-digit> <canada-fsa-letter>
+<prince-edward-island-fsa> ::= "C" <canada-fsa-digit> <canada-fsa-letter>
+<new-brunswick-fsa> ::= "E" <canada-fsa-digit> <canada-fsa-letter>
+<quebec-fsa> ::= ("G" | "H" | "J") <canada-fsa-digit> <canada-fsa-letter>
+<ontario-fsa> ::= ("K" | "L" | "M" | "N" | "P") <canada-fsa-digit> <canada-fsa-letter>
+<manitoba-fsa> ::= "R" <canada-fsa-digit> <canada-fsa-letter>
+<saskatchewan-fsa> ::= "S" <canada-fsa-digit> <canada-fsa-letter>
+<alberta-fsa> ::= "T" <canada-fsa-digit> <canada-fsa-letter>
+<british-columbia-fsa> ::= "V" <canada-fsa-digit> <canada-fsa-letter>
+<yukon-fsa> ::= "Y" <canada-fsa-digit> <canada-fsa-letter>
+<northwest-territories-fsa> ::= "X" <canada-fsa-digit> <canada-fsa-letter>
+<nunavut-fsa> ::= "X" <canada-fsa-digit> <canada-fsa-letter>
+
+/* ============================================================================
+ * COUNTRY INDICATOR
+ * ============================================================================ */
+
+<canada-country-indicator> ::= 
+    "Canada" | "CA" | "Canadian" | "Canadien" | 
+    "Canada Post" | "Postes Canada"
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" |
+    "é" | "è" | "ê" | "à" | "â" | "ç" | "î" | "ô" | "û" | "ë" | "ï" | "ü"
+
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/" | "#"
+<text> ::= <character> | <character> <text>
+
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* ============================================================================
+ * METADATA
+ * ============================================================================ */
+
+/*
+ * Canada Post Facts:
+ * - Introduced: 1971 (6-character alphanumeric format)
+ * - Format: A1A 1A1 (letter-number-letter space number-letter-number)
+ * - FSA (Forward Sortation Area): First 3 characters (geographic region)
+ * - LDU (Local Delivery Unit): Last 3 characters (specific address)
+ * - Valid letters: A, B, C, E, G, H, J, K, L, M, N, P, R, S, T, V, W, X, Y (no D, F, I, O, Q, U)
+ * - LDU can use: A, B, C, E, G, H, J, K, L, M, N, P, R, S, T, V, W, X, Y, Z
+ * 
+ * Special Notes:
+ * - Santa's official address: H0H 0H0 (North Pole, Canada)
+ * - Rural routes: RR #1, etc.
+ * - PO Boxes: PO Box 1234
+ * - French and English street types supported
+ * - Bilingual province names supported
+ */

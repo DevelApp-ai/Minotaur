@@ -1,0 +1,310 @@
+Grammar: Germany_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * Deutsche Post Grammar (Germany Postal Codes)
+ * 
+ * Comprehensive grammar for German postal addresses and PLZ (Postleitzahl) codes including:
+ * - 5-digit postal codes (since 1993)
+ * - Old 4-digit codes (pre-1993, for reference)
+ * - Street address parsing
+ * - Federal state (Bundesland) codes
+ * - Special postal codes
+ * - Validation rules
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Country: Germany (DE)
+ * Postal Authority: Deutsche Post AG
+ */
+
+/* ============================================================================
+ * MAIN RULES
+ * ============================================================================ */
+
+<germany-postal-address> ::= 
+    <germany-name-part>? <EOL>
+    <germany-street-address> <EOL>
+    <germany-postal-line> <EOL>
+    <germany-country-indicator>?
+
+/* Complete German address */
+<germany-address> ::= 
+    <germany-name-part>? 
+    <germany-street-address> <EOL>
+    <germany-postal-line> <EOL>
+    <germany-country-indicator>?
+
+/* ============================================================================
+ * NAME PART
+ * ============================================================================ */
+
+<germany-name-part> ::= <personal-name> | <company-name> | <personal-name> <EOL> <company-name>
+
+<personal-name> ::= 
+    <title>? <first-name> <whitespace> <last-name> <opt-whitespace> <name-suffix>?
+
+<title> ::= 
+    "Herr" | "Frau" | "Fr." | "Dr." | "Prof." | "Dipl." | "Ing."
+
+<first-name> ::= <text>
+<last-name> ::= <text>
+<name-suffix> ::= "Jr." | "Sr." | "II" | "III" | "IV"
+
+<company-name> ::= <text> | "GmbH" | "AG" | "KG" | "e.V." | "Gbr"
+
+/* ============================================================================
+ * STREET ADDRESS
+ * ============================================================================ */
+
+<germany-street-address> ::= 
+    <street-number> <whitespace> <street-name> <opt-whitespace> <street-type>? <opt-whitespace> <street-direction>?
+
+<street-number> ::= 
+    <digit>+ | 
+    <digit>+ <letter> | 
+    <digit>+ "-" <digit>+ | 
+    <digit>+ "/" <digit>+ | 
+    <letter>+  /* Some streets use letter-only numbers */
+
+<street-name> ::= <text>
+
+/* German street types */
+<street-type> ::= 
+    "Allee" | "Al." | 
+    "Berg" | 
+    "Boulevard" | "Boul." | 
+    "Burg" | 
+    "Damm" | 
+    "Feld" | 
+    "Gasse" | "G." | 
+    "Hof" | 
+    "Kai" | 
+    "Land" | 
+    "Park" | 
+    "Pfad" | 
+    "Platz" | "Pl." | 
+    "Ring" | 
+    "Schloss" | 
+    "See" | 
+    "Straße" | "Str." | 
+    "Tor" | 
+    "Ufer" | 
+    "Weg" | 
+    "Zug"
+
+<street-direction> ::= "Nord" | "Süd" | "Ost" | "West" | "N" | "S" | "O" | "W" | "NO" | "NW" | "SO" | "SW"
+
+/* ============================================================================
+ * POSTAL LINE
+ * ============================================================================ */
+
+<germany-postal-line> ::= <germany-postal-code> <whitespace> <germany-city>
+
+/* German Postal Code (Postleitzahl) */
+<germany-postal-code> ::= 
+    <germany-5digit-code> |  /* Current format (since 1993) */
+    <germany-4digit-code>   /* Old format (pre-1993, for reference) */
+
+/* Current 5-digit postal code */
+<germany-5digit-code> ::= <germany-plz-digit><germany-plz-digit><germany-plz-digit><germany-plz-digit><germany-plz-digit>
+
+/* Old 4-digit postal code (pre-1993) */
+<germany-4digit-code> ::= <germany-plz-digit><germany-plz-digit><germany-plz-digit><germany-plz-digit>
+
+<germany-plz-digit> ::= <digit>
+
+/* ============================================================================
+ * CITY AND REGION
+ * ============================================================================ */
+
+<germany-city> ::= <text>
+
+/* German Federal States (Bundeslander) */
+<germany-state> ::= 
+    "Baden-Württemberg" | "BW" | 
+    "Bayern" | "BY" | "Bavaria" | 
+    "Berlin" | "BE" | 
+    "Brandenburg" | "BB" | 
+    "Bremen" | "HB" | 
+    "Hamburg" | "HH" | 
+    "Hessen" | "HE" | "Hesse" | 
+    "Mecklenburg-Vorpommern" | "MV" | 
+    "Niedersachsen" | "NI" | "Lower Saxony" | 
+    "Nordrhein-Westfalen" | "NW" | "North Rhine-Westphalia" | 
+    "Rheinland-Pfalz" | "RP" | "Rhineland-Palatinate" | 
+    "Saarland" | "SL" | 
+    "Sachsen" | "SN" | "Saxony" | 
+    "Sachsen-Anhalt" | "ST" | "Saxony-Anhalt" | 
+    "Schleswig-Holstein" | "SH" | 
+    "Thüringen" | "TH" | "Thuringia"
+
+/* ============================================================================
+ * POSTAL CODE RANGES BY STATE
+ * ============================================================================ */
+
+/* Baden-Württemberg: 68-79, 88-89 */
+<baden-wuerttemberg-plz> ::= 
+    ("68" | "69" | "70" | "71" | "72" | "73" | "74" | "75" | "76" | "77" | "78" | "79") <digit><digit><digit> | 
+    ("88" | "89") <digit><digit><digit>
+
+/* Bayern: 80-87, 90-97 */
+<bavaria-plz> ::= 
+    ("80" | "81" | "82" | "83" | "84" | "85" | "86" | "87") <digit><digit><digit> | 
+    ("90" | "91" | "92" | "93" | "94" | "95" | "96" | "97") <digit><digit><digit>
+
+/* Berlin: 10-14 */
+<berlin-plz> ::= ("10" | "11" | "12" | "13" | "14") <digit><digit><digit>
+
+/* Brandenburg: 03, 14-19, 39 */
+<brandenburg-plz> ::= 
+    "03" <digit><digit><digit> | 
+    ("14" | "15" | "16" | "17" | "18" | "19") <digit><digit><digit> | 
+    "39" <digit><digit><digit>
+
+/* Bremen: 28 */
+<bremen-plz> ::= "28" <digit><digit><digit>
+
+/* Hamburg: 20-22 */
+<hamburg-plz> ::= ("20" | "21" | "22") <digit><digit><digit>
+
+/* Hessen: 34-36, 61-65, 67-79 (partial) */
+<hessen-plz> ::= 
+    ("34" | "35" | "36") <digit><digit><digit> | 
+    ("61" | "62" | "63" | "64" | "65") <digit><digit><digit>
+
+/* Mecklenburg-Vorpommern: 17, 18, 23 */
+<mecklenburg-vorpommern-plz> ::= 
+    ("17" | "18") <digit><digit><digit> | 
+    "23" <digit><digit><digit>
+
+/* Niedersachsen: 21-27, 29, 30-32, 37-39, 48-49 */
+<niedersachsen-plz> ::= 
+    ("21" | "22" | "23" | "24" | "25" | "26" | "27" | "29") <digit><digit><digit> | 
+    ("30" | "31" | "32") <digit><digit><digit> | 
+    ("37" | "38" | "39") <digit><digit><digit> | 
+    ("48" | "49") <digit><digit><digit>
+
+/* Nordrhein-Westfalen: 32-34, 40-59, 99 */
+<nordrhein-westfalen-plz> ::= 
+    ("32" | "33" | "34") <digit><digit><digit> | 
+    ("40" | "41" | "42" | "43" | "44" | "45" | "46" | "47" | "48" | "49") <digit><digit><digit> | 
+    ("50" | "51" | "52" | "53" | "54" | "55" | "56" | "57" | "58" | "59") <digit><digit><digit> | 
+    "99" <digit><digit><digit>
+
+/* Rheinland-Pfalz: 53-56, 66-67, 76 */
+<rheinland-pfalz-plz> ::= 
+    ("53" | "54" | "55" | "56") <digit><digit><digit> | 
+    ("66" | "67") <digit><digit><digit> | 
+    "76" <digit><digit><digit>
+
+/* Saarland: 66 */
+<saarland-plz> ::= "66" <digit><digit><digit>
+
+/* Sachsen: 01-09, 29 */
+<sachsen-plz> ::= 
+    ("01" | "02" | "03" | "04" | "05" | "06" | "07" | "08" | "09") <digit><digit><digit> | 
+    "29" <digit><digit><digit>
+
+/* Sachsen-Anhalt: 06, 29, 39 */
+<sachsen-anhalt-plz> ::= 
+    "06" <digit><digit><digit> | 
+    "29" <digit><digit><digit> | 
+    "39" <digit><digit><digit>
+
+/* Schleswig-Holstein: 23-25 */
+<schleswig-holstein-plz> ::= ("23" | "24" | "25") <digit><digit><digit>
+
+/* Thüringen: 07, 36-37, 98-99 */
+<thueringen-plz> ::= 
+    "07" <digit><digit><digit> | 
+    ("36" | "37") <digit><digit><digit> | 
+    ("98" | "99") <digit><digit><digit>
+
+/* ============================================================================
+ * SPECIAL POSTAL CODES
+ * ============================================================================ */
+
+/* Special postal codes */
+<germany-special-plz> ::= 
+    "11011" | "11012" | "11013" | "11014" | "11015" |  /* Berlin - Government */
+    "11016" | "11017" | "11018" | "11019" | "11020" | 
+    "53111" | "53113" | "53115" | "53117" | "53119" |  /* Bonn - Government */
+    "53121" | "53123" | "53125" | "53127" | "53129" | 
+    "53170" | "53173" | "53175" | "53177" | "53179" | 
+    "99999"  /* Non-geographic */
+
+/* Military postal codes */
+<germany-military-plz> ::= 
+    "5300" | "5301" | "5302" | "5303" |  /* Old military codes */
+    "99998" | "99997"  /* Current military */
+
+/* ============================================================================
+ * POSTCODE VALIDATION
+ * ============================================================================ */
+
+<germany-postal-validation> ::= 
+    <germany-postal-code> <whitespace> "->" <whitespace> <germany-validation-result>
+
+<germany-validation-result> ::= 
+    "Valid Germany PLZ (5-digit)" | 
+    "Valid Germany PLZ (4-digit, legacy)" | 
+    "Invalid Germany PLZ: Format" | 
+    "Invalid Germany PLZ: Range" | 
+    "Valid Germany Special PLZ" | 
+    "Valid Germany Military PLZ"
+
+/* ============================================================================
+ * COUNTRY INDICATOR
+ * ============================================================================ */
+
+<germany-country-indicator> ::= 
+    "Germany" | "DE" | "Deutschland" | "Bundesrepublik Deutschland" | 
+    "German" | "Deutsche Post"
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" |
+    "ä" | "ö" | "ü" | "ß"
+
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/"
+<text> ::= <character> | <character> <text>
+
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* ============================================================================
+ * METADATA
+ * ============================================================================ */
+
+/*
+ * Deutsche Post Facts:
+ * - 5-digit postal codes introduced: July 1, 1993
+ * - Old 4-digit codes used: 1962-1993
+ * - Format: 5 digits (00000-99999)
+ * - First digit: Geographic region
+ * - Second digit: Sub-region
+ * - Third digit: District
+ * - Fourth and fifth digits: Specific delivery area
+ * 
+ * Validation Notes:
+ * - All 5-digit combinations are theoretically valid
+ * - Some ranges are reserved for special purposes
+ * - Military codes use 5300-5303 (old) or 99997-99999 (current)
+ * - Non-geographic codes start with 99
+ * - Each federal state has specific ranges
+ * - East Germany (former GDR) codes start with 0-1 (mostly)
+ * - West Germany (former FRG) codes start with 2-9 (mostly)
+ */

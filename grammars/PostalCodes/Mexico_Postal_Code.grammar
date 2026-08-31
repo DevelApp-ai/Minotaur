@@ -1,0 +1,94 @@
+Grammar: Mexico_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+
+/*
+ * SEPOMEX Grammar (Mexico Postal Codes)
+ * 
+ * Comprehensive grammar for Mexican postal addresses and codes postales including:
+ * - 5-digit postal codes
+ * - State and municipality codes
+ * - Address parsing in Spanish
+ * - Special postal codes
+ * - Validation rules
+ * 
+ * Version: 2.0.0
+ * Country: Mexico (MX)
+ * Postal Authority: Servicio Postal Mexicano (SEPOMEX)
+ */
+
+<mexico-postal-address> ::= 
+    <mexico-name-part>? <EOL>
+    <mexico-street-address> <EOL>
+    <mexico-colony-line> <EOL>
+    <mexico-city-state-line> <EOL>
+    <mexico-postal-code> <EOL>
+    <mexico-country-indicator>?
+
+<mexico-name-part> ::= <personal-name> | <company-name>
+<personal-name> ::= <title>? <first-name> <whitespace> <last-name> <opt-whitespace> <name-suffix>?
+<company-name> ::= <text>
+
+<mexico-street-address> ::= 
+    <street-type>? <whitespace> <street-name> <opt-whitespace> <street-number>? <opt-whitespace> <street-complement>?
+
+<street-type> ::= "Calle" | "C." | "Av." | "Avenida" | "Blvd." | "Boulevard" | "Cerrada" | "Cda." | "Circuito" | "Circ."
+<street-name> ::= <text>
+<street-number> ::= <digit>+ | <digit>+ <letter> | <letter>+ <digit>+
+<street-complement> ::= "Int." <digit>+ | "Ext." <digit>+ | "Mz." <digit>+ | "Lote" <digit>+
+
+<mexico-colony-line> ::= <mexico-colony> <opt-whitespace> "," <opt-whitespace> <mexico-municipality>?
+<mexico-colony> ::= <text>
+<mexico-municipality> ::= <text>
+
+<mexico-city-state-line> ::= <mexico-city> <opt-whitespace> "," <opt-whitespace> <mexico-state-code>
+<mexico-city> ::= <text>
+
+/* Mexico State Codes */
+<mexico-state-code> ::= 
+    "AGS" | "Aguascalientes" | 
+    "BC" | "Baja California" | 
+    "BCS" | "Baja California Sur" | 
+    "CAMP" | "Campeche" | 
+    "COAH" | "Coahuila" | 
+    "COL" | "Colima" | 
+    "CHIS" | "Chiapas" | 
+    "CHIH" | "Chihuahua" | 
+    "DF" | "Distrito Federal" | "CDMX" | "Ciudad de Mexico" | 
+    "DGO" | "Durango" | 
+    "GTO" | "Guanajuato" | 
+    "GRO" | "Guerrero" | 
+    "HGO" | "Hidalgo" | 
+    "JAL" | "Jalisco" | 
+    "MEX" | "Estado de Mexico" | 
+    "MICH" | "Michoacan" | 
+    "MOR" | "Morelos" | 
+    "NAY" | "Nayarit" | 
+    "NL" | "Nuevo Leon" | 
+    "OAX" | "Oaxaca" | 
+    "PUE" | "Puebla" | 
+    "QRO" | "Queretaro" | 
+    "QROO" | "Quintana Roo" | 
+    "SLP" | "San Luis Potosi" | 
+    "SIN" | "Sinaloa" | 
+    "SON" | "Sonora" | 
+    "TAB" | "Tabasco" | 
+    "TAMPS" | "Tamaulipas" | 
+    "TLAX" | "Tlaxcala" | 
+    "VER" | "Veracruz" | 
+    "YUC" | "Yucatan" | 
+    "ZAC" | "Zacatecas"
+
+/* Mexican Postal Code - 5 digits */
+<mexico-postal-code> ::= <digit><digit><digit><digit><digit>
+
+<mexico-country-indicator> ::= "Mexico" | "MX" | "Estados Unidos Mexicanos"
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+<character> ::= <letter> | <digit> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/" | "#" | "á" | "é" | "í" | "ó" | "ú" | "ñ" | "ü"
+<text> ::= <character> | <character> <text>
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+<EOL> ::= "\n" | "\r\n" | "\r"

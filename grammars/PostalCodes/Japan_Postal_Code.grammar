@@ -1,0 +1,374 @@
+Grammar: Japan_Postal_Code
+TokenSplitter: Space
+FormatType: CEBNF
+ContextSensitive: true
+
+/*
+ * Japan Post Grammar (Japanese Postal Codes)
+ * 
+ * Comprehensive grammar for Japanese postal addresses and 郵便番号 (yūbin bangō) codes including:
+ * - 7-digit postal codes (3-digit + 4-digit format)
+ * - Old 5-digit codes (pre-1998, for reference)
+ * - Address parsing in Japanese and Romanized formats
+ * - Prefectural codes
+ * - Special postal codes
+ * - Validation rules
+ * 
+ * Version: 2.0.0
+ * Last Updated: 2025-01-15
+ * Country: Japan (JP)
+ * Postal Authority: Japan Post Service (日本郵便)
+ */
+
+/* ============================================================================
+ * MAIN RULES
+ * ============================================================================ */
+
+<japan-postal-address> ::= 
+    <japan-name-part>? <EOL>
+    <japan-postal-code-line> <EOL>
+    <japan-prefecture-city-line> <EOL>
+    <japan-street-address-line> <EOL>
+    <japan-building-line>? <EOL>
+    <japan-country-indicator>?
+
+/* Complete Japanese address (Western style) */
+<japan-address-western> ::= 
+    <japan-name-part>? <EOL>
+    <japan-street-address-line> <EOL>
+    <japan-prefecture-city-line> <EOL>
+    <japan-postal-code-line> <EOL>
+    <japan-country-indicator>?
+
+/* Complete Japanese address (Japanese style - most common) */
+<japan-address-japanese> ::= 
+    <japan-postal-code-line> <EOL>
+    <japan-prefecture-city-line> <EOL>
+    <japan-street-address-line> <EOL>
+    <japan-building-line>? <EOL>
+    <japan-name-part>?
+
+/* ============================================================================
+ * NAME PART
+ * ============================================================================ */
+
+<japan-name-part> ::= <japanese-name> | <company-name> | <japanese-name> <EOL> <company-name>
+
+<japanese-name> ::= 
+    <japanese-last-name> <whitespace> <japanese-first-name> <opt-whitespace> <japanese-suffix>?
+
+<japanese-last-name> ::= <kanji-text> | <romaji-text>
+<japanese-first-name> ::= <kanji-text> | <romaji-text>
+<japanese-suffix> ::= "様" | "殿" | "さん" | "先生" | "女史" | "先生方"
+
+<company-name> ::= <kanji-text> | <romaji-text> | "株式会社" | "有限会社" | "合同会社"
+
+/* ============================================================================
+ * POSTAL CODE LINE
+ * ============================================================================ */
+
+<japan-postal-code-line> ::= "〒" <japan-postal-code> | <japan-postal-code>
+
+/* Japanese postal code (yūbin bangō) */
+<japan-postal-code> ::= 
+    <japan-7digit-code> | 
+    <japan-5digit-code> | 
+    <japan-special-code>
+
+/* Current 7-digit format: 123-4567 */
+<japan-7digit-code> ::= <japan-3digit> "-" <japan-4digit>
+
+/* Old 5-digit format (pre-1998) */
+<japan-5digit-code> ::= <japan-3digit><japan-2digit>
+
+/* Special codes */
+<japan-special-code> ::= 
+    "000-0000" |  /* Non-geographic */
+    "999-9999" |  /* Non-geographic */
+    "100-0001" |  /* Tokyo - Imperial Palace */
+    "100-0002" |  /* Tokyo - National Diet Building */
+    "100-0011" |  /* Tokyo - Tokyo Station */
+    "100-0012"   /* Tokyo - Marunouchi */
+
+<japan-3digit> ::= <digit><digit><digit>
+<japan-2digit> ::= <digit><digit>
+<japan-4digit> ::= <digit><digit><digit><digit>
+
+/* ============================================================================
+ * PREFECTURE AND CITY LINE
+ * ============================================================================ */
+
+<japan-prefecture-city-line> ::= <japan-prefecture> <japan-city>? <japan-district>?
+
+/* Japanese prefectures (都道府県) */
+<japan-prefecture> ::= 
+    /* Hokkaido */
+    "北海道" | "Hokkaidō" | "Hokkaido" | 
+    /* Tohoku Region */
+    "青森県" | "Aomori-ken" | "Aomori" | 
+    "岩手県" | "Iwate-ken" | "Iwate" | 
+    "宮城県" | "Miyagi-ken" | "Miyagi" | 
+    "秋田県" | "Akita-ken" | "Akita" | 
+    "山形県" | "Yamagata-ken" | "Yamagata" | 
+    "福島県" | "Fukushima-ken" | "Fukushima" | 
+    /* Kanto Region */
+    "茨城県" | "Ibaraki-ken" | "Ibaraki" | 
+    "栃木県" | "Tochigi-ken" | "Tochigi" | 
+    "群馬県" | "Gunma-ken" | "Gunma" | 
+    "埼玉県" | "Saitama-ken" | "Saitama" | 
+    "千葉県" | "Chiba-ken" | "Chiba" | 
+    "東京都" | "Tōkyō-to" | "Tokyo" | 
+    "神奈川県" | "Kanagawa-ken" | "Kanagawa" | 
+    /* Chubu Region */
+    "新潟県" | "Niigata-ken" | "Niigata" | 
+    "富山県" | "Toyama-ken" | "Toyama" | 
+    "石川県" | "Ishikawa-ken" | "Ishikawa" | 
+    "福井県" | "Fukui-ken" | "Fukui" | 
+    "山梨県" | "Yamanashi-ken" | "Yamanashi" | 
+    "長野県" | "Nagano-ken" | "Nagano" | 
+    "岐阜県" | "Gifu-ken" | "Gifu" | 
+    "静岡県" | "Shizuoka-ken" | "Shizuoka" | 
+    "愛知県" | "Aichi-ken" | "Aichi" | 
+    /* Kansai Region */
+    "三重県" | "Mie-ken" | "Mie" | 
+    "滋賀県" | "Shiga-ken" | "Shiga" | 
+    "京都府" | "Kyōto-fu" | "Kyoto" | 
+    "大阪府" | "Ōsaka-fu" | "Osaka" | 
+    "兵庫県" | "Hyōgo-ken" | "Hyogo" | 
+    "奈良県" | "Nara-ken" | "Nara" | 
+    "和歌山県" | "Wakayama-ken" | "Wakayama" | 
+    /* Chugoku Region */
+    "鳥取県" | "Tottori-ken" | "Tottori" | 
+    "島根県" | "Shimane-ken" | "Shimane" | 
+    "岡山県" | "Okayama-ken" | "Okayama" | 
+    "広島県" | "Hiroshima-ken" | "Hiroshima" | 
+    "山口県" | "Yamaguchi-ken" | "Yamaguchi" | 
+    /* Shikoku Region */
+    "徳島県" | "Tokushima-ken" | "Tokushima" | 
+    "香川県" | "Kagawa-ken" | "Kagawa" | 
+    "愛媛県" | "Ehime-ken" | "Ehime" | 
+    "高知県" | "Kōchi-ken" | "Kochi" | 
+    /* Kyushu Region */
+    "福岡県" | "Fukuoka-ken" | "Fukuoka" | 
+    "佐賀県" | "Saga-ken" | "Saga" | 
+    "長崎県" | "Nagasaki-ken" | "Nagasaki" | 
+    "熊本県" | "Kumamoto-ken" | "Kumamoto" | 
+    "大分県" | "Ōita-ken" | "Oita" | 
+    "宮崎県" | "Miyazaki-ken" | "Miyazaki" | 
+    "鹿児島県" | "Kagoshima-ken" | "Kagoshima" | 
+    /* Okinawa Region */
+    "沖縄県" | "Okinawa-ken" | "Okinawa"
+
+/* Japanese cities (市区町村) */
+<japan-city> ::= 
+    <kanji-text> | 
+    <romaji-text> | 
+    <kanji-text> <whitespace> <kanji-text> |  /* Multi-word city names */
+    <city-designator>
+
+<city-designator> ::= 
+    "市" | "区" | "町" | "村" | "郡" | 
+    "Shi" | "Ku" | "Cho" | "Son" | "Gun"
+
+/* Japanese districts (区) - for Tokyo and other major cities */
+<japan-district> ::= 
+    <kanji-text> <whitespace> "区" | 
+    <romaji-text> <whitespace> "Ku"
+
+/* ============================================================================
+ * STREET ADDRESS LINE
+ * ============================================================================ */
+
+<japan-street-address-line> ::= 
+    <japan-street-number> <japan-street-name> <japan-street-suffix>?
+
+<japan-street-number> ::= 
+    <digit>+ | 
+    <digit>+ "-" <digit>+ | 
+    <digit>+ "番" | 
+    <kanji-digit>+ | 
+    <kanji-digit>+ "-" <kanji-digit>+
+
+<japan-street-name> ::= <kanji-text> | <romaji-text>
+
+/* Japanese street suffixes */
+<japan-street-suffix> ::= 
+    "丁目" | "Chōme" | 
+    "番" | "Ban" | 
+    "地割" | "Jiwari" | 
+    "線" | "Sen" | 
+    "通" | "Dori" | 
+    "町" | "Cho" | 
+    "字" | "Aza"
+
+/* ============================================================================
+ * BUILDING LINE
+ * ============================================================================ */
+
+<japan-building-line> ::= 
+    <japan-building-name> <japan-building-number>? <japan-room-number>?
+
+<japan-building-name> ::= 
+    <kanji-text> | 
+    <romaji-text> | 
+    "マンション" | "Mansion" | 
+    "アパート" | "Apartment" | "Apato" | 
+    "ビル" | "Building" | "Biru" | 
+    "タワー" | "Tower" | "Tawa" | 
+    "ハイツ" | "Heights" | "Haitsu" | 
+    "コーポ" | "Corporation" | "Kopo"
+
+<japan-building-number> ::= 
+    <digit>+ "号" | 
+    <digit>+ "-" <digit>+ "号" | 
+    <digit>+ "F" | 
+    <digit>+ "階" | 
+    <kanji-digit>+ "号"
+
+<japan-room-number> ::= 
+    <digit>+ "号室" | 
+    <digit>+ "Room" | 
+    <digit>+ "R" | 
+    <digit>+ "階" | 
+    <digit>+ "F"
+
+/* ============================================================================
+ * PREFECTURAL CODES
+ * ============================================================================ */
+
+/* Prefectural codes (first 2 digits of postal code) */
+<japan-prefecture-code> ::= 
+    "01" | "Hokkaido" | 
+    "02" | "Aomori" | 
+    "03" | "Iwate" | 
+    "04" | "Miyagi" | 
+    "05" | "Akita" | 
+    "06" | "Yamagata" | 
+    "07" | "Fukushima" | 
+    "08" | "Ibaraki" | 
+    "09" | "Tochigi" | 
+    "10" | "Gunma" | 
+    "11" | "Saitama" | 
+    "12" | "Chiba" | 
+    "13" | "Tokyo" | 
+    "14" | "Kanagawa" | 
+    "15" | "Niigata" | 
+    "16" | "Toyama" | 
+    "17" | "Ishikawa" | 
+    "18" | "Fukui" | 
+    "19" | "Yamanashi" | 
+    "20" | "Nagano" | 
+    "21" | "Gifu" | 
+    "22" | "Shizuoka" | 
+    "23" | "Aichi" | 
+    "24" | "Mie" | 
+    "25" | "Shiga" | 
+    "26" | "Kyoto" | 
+    "27" | "Osaka" | 
+    "28" | "Hyogo" | 
+    "29" | "Nara" | 
+    "30" | "Wakayama" | 
+    "31" | "Tottori" | 
+    "32" | "Shimane" | 
+    "33" | "Okayama" | 
+    "34" | "Hiroshima" | 
+    "35" | "Yamaguchi" | 
+    "36" | "Tokushima" | 
+    "37" | "Kagawa" | 
+    "38" | "Ehime" | 
+    "39" | "Kochi" | 
+    "40" | "Fukuoka" | 
+    "41" | "Saga" | 
+    "42" | "Nagasaki" | 
+    "43" | "Kumamoto" | 
+    "44" | "Oita" | 
+    "45" | "Miyazaki" | 
+    "46" | "Kagoshima" | 
+    "47" | "Okinawa"
+
+/* ============================================================================
+ * POSTCODE VALIDATION
+ * ============================================================================ */
+
+<japan-postal-validation> ::= 
+    <japan-postal-code> <whitespace> "->" <whitespace> <japan-validation-result>
+
+<japan-validation-result> ::= 
+    "Valid Japan Postal Code (7-digit)" | 
+    "Valid Japan Postal Code (5-digit, legacy)" | 
+    "Valid Japan Special Postal Code" | 
+    "Invalid Japan Postal Code: Format" | 
+    "Invalid Japan Postal Code: Range"
+
+/* ============================================================================
+ * COUNTRY INDICATOR
+ * ============================================================================ */
+
+<japan-country-indicator> ::= 
+    "Japan" | "JP" | "Nihon" | "Nippon" | "日本" | 
+    "Japan Post" | "日本郵便"
+
+/* ============================================================================
+ * COMMON COMPONENTS
+ * ============================================================================ */
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+/* Japanese kanji digits */
+<kanji-digit> ::= "零" | "一" | "二" | "三" | "四" | "五" | "六" | "七" | "八" | "九" | "十"
+
+<letter> ::= 
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
+/* Japanese kanji characters (sample - would need comprehensive list) */
+<kanji-character> ::= 
+    "日" | "月" | "年" | "人" | "大" | "小" | "上" | "下" | "左" | "右" | 
+    "東" | "西" | "南" | "北" | "中" | "京" | "都" | "道" | "府" | "県" | 
+    "市" | "区" | "町" | "村" | "郡" | "島" | "山" | "川" | "谷" | "田" | 
+    "一" | "二" | "三" | "四" | "五" | "六" | "七" | "八" | "九" | "十" | 
+    "百" | "千" | "万" | "万" | 
+    "木" | "林" | "森" | "川" | "田" | "土" | "石" | "金" | "銀" | "鉄" | 
+    "水" | "火" | "風" | "花" | "草" | "竹" | "魚" | "鳥" | "犬" | "猫"
+
+<kanji-text> ::= <kanji-character> | <kanji-character> <kanji-text>
+
+/* Romaji (Romanized Japanese) text */
+<romaji-text> ::= <letter> | <letter> <romaji-text> | <text>
+
+<character> ::= <letter> | <digit> | <kanji-character> | <special-character>
+<special-character> ::= "-" | "_" | "." | "," | "'" | " " | "/" | "・" | "、" | "。" | "「" | "」"
+<text> ::= <character> | <character> <text>
+
+<whitespace> ::= " " | "\t" | <whitespace> <whitespace>
+<opt-whitespace> ::= "" | <whitespace>
+
+<EOL> ::= "\n" | "\r\n" | "\r"
+
+/* ============================================================================
+ * METADATA
+ * ============================================================================ */
+
+/*
+ * Japan Post Facts:
+ * - 7-digit postal codes introduced: July 1, 1998
+ * - Old 5-digit codes used: 1968-1998
+ * - Format: 3 digits + hyphen + 4 digits (123-4567)
+ * - First 2 digits: Prefecture code
+ * - Next digit: District code
+ * - Next 2 digits: Delivery office code
+ * - Last 2 digits: Delivery block code
+ * - Special codes: 000-0000, 999-9999 (non-geographic)
+ * - Tokyo special codes: 100-xxxx (Imperial Palace, government buildings)
+ * 
+ * Validation Notes:
+ * - All 7-digit combinations are theoretically valid
+ * - First 2 digits correspond to prefectures
+ * - Third digit often corresponds to cities
+ * - Last 4 digits specify delivery areas
+ * - Hyphen is optional in some contexts
+ * - 〒 symbol is the postal mark (yūbin mark)
+ * - Addresses are written in reverse order compared to Western addresses
+ */
