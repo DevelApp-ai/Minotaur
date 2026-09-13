@@ -137,6 +137,7 @@ ipch/
 *.e2e
 
 # TFS 2012 Local Workspace
+
 $tf/
 
 # Guidance Automation Toolkit
@@ -236,7 +237,8 @@ BundleArtifacts/
 Package.StoreAssociation.xml
 _pkginfo.txt
 *.appx
-*.appxbundle
+*
+.appxbundle
 *.appxupload
 
 # Visual Studio cache files
@@ -336,7 +338,8 @@ paket-files/
 # FAKE - F# Make
 **/.fake/
 
-# CodeRush personal settings
+# CodeRush perso
+nal settings
 **/.cr/personal
 
 # Python Tools for Visual Studio (PTVS)
@@ -419,3 +422,9 @@ FodyWeavers.xsd
 
 # Legacy code directory (to be removed in future)
 old_code/
+
+# Build output (should not be committed)
+build_output.txt
+
+# Backup files
+*.backup
