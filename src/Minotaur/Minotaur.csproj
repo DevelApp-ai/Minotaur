@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -16,7 +16,7 @@
     <Company>DevelApp AI</Company>
     <Copyright>Copyright © 2024 DevelApp AI</Copyright>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur2</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur2.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
