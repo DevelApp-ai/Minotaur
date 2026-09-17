@@ -49,13 +49,12 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Gets the array of file extensions supported by Java.
     /// </summary>
-    public string[] SupportedExtensions => new[] { ".java", ".JAVA" };
+    public string[] SupportedExtensions => new[] { ".java" };
 
     /// <summary>
     /// Converts a cognitive graph representation back to Java source code.
     /// </summary>
-    /// <param na
-me="graph">The cognitive graph node to unparse.</param>
+    /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Java code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -104,8 +103,8 @@ me="graph">The cognitive graph node to unparse.</param>
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "class_declaration",
-            GenerationTemplat
-e = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
+     
+       GenerationTemplate = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
@@ -145,8 +144,7 @@ e = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {member
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "sealed_class_declaration",
-            GenerationTemplate = "{modifiers} sealed class {name}{type_parameters} {extends} {implements} permits {permitted_types} {{ {
-members} }}\n",
+            GenerationTemplate = "{modifiers} sealed class {name}{type_parameters} {extends} {implements} permits {permitted_types} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false, ["MinJavaVersion"] = 15 }
         });
 
@@ -191,8 +189,7 @@ members} }}\n",
         });
 
         // Java for statement
-        rules.Gene
-rationRules.Add(new CodeGenerationRule
+        rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "for_statement",
             GenerationTemplate = "for ({initialization}; {condition}; {update}) {{ {statement} }}\n",
@@ -236,8 +233,7 @@ rationRules.Add(new CodeGenerationRule
         {
             NodeType = "catch_clause",
             GenerationTemplate = " catch ({parameter}) {{ {block} }}",
-            GenerationHints = new Dictionary<string, object> { ["BraceStyl
-e"] = "K&R", ["Semicolon"] = false }
+            GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
         // Java finally clause
@@ -285,8 +281,8 @@ e"] = "K&R", ["Semicolon"] = false }
         {
             NodeType = "return_statement",
             GenerationTemplate = "return {expression};\n",
-            GenerationHints = new Dictionary<string, objec
-t> { ["Semicolon"] = true }
+            GenerationHints = new 
+Dictionary<string, object> { ["Semicolon"] = true }
         });
 
         // Java throw statement
@@ -349,15 +345,9 @@ t> { ["Semicolon"] = true }
     {
         return new CodeFormattingOptions
         {
+            IndentStyle = "spaces",
             IndentSize = 4,
-            UseTabs = false,
-            BraceStyle = "K&R",
-            IndentBraces = true,
-            IndentCaseLabels = true,
-            NewLineAfterSemicolon = true,
-            SpaceAfterKeywords = true,
-            SpaceBeforeBraces = false,
-            LanguageSpecificOptions = new Dictionary<string, object>
+            CosmeticOptions = new Dictionary<string, object>
             {
                 ["JavaVersion"] = "17",
                 ["TextBlockEnabled"] = true,
@@ -369,7 +359,6 @@ t> { ["Semicolon"] = true }
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid Java code.
     /// </summary>
-    
     /// <summary>
     /// Maps Java-specific validation result to canonical plugin result.
     /// </summary>
@@ -398,13 +387,62 @@ t> { ["Semicolon"] = true }
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
+        if (graph == null)
+        {
+            return new Minotaur.Plugins.UnparseValidationResult
+            {
+                CanUnparse = false,
+                Errors = new List<Minotaur.Plugins.UnparseValidationError>
+                {
+                    new Minotaur.Plugins.UnparseValidationError
+                    {
+                        Message = "Cannot unparse null graph",
+                        NodeId = "null",
+                        NodeType = "null"
+                    }
+                }
+            };
+        }
+
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
         await Task.CompletedTask;
         var localResult = _validationVisitor.GetValidationResult();
         return MapToCanonicalResult(localResult);
+    }
+
+    /// <summary>
+    /// Performs Java-specific symbolic analysis (minimal Phase 2 implementation).
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return new List<SymbolicError>();
+    }
+
+    /// <summary>
+    /// Gets Java-specific error patterns (minimal Phase 2 implementation).
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return new List<ErrorPattern>();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for a specific error type in Java (minimal Phase 2 implementation).
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return 0.0;
+    }
+
+    /// <summary>
+    /// Generates test cases for a specific Java error (minimal Phase 2 implementation).
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return new List<TestCase>();
     }
 
     /// <summary>

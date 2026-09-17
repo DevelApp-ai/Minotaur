@@ -93,6 +93,7 @@ public class TypeScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
             NodeType = "interface_declaration",
             GenerationTemplate = "{modifiers} interface {name}{type_parameters} {extends} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = true }
+
         });
 
         // TypeScript type alias declaration
@@ -356,7 +357,7 @@ public class TypeScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <param name="error">The symbolic error to generate test cases for</param>
     /// <param name="sourceCode">The original TypeScript source code</param>
     /// <returns>List of generated test cases</returns>
-    public List<string> GenerateTestCases(SymbolicError error, string sourceCode)
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
     {
         return _symbolicAnalysis.GenerateTestCases(error, sourceCode);
     }

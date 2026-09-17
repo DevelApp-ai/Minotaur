@@ -15,23 +15,22 @@
 using Minotaur.Core;
 using Minotaur.Visitors;
 
-namespace Minotaur.Plugins.TypeScript;
+namespace Minotaur.Plugins.Java;
 
 /// <summary>
-/// Validator for TypeScript unparsing operations.
-/// Validates that a cognitive graph can be successfully unparsed to TypeScript code.
+/// Validator for Java unparsing operations.
+/// Validates that a cognitive graph can be successfully unparsed to Java code.
 /// </summary>
-public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
+public class JavaUnparseValidator : CognitiveGraphVisitorBase
 {
     private readonly List<UnparseValidationError> _errors = new();
     private readonly Stack<string> _contextStack = new();
     private int _braceDepth = 0;
     private int _parenDepth = 0;
     private int _bracketDepth = 0;
-    private int _templateDepth = 0;
 
     /// <summary>
-    /// Validates that a cognitive graph can be unparsed to valid TypeScript code.
+    /// Validates that a cognitive graph can be unparsed to valid Java code.
     /// </summary>
     /// <param name="graph">The cognitive graph to validate.</param>
     /// <returns>List of validation errors, if any.</returns>
@@ -42,7 +41,6 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
         _braceDepth = 0;
         _parenDepth = 0;
         _bracketDepth = 0;
-        _templateDepth = 0;
         
         if (graph == null)
         {
@@ -64,7 +62,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             {
                 Message = $"Unbalanced braces: {_braceDepth} unclosed braces",
                 NodeId = "root",
-                NodeType = "program",
+                NodeType = "compilation_unit",
                 Severity = "Error"
             });
         }
@@ -75,7 +73,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             {
                 Message = $"Unbalanced parentheses: {_parenDepth} unclosed parentheses",
                 NodeId = "root",
-                NodeType = "program",
+                NodeType = "compilation_unit",
                 Severity = "Error"
             });
         }
@@ -86,18 +84,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             {
                 Message = $"Unbalanced brackets: {_bracketDepth} unclosed brackets",
                 NodeId = "root",
-                NodeType = "program",
-                Severity = "Error"
-            });
-        }
-        
-        if (_templateDepth != 0)
-        {
-            _errors.Add(new UnparseValidationError
-            {
-                Message = $"Unbalanced template literals: {_templateDepth} unclosed template literals",
-                NodeId = "root",
-                NodeType = "program",
+                NodeType = "compilation_unit",
                 Severity = "Error"
             });
         }
@@ -134,9 +121,10 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
         
         switch (ruleName)
         {
-            case "interface_body":
             case "class_body":
+            case "interface_body":
             case "enum_body":
+            case "record_body":
             case "method_body":
             case "constructor_body":
             case "block":
@@ -144,8 +132,9 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             case "try_block":
             case "catch_block":
             case "finally_block":
-            case "function_body":
             case "static_initializer":
+            case "array_initializer":
+            case "annotation_body":
                 _braceDepth++;
                 _contextStack.Push(ruleName);
                 break;
@@ -154,20 +143,14 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             case "argument_list":
             case "type_parameters":
             case "type_arguments":
-            case "tuple_type":
+            case "resource_list":
                 _parenDepth++;
                 _contextStack.Push(ruleName);
                 break;
                 
-            case "array_initializer":
-            case "array_literal":
+            case "array_access":
+            case "array_creation":
                 _bracketDepth++;
-                _contextStack.Push(ruleName);
-                break;
-                
-            case "template_string":
-            case "template_head":
-                _templateDepth++;
                 _contextStack.Push(ruleName);
                 break;
         }
@@ -179,19 +162,20 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
         
         switch (ruleName)
         {
-            case "interface_body":
             case "class_body":
+            case "interface_body":
             case "enum_body":
+            case "record_body":
             case "method_body":
             case "constructor_body":
             case "block":
             case "switch_block":
             case "try_block":
-       
-     case "catch_block":
+            case "catch_block":
             case "finally_block":
-            case "function_body":
             case "static_initializer":
+            case "array_initializer":
+            case "annotation_body":
                 _braceDepth--;
                 if (_contextStack.Count > 0 && _contextStack.Peek() == ruleName)
                 {
@@ -203,7 +187,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             case "argument_list":
             case "type_parameters":
             case "type_arguments":
-            case "tuple_type":
+            case "resource_list":
                 _parenDepth--;
                 if (_contextStack.Count > 0 && _contextStack.Peek() == ruleName)
                 {
@@ -211,18 +195,9 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 }
                 break;
                 
-            case "array_initializer":
-            case "array_literal":
+            case "array_access":
+            case "array_creation":
                 _bracketDepth--;
-                if (_contextStack.Count > 0 && _contextStack.Peek() == ruleName)
-                {
-                    _contextStack.Pop();
-                }
-                break;
-                
-            case "template_string":
-            case "template_head":
-                _templateDepth--;
                 if (_contextStack.Count > 0 && _contextStack.Peek() == ruleName)
                 {
                     _contextStack.Pop();
@@ -254,12 +229,8 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 case '[':
                     _bracketDepth++;
                     break;
-            
-    case ']':
+                case ']':
                     _bracketDepth--;
-                    break;
-                case '`':
-                    _templateDepth++;
                     break;
             }
         }

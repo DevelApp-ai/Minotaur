@@ -64,7 +64,7 @@ public class CodeDiffService : ICodeDiffService
             new TokenPattern { Type = TokenType.Keyword, Pattern = @"\b(abstract|as|base|break|case|catch|checked|class|const|continue|default|delegate|do|else|enum|event|explicit|extern|false|finally|fixed|for|foreach|goto|if|implicit|in|interface|internal|is|lock|namespace|new|null|operator|out|override|params|private|protected|public|readonly|ref|return|sealed|sizeof|stackalloc|static|switch|this|throw|true|try|typeof|unchecked|unsafe|using|virtual|void|while|yield)\b" },
             new TokenPattern { Type = TokenType.Comment, Pattern = @"//.*" },
             new TokenPattern { Type = TokenType.Comment, Pattern = @"/\*.*\*/", IsMultiline = true },
-            new TokenPattern { Type = TokenType.String, Pattern = @"\"[^\"]*\"" },
+            new TokenPattern { Type = TokenType.String, Pattern = @"""[^""]*""" },
             new TokenPattern { Type = TokenType.Character, Pattern = @"'\\?.'" }
         };
     }
@@ -79,7 +79,7 @@ public class CodeDiffService : ICodeDiffService
             new TokenPattern { Type = TokenType.Keyword, Pattern = @"\b(abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while)\b" },
             new TokenPattern { Type = TokenType.Comment, Pattern = @"//.*" },
             new TokenPattern { Type = TokenType.Comment, Pattern = @"/\*.*\*/", IsMultiline = true },
-            new TokenPattern { Type = TokenType.String, Pattern = @"\"[^\"]*\"" },
+            new TokenPattern { Type = TokenType.String, Pattern = @"""[^""]*""" },
             new TokenPattern { Type = TokenType.Character, Pattern = @"'\\?.'" }
         };
     }
@@ -94,7 +94,7 @@ public class CodeDiffService : ICodeDiffService
             new TokenPattern { Type = TokenType.Keyword, Pattern = @"\b(break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|false|finally|for|function|if|import|in|instanceof|new|null|return|super|switch|this|throw|true|try|typeof|var|void|while|with|yield)\b" },
             new TokenPattern { Type = TokenType.Comment, Pattern = @"//.*" },
             new TokenPattern { Type = TokenType.Comment, Pattern = @"/\*.*\*/", IsMultiline = true },
-            new TokenPattern { Type = TokenType.String, Pattern = @"\"[^\"]*\"" },
+            new TokenPattern { Type = TokenType.String, Pattern = @"""[^""]*""" },
             new TokenPattern { Type = TokenType.String, Pattern = @"'`[^`]*`" },
             new TokenPattern { Type = TokenType.TemplateString, Pattern = @"`[^`]*`" }
         };
@@ -120,8 +120,8 @@ public class CodeDiffService : ICodeDiffService
         {
             new TokenPattern { Type = TokenType.Keyword, Pattern = @"\b(False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)\b" },
             new TokenPattern { Type = TokenType.Comment, Pattern = @"#.*" },
-            new TokenPattern { Type = TokenType.String, Pattern = @"\"\"\"[^\"\"\"]*\"\"\"", IsMultiline = true },
-            new TokenPattern { Type = TokenType.String, Pattern = @"\"[^\"\\]*(?:\\.[^\"\\]*)*\"" },
+            new TokenPattern { Type = TokenType.String, Pattern = @"""""""[^""""""]*""""""", IsMultiline = true },
+            new TokenPattern { Type = TokenType.String, Pattern = @"""[^""\\]*(?:\\.[^""\\]*)*""" },
             new TokenPattern { Type = TokenType.String, Pattern = @"'[^'\\]*(?:\\.[^'\\]*)*'" }
         };
     }

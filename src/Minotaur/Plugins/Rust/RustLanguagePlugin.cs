@@ -55,8 +55,7 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Converts a cognitive graph representation back to Rust source code.
     /// </summary>
-    /// <para
-m name="graph">The cognitive graph node to unparse.</param>
+    /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Rust code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -105,8 +104,7 @@ m name="graph">The cognitive graph node to unparse.</param>
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "enum_declaration",
-            GenerationTemplate = "pub enum {
-name} { {variants} }\n",
+            GenerationTemplate = "pub enum {name} { {variants} }\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Pascal", ["Visibility"] = "pub" }
         });
 
@@ -154,8 +152,7 @@ name} { {variants} }\n",
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "match_expression",
-            Generat
-ionTemplate = "match {expression} { {arms} }\n",
+            GenerationTemplate = "match {expression} { {arms} }\n",
             GenerationHints = new Dictionary<string, object> { ["ExpressionBased"] = true }
         });
 
@@ -204,8 +201,7 @@ ionTemplate = "match {expression} { {arms} }\n",
         {
             NodeType = "static_declaration",
             GenerationTemplate = "static {name}: {type} = {expression};\n",
-            GenerationHints = new Dictionary<string, object> { ["Case"]
- = "ScreamingSnake" }
+            GenerationHints = new Dictionary<string, object> { ["Case"] = "ScreamingSnake" }
         });
 
         // Rust return expression
@@ -261,8 +257,7 @@ ionTemplate = "match {expression} { {arms} }\n",
         {
             NodeType = "doc_comment",
             GenerationTemplate = "/// {text}\n",
-            GenerationHints = new Dictionary<string, object> { ["DocComment
-"] = true }
+            GenerationHints = new Dictionary<string, object> { ["DocComment"] = true }
         });
 
         await Task.CompletedTask;
@@ -277,14 +272,7 @@ ionTemplate = "match {expression} { {arms} }\n",
         return new CodeFormattingOptions
         {
             IndentSize = 4,
-            UseTabs = false,
-            BraceStyle = "Rust",
-            IndentBraces = true,
-            IndentCaseLabels = false,
-            NewLineAfterSemicolon = true,
-            SpaceAfterKeywords = true,
-            SpaceBeforeBraces = false,
-            LanguageSpecificOptions = new Dictionary<string, object>
+            CosmeticOptions = new Dictionary<string, object>
             {
                 ["RustEdition"] = "2021",
                 ["Case"] = "Snake",
@@ -297,7 +285,6 @@ ionTemplate = "match {expression} { {arms} }\n",
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid Rust code.
     /// </summary>
-    
     /// <summary>
     /// Maps Rust-specific validation result to canonical plugin result.
     /// </summary>
@@ -326,13 +313,45 @@ ionTemplate = "match {expression} { {arms} }\n",
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
         await Task.CompletedTask;
         var localResult = _validationVisitor.GetValidationResult();
         return MapToCanonicalResult(localResult);
+    }
+
+    /// <summary>
+    /// Performs Rust-specific symbolic analysis (minimal Phase 2 implementation).
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return new List<SymbolicError>();
+    }
+
+    /// <summary>
+    /// Gets Rust-specific error patterns (minimal Phase 2 implementation).
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return new List<ErrorPattern>();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for a specific error type in Rust (minimal Phase 2 implementation).
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return 0.0;
+    }
+
+    /// <summary>
+    /// Generates test cases for a specific Rust error (minimal Phase 2 implementation).
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return new List<TestCase>();
     }
 
     /// <summary>

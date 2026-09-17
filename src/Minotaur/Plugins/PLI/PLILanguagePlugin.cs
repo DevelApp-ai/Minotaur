@@ -53,8 +53,7 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string[] SupportedExtensions => new[] { ".pli", ".PLI", ".pl1", ".PL1" };
 
     /// <summary>
-    /// Converts a cognitive graph representation back to PL/
-I source code.
+    /// Converts a cognitive graph representation back to PL/I source code.
     /// </summary>
     /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated PL/I code.</returns>
@@ -153,8 +152,8 @@ I source code.
         // PL/I do while
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            NodeType = "d
-o_while",
+
+            NodeType = "do_while",
             GenerationTemplate = "DO WHILE({condition});\n{statements}\nEND;\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
@@ -203,8 +202,7 @@ o_while",
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "goto_statement",
- 
-           GenerationTemplate = "GO TO {label};\n",
+            GenerationTemplate = "GO TO {label};\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
 
@@ -253,8 +251,7 @@ o_while",
         {
             NodeType = "put_statement",
             GenerationTemplate = "PUT {destination}({data});\n",
-            GenerationHints = new Dictionary<string, object> { ["Case"] = "
-Mixed", ["Indent"] = 4 }
+            GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
 
         // PL/I get statement (input)
@@ -285,14 +282,7 @@ Mixed", ["Indent"] = 4 }
         return new CodeFormattingOptions
         {
             IndentSize = 4,
-            UseTabs = false,
-            BraceStyle = "PL/I",
-            IndentBraces = false,
-            IndentCaseLabels = false,
-            NewLineAfterSemicolon = true,
-            SpaceAfterKeywords = true,
-            SpaceBeforeBraces = false,
-            LanguageSpecificOptions = new Dictionary<string, object>
+            CosmeticOptions = new Dictionary<string, object>
             {
                 ["PLIVersion"] = "PL/I F",
                 ["Case"] = "Mixed",
@@ -305,7 +295,6 @@ Mixed", ["Indent"] = 4 }
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid PL/I code.
     /// </summary>
-    
     /// <summary>
     /// Maps PLI-specific validation result to canonical plugin result.
     /// </summary>
@@ -334,7 +323,7 @@ Mixed", ["Indent"] = 4 }
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
@@ -344,10 +333,41 @@ public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnpa
     }
 
     /// <summary>
+    /// Performs PLI-specific symbolic analysis (minimal Phase 2 implementation).
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return new List<SymbolicError>();
+    }
+
+    /// <summary>
+    /// Gets PLI-specific error patterns (minimal Phase 2 implementation).
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return new List<ErrorPattern>();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for a specific error type in PLI (minimal Phase 2 implementation).
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return 0.0;
+    }
+
+    /// <summary>
+    /// Generates test cases for a specific PLI error (minimal Phase 2 implementation).
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return new List<TestCase>();
+    }
+
+    /// <summary>
     /// Gets the symbolic analysis visitor for PL/I.
     /// </summary>
-    public ISymbolicAnalysisVisitor Ge
-tSymbolicAnalysisVisitor()
+    public ISymbolicAnalysisVisitor GetSymbolicAnalysisVisitor()
     {
         return _validationVisitor;
     }

@@ -28,8 +28,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     private readonly System.Collections.Generic.List<UnparseValidationError> _warnings = new();
     private int _currentDepth = 0;
     private int _maxDepth = 100;
-    
-    private bool _hasMainFunction = false;
+        private bool _hasMainFunction = false;
     private bool _inFunction = false;
 
     /// <summary>
@@ -70,8 +69,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         {
             AddError(null, "RV001", "Missing main function (fn main)", ValidationSeverity.Warning);
         }
-        
-        return new UnparseValidationResult
+                return new UnparseValidationResult
         {
             IsValid = _errors.Count == 0,
             Errors = _errors.ToList(),
@@ -94,8 +92,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         }
 
         _currentDepth++;
-        
-        try
+                try
         {
             // CognitiveGraphNode is a class-based wrapper. The zero-copy
             // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be
@@ -123,20 +120,17 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
-        
-        if (packedNodes.Count == 0)
+                if (packedNodes.Count == 0)
         {
             ValidateLeafNode(node);
             return;
         }
-        
-        // Check for ambiguity
+                // Check for ambiguity
         if (packedNodes.Count > 1)
         {
             ValidateAmbiguity(node, packedNodes);
         }
-        
-        // Visit each PackedNode
+                // Visit each PackedNode
         foreach (var packedNode in packedNodes)
         {
             VisitPackedNode(packedNode);
@@ -150,8 +144,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     {
         var childNodes = packedNode.GetChildNodes();
         var nodeType = GetNodeType(packedNode);
-        
-        // Track function context
+                // Track function context
         if (nodeType == "function_declaration" || nodeType == "method_declaration")
         {
             _inFunction = true;
@@ -160,17 +153,14 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         {
             _hasMainFunction = true;
         }
-        
-        // Validate the packed node
+                // Validate the packed node
         ValidatePackedNode(packedNode);
-        
-        // Visit children
+                // Visit children
         foreach (var child in childNodes)
         {
             Visit(child);
         }
-        
-        // Reset function context
+                // Reset function context
         if (nodeType == "function_declaration" || nodeType == "method_declaration")
         {
             _inFunction = false;
@@ -195,8 +185,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         {
             AddWarning(node, "RV003", "Empty node content", ValidationSeverity.Warning);
         }
-        
-        if (node.NodeType == 0)
+                if (node.NodeType == 0)
         {
             AddError(node, "RV004", "Invalid node type (0)", ValidationSeverity.Error);
         }
@@ -223,8 +212,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         {
             AddError(packedNode, "RV006", "Invalid RuleId (0)", ValidationSeverity.Error);
         }
-        
-        var childNodes = packedNode.GetChildNodes();
+                var childNodes = packedNode.GetChildNodes();
         if (childNodes.Count == 0)
         {
             AddWarning(packedNode, "RV007", "PackedNode with no children", ValidationSeverity.Info);
@@ -259,8 +247,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             SourceStart = node.SourceStart,
             SourceLength = node?.SourceLength ?? 0
         };
-        
-        _errors.Add(error);
+                _errors.Add(error);
     }
 
     /// <summary>
@@ -276,8 +263,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             NodeType = "PackedNode",
             RuleId = packedNode.RuleID
         };
-        
-        _errors.Add(error);
+                _errors.Add(error);
     }
 
     /// <summary>
@@ -294,8 +280,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             SourceStart = node.SourceStart,
             SourceLength = node?.SourceLength ?? 0
         };
-        
-        _warnings.Add(warning);
+                _warnings.Add(warning);
     }
 
     /// <summary>
@@ -311,8 +296,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             NodeType = "PackedNode",
             RuleId = packedNode.RuleID
         };
-        
-        _warnings.Add(warning);
+                _warnings.Add(warning);
     }
 
     /// <summary>
@@ -369,8 +353,7 @@ public class UnparseValidationResult
     public bool IsValid { get; set; } = true;
     public System.Collections.Generic.List<UnparseValidationError> Errors { get; set; } = new();
     public System.Collections.Generic.List<UnparseValidationError> Warnings { get; set; } = new();
-    
-    public System.Collections.Generic.IEnumerable<UnparseValidationError> AllMessages
+        public System.Collections.Generic.IEnumerable<UnparseValidationError> AllMessages
     {
         get
         {
@@ -394,8 +377,7 @@ public class UnparseValidationError
     public uint SourceStart { get; set; }
     public uint SourceLength { get; set; }
     public uint RuleId { get; set; }
-    
-    public override string ToString()
+        public override string ToString()
     {
         return $"[{Severity}] {Code}: {Message} (Node: {NodeType}, Position: {SourceStart}-{SourceStart + SourceLength})";
     }

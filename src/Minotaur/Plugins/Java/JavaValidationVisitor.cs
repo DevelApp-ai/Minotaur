@@ -84,8 +84,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         }
 
         _currentDepth++;
-        
-        try
+                try
         {
             // CognitiveGraphNode is a class-based wrapper. The zero-copy
             // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be
@@ -114,21 +113,18 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     {
         // Check for PackedNodes (ambiguity)
         var packedNodes = node.GetPackedNodes();
-        
-        if (packedNodes.Count == 0)
+                if (packedNodes.Count == 0)
         {
             // No PackedNodes - this is a leaf node
             ValidateLeafNode(node);
             return;
         }
-        
-        // Multiple PackedNodes - check for ambiguity issues
+                // Multiple PackedNodes - check for ambiguity issues
         if (packedNodes.Count > 1)
         {
             ValidateAmbiguity(node, packedNodes);
         }
-        
-        // Visit each PackedNode
+                // Visit each PackedNode
         foreach (var packedNode in packedNodes)
         {
             VisitPackedNode(packedNode);
@@ -141,11 +137,9 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     private void VisitPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var childNodes = packedNode.GetChildNodes();
-        
-        // Validate the packed node
+                // Validate the packed node
         ValidatePackedNode(packedNode);
-        
-        // Visit children
+                // Visit children
         foreach (var child in childNodes)
         {
             Visit(child);
@@ -163,8 +157,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         {
             AddWarning(node, "JV002", "Empty node content", ValidationSeverity.Warning);
         }
-        
-        // Check for valid node type
+                // Check for valid node type
         if (node.NodeType == 0)
         {
             AddError(node, "JV003", "Invalid node type (0)", ValidationSeverity.Error);
@@ -182,15 +175,13 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         {
             AddWarning(node, "JV004", $"High ambiguity: {packedNodes.Count} PackedNodes", ValidationSeverity.Warning);
         }
-        
-        // Check if all PackedNodes have the same rule ID (redundant)
+                // Check if all PackedNodes have the same rule ID (redundant)
         var ruleIds = new System.Collections.Generic.HashSet<uint>();
         foreach (var packedNode in packedNodes)
         {
             ruleIds.Add(packedNode.RuleID);
         }
-        
-        if (ruleIds.Count == 1 && packedNodes.Count > 1)
+                if (ruleIds.Count == 1 && packedNodes.Count > 1)
         {
             AddWarning(node, "JV005", "Multiple PackedNodes with same RuleId", ValidationSeverity.Warning);
         }
@@ -206,8 +197,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         {
             AddError(packedNode, "JV006", "Invalid RuleId (0)", ValidationSeverity.Error);
         }
-        
-        // Check for children
+                // Check for children
         var childNodes = packedNode.GetChildNodes();
         if (childNodes.Count == 0)
         {
@@ -245,8 +235,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             SourceStart = node.SourceStart,
             SourceLength = node.SourceLength
         };
-        
-        _errors.Add(error);
+                _errors.Add(error);
     }
 
     /// <summary>
@@ -262,8 +251,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             NodeType = "PackedNode",
             RuleId = packedNode.RuleID
         };
-        
-        _errors.Add(error);
+                _errors.Add(error);
     }
 
     /// <summary>
@@ -280,8 +268,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             SourceStart = node.SourceStart,
             SourceLength = node.SourceLength
         };
-        
-        _warnings.Add(warning);
+                _warnings.Add(warning);
     }
 
     /// <summary>
@@ -297,8 +284,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             NodeType = "PackedNode",
             RuleId = packedNode.RuleID
         };
-        
-        _warnings.Add(warning);
+                _warnings.Add(warning);
     }
 
     /// <summary>

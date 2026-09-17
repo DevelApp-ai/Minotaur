@@ -104,7 +104,7 @@ public class JavaLanguagePluginTests
     [Fact]
     public void GetErrorConfidence_ShouldReturnValue()
     {
-        var confidence = _plugin.GetErrorConfidence(Analysis.Symbolic.SymbolicErrorType.NullDereference);
+        var confidence = _plugin.GetErrorConfidence(Analysis.Symbolic.SymbolicErrorType.NullPointerAccess);
         
         Assert.True(confidence >= 0.0 && confidence <= 1.0);
     }
@@ -112,11 +112,11 @@ public class JavaLanguagePluginTests
     [Fact]
     public void GenerateTestCases_ShouldReturnTestCases()
     {
-        var error = new Analysis.Symbolic.SymbolicError
-        {
-            ErrorType = Analysis.Symbolic.SymbolicErrorType.NullDereference,
-            Message = "Test error"
-        };
+        var error = new Analysis.Symbolic.SymbolicError(
+            Analysis.Symbolic.SymbolicErrorType.NullPointerAccess,
+            new Analysis.Symbolic.SourceLocation(1, 1),
+            "Test error",
+            0.5);
         
         var testCases = _plugin.GenerateTestCases(error, "test code");
         

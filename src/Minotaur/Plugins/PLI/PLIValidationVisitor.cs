@@ -28,8 +28,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
     private readonly System.Collections.Generic.List<UnparseValidationError> _warnings = new();
     private int _currentDepth = 0;
     private int _maxDepth = 100;
-    
-    private bool _hasProgramDeclaration = false;
+        private bool _hasProgramDeclaration = false;
     private bool _inProcedure = false;
 
     /// <summary>
@@ -70,8 +69,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
         {
             AddError(null, "PV001", "Missing PROC declaration (main procedure)", ValidationSeverity.Error);
         }
-        
-        return new UnparseValidationResult
+                return new UnparseValidationResult
         {
             IsValid = _errors.Count == 0,
             Errors = _errors.ToList(),
@@ -94,8 +92,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
         }
 
         _currentDepth++;
-        
-        try
+                try
         {
             // CognitiveGraphNode is a class-based wrapper. The zero-copy
             // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be
@@ -123,20 +120,17 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
     private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
-        
-        if (packedNodes.Count == 0)
+                if (packedNodes.Count == 0)
         {
             ValidateLeafNode(node);
             return;
         }
-        
-        // Check for ambiguity
+                // Check for ambiguity
         if (packedNodes.Count > 1)
         {
             ValidateAmbiguity(node, packedNodes);
         }
-        
-        // Visit each PackedNode
+                // Visit each PackedNode
         foreach (var packedNode in packedNodes)
         {
             VisitPackedNode(packedNode);
@@ -150,14 +144,12 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
     {
         var childNodes = packedNode.GetChildNodes();
         var nodeType = GetNodeType(packedNode);
-        
-        // Track program declaration
+                // Track program declaration
         if (nodeType == "program_declaration")
         {
             _hasProgramDeclaration = true;
         }
-        
-        // Track procedure context
+                // Track procedure context
         if (nodeType == "procedure_declaration")
         {
             _inProcedure = true;
@@ -166,11 +158,9 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
         {
             _inProcedure = false;
         }
-        
-        // Validate the packed node
+                // Validate the packed node
         ValidatePackedNode(packedNode);
-        
-        // Visit children
+                // Visit children
         foreach (var child in childNodes)
         {
             Visit(child);
@@ -195,8 +185,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
         {
             AddWarning(node, "PV003", "Empty node content", ValidationSeverity.Warning);
         }
-        
-        if (node.NodeType == 0)
+                if (node.NodeType == 0)
         {
             AddError(node, "PV004", "Invalid node type (0)", ValidationSeverity.Error);
         }
@@ -223,8 +212,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
         {
             AddError(packedNode, "PV006", "Invalid RuleId (0)", ValidationSeverity.Error);
         }
-        
-        var childNodes = packedNode.GetChildNodes();
+                var childNodes = packedNode.GetChildNodes();
         if (childNodes.Count == 0)
         {
             AddWarning(packedNode, "PV007", "PackedNode with no children", ValidationSeverity.Info);
@@ -259,8 +247,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             SourceStart = node.SourceStart,
             SourceLength = node?.SourceLength ?? 0
         };
-        
-        _errors.Add(error);
+                _errors.Add(error);
     }
 
     /// <summary>
@@ -276,8 +263,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             NodeType = "PackedNode",
             RuleId = packedNode.RuleID
         };
-        
-        _errors.Add(error);
+                _errors.Add(error);
     }
 
     /// <summary>
@@ -294,8 +280,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             SourceStart = node.SourceStart,
             SourceLength = node?.SourceLength ?? 0
         };
-        
-        _warnings.Add(warning);
+                _warnings.Add(warning);
     }
 
     /// <summary>
@@ -311,8 +296,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             NodeType = "PackedNode",
             RuleId = packedNode.RuleID
         };
-        
-        _warnings.Add(warning);
+                _warnings.Add(warning);
     }
 
     /// <summary>
@@ -369,8 +353,7 @@ public class UnparseValidationResult
     public bool IsValid { get; set; } = true;
     public System.Collections.Generic.List<UnparseValidationError> Errors { get; set; } = new();
     public System.Collections.Generic.List<UnparseValidationError> Warnings { get; set; } = new();
-    
-    public System.Collections.Generic.IEnumerable<UnparseValidationError> AllMessages
+        public System.Collections.Generic.IEnumerable<UnparseValidationError> AllMessages
     {
         get
         {
@@ -394,8 +377,7 @@ public class UnparseValidationError
     public uint SourceStart { get; set; }
     public uint SourceLength { get; set; }
     public uint RuleId { get; set; }
-    
-    public override string ToString()
+        public override string ToString()
     {
         return $"[{Severity}] {Code}: {Message} (Node: {NodeType}, Position: {SourceStart}-{SourceStart + SourceLength})";
     }
