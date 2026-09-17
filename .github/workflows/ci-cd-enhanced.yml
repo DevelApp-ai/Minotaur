@@ -223,7 +223,10 @@ jobs:
     
     - name: Run static analysis
       run: |
+        # --no-restore: use the retried restore above; an implicit restore here can hit
+        # transient GitHub Packages issues whose NU warnings become errors under TreatWarningsAsErrors
         dotnet build ${{ env.SOLUTION_PATH }} \
+          --no-restore \
           --configuration Release \
           --verbosity normal \
           -p:TreatWarningsAsErrors=true \
