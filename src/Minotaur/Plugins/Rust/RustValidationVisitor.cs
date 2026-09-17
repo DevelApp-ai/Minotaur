@@ -89,7 +89,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
 
         if (_currentDepth > _maxDepth)
         {
-            AddError(node, "RV002", "Maximum nesting depth exceeded", ValidationSeverity.Error);
+            AddError("RV002", "Maximum nesting depth exceeded", ValidationSeverity.Error);
             return;
         }
 
@@ -97,14 +97,11 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         
         try
         {
-            if (node is CognitiveGraph.SymbolNode symbolNode)
-            {
-                VisitSymbolNode(symbolNode);
-            }
-            else
-            {
-                base.Visit(node);
-            }
+            // CognitiveGraphNode is a class-based wrapper. The zero-copy
+            // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be
+            // reached from a class reference, so the class-based graph is traversed here.
+            // The zero-copy path is entered through the Visit(SymbolNode) overload below.
+            base.Visit(node);
         }
         finally
         {
@@ -113,9 +110,17 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     }
 
     /// <summary>
+    /// Visits a zero-copy SymbolNode (entered while walking packed-node children).
+    /// </summary>
+    public void Visit(CognitiveGraph.Accessors.SymbolNode node)
+    {
+        VisitSymbolNode(node);
+    }
+
+    /// <summary>
     /// Visits a SymbolNode.
     /// </summary>
-    private void VisitSymbolNode(CognitiveGraph.SymbolNode node)
+    private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
         
@@ -141,7 +146,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Visits a PackedNode.
     /// </summary>
-    private void VisitPackedNode(CognitiveGraph.PackedNode packedNode)
+    private void VisitPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var childNodes = packedNode.GetChildNodes();
         var nodeType = GetNodeType(packedNode);
@@ -175,7 +180,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Gets the node type from a PackedNode.
     /// </summary>
-    private string GetNodeType(CognitiveGraph.PackedNode packedNode)
+    private string GetNodeType(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         return "unknown";
     }
@@ -183,7 +188,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Validates a leaf node.
     /// </summary>
-    private void ValidateLeafNode(CognitiveGraph.SymbolNode node)
+    private void ValidateLeafNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var text = node.GetSourceText();
         if (string.IsNullOrEmpty(text.ToString()))
@@ -200,7 +205,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Validates ambiguity.
     /// </summary>
-    private void ValidateAmbiguity(CognitiveGraph.SymbolNode node, CognitiveGraph.PackedNodeOffsetCollection packedNodes)
+    private void ValidateAmbiguity(CognitiveGraph.Accessors.SymbolNode node, CognitiveGraph.Accessors.PackedNodeOffsetCollection packedNodes)
     {
         // Rust can have some ambiguity in parsing
         if (packedNodes.Count > 3)
@@ -212,7 +217,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Validates a PackedNode.
     /// </summary>
-    private void ValidatePackedNode(CognitiveGraph.PackedNode packedNode)
+    private void ValidatePackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         if (packedNode.RuleID == 0)
         {
@@ -229,15 +234,29 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds an error to the validation result.
     /// </summary>
-    private void AddError(CognitiveGraph.SymbolNode node, string code, string message, ValidationSeverity severity)
+    /// <summary>
+    /// Adds an error that is not tied to a zero-copy node.
+    /// </summary>
+    private void AddError(string code, string message, ValidationSeverity severity)
+    {
+        _errors.Add(new UnparseValidationError
+        {
+            Code = code,
+            Message = message,
+            Severity = severity,
+            NodeType = "unknown"
+        });
+    }
+
+    private void AddError(CognitiveGraph.Accessors.SymbolNode node, string code, string message, ValidationSeverity severity)
     {
         var error = new UnparseValidationError
         {
             Code = code,
             Message = message,
             Severity = severity,
-            NodeType = node?.NodeType.ToString() ?? "unknown",
-            SourceStart = node?.SourceStart ?? 0,
+            NodeType = node.NodeType.ToString(),
+            SourceStart = node.SourceStart,
             SourceLength = node?.SourceLength ?? 0
         };
         
@@ -247,7 +266,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds an error to the validation result.
     /// </summary>
-    private void AddError(CognitiveGraph.PackedNode packedNode, string code, string message, ValidationSeverity severity)
+    private void AddError(CognitiveGraph.Accessors.PackedNode packedNode, string code, string message, ValidationSeverity severity)
     {
         var error = new UnparseValidationError
         {
@@ -264,15 +283,15 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds a warning to the validation result.
     /// </summary>
-    private void AddWarning(CognitiveGraph.SymbolNode node, string code, string message, ValidationSeverity severity)
+    private void AddWarning(CognitiveGraph.Accessors.SymbolNode node, string code, string message, ValidationSeverity severity)
     {
         var warning = new UnparseValidationError
         {
             Code = code,
             Message = message,
             Severity = severity,
-            NodeType = node?.NodeType.ToString() ?? "unknown",
-            SourceStart = node?.SourceStart ?? 0,
+            NodeType = node.NodeType.ToString(),
+            SourceStart = node.SourceStart,
             SourceLength = node?.SourceLength ?? 0
         };
         
@@ -282,7 +301,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds a warning to the validation result.
     /// </summary>
-    private void AddWarning(CognitiveGraph.PackedNode packedNode, string code, string message, ValidationSeverity severity)
+    private void AddWarning(CognitiveGraph.Accessors.PackedNode packedNode, string code, string message, ValidationSeverity severity)
     {
         var warning = new UnparseValidationError
         {

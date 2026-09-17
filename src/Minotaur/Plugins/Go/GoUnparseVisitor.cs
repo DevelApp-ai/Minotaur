@@ -69,20 +69,25 @@ public class GoUnparseVisitor : UnparseVisitorBase
         if (node == null)
             return;
 
-        if (node is CognitiveGraph.SymbolNode symbolNode)
-        {
-            VisitSymbolNode(symbolNode);
-        }
-        else
-        {
-            base.Visit(node);
-        }
+        // CognitiveGraphNode is a class-based wrapper. The zero-copy
+        // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be reached
+        // from a class reference, so the class-based graph is traversed here. The
+        // zero-copy path is entered through the Visit(SymbolNode) overload below.
+        base.Visit(node);
+    }
+
+    /// <summary>
+    /// Visits a zero-copy SymbolNode (entered while walking packed-node children).
+    /// </summary>
+    public override void Visit(CognitiveGraph.Accessors.SymbolNode node)
+    {
+        VisitSymbolNode(node);
     }
 
     /// <summary>
     /// Visits a SymbolNode and handles its PackedNodes.
     /// </summary>
-    private void VisitSymbolNode(CognitiveGraph.SymbolNode node)
+    private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
         
@@ -108,7 +113,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a PackedNode.
     /// </summary>
-    private void VisitPackedNode(CognitiveGraph.PackedNode packedNode)
+    private void VisitPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var ruleId = packedNode.RuleID;
         var childNodes = packedNode.GetChildNodes();
@@ -192,7 +197,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Gets the node type from a PackedNode.
     /// </summary>
-    private string GetNodeType(CognitiveGraph.PackedNode packedNode)
+    private string GetNodeType(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         return "unknown";
     }
@@ -200,7 +205,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Checks if a PackedNode is valid for unparsing.
     /// </summary>
-    private bool IsValidPackedNode(CognitiveGraph.PackedNode packedNode)
+    private bool IsValidPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var childNodes = packedNode.GetChildNodes();
         return childNodes.Count > 0 || packedNode.RuleID > 0;
@@ -209,7 +214,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Writes a node directly.
     /// </summary>
-    private void WriteNode(CognitiveGraph.SymbolNode node)
+    private void WriteNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var text = node.GetSourceText();
         if (!string.IsNullOrEmpty(text))
@@ -281,7 +286,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a package declaration.
     /// </summary>
-    private void VisitPackageDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitPackageDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("package ");
         
@@ -298,7 +303,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an import declaration.
     /// </summary>
-    private void VisitImportDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitImportDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("import (");
         WriteLine();
@@ -319,7 +324,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a function declaration.
     /// </summary>
-    private void VisitFunctionDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitFunctionDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("func ");
         
@@ -369,7 +374,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a method declaration.
     /// </summary>
-    private void VisitMethodDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitMethodDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("func ");
         
@@ -427,7 +432,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a struct declaration.
     /// </summary>
-    private void VisitStructDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitStructDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("type ");
         
@@ -460,7 +465,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an interface declaration.
     /// </summary>
-    private void VisitInterfaceDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitInterfaceDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("type ");
         
@@ -493,7 +498,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a type alias.
     /// </summary>
-    private void VisitTypeAlias(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitTypeAlias(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("type ");
         
@@ -518,7 +523,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a variable declaration.
     /// </summary>
-    private void VisitVariableDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitVariableDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("var ");
         
@@ -548,7 +553,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a constant declaration.
     /// </summary>
-    private void VisitConstDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitConstDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("const ");
         
@@ -578,7 +583,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an if statement.
     /// </summary>
-    private void VisitIfStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitIfStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("if ");
         
@@ -610,7 +615,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an if-else statement.
     /// </summary>
-    private void VisitIfElseStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitIfElseStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("if ");
         
@@ -657,7 +662,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a switch statement.
     /// </summary>
-    private void VisitSwitchStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitSwitchStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("switch ");
         
@@ -689,7 +694,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a for loop.
     /// </summary>
-    private void VisitForLoop(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitForLoop(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("for ");
         
@@ -737,7 +742,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a range loop.
     /// </summary>
-    private void VisitRangeLoop(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitRangeLoop(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("for ");
         
@@ -777,7 +782,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a go statement (goroutine).
     /// </summary>
-    private void VisitGoStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitGoStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("go ");
         
@@ -793,7 +798,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a channel declaration.
     /// </summary>
-    private void VisitChannelDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitChannelDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         // Visit name
         if (childNodes.Count > 0)
@@ -823,7 +828,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a select statement.
     /// </summary>
-    private void VisitSelectStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitSelectStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("select {");
         
@@ -847,7 +852,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a defer statement.
     /// </summary>
-    private void VisitDeferStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDeferStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("defer ");
         
@@ -863,7 +868,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a return statement.
     /// </summary>
-    private void VisitReturnStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitReturnStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("return ");
         
@@ -879,7 +884,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a comment.
     /// </summary>
-    private void VisitComment(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitComment(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("// ");
         
@@ -894,7 +899,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a doc comment.
     /// </summary>
-    private void VisitDocComment(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDocComment(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("// ");
         
@@ -939,6 +944,11 @@ public abstract class UnparseVisitorBase : IDisposable
     /// Visits the specified node.
     /// </summary>
     public virtual void Visit(CognitiveGraphNode node) { }
+
+    /// <summary>
+    /// Visits the specified zero-copy symbol node.
+    /// </summary>
+    public virtual void Visit(CognitiveGraph.Accessors.SymbolNode node) { }
 
     /// <summary>
     /// Disposes the visitor.
