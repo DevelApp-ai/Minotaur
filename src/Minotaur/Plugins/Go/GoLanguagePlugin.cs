@@ -56,6 +56,7 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Converts a cognitive graph representation back to Go source code.
     /// </summary>
+
     /// <param name="gr
 aph">The cognitive graph
  node to unparse.</param>
@@ -106,7 +107,8 @@ aph">The cognitive graph
         // Go method declaration
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            NodeType = "method_declaration",
+            NodeType = "method_declarat
+ion",
             Generat
 ionTemplate = "func ({rec
 eiver}) {name}({parameters}) {return_type} { {body} }\n",
@@ -158,7 +160,8 @@ eiver}) {name}({parameters}) {return_type} { {body} }\n",
         {
             NodeType = "if_statement",
             GenerationTemplate = "if {condition} { {body} }\n",
-            GenerationHints = new Dictionary<string, object> { ["BracesOnNewli
+            GenerationHints = new Dictionary<string,
+ object> { ["BracesOnNewli
 ne"] = false }
         });
 
@@ -211,7 +214,8 @@ ne"] = false }
             GenerationHints = new Dictionary<string, object> { ["Concurrent"] = true }
         });
 
-        // Go select statement
+        // Go 
+select statement
         ru
 les.GenerationRules.Add(new
  CodeGenerationRule
@@ -265,14 +269,8 @@ les.GenerationRules.Add(new
         return new CodeFormattingOptions
         {
             IndentSize = 1,
-            UseTabs = true,
-            BraceStyle = "Go",
-            IndentBraces = false,
-            IndentCaseLabels = false,
-            NewLineAfterSemicolon = false,
-            SpaceAfterKeywords = true,
-            SpaceBeforeBraces = false,
-            LanguageSpecificOptions = new Dictionary<string, object>
+            LanguageSpecificOptions = new Di
+ctionary<string, object>
    
          {
                 [
@@ -332,7 +330,8 @@ les.GenerationRules.Add(new
 
         var canonicalWarnings = localResult.Warnings.Select(w => new Minotaur.Plugins.UnparseValidationWarning
         {
-            Message = w.Code + ": " + w.Message,
+            Message = w.Code 
++ ": " + w.Message,
             NodeId = w.Code,
             NodeType = w.NodeType
         }).ToList();
@@ -352,6 +351,38 @@ public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnpa
         await Task.CompletedTask;
         var localResult = _validationVisitor.GetValidationResult();
         return MapToCanonicalResult(localResult);
+    }
+
+    /// <summary>
+    /// Performs Go-specific symbolic analysis (minimal Phase 2 implementation).
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return new List<SymbolicError>();
+    }
+
+    /// <summary>
+    /// Gets Go-specific error patterns (minimal Phase 2 implementation).
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return new List<ErrorPattern>();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for a specific error type in Go (minimal Phase 2 implementation).
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return 0.0;
+    }
+
+    /// <summary>
+    /// Generates test cases for a specific Go error (minimal Phase 2 implementation).
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return new List<TestCase>();
     }
 
     /// <summary>
