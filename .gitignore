@@ -137,7 +137,6 @@ ipch/
 *.e2e
 
 # TFS 2012 Local Workspace
-
 $tf/
 
 # Guidance Automation Toolkit
@@ -237,8 +236,7 @@ BundleArtifacts/
 Package.StoreAssociation.xml
 _pkginfo.txt
 *.appx
-*
-.appxbundle
+*.appxbundle
 *.appxupload
 
 # Visual Studio cache files
@@ -338,8 +336,7 @@ paket-files/
 # FAKE - F# Make
 **/.fake/
 
-# CodeRush perso
-nal settings
+# CodeRush personal settings
 **/.cr/personal
 
 # Python Tools for Visual Studio (PTVS)
