@@ -1,5 +1,12 @@
 name: Security and Dependency Scan
 
+permissions:
+  contents: read
+  packages: read
+
+env:
+  NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 on:
   push:
     branches: [ main, develop, 'copilot/**' ]
@@ -62,6 +69,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      packages: read
       security-events: write
     
     strategy:
@@ -105,6 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: read
     
     steps:
     - name: Checkout code

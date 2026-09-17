@@ -419,3 +419,9 @@ FodyWeavers.xsd
 
 # Legacy code directory (to be removed in future)
 old_code/
+
+# Build output (should not be committed)
+build_output.txt
+
+# Backup files
+*.backup

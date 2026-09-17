@@ -97,7 +97,7 @@ var code = await unparser.UnparseAsync(root);
 ## Implementation Status
 
 ### ✅ Completed Features
-- **StepParser Integration**: Full parsing via DevelApp.StepParser 1.9.0
+- **StepParser Integration**: Full parsing via DevelApp.StepParser 1.12.0
 - **Cognitive graph infrastructure**: Node types, visitor pattern, metadata
 - **Direct graph editing**: Add, remove, and modify nodes
 - **Unparsing framework**: Strategy-based code generation
@@ -129,9 +129,9 @@ dotnet test Minotaur.Tests
 ## Dependencies
 
 - **.NET 8.0**: Target framework
-- **DevelApp.CognitiveGraph 1.0.2**: Cognitive graph data structures
-- **DevelApp.StepLexer 1.9.0**: Tokenization
-- **DevelApp.StepParser 1.9.0**: Parsing
+- **DevelApp.CognitiveGraph 1.1.12**: Cognitive graph data structures
+- **DevelApp.StepLexer 1.12.0**: Tokenization
+- **DevelApp.StepParser 1.12.0**: Parsing
 - **DevelApp.RuntimePluggableClassFactory 2.0.1**: Plugin system
 
 ## Notes

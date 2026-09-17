@@ -1,7 +1,7 @@
 # Minotaur - Advanced Compiler-Compiler Platform
 
 [![CI/CD Pipeline](https://github.com/DevelApp-ai/Minotaur/actions/workflows/ci-cd-enhanced.yml/badge.svg)](https://github.com/DevelApp-ai/Minotaur/actions/workflows/ci-cd-enhanced.yml)
-[![NuGet Version](https://img.shields.io/nuget/v/Minotaur)](https://www.nuget.org/packages/Minotaur)
+[![NuGet Version](https://img.shields.io/nuget/v/DevelApp.Minotaur)](https://www.nuget.org/packages/DevelApp.Minotaur)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ![Minotaur Logo](assets/logos/Minotaur_logo.png)
@@ -185,7 +185,7 @@ See [Electron Desktop App documentation](./src/Minotaur.UI.Electron/README.md) f
 ## 🔗 Dependencies
 
 ### Core Dependencies
-- [DevelApp.CognitiveGraph 1.1.0](https://www.nuget.org/packages/DevelApp.CognitiveGraph/) - Includes V2 cognitive graph support for massive project analysis with simplified GraphQL and fluid interface
+- [DevelApp.CognitiveGraph 1.1.12](https://www.nuget.org/packages/DevelApp.CognitiveGraph/) - Includes V2 cognitive graph support for massive project analysis with simplified GraphQL and fluid interface
 - [DevelApp.StepLexer 1.12.0](https://www.nuget.org/packages/DevelApp.StepLexer/) - Advanced lexical analysis with improved performance
 - [DevelApp.StepParser 1.12.0](https://www.nuget.org/packages/DevelApp.StepParser/) - GLR parser with V2 cognitive graph integration
 - [DevelApp.RuntimePluggableClassFactory 2.0.1](https://www.nuget.org/packages/DevelApp.RuntimePluggableClassFactory/) - Dynamic plugin system

@@ -2,12 +2,16 @@ name: Code Quality Checks
 
 permissions:
   contents: read
+  packages: read
 
 on:
   push:
     branches: [ main, develop, 'copilot/**' ]
   pull_request:
     branches: [ main, develop ]
+
+env:
+  NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   code-metrics:
