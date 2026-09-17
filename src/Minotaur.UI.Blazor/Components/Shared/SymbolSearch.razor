@@ -71,7 +71,7 @@
     <div class="search-filters">
         <div class="filter-group">
             <label class="filter-label">Language:</label>
-            <select class="filter-select" @bind="LanguageFilter" @onchange="PerformSearch">
+            <select class="filter-select" @bind="LanguageFilter" @bind:after="PerformSearch">
                 <option value="">All Languages</option>
                 @foreach (var lang in SupportedLanguages)
                 {
@@ -82,7 +82,7 @@
         
         <div class="filter-group">
             <label class="filter-label">Type:</label>
-            <select class="filter-select" @bind="TypeFilter" @onchange="PerformSearch">
+            <select class="filter-select" @bind="TypeFilter" @bind:after="PerformSearch">
                 <option value="">All Types</option>
                 @foreach (var type in Enum.GetValues(typeof(SymbolType)).Cast<SymbolType>())
                 {
@@ -93,7 +93,7 @@
         
         <div class="filter-group">
             <label class="filter-check">
-                <input type="checkbox" @bind="IncludeReferences" @onchange="PerformSearch" />
+                <input type="checkbox" @bind="IncludeReferences" @bind:after="PerformSearch" />
                 <span>Include References</span>
             </label>
         </div>

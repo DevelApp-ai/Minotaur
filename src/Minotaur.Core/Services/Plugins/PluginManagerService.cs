@@ -451,7 +451,7 @@ public class PluginManagerService : IPluginManagerService
     /// <summary>
     /// Gets the count of available plugins.
     /// </summary>
-    public async Task<int> AvailablePluginCountAsync => (await DiscoverAvailablePluginsAsync()).Count;
+    public async Task<int> AvailablePluginCountAsync() => (await DiscoverAvailablePluginsAsync()).Count;
 }
 
 /// <summary>

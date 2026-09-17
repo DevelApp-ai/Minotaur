@@ -4,7 +4,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur", "Minotaur\Minotaur.csproj", "{C1FB5F7A-6F73-4D8E-9B85-2A1E8B4F7557}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Tests", "Minotaur.Tests\Minotaur.Tests.csproj", "{EC2949FF-CFF7-430F-B27E-427A08EF94D2}"
+PProject("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Core", "Minotaur.Core\Minotaur.Core.csproj", "{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}"
+EndProject
+roject("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Tests", "Minotaur.Tests\Minotaur.Tests.csproj", "{EC2949FF-CFF7-430F-B27E-427A08EF94D2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Demo", "Minotaur.Demo\Minotaur.Demo.csproj", "{4863017D-411F-4F41-8BAC-03EA17DF696A}"
 EndProject
@@ -29,5 +31,9 @@ Global
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
