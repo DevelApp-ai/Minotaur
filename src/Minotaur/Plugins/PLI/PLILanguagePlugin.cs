@@ -53,8 +53,7 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string[] SupportedExtensions => new[] { ".pli", ".PLI", ".pl1", ".PL1" };
 
     /// <summary>
-    /// Converts a cognitive graph re
-presentation back to PL/
+    /// Converts a cognitive graph representation back to PL/
 I source code.
     /// </summary>
     /// <param name="graph">The cognitive graph node to unparse.</param>
@@ -103,8 +102,7 @@ I source code.
         });
 
         // PL/I array declaration
-        rules.GenerationRules.Add(new Cod
-eGenerationRule
+        rules.GenerationRules.Add(new CodeGenerationRule
         {
 
             NodeType = "array_declaration",
@@ -156,8 +154,7 @@ eGenerationRule
         rules.GenerationRules.Add(new CodeGenerationRule
         {
 
-            NodeType = "d
-o_while",
+            NodeType = "do_while",
             GenerationTemplate = "DO WHILE({condition});\n{statements}\nEND;\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
@@ -205,10 +202,8 @@ o_while",
         // PL/I go to statement
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            Nod
-eType = "goto_statement",
- 
-           GenerationTemplate = "GO TO {label};\n",
+            NodeType = "goto_statement",
+            GenerationTemplate = "GO TO {label};\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
 
@@ -257,9 +252,7 @@ eType = "goto_statement",
         {
             NodeType = "put_statement",
             GenerationTemplate = "PUT {destination}({data});\n",
-            GenerationHints = new Dictionary<st
-ring, object> { ["Case"] = "
-Mixed", ["Indent"] = 4 }
+            GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
 
         // PL/I get statement (input)
@@ -303,7 +296,6 @@ Mixed", ["Indent"] = 4 }
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid PL/I code.
     /// </summary>
-    
     /// <summary>
     /// Maps PLI-specific validation result to canonical plugin result.
     /// </summary>
@@ -311,8 +303,7 @@ Mixed", ["Indent"] = 4 }
     {
         var canonicalErrors = localResult.Errors.Select(e => new Minotaur.Plugins.UnparseValidationError
         {
-            Message = e.Code + ": " + 
-e.Message,
+            Message = e.Code + ": " + e.Message,
             NodeId = e.Code,
             NodeType = e.NodeType,
             Severity = e.Severity.ToString()
@@ -333,7 +324,7 @@ e.Message,
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
@@ -377,8 +368,7 @@ public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnpa
     /// <summary>
     /// Gets the symbolic analysis visitor for PL/I.
     /// </summary>
-    public ISymbolicAnalysisVisitor Ge
-tSymbolicAnalysisVisitor()
+    public ISymbolicAnalysisVisitor GetSymbolicAnalysisVisitor()
     {
         return _validationVisitor;
     }
