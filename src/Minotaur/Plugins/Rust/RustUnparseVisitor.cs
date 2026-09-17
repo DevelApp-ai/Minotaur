@@ -230,7 +230,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     private void WriteNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var text = node.GetSourceText();
-        if (!string.IsNullOrEmpty(text))
+        if (!text.IsEmpty)
         {
             Write(text.ToString());
         }

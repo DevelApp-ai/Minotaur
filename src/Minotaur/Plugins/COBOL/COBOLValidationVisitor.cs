@@ -71,11 +71,11 @@ public class COBOLValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnal
         // Check for required divisions
         if (!_hasIdentificationDivision)
         {
-            AddError(null, "CV001", "Missing IDENTIFICATION DIVISION", ValidationSeverity.Error);
+            AddError("CV001", "Missing IDENTIFICATION DIVISION", ValidationSeverity.Error);
         }
                 if (!_hasProcedureDivision)
         {
-            AddError(null, "CV002", "Missing PROCEDURE DIVISION", ValidationSeverity.Error);
+            AddError("CV002", "Missing PROCEDURE DIVISION", ValidationSeverity.Error);
         }
                 return new UnparseValidationResult
         {
@@ -259,7 +259,7 @@ public class COBOLValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnal
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _errors.Add(error);
     }
@@ -292,7 +292,7 @@ public class COBOLValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnal
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _warnings.Add(warning);
     }

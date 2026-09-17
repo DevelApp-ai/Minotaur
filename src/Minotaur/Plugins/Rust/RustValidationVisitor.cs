@@ -67,7 +67,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         // Check for required main function
         if (!_hasMainFunction)
         {
-            AddError(null, "RV001", "Missing main function (fn main)", ValidationSeverity.Warning);
+            AddError("RV001", "Missing main function (fn main)", ValidationSeverity.Warning);
         }
                 return new UnparseValidationResult
         {
@@ -245,7 +245,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _errors.Add(error);
     }
@@ -278,7 +278,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _warnings.Add(warning);
     }

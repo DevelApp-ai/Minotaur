@@ -67,7 +67,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
         // Check for required program declaration
         if (!_hasProgramDeclaration)
         {
-            AddError(null, "PV001", "Missing PROC declaration (main procedure)", ValidationSeverity.Error);
+            AddError("PV001", "Missing PROC declaration (main procedure)", ValidationSeverity.Error);
         }
                 return new UnparseValidationResult
         {
@@ -245,7 +245,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _errors.Add(error);
     }
@@ -278,7 +278,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _warnings.Add(warning);
     }

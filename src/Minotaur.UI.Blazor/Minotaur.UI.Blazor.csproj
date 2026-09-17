@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Minotaur\Minotaur.csproj" />
+    <ProjectReference Include="..\Minotaur.Core\Minotaur.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

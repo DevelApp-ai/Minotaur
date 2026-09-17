@@ -258,4 +258,17 @@ namespace Minotaur.Core.Services.Marketplace
                 return new PublishResult
                 {
                     Success = false,
-                    Error = $
+                    Error = $"HTTP error: {ex.StatusCode} - {ex.Message}"
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                return new PublishResult
+                {
+                    Success = false,
+                    Error = "Request timeout"
+                };
+            }
+        }
+    }
+}

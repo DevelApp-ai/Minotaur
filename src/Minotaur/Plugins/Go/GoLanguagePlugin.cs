@@ -15,7 +15,6 @@
 using Minotaur.Core;
 using Minotaur.Analysis.Symbolic;
 using Minotaur.Plugins;
-using Minotaur.Plugins;
 
 namespace Minotaur.Plugins.Go;
 
@@ -274,11 +273,6 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     }
 
     /// <summary>
-    
-/// Validate that a cognitive graph can be unparsed to valid Go code.
-    /// </summary>
-    
-    /// <summary>
     /// Maps Go-specific validation result to canonical plugin result.
     /// </summary>
     private Minotaur.Plugins.UnparseValidationResult MapToCanonicalResult(UnparseValidationResult localResult)
@@ -310,31 +304,6 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Maps Go-specific validation result to canonical plugin result.
     /// </summary>
-    private Minotaur.Plugins.UnparseValidationResult MapToCanonicalResult(UnparseValidationResult localResult)
-    {
-        var canonicalErrors = localResult.Errors.Select(e => new Minotaur.Plugins.UnparseValidationError
-        {
-            Message = e.Code + ": " + e.Message,
-            NodeId = e.Code,
-            NodeType = e.NodeType,
-            Severity = e.Severity.ToString()
-        }).ToList();
-
-        var canonicalWarnings = localResult.Warnings.Select(w => new Minotaur.Plugins.UnparseValidationWarning
-        {
-            Message = w.Code 
-+ ": " + w.Message,
-            NodeId = w.Code,
-            NodeType = w.NodeType
-        }).ToList();
-
-        return new Minotaur.Plugins.UnparseValidationResult
-        {
-            CanUnparse = localResult.IsValid,
-            Errors = canonicalErrors,
-            Warnings = canonicalWarnings
-        };
-    }
 
     public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
