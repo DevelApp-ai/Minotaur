@@ -54,7 +54,8 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 
     /// <summary>
     /// Converts a cognitive graph representation back to Rust source code.
-    /// </summary>
+    /// 
+</summary>
     /// <para
 m name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Rust code.</returns>
@@ -105,7 +106,8 @@ m name="graph">The cognitive graph node to unparse.</param>
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "enum_declaration",
-            GenerationTemplate = "pub enum {
+            Generat
+ionTemplate = "pub enum {
 name} { {variants} }\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Pascal", ["Visibility"] = "pub" }
         });
@@ -153,7 +155,8 @@ name} { {variants} }\n",
         // Rust match expression
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            NodeType = "match_expression",
+            NodeType = "match_expres
+sion",
             Generat
 ionTemplate = "match {expression} { {arms} }\n",
             GenerationHints = new Dictionary<string, object> { ["ExpressionBased"] = true }
@@ -204,7 +207,8 @@ ionTemplate = "match {expression} { {arms} }\n",
         {
             NodeType = "static_declaration",
             GenerationTemplate = "static {name}: {type} = {expression};\n",
-            GenerationHints = new Dictionary<string, object> { ["Case"]
+            GenerationHints = new Dictionary
+<string, object> { ["Case"]
  = "ScreamingSnake" }
         });
 
@@ -261,7 +265,8 @@ ionTemplate = "match {expression} { {arms} }\n",
         {
             NodeType = "doc_comment",
             GenerationTemplate = "/// {text}\n",
-            GenerationHints = new Dictionary<string, object> { ["DocComment
+            GenerationHints = new Dictionary<st
+ring, object> { ["DocComment
 "] = true }
         });
 
@@ -277,14 +282,7 @@ ionTemplate = "match {expression} { {arms} }\n",
         return new CodeFormattingOptions
         {
             IndentSize = 4,
-            UseTabs = false,
-            BraceStyle = "Rust",
-            IndentBraces = true,
-            IndentCaseLabels = false,
-            NewLineAfterSemicolon = true,
-            SpaceAfterKeywords = true,
-            SpaceBeforeBraces = false,
-            LanguageSpecificOptions = new Dictionary<string, object>
+            CosmeticOptions = new Dictionary<string, object>
             {
                 ["RustEdition"] = "2021",
                 ["Case"] = "Snake",
@@ -326,13 +324,46 @@ ionTemplate = "match {expression} { {arms} }\n",
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+public asy
+nc Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
         await Task.CompletedTask;
         var localResult = _validationVisitor.GetValidationResult();
         return MapToCanonicalResult(localResult);
+    }
+
+    /// <summary>
+    /// Performs Rust-specific symbolic analysis (minimal Phase 2 implementation).
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return new List<SymbolicError>();
+    }
+
+    /// <summary>
+    /// Gets Rust-specific error patterns (minimal Phase 2 implementation).
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return new List<ErrorPattern>();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for a specific error type in Rust (minimal Phase 2 implementation).
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return 0.0;
+    }
+
+    /// <summary>
+    /// Generates test cases for a specific Rust error (minimal Phase 2 implementation).
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return new List<TestCase>();
     }
 
     /// <summary>
