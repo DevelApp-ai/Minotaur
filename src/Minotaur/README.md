@@ -44,6 +44,7 @@ This implementation provides a cognitive graph editing system and unparser for t
 ### Terminal Nodes
 - `TerminalNode`: Basic leaf nodes with text content
 - `LiteralNode`: Specialized 
+
 for literal values (strings, numbers, booleans)
 - `IdentifierNode`: For identifiers with namespace support
 
@@ -111,7 +112,8 @@ var code = await unparser.UnparseAsync(root);
 - **GraphEditor class**: Does not exist - use direct node manipulation
 - **Undo/redo system**: Not implemented
 - **Context-aware editor**: Not implemented
-- **Location tracker**: Not imp
+- **Location tracker**: Not i
+mp
 lemented
 
 ## Testing
@@ -131,7 +133,7 @@ dotnet test Minotaur.Tests
 ## Dependencies
 
 - **.NET 8.0**: Target framework
-- **DevelApp.CognitiveGraph 1.1.0**: Cognitive graph data structures
+- **DevelApp.CognitiveGraph 1.1.12**: Cognitive graph data structures
 - **DevelApp.StepLexer 1.12.0**: Tokenization
 - **DevelApp.StepParser 1.9.0**: Parsing
 - **DevelApp.RuntimePluggableClassFactory 2.0.1**: Plugin system
