@@ -53,7 +53,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 
     /// <summary>
     /// Converts a cognitive graph representation back to Java source code.
-    /// </summary>
+    /// </su
+mmary>
     /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Java code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
@@ -103,7 +104,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "class_declaration",
-            GenerationTemplate = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
+     
+       GenerationTemplate = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
@@ -143,7 +145,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "sealed_class_declaration",
-            GenerationTemplate = "{modifiers} sealed class {name}{type_parameters} {extends} {implements} permits {permitted_types} {{ {members} }}\n",
+            GenerationTemplate = "{modifiers} sealed class {name}{type_parameters} {extends} {implements} permit
+s {permitted_types} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false, ["MinJavaVersion"] = 15 }
         });
 
@@ -187,7 +190,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
-        // Java for statement
+        // Java for stat
+ement
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "for_statement",
@@ -232,7 +236,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "catch_clause",
             GenerationTemplate = " catch ({parameter}) {{ {block} }}",
-            GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
+            GenerationHints = new Dictionary<strin
+g, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
         // Java finally clause
@@ -280,7 +285,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "return_statement",
             GenerationTemplate = "return {expression};\n",
-            GenerationHints = new Dictionary<string, object> { ["Semicolon"] = true }
+            GenerationHints = new 
+Dictionary<string, object> { ["Semicolon"] = true }
         });
 
         // Java throw statement
@@ -328,7 +334,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "module_declaration",
             GenerationTemplate = "{modifiers} module {name} {{ {directives} }}\n",
-            GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false, ["MinJavaVersion"] = 9 }
+            GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false, ["MinJavaVers
+ion"] = 9 }
         });
 
 
@@ -343,6 +350,7 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     {
         return new CodeFormattingOptions
         {
+            IndentStyle = "spaces",
             IndentSize = 4,
             CosmeticOptions = new Dictionary<string, object>
             {
@@ -390,7 +398,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         _validationVisitor.Visit(graph);
         await Task.CompletedTask;
         var localResult = _validationVisitor.GetValidationResult();
-        return MapToCanonicalResult(localResult);
+        return MapToCanonica
+lResult(localResult);
     }
 
     /// <summary>
