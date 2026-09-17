@@ -54,10 +54,8 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 
     /// <summary>
     /// Converts a cognitive graph representation back to Rust source code.
-    /// 
-</summary>
-    /// <para
-m name="graph">The cognitive graph node to unparse.</param>
+    /// </summary>
+    /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Rust code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -106,9 +104,7 @@ m name="graph">The cognitive graph node to unparse.</param>
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "enum_declaration",
-            Generat
-ionTemplate = "pub enum {
-name} { {variants} }\n",
+            GenerationTemplate = "pub enum {name} { {variants} }\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Pascal", ["Visibility"] = "pub" }
         });
 
@@ -155,10 +151,8 @@ name} { {variants} }\n",
         // Rust match expression
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            NodeType = "match_expres
-sion",
-            Generat
-ionTemplate = "match {expression} { {arms} }\n",
+            NodeType = "match_expression",
+            GenerationTemplate = "match {expression} { {arms} }\n",
             GenerationHints = new Dictionary<string, object> { ["ExpressionBased"] = true }
         });
 
@@ -207,9 +201,7 @@ ionTemplate = "match {expression} { {arms} }\n",
         {
             NodeType = "static_declaration",
             GenerationTemplate = "static {name}: {type} = {expression};\n",
-            GenerationHints = new Dictionary
-<string, object> { ["Case"]
- = "ScreamingSnake" }
+            GenerationHints = new Dictionary<string, object> { ["Case"] = "ScreamingSnake" }
         });
 
         // Rust return expression
@@ -265,9 +257,7 @@ ionTemplate = "match {expression} { {arms} }\n",
         {
             NodeType = "doc_comment",
             GenerationTemplate = "/// {text}\n",
-            GenerationHints = new Dictionary<st
-ring, object> { ["DocComment
-"] = true }
+            GenerationHints = new Dictionary<string, object> { ["DocComment"] = true }
         });
 
         await Task.CompletedTask;
@@ -295,7 +285,6 @@ ring, object> { ["DocComment
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid Rust code.
     /// </summary>
-    
     /// <summary>
     /// Maps Rust-specific validation result to canonical plugin result.
     /// </summary>
@@ -324,8 +313,7 @@ ring, object> { ["DocComment
         };
     }
 
-public asy
-nc Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
