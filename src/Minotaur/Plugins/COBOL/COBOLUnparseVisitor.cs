@@ -27,7 +27,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private int _currentColumn = 0;
     private int _currentLine = 1;
     private int _margin = 8; // Standard COBOL margin
-        private bool _inDataDivision = false;
+    private bool _inDataDivision = false;
     private bool _inProcedureDivision = false;
     private bool _atLineStart = true;
 
@@ -50,7 +50,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
         _inDataDivision = false;
         _inProcedureDivision = false;
         _atLineStart = true;
-                // Write COBOL header (optional)
+        // Write COBOL header (optional)
         // Most COBOL programs start with identification division
     }
 
@@ -99,12 +99,12 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
-                if (packedNodes.Count == 0)
+        if (packedNodes.Count == 0)
         {
             WriteNode(node);
             return;
         }
-                // For COBOL, select the first valid PackedNode
+        // For COBOL, select the first valid PackedNode
         foreach (var packedNode in packedNodes)
         {
             if (IsValidPackedNode(packedNode))
@@ -113,7 +113,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
                 return;
             }
         }
-                WriteNode(node);
+        WriteNode(node);
     }
 
     /// <summary>
@@ -123,8 +123,8 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     {
         var ruleId = packedNode.RuleID;
         var childNodes = packedNode.GetChildNodes();
-                var nodeType = GetNodeType(packedNode);
-                switch (nodeType)
+        var nodeType = GetNodeType(packedNode);
+        switch (nodeType)
         {
             case "identification_division":
                 VisitIdentificationDivision(packedNode, childNodes);
@@ -232,13 +232,13 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
 
         // Handle line breaks
         var lines = text.Split('\n');
-                for (int i = 0; i < lines.Length; i++)
+        for (int i = 0; i < lines.Length; i++)
         {
             if (i > 0)
             {
                 NewLine();
             }
-                        WriteLineContent(lines[i]);
+            WriteLineContent(lines[i]);
         }
     }
 
@@ -304,9 +304,9 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     {
         _inDataDivision = false;
         _inProcedureDivision = false;
-                Write("       IDENTIFICATION DIVISION.");
+        Write("       IDENTIFICATION DIVISION.");
         NewLine();
-                // Visit children (should include program-id, etc.)
+        // Visit children (should include program-id, etc.)
         foreach (var child in childNodes)
         {
             Visit(child);
@@ -320,13 +320,13 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     {
         _inDataDivision = true;
         _inProcedureDivision = false;
-                Write("       DATA DIVISION.");
+        Write("       DATA DIVISION.");
         NewLine();
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
-                _inDataDivision = false;
+        _inDataDivision = false;
     }
 
     /// <summary>
@@ -336,7 +336,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     {
         Write("       ENVIRONMENT DIVISION.");
         NewLine();
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
@@ -349,13 +349,13 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     {
         _inDataDivision = false;
         _inProcedureDivision = true;
-                Write("       PROCEDURE DIVISION.");
+        Write("       PROCEDURE DIVISION.");
         NewLine();
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
-                _inProcedureDivision = false;
+        _inProcedureDivision = false;
     }
 
     /// <summary>
@@ -364,11 +364,11 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitProgramId(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       PROGRAM-ID. ");
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
-                Write(".");
+        Write(".");
         NewLine();
     }
 
@@ -379,7 +379,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     {
         Write("       WORKING-STORAGE SECTION.");
         NewLine();
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
@@ -392,7 +392,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     {
         Write("       FILE SECTION.");
         NewLine();
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
@@ -410,7 +410,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
             var name = nameNode.GetSourceText().ToString();
             Write($"{name}.");
             NewLine();
-                        // Visit remaining children (statements)
+            // Visit remaining children (statements)
             for (int i = 1; i < childNodes.Count; i++)
             {
                 Visit(childNodes[i]);
@@ -429,13 +429,13 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
             var levelNode = childNodes[0];
             var level = levelNode.GetSourceText().ToString();
             Write($"       {level} ");
-                        // Visit remaining children (name, picture, value, etc.)
+            // Visit remaining children (name, picture, value, etc.)
             for (int i = 1; i < childNodes.Count; i++)
             {
                 Visit(childNodes[i]);
                 Write(" ");
             }
-                        Write(".");
+            Write(".");
             NewLine();
         }
     }
@@ -446,7 +446,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitPictureClause(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("PIC ");
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
@@ -458,7 +458,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitValueClause(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("VALUE ");
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
@@ -470,18 +470,18 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitMoveStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       MOVE ");
-                // First child is source
+        // First child is source
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-                Write(" TO ");
-                // Second child is destination
+        Write(" TO ");
+        // Second child is destination
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-                Write(".");
+        Write(".");
         NewLine();
     }
 
@@ -491,11 +491,11 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitDisplayStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       DISPLAY ");
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
-                Write(".");
+        Write(".");
         NewLine();
     }
 
@@ -505,11 +505,11 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitAcceptStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       ACCEPT ");
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
-                Write(".");
+        Write(".");
         NewLine();
     }
 
@@ -519,13 +519,13 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitIfStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       IF ");
-                // Visit condition
+        // Visit condition
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-                NewLine();
-                // Visit then statements
+        NewLine();
+        // Visit then statements
         if (childNodes.Count > 1)
         {
             // Manual loop: the zero-copy child collection is a ref struct and cannot
@@ -535,7 +535,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
                 Visit(childNodes[i]);
             }
         }
-                // Check for else
+        // Check for else
         var elseIndex = -1;
         for (int i = 0; i < childNodes.Count; i++)
         {
@@ -549,13 +549,13 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
         {
             Write("       ELSE");
             NewLine();
-                        // Visit else statements
+            // Visit else statements
             for (int i = elseIndex; i < childNodes.Count; i++)
             {
                 Visit(childNodes[i]);
             }
         }
-                Write("       END-IF.");
+        Write("       END-IF.");
         NewLine();
     }
 
@@ -565,11 +565,11 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitPerformStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       PERFORM ");
-                foreach (var child in childNodes)
+        foreach (var child in childNodes)
         {
             Visit(child);
         }
-                Write(".");
+        Write(".");
         NewLine();
     }
 
@@ -579,16 +579,16 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     private void VisitCallStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       CALL ");
-                // Visit program name
+        // Visit program name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-                // Check for USING clause
+        // Check for USING clause
         if (childNodes.Count > 1)
         {
             Write(" USING ");
-                        // Visit parameters
+            // Visit parameters
             for (int i = 1; i < childNodes.Count; i++)
             {
                 if (i > 1)
@@ -596,7 +596,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
                 Visit(childNodes[i]);
             }
         }
-                Write(".");
+        Write(".");
         NewLine();
     }
 

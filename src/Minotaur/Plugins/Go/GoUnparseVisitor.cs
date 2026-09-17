@@ -90,13 +90,13 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
-        
+
         if (packedNodes.Count == 0)
         {
             WriteNode(node);
             return;
         }
-        
+
         // For Go, select the first valid PackedNode
         foreach (var packedNode in packedNodes)
         {
@@ -106,7 +106,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
                 return;
             }
         }
-        
+
         WriteNode(node);
     }
 
@@ -118,7 +118,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         var ruleId = packedNode.RuleID;
         var childNodes = packedNode.GetChildNodes();
         var nodeType = GetNodeType(packedNode);
-        
+
         switch (nodeType)
         {
             case "package_declaration":
@@ -238,7 +238,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         }
 
         _builder.Append(text);
-        
+
         // Check for newlines
         if (text.Contains("\n"))
         {
@@ -289,13 +289,13 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitPackageDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("package ");
-        
+
         // Visit name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         WriteLine();
         WriteLine();
     }
@@ -307,7 +307,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     {
         Write("import (");
         WriteLine();
-        
+
         // Visit imports
         foreach (var child in childNodes)
         {
@@ -315,7 +315,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
             Visit(child);
             WriteLine();
         }
-        
+
         Write(")");
         WriteLine();
         WriteLine();
@@ -327,32 +327,32 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitFunctionDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("func ");
-        
+
         // Visit name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write("(");
-        
+
         // Visit parameters
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-        
+
         Write(") ");
-        
+
         // Visit return type
         if (childNodes.Count > 2)
         {
             Visit(childNodes[2]);
             Write(" ");
         }
-        
+
         Write("{");
-        
+
         // Visit body
         if (childNodes.Count > 3)
         {
@@ -365,7 +365,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
         WriteLine();
@@ -377,7 +377,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitMethodDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("func ");
-        
+
         // Visit receiver
         if (childNodes.Count > 0)
         {
@@ -385,32 +385,32 @@ public class GoUnparseVisitor : UnparseVisitorBase
             Visit(childNodes[0]);
             Write(") ");
         }
-        
+
         // Visit name
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-        
+
         Write("(");
-        
+
         // Visit parameters
         if (childNodes.Count > 2)
         {
             Visit(childNodes[2]);
         }
-        
+
         Write(") ");
-        
+
         // Visit return type
         if (childNodes.Count > 3)
         {
             Visit(childNodes[3]);
             Write(" ");
         }
-        
+
         Write("{");
-        
+
         // Visit body
         if (childNodes.Count > 4)
         {
@@ -423,7 +423,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
         WriteLine();
@@ -435,15 +435,15 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitStructDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("type ");
-        
+
         // Visit name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" struct {");
-        
+
         // Visit fields
         if (childNodes.Count > 1)
         {
@@ -456,7 +456,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
         WriteLine();
@@ -468,15 +468,15 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitInterfaceDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("type ");
-        
+
         // Visit name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" interface {");
-        
+
         // Visit methods
         if (childNodes.Count > 1)
         {
@@ -489,7 +489,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
         WriteLine();
@@ -501,21 +501,21 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitTypeAlias(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("type ");
-        
+
         // Visit name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" ");
-        
+
         // Visit type
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-        
+
         WriteLine();
         WriteLine();
     }
@@ -526,27 +526,27 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitVariableDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("var ");
-        
+
         // Visit name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         // Visit type
         if (childNodes.Count > 1)
         {
             Write(" ");
             Visit(childNodes[1]);
         }
-        
+
         // Visit value
         if (childNodes.Count > 2)
         {
             Write(" = ");
             Visit(childNodes[2]);
         }
-        
+
         WriteLine();
     }
 
@@ -556,27 +556,27 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitConstDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("const ");
-        
+
         // Visit name
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         // Visit type
         if (childNodes.Count > 1)
         {
             Write(" ");
             Visit(childNodes[1]);
         }
-        
+
         // Visit value
         if (childNodes.Count > 2)
         {
             Write(" = ");
             Visit(childNodes[2]);
         }
-        
+
         WriteLine();
     }
 
@@ -586,15 +586,15 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitIfStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("if ");
-        
+
         // Visit condition
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" {");
-        
+
         // Visit body
         if (childNodes.Count > 1)
         {
@@ -607,7 +607,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
     }
@@ -618,15 +618,15 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitIfElseStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("if ");
-        
+
         // Visit condition
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" {");
-        
+
         // Visit then body
         if (childNodes.Count > 1)
         {
@@ -639,9 +639,9 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write(" } else {");
-        
+
         // Visit else body
         if (childNodes.Count > 2)
         {
@@ -654,7 +654,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
     }
@@ -665,15 +665,15 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitSwitchStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("switch ");
-        
+
         // Visit expression
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" {");
-        
+
         // Visit cases
         if (childNodes.Count > 1)
         {
@@ -686,7 +686,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
     }
@@ -697,31 +697,31 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitForLoop(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("for ");
-        
+
         // Visit initialization
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write("; ");
-        
+
         // Visit condition
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-        
+
         Write("; ");
-        
+
         // Visit post
         if (childNodes.Count > 2)
         {
             Visit(childNodes[2]);
         }
-        
+
         Write(" {");
-        
+
         // Visit body
         if (childNodes.Count > 3)
         {
@@ -734,7 +734,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
     }
@@ -745,23 +745,23 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitRangeLoop(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("for ");
-        
+
         // Visit index and value
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" := range ");
-        
+
         // Visit collection
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-        
+
         Write(" {");
-        
+
         // Visit body
         if (childNodes.Count > 2)
         {
@@ -774,7 +774,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
     }
@@ -785,13 +785,13 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitGoStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("go ");
-        
+
         // Visit function call
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         WriteLine();
     }
 
@@ -805,22 +805,22 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             Visit(childNodes[0]);
         }
-        
+
         Write(" := make(chan ");
-        
+
         // Visit type
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-        
+
         // Visit buffer
         if (childNodes.Count > 2)
         {
             Write(", ");
             Visit(childNodes[2]);
         }
-        
+
         Write(")");
         WriteLine();
     }
@@ -831,7 +831,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitSelectStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("select {");
-        
+
         // Visit cases
         if (childNodes.Count > 0)
         {
@@ -844,7 +844,7 @@ public class GoUnparseVisitor : UnparseVisitorBase
         {
             WriteLine();
         }
-        
+
         Write("}");
         WriteLine();
     }
@@ -855,13 +855,13 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitDeferStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("defer ");
-        
+
         // Visit function call
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         WriteLine();
     }
 
@@ -871,13 +871,13 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitReturnStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("return ");
-        
+
         // Visit values
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
+
         WriteLine();
     }
 
@@ -887,12 +887,12 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitComment(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("// ");
-        
+
         foreach (var child in childNodes)
         {
             Visit(child);
         }
-        
+
         WriteLine();
     }
 
@@ -902,12 +902,12 @@ public class GoUnparseVisitor : UnparseVisitorBase
     private void VisitDocComment(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("// ");
-        
+
         foreach (var child in childNodes)
         {
             Visit(child);
         }
-        
+
         WriteLine();
     }
 

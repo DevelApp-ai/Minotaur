@@ -103,8 +103,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "class_declaration",
-     
-       GenerationTemplate = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
+
+            GenerationTemplate = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
@@ -281,8 +281,9 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "return_statement",
             GenerationTemplate = "return {expression};\n",
-            GenerationHints = new 
-Dictionary<string, object> { ["Semicolon"] = true }
+            GenerationHints = new
+Dictionary<string, object>
+            { ["Semicolon"] = true }
         });
 
         // Java throw statement

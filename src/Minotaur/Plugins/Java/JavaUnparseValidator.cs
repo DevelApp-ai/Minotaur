@@ -41,7 +41,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
         _braceDepth = 0;
         _parenDepth = 0;
         _bracketDepth = 0;
-        
+
         if (graph == null)
         {
             _errors.Add(new Minotaur.Plugins.UnparseValidationError
@@ -53,9 +53,9 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
             });
             return _errors;
         }
-        
+
         Visit(graph);
-        
+
         if (_braceDepth != 0)
         {
             _errors.Add(new Minotaur.Plugins.UnparseValidationError
@@ -66,7 +66,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
                 Severity = "Error"
             });
         }
-        
+
         if (_parenDepth != 0)
         {
             _errors.Add(new Minotaur.Plugins.UnparseValidationError
@@ -77,7 +77,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
                 Severity = "Error"
             });
         }
-        
+
         if (_bracketDepth != 0)
         {
             _errors.Add(new Minotaur.Plugins.UnparseValidationError
@@ -88,7 +88,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
                 Severity = "Error"
             });
         }
-        
+
         return _errors;
     }
 
@@ -118,7 +118,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
     private void ValidateNonTerminal(NonTerminalNode node)
     {
         var ruleName = node.RuleName.ToLowerInvariant();
-        
+
         switch (ruleName)
         {
             case "class_body":
@@ -138,7 +138,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
                 _braceDepth++;
                 _contextStack.Push(ruleName);
                 break;
-                
+
             case "formal_parameters":
             case "argument_list":
             case "type_parameters":
@@ -147,7 +147,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
                 _parenDepth++;
                 _contextStack.Push(ruleName);
                 break;
-                
+
             case "array_access":
             case "array_creation":
                 _bracketDepth++;
@@ -159,7 +159,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
     private void ValidateNonTerminalAfter(NonTerminalNode node)
     {
         var ruleName = node.RuleName.ToLowerInvariant();
-        
+
         switch (ruleName)
         {
             case "class_body":
@@ -182,7 +182,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
                     _contextStack.Pop();
                 }
                 break;
-                
+
             case "formal_parameters":
             case "argument_list":
             case "type_parameters":
@@ -194,7 +194,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
                     _contextStack.Pop();
                 }
                 break;
-                
+
             case "array_access":
             case "array_creation":
                 _bracketDepth--;
@@ -209,7 +209,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
     private void ValidateTerminal(TerminalNode node)
     {
         var text = node.Text;
-        
+
         foreach (var c in text)
         {
             switch (c)

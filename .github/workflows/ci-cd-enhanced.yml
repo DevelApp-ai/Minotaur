@@ -213,13 +213,9 @@ jobs:
       run: dotnet restore ${{ env.SOLUTION_PATH }}
     
     - name: Check code formatting
-      # TEMP (#72): non-blocking so the release pipeline can publish; remove continue-on-error to re-enable strict formatting
-      continue-on-error: true
       run: dotnet format ${{ env.SOLUTION_PATH }} --verify-no-changes --verbosity diagnostic --exclude examples/
     
     - name: Run static analysis
-      # TEMP (#72): non-blocking (warnings-as-errors debt); remove continue-on-error to re-enable
-      continue-on-error: true
       run: |
         dotnet build ${{ env.SOLUTION_PATH }} \
           --configuration Release \
