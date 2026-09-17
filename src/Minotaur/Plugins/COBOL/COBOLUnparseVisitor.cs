@@ -80,20 +80,25 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
         if (node == null)
             return;
 
-        if (node is CognitiveGraph.SymbolNode symbolNode)
-        {
-            VisitSymbolNode(symbolNode);
-        }
-        else
-        {
-            base.Visit(node);
-        }
+        // CognitiveGraphNode is a class-based wrapper. The zero-copy
+        // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be reached
+        // from a class reference, so the class-based graph is traversed here. The
+        // zero-copy path is entered through the Visit(SymbolNode) overload below.
+        base.Visit(node);
+    }
+
+    /// <summary>
+    /// Visits a zero-copy SymbolNode (entered while walking packed-node children).
+    /// </summary>
+    public override void Visit(CognitiveGraph.Accessors.SymbolNode node)
+    {
+        VisitSymbolNode(node);
     }
 
     /// <summary>
     /// Visits a SymbolNode and handles its PackedNodes.
     /// </summary>
-    private void VisitSymbolNode(CognitiveGraph.SymbolNode node)
+    private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
         
@@ -119,7 +124,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a PackedNode.
     /// </summary>
-    private void VisitPackedNode(CognitiveGraph.PackedNode packedNode)
+    private void VisitPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var ruleId = packedNode.RuleID;
         var childNodes = packedNode.GetChildNodes();
@@ -198,7 +203,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Gets the node type from a PackedNode.
     /// </summary>
-    private string GetNodeType(CognitiveGraph.PackedNode packedNode)
+    private string GetNodeType(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         return "unknown";
     }
@@ -206,7 +211,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Checks if a PackedNode is valid for unparsing.
     /// </summary>
-    private bool IsValidPackedNode(CognitiveGraph.PackedNode packedNode)
+    private bool IsValidPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var childNodes = packedNode.GetChildNodes();
         return childNodes.Count > 0 || packedNode.RuleID > 0;
@@ -215,7 +220,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Writes a node directly.
     /// </summary>
-    private void WriteNode(CognitiveGraph.SymbolNode node)
+    private void WriteNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var text = node.GetSourceText();
         if (!string.IsNullOrEmpty(text))
@@ -304,7 +309,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits the identification division.
     /// </summary>
-    private void VisitIdentificationDivision(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitIdentificationDivision(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         _inDataDivision = false;
         _inProcedureDivision = false;
@@ -322,7 +327,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits the data division.
     /// </summary>
-    private void VisitDataDivision(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDataDivision(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         _inDataDivision = true;
         _inProcedureDivision = false;
@@ -341,7 +346,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits the environment division.
     /// </summary>
-    private void VisitEnvironmentDivision(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitEnvironmentDivision(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       ENVIRONMENT DIVISION.");
         NewLine();
@@ -355,7 +360,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits the procedure division.
     /// </summary>
-    private void VisitProcedureDivision(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitProcedureDivision(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         _inDataDivision = false;
         _inProcedureDivision = true;
@@ -374,7 +379,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits the program ID paragraph.
     /// </summary>
-    private void VisitProgramId(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitProgramId(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       PROGRAM-ID. ");
         
@@ -390,7 +395,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits the working storage section.
     /// </summary>
-    private void VisitWorkingStorageSection(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitWorkingStorageSection(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       WORKING-STORAGE SECTION.");
         NewLine();
@@ -404,7 +409,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits the file section.
     /// </summary>
-    private void VisitFileSection(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitFileSection(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       FILE SECTION.");
         NewLine();
@@ -418,7 +423,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a paragraph.
     /// </summary>
-    private void VisitParagraph(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitParagraph(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         // Get paragraph name
         if (childNodes.Count > 0)
@@ -439,7 +444,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a data description entry.
     /// </summary>
-    private void VisitDataDescriptionEntry(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDataDescriptionEntry(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         // Level number should be the first child
         if (childNodes.Count > 0)
@@ -463,7 +468,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a picture clause.
     /// </summary>
-    private void VisitPictureClause(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitPictureClause(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("PIC ");
         
@@ -476,7 +481,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a value clause.
     /// </summary>
-    private void VisitValueClause(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitValueClause(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("VALUE ");
         
@@ -489,7 +494,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a move statement.
     /// </summary>
-    private void VisitMoveStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitMoveStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       MOVE ");
         
@@ -514,7 +519,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a display statement.
     /// </summary>
-    private void VisitDisplayStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDisplayStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       DISPLAY ");
         
@@ -530,7 +535,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an accept statement.
     /// </summary>
-    private void VisitAcceptStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitAcceptStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       ACCEPT ");
         
@@ -546,7 +551,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an if statement.
     /// </summary>
-    private void VisitIfStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitIfStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       IF ");
         
@@ -561,14 +566,24 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
         // Visit then statements
         if (childNodes.Count > 1)
         {
-            foreach (var child in childNodes.Skip(1).TakeWhile(c => !IsElseClause(c)))
+            // Manual loop: the zero-copy child collection is a ref struct and cannot
+            // be used with LINQ extension methods.
+            for (int i = 1; i < childNodes.Count && !IsElseClause(childNodes[i]); i++)
             {
-                Visit(child);
+                Visit(childNodes[i]);
             }
         }
         
         // Check for else
-        var elseIndex = childNodes.ToList().FindIndex(c => IsElseClause(c));
+        var elseIndex = -1;
+        for (int i = 0; i < childNodes.Count; i++)
+        {
+            if (IsElseClause(childNodes[i]))
+            {
+                elseIndex = i;
+                break;
+            }
+        }
         if (elseIndex >= 0)
         {
             Write("       ELSE");
@@ -588,7 +603,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a perform statement.
     /// </summary>
-    private void VisitPerformStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitPerformStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       PERFORM ");
         
@@ -604,7 +619,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a call statement.
     /// </summary>
-    private void VisitCallStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitCallStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("       CALL ");
         
@@ -635,7 +650,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a division header.
     /// </summary>
-    private void VisitDivisionHeader(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDivisionHeader(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -647,7 +662,7 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a section header.
     /// </summary>
-    private void VisitSectionHeader(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitSectionHeader(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -659,10 +674,12 @@ public class COBOLUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Checks if a node is an else clause.
     /// </summary>
-    private bool IsElseClause(CognitiveGraph.SymbolNode node)
+    private bool IsElseClause(CognitiveGraph.Accessors.SymbolNode node)
     {
-        // Check if this is an else clause
-        return node.NodeType == (ushort)CognitiveGraph.NodeType.ElseClause;
+        // The CognitiveGraph 1.1.x package does not expose a NodeType enum to identify
+        // else clauses, so clauses cannot currently be distinguished. TODO: detect else
+        // clauses once node-type metadata is available from the graph.
+        return false;
     }
 
     /// <summary>
@@ -698,6 +715,11 @@ public abstract class UnparseVisitorBase : IDisposable
     /// Visits the specified node.
     /// </summary>
     public virtual void Visit(CognitiveGraphNode node) { }
+
+    /// <summary>
+    /// Visits the specified zero-copy symbol node.
+    /// </summary>
+    public virtual void Visit(CognitiveGraph.Accessors.SymbolNode node) { }
 
     /// <summary>
     /// Disposes the visitor.

@@ -86,22 +86,25 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         if (node == null)
             return;
 
-        // Check if this is a SymbolNode with PackedNode alternatives
-        if (node is CognitiveGraph.SymbolNode symbolNode)
-        {
-            VisitSymbolNode(symbolNode);
-        }
-        else
-        {
-            // Fallback to base visit
-            base.Visit(node);
-        }
+        // CognitiveGraphNode is a class-based wrapper. The zero-copy
+        // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be reached
+        // from a class reference, so the class-based graph is traversed here. The
+        // zero-copy path is entered through the Visit(SymbolNode) overload below.
+        base.Visit(node);
+    }
+
+    /// <summary>
+    /// Visits a zero-copy SymbolNode (entered while walking packed-node children).
+    /// </summary>
+    public override void Visit(CognitiveGraph.Accessors.SymbolNode node)
+    {
+        VisitSymbolNode(node);
     }
 
     /// <summary>
     /// Visits a SymbolNode and handles its PackedNodes.
     /// </summary>
-    private void VisitSymbolNode(CognitiveGraph.SymbolNode node)
+    private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
         
@@ -131,7 +134,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a PackedNode.
     /// </summary>
-    private void VisitPackedNode(CognitiveGraph.PackedNode packedNode)
+    private void VisitPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var ruleId = packedNode.RuleID;
         var childNodes = packedNode.GetChildNodes();
@@ -211,7 +214,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Gets the node type from a PackedNode.
     /// </summary>
-    private string GetNodeType(CognitiveGraph.PackedNode packedNode)
+    private string GetNodeType(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         // Try to get the node type from the packed node
         // This would come from the SymbolNode's NodeType
@@ -221,7 +224,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Checks if a PackedNode is valid for unparsing.
     /// </summary>
-    private bool IsValidPackedNode(CognitiveGraph.PackedNode packedNode)
+    private bool IsValidPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         // Basic validation - check if it has children or is a leaf
         var childNodes = packedNode.GetChildNodes();
@@ -231,7 +234,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Writes a node directly.
     /// </summary>
-    private void WriteNode(CognitiveGraph.SymbolNode node)
+    private void WriteNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var text = node.GetSourceText();
         if (!string.IsNullOrEmpty(text))
@@ -314,7 +317,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a compilation unit.
     /// </summary>
-    private void VisitCompilationUnit(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitCompilationUnit(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         // Visit all children of the compilation unit
         foreach (var child in childNodes)
@@ -326,7 +329,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a package declaration.
     /// </summary>
-    private void VisitPackageDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitPackageDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("package ");
         
@@ -344,7 +347,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an import declaration.
     /// </summary>
-    private void VisitImportDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitImportDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("import ");
         
@@ -360,7 +363,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a class declaration.
     /// </summary>
-    private void VisitClassDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitClassDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         // Visit modifiers
         // Visit class keyword
@@ -379,7 +382,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an interface declaration.
     /// </summary>
-    private void VisitInterfaceDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitInterfaceDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -390,7 +393,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an enum declaration.
     /// </summary>
-    private void VisitEnumDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitEnumDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -401,7 +404,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a record declaration (Java 14+).
     /// </summary>
-    private void VisitRecordDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitRecordDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -412,7 +415,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a method declaration.
     /// </summary>
-    private void VisitMethodDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitMethodDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -423,7 +426,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a field declaration.
     /// </summary>
-    private void VisitFieldDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitFieldDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -437,7 +440,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an if statement.
     /// </summary>
-    private void VisitIfStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitIfStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("if ");
         
@@ -451,18 +454,11 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         if (childNodes.Count > 1)
         {
             var thenStatement = childNodes[1];
-            if (thenStatement is CognitiveGraph.SymbolNode symbolNode && 
-                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
-            {
-                Write(" ");
-                Visit(thenStatement);
-            }
-            else
-            {
-                Write(" { ");
-                Visit(thenStatement);
-                Write(" }");
-            }
+            // The CognitiveGraph 1.1.x package does not expose a NodeType enum to
+            // distinguish block statements, so braces are always emitted (the safe form).
+            Write(" { ");
+            Visit(thenStatement);
+            Write(" }");
         }
         
         // Visit else clause if present
@@ -470,17 +466,11 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         {
             Write(" else ");
             var elseStatement = childNodes[2];
-            if (elseStatement is CognitiveGraph.SymbolNode symbolNode && 
-                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
-            {
-                Visit(elseStatement);
-            }
-            else
-            {
-                Write("{ ");
-                Visit(elseStatement);
-                Write(" }");
-            }
+            // The CognitiveGraph 1.1.x package does not expose a NodeType enum to
+            // distinguish block statements, so braces are always emitted (the safe form).
+            Write("{ ");
+            Visit(elseStatement);
+            Write(" }");
         }
         
         WriteLine();
@@ -489,7 +479,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a for statement.
     /// </summary>
-    private void VisitForStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitForStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("for ");
         
@@ -509,7 +499,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a while statement.
     /// </summary>
-    private void VisitWhileStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitWhileStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("while ");
         
@@ -523,18 +513,11 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         if (childNodes.Count > 1)
         {
             var body = childNodes[1];
-            if (body is CognitiveGraph.SymbolNode symbolNode && 
-                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
-            {
-                Write(" ");
-                Visit(body);
-            }
-            else
-            {
-                Write(" { ");
-                Visit(body);
-                Write(" }");
-            }
+            // The CognitiveGraph 1.1.x package does not expose a NodeType enum to
+            // distinguish block statements, so braces are always emitted (the safe form).
+            Write(" { ");
+            Visit(body);
+            Write(" }");
         }
         
         WriteLine();
@@ -543,7 +526,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a do statement.
     /// </summary>
-    private void VisitDoStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDoStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("do ");
         
@@ -551,17 +534,11 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         if (childNodes.Count > 0)
         {
             var body = childNodes[0];
-            if (body is CognitiveGraph.SymbolNode symbolNode && 
-                symbolNode.NodeType == (ushort)CognitiveGraph.NodeType.Block)
-            {
-                Visit(body);
-            }
-            else
-            {
-                Write("{ ");
-                Visit(body);
-                Write(" }");
-            }
+            // The CognitiveGraph 1.1.x package does not expose a NodeType enum to
+            // distinguish block statements, so braces are always emitted (the safe form).
+            Write("{ ");
+            Visit(body);
+            Write(" }");
         }
         
         Write(" while ");
@@ -579,7 +556,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a try statement.
     /// </summary>
-    private void VisitTryStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitTryStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("try ");
         
@@ -601,7 +578,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a switch statement.
     /// </summary>
-    private void VisitSwitchStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitSwitchStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("switch ");
         
@@ -629,7 +606,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a return statement.
     /// </summary>
-    private void VisitReturnStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitReturnStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("return ");
         
@@ -646,7 +623,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a throw statement.
     /// </summary>
-    private void VisitThrowStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitThrowStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("throw ");
         
@@ -663,7 +640,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a block.
     /// </summary>
-    private void VisitBlock(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitBlock(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("{ ");
         WriteLine();
@@ -682,7 +659,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an expression statement.
     /// </summary>
-    private void VisitExpressionStatement(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitExpressionStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         foreach (var child in childNodes)
         {
@@ -731,7 +708,7 @@ public abstract class UnparseVisitorBase : IDisposable
     /// <summary>
     /// Visits the specified symbol node.
     /// </summary>
-    public virtual void Visit(CognitiveGraph.SymbolNode node) { }
+    public virtual void Visit(CognitiveGraph.Accessors.SymbolNode node) { }
 
     /// <summary>
     /// Disposes the visitor.

@@ -79,7 +79,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         // Check depth to prevent infinite recursion
         if (_currentDepth > _maxDepth)
         {
-            AddError(node, "JV001", "Maximum nesting depth exceeded", ValidationSeverity.Error);
+            AddError("JV001", "Maximum nesting depth exceeded", ValidationSeverity.Error);
             return;
         }
 
@@ -87,16 +87,11 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         
         try
         {
-            // Check if this is a SymbolNode
-            if (node is CognitiveGraph.SymbolNode symbolNode)
-            {
-                VisitSymbolNode(symbolNode);
-            }
-            else
-            {
-                // Visit children if it's a container
-                base.Visit(node);
-            }
+            // CognitiveGraphNode is a class-based wrapper. The zero-copy
+            // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be
+            // reached from a class reference, so the class-based graph is traversed here.
+            // The zero-copy path is entered through the Visit(SymbolNode) overload below.
+            base.Visit(node);
         }
         finally
         {
@@ -105,9 +100,17 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     }
 
     /// <summary>
+    /// Visits a zero-copy SymbolNode (entered while walking packed-node children).
+    /// </summary>
+    public void Visit(CognitiveGraph.Accessors.SymbolNode node)
+    {
+        VisitSymbolNode(node);
+    }
+
+    /// <summary>
     /// Visits a SymbolNode.
     /// </summary>
-    private void VisitSymbolNode(CognitiveGraph.SymbolNode node)
+    private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         // Check for PackedNodes (ambiguity)
         var packedNodes = node.GetPackedNodes();
@@ -135,7 +138,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Visits a PackedNode.
     /// </summary>
-    private void VisitPackedNode(CognitiveGraph.PackedNode packedNode)
+    private void VisitPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var childNodes = packedNode.GetChildNodes();
         
@@ -152,7 +155,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Validates a leaf node.
     /// </summary>
-    private void ValidateLeafNode(CognitiveGraph.SymbolNode node)
+    private void ValidateLeafNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         // Check for empty nodes
         var text = node.GetSourceText();
@@ -171,7 +174,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Validates ambiguity (multiple PackedNodes).
     /// </summary>
-    private void ValidateAmbiguity(CognitiveGraph.SymbolNode node, CognitiveGraph.PackedNodeOffsetCollection packedNodes)
+    private void ValidateAmbiguity(CognitiveGraph.Accessors.SymbolNode node, CognitiveGraph.Accessors.PackedNodeOffsetCollection packedNodes)
     {
         // For Java, some ambiguity is acceptable (e.g., expression vs statement)
         // But we should warn about excessive ambiguity
@@ -196,7 +199,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Validates a PackedNode.
     /// </summary>
-    private void ValidatePackedNode(CognitiveGraph.PackedNode packedNode)
+    private void ValidatePackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         // Check for valid RuleId
         if (packedNode.RuleID == 0)
@@ -217,7 +220,21 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds an error to the validation result.
     /// </summary>
-    private void AddError(CognitiveGraph.SymbolNode node, string code, string message, ValidationSeverity severity)
+    /// <summary>
+    /// Adds an error that is not tied to a zero-copy node.
+    /// </summary>
+    private void AddError(string code, string message, ValidationSeverity severity)
+    {
+        _errors.Add(new UnparseValidationError
+        {
+            Code = code,
+            Message = message,
+            Severity = severity,
+            NodeType = "unknown"
+        });
+    }
+
+    private void AddError(CognitiveGraph.Accessors.SymbolNode node, string code, string message, ValidationSeverity severity)
     {
         var error = new UnparseValidationError
         {
@@ -235,7 +252,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds an error to the validation result.
     /// </summary>
-    private void AddError(CognitiveGraph.PackedNode packedNode, string code, string message, ValidationSeverity severity)
+    private void AddError(CognitiveGraph.Accessors.PackedNode packedNode, string code, string message, ValidationSeverity severity)
     {
         var error = new UnparseValidationError
         {
@@ -252,7 +269,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds a warning to the validation result.
     /// </summary>
-    private void AddWarning(CognitiveGraph.SymbolNode node, string code, string message, ValidationSeverity severity)
+    private void AddWarning(CognitiveGraph.Accessors.SymbolNode node, string code, string message, ValidationSeverity severity)
     {
         var warning = new UnparseValidationError
         {
@@ -270,7 +287,7 @@ public class JavaValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
     /// <summary>
     /// Adds a warning to the validation result.
     /// </summary>
-    private void AddWarning(CognitiveGraph.PackedNode packedNode, string code, string message, ValidationSeverity severity)
+    private void AddWarning(CognitiveGraph.Accessors.PackedNode packedNode, string code, string message, ValidationSeverity severity)
     {
         var warning = new UnparseValidationError
         {

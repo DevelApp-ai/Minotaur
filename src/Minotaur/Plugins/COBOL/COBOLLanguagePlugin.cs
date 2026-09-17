@@ -14,6 +14,7 @@
 
 using Minotaur.Core;
 using Minotaur.Analysis.Symbolic;
+using Minotaur.Plugins;
 
 namespace Minotaur.Plugins.COBOL;
 
@@ -283,12 +284,42 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid COBOL code.
     /// </summary>
-    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    
+    /// <summary>
+    /// Maps COBOL-specific validation result to canonical plugin result.
+    /// </summary>
+    private Minotaur.Plugins.UnparseValidationResult MapToCanonicalResult(UnparseValidationResult localResult)
+    {
+        var canonicalErrors = localResult.Errors.Select(e => new Minotaur.Plugins.UnparseValidationError
+        {
+            Message = e.Code + ": " + e.Message,
+            NodeId = e.Code,
+            NodeType = e.NodeType,
+            Severity = e.Severity.ToString()
+        }).ToList();
+
+        var canonicalWarnings = localResult.Warnings.Select(w => new Minotaur.Plugins.UnparseValidationWarning
+        {
+            Message = w.Code + ": " + w.Message,
+            NodeId = w.Code,
+            NodeType = w.NodeType
+        }).ToList();
+
+        return new Minotaur.Plugins.UnparseValidationResult
+        {
+            CanUnparse = localResult.IsValid,
+            Errors = canonicalErrors,
+            Warnings = canonicalWarnings
+        };
+    }
+
+public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
         await Task.CompletedTask;
-        return _validationVisitor.GetValidationResult();
+        var localResult = _validationVisitor.GetValidationResult();
+        return MapToCanonicalResult(localResult);
     }
 
     /// <summary>

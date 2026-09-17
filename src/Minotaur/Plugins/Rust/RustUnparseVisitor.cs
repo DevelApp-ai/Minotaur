@@ -76,20 +76,25 @@ public class RustUnparseVisitor : UnparseVisitorBase
         if (node == null)
             return;
 
-        if (node is CognitiveGraph.SymbolNode symbolNode)
-        {
-            VisitSymbolNode(symbolNode);
-        }
-        else
-        {
-            base.Visit(node);
-        }
+        // CognitiveGraphNode is a class-based wrapper. The zero-copy
+        // CognitiveGraph.Accessors.SymbolNode type is a ref struct and cannot be reached
+        // from a class reference, so the class-based graph is traversed here. The
+        // zero-copy path is entered through the Visit(SymbolNode) overload below.
+        base.Visit(node);
+    }
+
+    /// <summary>
+    /// Visits a zero-copy SymbolNode (entered while walking packed-node children).
+    /// </summary>
+    public override void Visit(CognitiveGraph.Accessors.SymbolNode node)
+    {
+        VisitSymbolNode(node);
     }
 
     /// <summary>
     /// Visits a SymbolNode and handles its PackedNodes.
     /// </summary>
-    private void VisitSymbolNode(CognitiveGraph.SymbolNode node)
+    private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
         
@@ -115,7 +120,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a PackedNode.
     /// </summary>
-    private void VisitPackedNode(CognitiveGraph.PackedNode packedNode)
+    private void VisitPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var ruleId = packedNode.RuleID;
         var childNodes = packedNode.GetChildNodes();
@@ -205,7 +210,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Gets the node type from a PackedNode.
     /// </summary>
-    private string GetNodeType(CognitiveGraph.PackedNode packedNode)
+    private string GetNodeType(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         return "unknown";
     }
@@ -213,7 +218,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Checks if a PackedNode is valid for unparsing.
     /// </summary>
-    private bool IsValidPackedNode(CognitiveGraph.PackedNode packedNode)
+    private bool IsValidPackedNode(CognitiveGraph.Accessors.PackedNode packedNode)
     {
         var childNodes = packedNode.GetChildNodes();
         return childNodes.Count > 0 || packedNode.RuleID > 0;
@@ -222,7 +227,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Writes a node directly.
     /// </summary>
-    private void WriteNode(CognitiveGraph.SymbolNode node)
+    private void WriteNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var text = node.GetSourceText();
         if (!string.IsNullOrEmpty(text))
@@ -305,7 +310,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a module declaration.
     /// </summary>
-    private void VisitModuleDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitModuleDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("mod ");
         
@@ -322,7 +327,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a use declaration.
     /// </summary>
-    private void VisitUseDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitUseDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("use ");
         
@@ -347,7 +352,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a struct declaration.
     /// </summary>
-    private void VisitStructDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitStructDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("pub struct ");
         
@@ -376,7 +381,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an enum declaration.
     /// </summary>
-    private void VisitEnumDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitEnumDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("pub enum ");
         
@@ -405,7 +410,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a trait declaration.
     /// </summary>
-    private void VisitTraitDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitTraitDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("pub trait ");
         
@@ -434,7 +439,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an impl block.
     /// </summary>
-    private void VisitImplBlock(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitImplBlock(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("impl ");
         
@@ -470,7 +475,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a function declaration.
     /// </summary>
-    private void VisitFunctionDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitFunctionDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("pub fn ");
         
@@ -516,7 +521,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a method declaration.
     /// </summary>
-    private void VisitMethodDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitMethodDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("pub fn ");
         
@@ -571,7 +576,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an if expression.
     /// </summary>
-    private void VisitIfExpression(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitIfExpression(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("if ");
         
@@ -610,7 +615,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a match expression.
     /// </summary>
-    private void VisitMatchExpression(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitMatchExpression(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("match ");
         
@@ -638,7 +643,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a loop expression.
     /// </summary>
-    private void VisitLoopExpression(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitLoopExpression(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("loop ");
         Write("{");
@@ -659,7 +664,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a while loop.
     /// </summary>
-    private void VisitWhileLoop(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitWhileLoop(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("while ");
         
@@ -687,7 +692,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a for loop.
     /// </summary>
-    private void VisitForLoop(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitForLoop(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("for ");
         
@@ -723,7 +728,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a let declaration.
     /// </summary>
-    private void VisitLetDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitLetDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("let ");
         
@@ -754,7 +759,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a const declaration.
     /// </summary>
-    private void VisitConstDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitConstDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("const ");
         
@@ -785,7 +790,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a static declaration.
     /// </summary>
-    private void VisitStaticDeclaration(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitStaticDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("static ");
         
@@ -816,7 +821,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a return expression.
     /// </summary>
-    private void VisitReturnExpression(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitReturnExpression(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("return ");
         
@@ -833,7 +838,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an async block.
     /// </summary>
-    private void VisitAsyncBlock(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitAsyncBlock(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("async ");
         Write("{");
@@ -854,7 +859,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an unsafe block.
     /// </summary>
-    private void VisitUnsafeBlock(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitUnsafeBlock(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("unsafe ");
         Write("{");
@@ -875,7 +880,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a macro invocation.
     /// </summary>
-    private void VisitMacroInvocation(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitMacroInvocation(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         // Visit name
         if (childNodes.Count > 0)
@@ -898,7 +903,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits an attribute.
     /// </summary>
-    private void VisitAttribute(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitAttribute(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("#[");
         
@@ -923,7 +928,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a comment.
     /// </summary>
-    private void VisitComment(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitComment(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("// ");
         
@@ -938,7 +943,7 @@ public class RustUnparseVisitor : UnparseVisitorBase
     /// <summary>
     /// Visits a doc comment.
     /// </summary>
-    private void VisitDocComment(CognitiveGraph.PackedNode packedNode, CognitiveGraph.SymbolNodeCollection childNodes)
+    private void VisitDocComment(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("/// ");
         
@@ -983,6 +988,11 @@ public abstract class UnparseVisitorBase : IDisposable
     /// Visits the specified node.
     /// </summary>
     public virtual void Visit(CognitiveGraphNode node) { }
+
+    /// <summary>
+    /// Visits the specified zero-copy symbol node.
+    /// </summary>
+    public virtual void Visit(CognitiveGraph.Accessors.SymbolNode node) { }
 
     /// <summary>
     /// Disposes the visitor.
