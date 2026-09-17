@@ -671,7 +671,7 @@ public class TypeScriptUnparseVisitor : CognitiveGraphVisitorBase
                 break;
 
             default:
-                var text = node.Value?.ToString();
+                var text = node.Value.ToString();
                 if (text != null)
                 {
                     Append(text);
