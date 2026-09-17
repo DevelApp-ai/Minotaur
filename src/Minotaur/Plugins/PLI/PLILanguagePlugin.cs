@@ -14,6 +14,7 @@
 
 using Minotaur.Core;
 using Minotaur.Analysis.Symbolic;
+using Minotaur.Plugins;
 
 namespace Minotaur.Plugins.PLI;
 
@@ -52,7 +53,8 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string[] SupportedExtensions => new[] { ".pli", ".PLI", ".pl1", ".PL1" };
 
     /// <summary>
-    /// Converts a cognitive graph representation back to PL/I source code.
+    /// Converts a cognitive graph representation back to PL/
+I source code.
     /// </summary>
     /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated PL/I code.</returns>
@@ -102,6 +104,7 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         // PL/I array declaration
         rules.GenerationRules.Add(new CodeGenerationRule
         {
+
             NodeType = "array_declaration",
             GenerationTemplate = "DCL {name}({dimensions}) {type};\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
@@ -150,7 +153,8 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         // PL/I do while
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            NodeType = "do_while",
+            NodeType = "d
+o_while",
             GenerationTemplate = "DO WHILE({condition});\n{statements}\nEND;\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
@@ -199,7 +203,8 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "goto_statement",
-            GenerationTemplate = "GO TO {label};\n",
+ 
+           GenerationTemplate = "GO TO {label};\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
         });
 
@@ -248,7 +253,8 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "put_statement",
             GenerationTemplate = "PUT {destination}({data});\n",
-            GenerationHints = new Dictionary<string, object> { ["Case"] = "Mixed", ["Indent"] = 4 }
+            GenerationHints = new Dictionary<string, object> { ["Case"] = "
+Mixed", ["Indent"] = 4 }
         });
 
         // PL/I get statement (input)
@@ -299,18 +305,49 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid PL/I code.
     /// </summary>
-    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    
+    /// <summary>
+    /// Maps PLI-specific validation result to canonical plugin result.
+    /// </summary>
+    private Minotaur.Plugins.UnparseValidationResult MapToCanonicalResult(UnparseValidationResult localResult)
+    {
+        var canonicalErrors = localResult.Errors.Select(e => new Minotaur.Plugins.UnparseValidationError
+        {
+            Message = e.Code + ": " + e.Message,
+            NodeId = e.Code,
+            NodeType = e.NodeType,
+            Severity = e.Severity.ToString()
+        }).ToList();
+
+        var canonicalWarnings = localResult.Warnings.Select(w => new Minotaur.Plugins.UnparseValidationWarning
+        {
+            Message = w.Code + ": " + w.Message,
+            NodeId = w.Code,
+            NodeType = w.NodeType
+        }).ToList();
+
+        return new Minotaur.Plugins.UnparseValidationResult
+        {
+            CanUnparse = localResult.IsValid,
+            Errors = canonicalErrors,
+            Warnings = canonicalWarnings
+        };
+    }
+
+public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
         await Task.CompletedTask;
-        return _validationVisitor.GetValidationResult();
+        var localResult = _validationVisitor.GetValidationResult();
+        return MapToCanonicalResult(localResult);
     }
 
     /// <summary>
     /// Gets the symbolic analysis visitor for PL/I.
     /// </summary>
-    public ISymbolicAnalysisVisitor GetSymbolicAnalysisVisitor()
+    public ISymbolicAnalysisVisitor Ge
+tSymbolicAnalysisVisitor()
     {
         return _validationVisitor;
     }
