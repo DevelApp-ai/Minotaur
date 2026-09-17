@@ -50,8 +50,9 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             {
                 Message = "Cannot validate null graph",
                 NodeId = "null",
-                NodeType = "null",
-                Severity = ValidationErrorSeverity.Error
+                NodeType = "nu
+ll",
+                Severity = "Error"
             });
             return _errors;
         }
@@ -65,7 +66,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Message = $"Unbalanced braces: {_braceDepth} unclosed braces",
                 NodeId = "root",
                 NodeType = "program",
-                Severity = ValidationErrorSeverity.Error
+                Severity = "Error"
             });
         }
         
@@ -76,7 +77,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Message = $"Unbalanced parentheses: {_parenDepth} unclosed parentheses",
                 NodeId = "root",
                 NodeType = "program",
-                Severity = ValidationErrorSeverity.Error
+                Severity = "Error"
             });
         }
         
@@ -87,7 +88,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Message = $"Unbalanced brackets: {_bracketDepth} unclosed brackets",
                 NodeId = "root",
                 NodeType = "program",
-                Severity = ValidationErrorSeverity.Error
+                Severity = "Error"
             });
         }
         
@@ -98,7 +99,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Message = $"Unbalanced template literals: {_templateDepth} unclosed template literals",
                 NodeId = "root",
                 NodeType = "program",
-                Severity = ValidationErrorSeverity.Error
+                Severity = "Error"
             });
         }
         
@@ -118,7 +119,8 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
         }
     }
 
-    protected override void AfterVisitNode(CognitiveGraphNode node)
+    protected override void A
+fterVisitNode(CognitiveGraphNode node)
     {
         switch (node)
         {
@@ -187,7 +189,8 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             case "block":
             case "switch_block":
             case "try_block":
-            case "catch_block":
+       
+     case "catch_block":
             case "finally_block":
             case "function_body":
             case "static_initializer":
@@ -253,7 +256,8 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 case '[':
                     _bracketDepth++;
                     break;
-                case ']':
+            
+    case ']':
                     _bracketDepth--;
                     break;
                 case '`':
