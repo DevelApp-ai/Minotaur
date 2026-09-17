@@ -671,11 +671,9 @@ public class TypeScriptUnparseVisitor : CognitiveGraphVisitorBase
                 break;
 
             default:
-                var text = node.Value.ToString();
-                if (text != null)
-                {
-                    Append(text);
-                }
+                // Interpolation handles a null node.Value without a null check, which both the
+                // compiler (CS8604) and CodeQL (constant condition) are happy with.
+                Append($"{node.Value}");
                 break;
         }
     }
