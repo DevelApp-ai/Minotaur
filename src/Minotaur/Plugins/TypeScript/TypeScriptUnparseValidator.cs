@@ -43,7 +43,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
         _parenDepth = 0;
         _bracketDepth = 0;
         _templateDepth = 0;
-        
+
         if (graph == null)
         {
             _errors.Add(new UnparseValidationError
@@ -55,9 +55,9 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             });
             return _errors;
         }
-        
+
         Visit(graph);
-        
+
         if (_braceDepth != 0)
         {
             _errors.Add(new UnparseValidationError
@@ -68,7 +68,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Severity = "Error"
             });
         }
-        
+
         if (_parenDepth != 0)
         {
             _errors.Add(new UnparseValidationError
@@ -79,7 +79,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Severity = "Error"
             });
         }
-        
+
         if (_bracketDepth != 0)
         {
             _errors.Add(new UnparseValidationError
@@ -90,7 +90,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Severity = "Error"
             });
         }
-        
+
         if (_templateDepth != 0)
         {
             _errors.Add(new UnparseValidationError
@@ -101,7 +101,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 Severity = "Error"
             });
         }
-        
+
         return _errors;
     }
 
@@ -131,7 +131,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
     private void ValidateNonTerminal(NonTerminalNode node)
     {
         var ruleName = node.RuleName.ToLowerInvariant();
-        
+
         switch (ruleName)
         {
             case "interface_body":
@@ -149,7 +149,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 _braceDepth++;
                 _contextStack.Push(ruleName);
                 break;
-                
+
             case "formal_parameters":
             case "argument_list":
             case "type_parameters":
@@ -158,13 +158,13 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 _parenDepth++;
                 _contextStack.Push(ruleName);
                 break;
-                
+
             case "array_initializer":
             case "array_literal":
                 _bracketDepth++;
                 _contextStack.Push(ruleName);
                 break;
-                
+
             case "template_string":
             case "template_head":
                 _templateDepth++;
@@ -176,7 +176,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
     private void ValidateNonTerminalAfter(NonTerminalNode node)
     {
         var ruleName = node.RuleName.ToLowerInvariant();
-        
+
         switch (ruleName)
         {
             case "interface_body":
@@ -187,8 +187,8 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
             case "block":
             case "switch_block":
             case "try_block":
-       
-     case "catch_block":
+
+            case "catch_block":
             case "finally_block":
             case "function_body":
             case "static_initializer":
@@ -198,7 +198,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                     _contextStack.Pop();
                 }
                 break;
-                
+
             case "formal_parameters":
             case "argument_list":
             case "type_parameters":
@@ -210,7 +210,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                     _contextStack.Pop();
                 }
                 break;
-                
+
             case "array_initializer":
             case "array_literal":
                 _bracketDepth--;
@@ -219,7 +219,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                     _contextStack.Pop();
                 }
                 break;
-                
+
             case "template_string":
             case "template_head":
                 _templateDepth--;
@@ -234,7 +234,7 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
     private void ValidateTerminal(TerminalNode node)
     {
         var text = node.Text;
-        
+
         foreach (var c in text)
         {
             switch (c)
@@ -254,8 +254,8 @@ public class TypeScriptUnparseValidator : CognitiveGraphVisitorBase
                 case '[':
                     _bracketDepth++;
                     break;
-            
-    case ']':
+
+                case ']':
                     _bracketDepth--;
                     break;
                 case '`':

@@ -156,7 +156,8 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
             NodeType = "if_statement",
             GenerationTemplate = "if {condition} { {body} }\n",
             GenerationHints = new Dictionary<string,
- object> { ["BracesOnNewline"] = false }
+ object>
+            { ["BracesOnNewline"] = false }
         });
 
 
@@ -261,8 +262,8 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             IndentSize = 1,
             CosmeticOptions = new Dictionary<string, object>
-   
-         {
+
+            {
                 [
 "GoVersion"] = "1.21",
                 ["Case"] = "Camel",

@@ -110,7 +110,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
 
     - name: Build solution
       run: |
@@ -173,7 +175,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
     
     - name: Build for analysis
       run: |
@@ -210,18 +214,19 @@ jobs:
       run: dotnet tool install -g dotnet-format
     
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
     
     - name: Check code formatting
-      # TEMP (#72): non-blocking so the release pipeline can publish; remove continue-on-error to re-enable strict formatting
-      continue-on-error: true
       run: dotnet format ${{ env.SOLUTION_PATH }} --verify-no-changes --verbosity diagnostic --exclude examples/
     
     - name: Run static analysis
-      # TEMP (#72): non-blocking (warnings-as-errors debt); remove continue-on-error to re-enable
-      continue-on-error: true
       run: |
+        # --no-restore: use the retried restore above; an implicit restore here can hit
+        # transient GitHub Packages issues whose NU warnings become errors under TreatWarningsAsErrors
         dotnet build ${{ env.SOLUTION_PATH }} \
+          --no-restore \
           --configuration Release \
           --verbosity normal \
           -p:TreatWarningsAsErrors=true \
@@ -245,7 +250,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
     
     - name: Build solution
       run: |
@@ -281,7 +288,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
 
     - name: Build for packaging
       run: |

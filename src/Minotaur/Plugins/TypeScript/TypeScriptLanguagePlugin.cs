@@ -307,7 +307,7 @@ public class TypeScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         // Validate TypeScript-specific constructs
         var validator = new TypeScriptUnparseValidator();
         var validationErrors = validator.Validate(graph);
-        
+
         if (validationErrors.Any())
         {
             result.CanUnparse = false;
