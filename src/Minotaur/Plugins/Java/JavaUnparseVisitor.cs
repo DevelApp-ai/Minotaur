@@ -29,8 +29,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private bool _needsSemicolon = false;
     private bool _inString = false;
     private bool _inComment = false;
-    
-    private readonly System.Collections.Generic.Stack<bool> _needsSemicolonStack = new();
+        private readonly System.Collections.Generic.Stack<bool> _needsSemicolonStack = new();
 
     /// <summary>
     /// Initializes a new instance.
@@ -68,14 +67,12 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     public override string GetGeneratedCode()
     {
         var code = _builder.ToString();
-        
-        // Ensure proper formatting
+                // Ensure proper formatting
         if (_needsSemicolon)
         {
             _builder.Append(";");
         }
-        
-        return code;
+                return code;
     }
 
     /// <summary>
@@ -107,15 +104,13 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitSymbolNode(CognitiveGraph.Accessors.SymbolNode node)
     {
         var packedNodes = node.GetPackedNodes();
-        
-        if (packedNodes.Count == 0)
+                if (packedNodes.Count == 0)
         {
             // No PackedNodes, just output the node
             WriteNode(node);
             return;
         }
-        
-        // Multiple PackedNodes means ambiguity
+                // Multiple PackedNodes means ambiguity
         // For unparsing, we need to select one interpretation
         // Here we select the first valid PackedNode
         foreach (var packedNode in packedNodes)
@@ -126,8 +121,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
                 return;
             }
         }
-        
-        // If no valid PackedNode, output the node anyway
+                // If no valid PackedNode, output the node anyway
         WriteNode(node);
     }
 
@@ -138,11 +132,9 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     {
         var ruleId = packedNode.RuleID;
         var childNodes = packedNode.GetChildNodes();
-        
-        // Handle based on rule ID or node type
+                // Handle based on rule ID or node type
         var nodeType = GetNodeType(packedNode);
-        
-        switch (nodeType)
+                switch (nodeType)
         {
             case "compilation_unit":
                 VisitCompilationUnit(packedNode, childNodes);
@@ -258,8 +250,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         }
 
         _builder.Append(text);
-        
-        // Check if we need a semicolon after this
+                // Check if we need a semicolon after this
         if (!text.EndsWith(";") && !text.EndsWith("{") && !text.EndsWith("}") && 
             !text.EndsWith("(") && !text.EndsWith(")") && !text.EndsWith(","))
         {
@@ -269,8 +260,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         {
             _needsSemicolon = false;
         }
-        
-        // Check for newlines
+                // Check for newlines
         if (text.Contains("\n"))
         {
             _atLineStart = true;
@@ -332,14 +322,12 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitPackageDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("package ");
-        
-        // Visit package name
+                // Visit package name
         foreach (var child in childNodes)
         {
             Visit(child);
         }
-        
-        Write(";");
+                Write(";");
         WriteLine();
         WriteLine();
     }
@@ -350,13 +338,11 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitImportDeclaration(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("import ");
-        
-        foreach (var child in childNodes)
+                foreach (var child in childNodes)
         {
             Visit(child);
         }
-        
-        Write(";");
+                Write(";");
         WriteLine();
     }
 
@@ -372,8 +358,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         // Visit extends
         // Visit implements
         // Visit body
-        
-        foreach (var child in childNodes)
+                foreach (var child in childNodes)
         {
             Visit(child);
         }
@@ -432,8 +417,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         {
             Visit(child);
         }
-        
-        Write(";");
+                Write(";");
         WriteLine();
     }
 
@@ -443,14 +427,12 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitIfStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("if ");
-        
-        // Visit condition (first child)
+                // Visit condition (first child)
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
-        // Visit then statement
+                // Visit then statement
         if (childNodes.Count > 1)
         {
             var thenStatement = childNodes[1];
@@ -460,8 +442,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
             Visit(thenStatement);
             Write(" }");
         }
-        
-        // Visit else clause if present
+                // Visit else clause if present
         if (childNodes.Count > 2)
         {
             Write(" else ");
@@ -472,8 +453,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
             Visit(elseStatement);
             Write(" }");
         }
-        
-        WriteLine();
+                WriteLine();
     }
 
     /// <summary>
@@ -482,8 +462,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitForStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("for ");
-        
-        // Visit initialization, condition, update, body
+                // Visit initialization, condition, update, body
         for (int i = 0; i < Math.Min(4, childNodes.Count); i++)
         {
             Visit(childNodes[i]);
@@ -492,8 +471,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
                 Write("; ");
             }
         }
-        
-        WriteLine();
+                WriteLine();
     }
 
     /// <summary>
@@ -502,14 +480,12 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitWhileStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("while ");
-        
-        // Visit condition
+                // Visit condition
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
-        // Visit body
+                // Visit body
         if (childNodes.Count > 1)
         {
             var body = childNodes[1];
@@ -519,8 +495,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
             Visit(body);
             Write(" }");
         }
-        
-        WriteLine();
+                WriteLine();
     }
 
     /// <summary>
@@ -529,8 +504,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitDoStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("do ");
-        
-        // Visit body
+                // Visit body
         if (childNodes.Count > 0)
         {
             var body = childNodes[0];
@@ -540,16 +514,13 @@ public class JavaUnparseVisitor : UnparseVisitorBase
             Visit(body);
             Write(" }");
         }
-        
-        Write(" while ");
-        
-        // Visit condition
+                Write(" while ");
+                // Visit condition
         if (childNodes.Count > 1)
         {
             Visit(childNodes[1]);
         }
-        
-        Write(";");
+                Write(";");
         WriteLine();
     }
 
@@ -559,20 +530,17 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitTryStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("try ");
-        
-        // Visit try block
+                // Visit try block
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
-        // Visit catch clauses
+                // Visit catch clauses
         for (int i = 1; i < childNodes.Count; i++)
         {
             Visit(childNodes[i]);
         }
-        
-        WriteLine();
+                WriteLine();
     }
 
     /// <summary>
@@ -581,24 +549,20 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitSwitchStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("switch ");
-        
-        // Visit expression
+                // Visit expression
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
-        Write(" { ");
+                Write(" { ");
         WriteLine();
         Indent();
-        
-        // Visit case groups
+                // Visit case groups
         for (int i = 1; i < childNodes.Count; i++)
         {
             Visit(childNodes[i]);
         }
-        
-        Unindent();
+                Unindent();
         Write("}");
         WriteLine();
     }
@@ -609,14 +573,12 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitReturnStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("return ");
-        
-        // Visit expression if present
+                // Visit expression if present
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
-        Write(";");
+                Write(";");
         WriteLine();
     }
 
@@ -626,14 +588,12 @@ public class JavaUnparseVisitor : UnparseVisitorBase
     private void VisitThrowStatement(CognitiveGraph.Accessors.PackedNode packedNode, CognitiveGraph.Accessors.SymbolNodeOffsetCollection childNodes)
     {
         Write("throw ");
-        
-        // Visit expression
+                // Visit expression
         if (childNodes.Count > 0)
         {
             Visit(childNodes[0]);
         }
-        
-        Write(";");
+                Write(";");
         WriteLine();
     }
 
@@ -645,14 +605,12 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         Write("{ ");
         WriteLine();
         Indent();
-        
-        // Visit all statements in the block
+                // Visit all statements in the block
         foreach (var child in childNodes)
         {
             Visit(child);
         }
-        
-        Unindent();
+                Unindent();
         Write("}");
     }
 
@@ -665,8 +623,7 @@ public class JavaUnparseVisitor : UnparseVisitorBase
         {
             Visit(child);
         }
-        
-        Write(";");
+                Write(";");
         WriteLine();
     }
 
