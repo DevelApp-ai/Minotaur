@@ -15,6 +15,7 @@
 using Minotaur.Core;
 using Minotaur.Analysis.Symbolic;
 using Minotaur.Plugins;
+using Minotaur.Plugins;
 
 namespace Minotaur.Plugins.Go;
 
@@ -56,7 +57,10 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// Converts a cognitive graph representation back to Go source code.
     /// </summary>
 
-    /// <param name="graph">The cognitive graph node to unparse.</param>
+
+    /// <param name="gr
+aph">The cognitive graph
+ node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Go code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -104,8 +108,12 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         // Go method declaration
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            NodeType = "method_declaration",
-            GenerationTemplate = "func ({receiver}) {name}({parameters}) {return_type} { {body} }\n",
+            NodeType = "method_declara
+t
+ion",
+            Generat
+ionTemplate = "func ({rec
+eiver}) {name}({parameters}) {return_type} { {body} }\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Camel" }
         });
 
@@ -154,7 +162,10 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "if_statement",
             GenerationTemplate = "if {condition} { {body} }\n",
-            GenerationHints = new Dictionary<string, object> { ["BracesOnNewline"] = false }
+            GenerationHints = new Dictionary<strin
+g,
+ object> { ["BracesOnNewli
+ne"] = false }
         });
 
 
@@ -206,8 +217,12 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
             GenerationHints = new Dictionary<string, object> { ["Concurrent"] = true }
         });
 
-        // Go select statement
-        rules.GenerationRules.Add(new CodeGenerationRule
+        // 
+Go 
+select statement
+        ru
+les.GenerationRules.Add(new
+ CodeGenerationRule
         {
             NodeType = "select_statement",
             GenerationTemplate = "select { {cases} }\n",
@@ -258,9 +273,12 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         return new CodeFormattingOptions
         {
             IndentSize = 1,
-            CosmeticOptions = new Dictionary<string, object>
-            {
-                ["GoVersion"] = "1.21",
+            CosmeticOptions = new Di
+ctionary<string, object>
+   
+         {
+                [
+"GoVersion"] = "1.21",
                 ["Case"] = "Camel",
                 ["UseGoFmt"] = true,
                 ["MaxLineLength"] = 80
@@ -269,8 +287,10 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     }
 
     /// <summary>
-    /// Validate that a cognitive graph can be unparsed to valid Go code.
+    
+/// Validate that a cognitive graph can be unparsed to valid Go code.
     /// </summary>
+    
     /// <summary>
     /// Maps Go-specific validation result to canonical plugin result.
     /// </summary>
@@ -301,7 +321,36 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 
 
     /// <summary>
-    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    /// Maps Go-specific validation result to canonical plugin result.
+    /// </summary>
+    private Minotaur.Plugins.UnparseValidationResult MapToCanonicalResult(UnparseValidationResult localResult)
+    {
+        var canonicalErrors = localResult.Errors.Select(e => new Minotaur.Plugins.UnparseValidationError
+        {
+            Message = e.Code + ": " + e.Message,
+            NodeId = e.Code,
+            NodeType = e.NodeType,
+            Severity = e.Severity.ToString()
+        }).ToList();
+
+        var canonicalWarnings = localResult.Warnings.Select(w => new Minotaur.Plugins.UnparseValidationWarning
+        {
+            Message = w.Code 
++ ": " + w.Message,
+            NodeId = w.Code,
+            NodeType = w.NodeType
+        }).ToList();
+
+        return new Minotaur.Plugins.UnparseValidationResult
+        {
+            CanUnparse = localResult.IsValid,
+            Errors = cano
+nicalErrors,
+            Warnings = canonicalWarnings
+        };
+    }
+
+public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
