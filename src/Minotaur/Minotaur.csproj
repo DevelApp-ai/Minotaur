@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -17,7 +17,7 @@
     <Copyright>Copyright © 2024 DevelApp AI</Copyright>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DevelApp-ai/Minotaur</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur2.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/DevelApp-ai/Minotaur.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>cognitive-graph;parser;compiler;stepparser;zero-copy;graph-editor;unparser;plugin-system;compiler-compiler</PackageTags>
@@ -34,8 +34,7 @@
     <!-- Graph editor backend moved to CognitiveGraph repository -->
     <!-- <PackageReference Include="DevelApp.CognitiveGraph.Editor" Version="2.0.0" /> -->
     <PackageReference Include="DevelApp.RuntimePluggableClassFactory.Interface" Version="2.0.1" />
-    <PackageReference Include="Dev
-elApp.RuntimePluggableClassFactory" Version="2.0.1" />
+    <PackageReference Include="DevelApp.RuntimePluggableClassFactory" Version="2.0.1" />
     <PackageReference Include="DevelApp.StepLexer" Version="1.12.0" />
     <PackageReference Include="DevelApp.StepParser" Version="1.12.0" />
     <PackageReference Include="System.Memory" Version="4.6.3" />
