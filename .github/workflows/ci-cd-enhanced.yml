@@ -463,6 +463,9 @@ jobs:
         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Publish to NuGet.org
+      # Skipped (not failed) while the NUGET_API_KEY repo secret is unset.
+      # Set the secret to enable NuGet.org publishing.
+      if: ${{ secrets.NUGET_API_KEY != '' }}
       run: |
         echo "Publishing to NuGet.org..."
         dotnet nuget push ./packages/*.nupkg \
@@ -474,6 +477,7 @@ jobs:
 
     - name: Create GitHub Release Assets
       uses: softprops/action-gh-release@v1
+      if: always()
       with:
         files: ./packages/*.nupkg
       env:
