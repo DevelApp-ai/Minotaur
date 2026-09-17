@@ -53,10 +53,8 @@ public class JavaLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
 
     /// <summary>
     /// Converts a cognitive graph representation back to Java source code.
-    /// </su
-mmary>
-    /// <param na
-me="graph">The cognitive graph node to unparse.</param>
+    /// </summary>
+    /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Java code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -105,9 +103,7 @@ me="graph">The cognitive graph node to unparse.</param>
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "class_declaration",
-    
-        GenerationTemplat
-e = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
+            GenerationTemplate = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
@@ -147,9 +143,7 @@ e = "{modifiers} class {name}{type_parameters} {extends} {implements} {{ {member
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "sealed_class_declaration",
-            GenerationTemplate = "{modifiers} sealed class {name}{type_parameters} {extends} {implements} perm
-its {permitted_types} {{ {
-members} }}\n",
+            GenerationTemplate = "{modifiers} sealed class {name}{type_parameters} {extends} {implements} permits {permitted_types} {{ {members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false, ["MinJavaVersion"] = 15 }
         });
 
@@ -193,10 +187,8 @@ members} }}\n",
             GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
-        // Java for s
-tatement
-        rules.Gene
-rationRules.Add(new CodeGenerationRule
+        // Java for statement
+        rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "for_statement",
             GenerationTemplate = "for ({initialization}; {condition}; {update}) {{ {statement} }}\n",
@@ -240,9 +232,7 @@ rationRules.Add(new CodeGenerationRule
         {
             NodeType = "catch_clause",
             GenerationTemplate = " catch ({parameter}) {{ {block} }}",
-            GenerationHints = new Dictionary<s
-tring, object> { ["BraceStyl
-e"] = "K&R", ["Semicolon"] = false }
+            GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false }
         });
 
         // Java finally clause
@@ -290,9 +280,7 @@ e"] = "K&R", ["Semicolon"] = false }
         {
             NodeType = "return_statement",
             GenerationTemplate = "return {expression};\n",
-            GenerationHints =
- new Dictionary<string, objec
-t> { ["Semicolon"] = true }
+            GenerationHints = new Dictionary<string, object> { ["Semicolon"] = true }
         });
 
         // Java throw statement
@@ -340,8 +328,7 @@ t> { ["Semicolon"] = true }
         {
             NodeType = "module_declaration",
             GenerationTemplate = "{modifiers} module {name} {{ {directives} }}\n",
-            GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false, ["MinJa
-vaVersion"] = 9 }
+            GenerationHints = new Dictionary<string, object> { ["BraceStyle"] = "K&R", ["Semicolon"] = false, ["MinJavaVersion"] = 9 }
         });
 
 
@@ -369,7 +356,6 @@ vaVersion"] = 9 }
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid Java code.
     /// </summary>
-    
     /// <summary>
     /// Maps Java-specific validation result to canonical plugin result.
     /// </summary>
@@ -398,8 +384,7 @@ vaVersion"] = 9 }
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> Vali
-dateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
