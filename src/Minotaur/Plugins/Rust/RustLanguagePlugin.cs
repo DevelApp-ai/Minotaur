@@ -14,6 +14,7 @@
 
 using Minotaur.Core;
 using Minotaur.Analysis.Symbolic;
+using Minotaur.Plugins;
 
 namespace Minotaur.Plugins.Rust;
 
@@ -54,7 +55,8 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Converts a cognitive graph representation back to Rust source code.
     /// </summary>
-    /// <param name="graph">The cognitive graph node to unparse.</param>
+    /// <para
+m name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Rust code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -103,7 +105,8 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "enum_declaration",
-            GenerationTemplate = "pub enum {name} { {variants} }\n",
+            GenerationTemplate = "pub enum {
+name} { {variants} }\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Pascal", ["Visibility"] = "pub" }
         });
 
@@ -151,7 +154,8 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "match_expression",
-            GenerationTemplate = "match {expression} { {arms} }\n",
+            Generat
+ionTemplate = "match {expression} { {arms} }\n",
             GenerationHints = new Dictionary<string, object> { ["ExpressionBased"] = true }
         });
 
@@ -200,7 +204,8 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "static_declaration",
             GenerationTemplate = "static {name}: {type} = {expression};\n",
-            GenerationHints = new Dictionary<string, object> { ["Case"] = "ScreamingSnake" }
+            GenerationHints = new Dictionary<string, object> { ["Case"]
+ = "ScreamingSnake" }
         });
 
         // Rust return expression
@@ -256,7 +261,8 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "doc_comment",
             GenerationTemplate = "/// {text}\n",
-            GenerationHints = new Dictionary<string, object> { ["DocComment"] = true }
+            GenerationHints = new Dictionary<string, object> { ["DocComment
+"] = true }
         });
 
         await Task.CompletedTask;
@@ -291,12 +297,42 @@ public class RustLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid Rust code.
     /// </summary>
-    public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    
+    /// <summary>
+    /// Maps Rust-specific validation result to canonical plugin result.
+    /// </summary>
+    private Minotaur.Plugins.UnparseValidationResult MapToCanonicalResult(UnparseValidationResult localResult)
+    {
+        var canonicalErrors = localResult.Errors.Select(e => new Minotaur.Plugins.UnparseValidationError
+        {
+            Message = e.Code + ": " + e.Message,
+            NodeId = e.Code,
+            NodeType = e.NodeType,
+            Severity = e.Severity.ToString()
+        }).ToList();
+
+        var canonicalWarnings = localResult.Warnings.Select(w => new Minotaur.Plugins.UnparseValidationWarning
+        {
+            Message = w.Code + ": " + w.Message,
+            NodeId = w.Code,
+            NodeType = w.NodeType
+        }).ToList();
+
+        return new Minotaur.Plugins.UnparseValidationResult
+        {
+            CanUnparse = localResult.IsValid,
+            Errors = canonicalErrors,
+            Warnings = canonicalWarnings
+        };
+    }
+
+public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
         await Task.CompletedTask;
-        return _validationVisitor.GetValidationResult();
+        var localResult = _validationVisitor.GetValidationResult();
+        return MapToCanonicalResult(localResult);
     }
 
     /// <summary>
