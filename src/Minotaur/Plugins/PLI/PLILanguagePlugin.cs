@@ -53,8 +53,7 @@ public class PLILanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string[] SupportedExtensions => new[] { ".pli", ".PLI", ".pl1", ".PL1" };
 
     /// <summary>
-    /// Converts a cognitive graph representation back to PL/
-I source code.
+    /// Converts a cognitive graph representation back to PL/I source code.
     /// </summary>
     /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated PL/I code.</returns>
