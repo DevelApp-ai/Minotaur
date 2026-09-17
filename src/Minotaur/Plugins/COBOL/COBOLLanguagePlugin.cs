@@ -53,8 +53,7 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string[] SupportedExtensions => new[] { ".cob", ".cbl", ".COB", ".CBL" };
 
     /// <summary>
-    /// Converts a cognitive graph representati
-on back to COBOL source code.
+    /// Converts a cognitive graph representation back to COBOL source code.
     /// </summary>
     /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated COBOL code.</returns>
@@ -102,8 +101,7 @@ on back to COBOL source code.
         });
 
         // COBOL procedure division
-        rules.Ge
-nerationRules.Add(new CodeGenerationRule
+        rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "procedure_division",
             GenerationTemplate = "       PROCEDURE DIVISION.\n",
@@ -154,8 +152,7 @@ nerationRules.Add(new CodeGenerationRule
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "display_statement",
-            Gen
-erationTemplate = "       DISPLAY {message}.\n",
+            GenerationTemplate = "       DISPLAY {message}.\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Upper", ["Margin"] = 8 }
         });
 
@@ -203,8 +200,7 @@ erationTemplate = "       DISPLAY {message}.\n",
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "file_description_entry",
-            GenerationTemplat
-e = "       FD {name}\n           {clauses}.\n",
+            GenerationTemplate = "       FD {name}\n           {clauses}.\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Upper", ["Margin"] = 8 }
         });
 
@@ -253,8 +249,7 @@ e = "       FD {name}\n           {clauses}.\n",
         {
             NodeType = "slash_comment",
             GenerationTemplate = "       /{comment_text}/\n",
-      
-      GenerationHints = new Dictionary<string, object> { ["Margin"] = 8 }
+            GenerationHints = new Dictionary<string, object> { ["Margin"] = 8 }
         });
 
         await Task.CompletedTask;
@@ -282,7 +277,6 @@ e = "       FD {name}\n           {clauses}.\n",
     /// <summary>
     /// Validate that a cognitive graph can be unparsed to valid COBOL code.
     /// </summary>
-    
     /// <summary>
     /// Maps COBOL-specific validation result to canonical plugin result.
     /// </summary>
@@ -307,12 +301,11 @@ e = "       FD {name}\n           {clauses}.\n",
         {
             CanUnparse = localResult.IsValid,
             Errors = canonicalErrors,
-            Warnings = canonicalWarni
-ngs
+            Warnings = canonicalWarnings
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);
