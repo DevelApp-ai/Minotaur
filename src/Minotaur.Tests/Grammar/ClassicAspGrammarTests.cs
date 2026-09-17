@@ -309,7 +309,7 @@ public class ClassicAspGrammarTests
     [Fact]
     public async Task Parse_ShouldHandleIfStatement()
     {
-        var sourceCode = @"<% If userId <> \"\" Then Response.Write(\"Valid\") End If %>";
+        var sourceCode = @"<% If userId <> """" Then Response.Write(""Valid"") End If %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
         
         Assert.NotNull(result);
@@ -318,7 +318,7 @@ public class ClassicAspGrammarTests
     [Fact]
     public async Task Parse_ShouldHandleIfElseStatement()
     {
-        var sourceCode = @"<% If x > 0 Then Response.Write(\"Positive\") Else Response.Write(\"Zero or Negative\") End If %>";
+        var sourceCode = @"<% If x > 0 Then Response.Write(""Positive"") Else Response.Write(""Zero or Negative"") End If %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
         
         Assert.NotNull(result);
@@ -327,7 +327,7 @@ public class ClassicAspGrammarTests
     [Fact]
     public async Task Parse_ShouldHandleIfElseIfStatement()
     {
-        var sourceCode = @"<% If x > 0 Then Response.Write(\"Positive\") ElseIf x < 0 Then Response.Write(\"Negative\") Else Response.Write(\"Zero\") End If %>";
+        var sourceCode = @"<% If x > 0 Then Response.Write(""Positive"") ElseIf x < 0 Then Response.Write(""Negative"") Else Response.Write(""Zero"") End If %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
         
         Assert.NotNull(result);
@@ -372,7 +372,7 @@ public class ClassicAspGrammarTests
     [Fact]
     public async Task Parse_ShouldHandleSelectCase()
     {
-        var sourceCode = @"<% Select Case userType Case \"Admin\" : Response.Write(\"Admin\") Case \"User\" : Response.Write(\"User\") Case Else : Response.Write(\"Unknown\") End Select %>";
+        var sourceCode = @"<% Select Case userType Case ""Admin"" : Response.Write(""Admin"") Case ""User"" : Response.Write(""User"") Case Else : Response.Write(""Unknown"") End Select %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
         
         Assert.NotNull(result);
@@ -381,7 +381,7 @@ public class ClassicAspGrammarTests
     [Fact]
     public async Task Parse_ShouldHandleWithStatement()
     {
-        var sourceCode = @"<% With Request : userId = .QueryString(\"id\") : End With %>";
+        var sourceCode = @"<% With Request : userId = .QueryString(""id"") : End With %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
         
         Assert.NotNull(result);
@@ -520,7 +520,7 @@ public class ClassicAspGrammarTests
     [Fact]
     public async Task Parse_ShouldHandleJScriptCommentMultiLine()
     {
-        var sourceCode = "<% /* This is a
+        var sourceCode = @"<% /* This is a
                multi-line comment */ %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
         
@@ -663,7 +663,7 @@ public class ClassicAspGrammarTests
 <head><title>Test</title></head>
 <body>
 <h1>Hello</h1>
-<% Response.Write(\"World\") %>
+<% Response.Write(""World"") %>
 </body>
 </html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
@@ -681,7 +681,7 @@ function test() { return true; }
 </script>
 </head>
 <body>
-<% Response.Write(\"Test\") %>
+<% Response.Write(""Test"") %>
 </body>
 </html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
@@ -699,7 +699,7 @@ body { color: red; }
 </style>
 </head>
 <body>
-<% Response.Write(\"Test\") %>
+<% Response.Write(""Test"") %>
 </body>
 </html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
@@ -721,20 +721,20 @@ body { color: red; }
 <body>
 <%
 Dim conn, rs, sql
-Set conn = Server.CreateObject(\"ADODB.Connection\")
-conn.Open \"myConnectionString\"
-Set rs = Server.CreateObject(\"ADODB.Recordset\")
+Set conn = Server.CreateObject(""ADODB.Connection"")
+conn.Open ""myConnectionString""
+Set rs = Server.CreateObject(""ADODB.Recordset"")
 
-sql = \"SELECT * FROM Users\"
+sql = ""SELECT * FROM Users""
 rs.Open sql, conn
 
 If Not rs.EOF Then
     Do Until rs.EOF
-        Response.Write(\"<div>\" & rs(\"UserName\") & \"</div>\")
+        Response.Write(""<div>"" & rs(""UserName"") & ""</div>"")
         rs.MoveNext
     Loop
 Else
-    Response.Write(\"No users found\")
+    Response.Write(""No users found"")
 End If
 
 rs.Close
@@ -755,9 +755,9 @@ Set conn = Nothing
         var sourceCode = @"<%
 On Error Resume Next
 Dim conn
-Set conn = Server.CreateObject(\"ADODB.Connection\")
+Set conn = Server.CreateObject(""ADODB.Connection"")
 If Err.Number <> 0 Then
-    Response.Write(\"Error: \" & Err.Description)
+    Response.Write(""Error: "" & Err.Description)
     Err.Clear
 End If
 On Error GoTo 0
@@ -771,11 +771,11 @@ On Error GoTo 0
     public async Task Parse_ShouldHandleAspWithSessionAndCookies()
     {
         var sourceCode = @"<%
-Session(\"UserName\") = Request.Cookies(\"user\")
-If Session(\"UserName\") <> \"\" Then
-    Response.Write(\"Welcome back, \" & Session(\"UserName\"))
+Session(""UserName"") = Request.Cookies(""user"")
+If Session(""UserName"") <> """" Then
+    Response.Write(""Welcome back, "" & Session(""UserName""))
 Else
-    Response.Redirect(\"/login.asp\")
+    Response.Redirect(""/login.asp"")
 End If
 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);

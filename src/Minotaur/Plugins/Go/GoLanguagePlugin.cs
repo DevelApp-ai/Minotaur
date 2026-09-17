@@ -58,9 +58,7 @@ public class GoLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// </summary>
 
 
-    /// <param name="gr
-aph">The cognitive graph
- node to unparse.</param>
+    /// <param name="graph">The cognitive graphnode to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated Go code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
@@ -108,12 +106,8 @@ aph">The cognitive graph
         // Go method declaration
         rules.GenerationRules.Add(new CodeGenerationRule
         {
-            NodeType = "method_declara
-t
-ion",
-            Generat
-ionTemplate = "func ({rec
-eiver}) {name}({parameters}) {return_type} { {body} }\n",
+            NodeType = "method_declaration",
+            GenerationTemplate = "func ({receiver}) {name}({parameters}) {return_type} { {body} }\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Camel" }
         });
 
@@ -162,10 +156,8 @@ eiver}) {name}({parameters}) {return_type} { {body} }\n",
         {
             NodeType = "if_statement",
             GenerationTemplate = "if {condition} { {body} }\n",
-            GenerationHints = new Dictionary<strin
-g,
- object> { ["BracesOnNewli
-ne"] = false }
+            GenerationHints = new Dictionary<string,
+ object> { ["BracesOnNewline"] = false }
         });
 
 
@@ -217,12 +209,8 @@ ne"] = false }
             GenerationHints = new Dictionary<string, object> { ["Concurrent"] = true }
         });
 
-        // 
-Go 
-select statement
-        ru
-les.GenerationRules.Add(new
- CodeGenerationRule
+        // Go select statement
+        rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "select_statement",
             GenerationTemplate = "select { {cases} }\n",
@@ -273,8 +261,7 @@ les.GenerationRules.Add(new
         return new CodeFormattingOptions
         {
             IndentSize = 1,
-            CosmeticOptions = new Di
-ctionary<string, object>
+            CosmeticOptions = new Dictionary<string, object>
    
          {
                 [
@@ -344,13 +331,12 @@ ctionary<string, object>
         return new Minotaur.Plugins.UnparseValidationResult
         {
             CanUnparse = localResult.IsValid,
-            Errors = cano
-nicalErrors,
+            Errors = canonicalErrors,
             Warnings = canonicalWarnings
         };
     }
 
-public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
+    public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         _validationVisitor.Reset();
         _validationVisitor.Visit(graph);

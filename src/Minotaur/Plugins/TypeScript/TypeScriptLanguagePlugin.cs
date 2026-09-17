@@ -46,8 +46,7 @@ public class TypeScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated TypeScript code.</returns>
     public async Task<string> UnparseAsync(CognitiveGraphNode graph)
     {
-        var visitor = new T
-ypeScriptUnparseVisitor();
+        var visitor = new TypeScriptUnparseVisitor();
         visitor.Visit(graph);
         await Task.CompletedTask;
         return visitor.GetGeneratedCode();
@@ -138,8 +137,7 @@ ypeScriptUnparseVisitor();
         });
 
         // TypeScript property declaration with type annotation
-        rules.GenerationRules.Add(new CodeGeneration
-Rule
+        rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "property_declaration",
             GenerationTemplate = "{modifiers} {name}{optional}: {type} {initializer};\n",
@@ -186,8 +184,7 @@ Rule
             GenerationHints = new Dictionary<string, object> { }
         });
 
-        // TypeScript generic typ
-e declaration
+        // TypeScript generic type declaration
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "type_parameter",
@@ -240,8 +237,7 @@ e declaration
             {
                 TemplateName = "typescript_type_alias_template",
                 TemplateContent = "export type {name}{type_parameters} = {type};",
-                Required
-Parameters = new List<string> { "name", "type_parameters", "type" }
+                RequiredParameters = new List<string> { "name", "type_parameters", "type" }
             },
             new TemplateRule
             {
@@ -291,8 +287,7 @@ Parameters = new List<string> { "name", "type_parameters", "type" }
     /// Validates that a cognitive graph can be unparsed to valid TypeScript code.
     /// </summary>
     /// <param name="graph">The cognitive graph to validate for unparsing.</param>
-    /// <returns>A task that represents the
- asynchronous validation operation. The task result contains the validation results.</returns>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains the validation results.</returns>
     public async Task<UnparseValidationResult> ValidateGraphForUnparsingAsync(CognitiveGraphNode graph)
     {
         var result = new UnparseValidationResult { CanUnparse = true };
@@ -347,8 +342,7 @@ Parameters = new List<string> { "name", "type_parameters", "type" }
     }
 
     /// <summary>
-    /// 
-Gets the confidence level for detecting a specific error type in TypeScript
+    /// Gets the confidence level for detecting a specific error type in TypeScript
     /// </summary>
     /// <param name="errorType">The type of error to check confidence for</param>
     /// <returns>Confidence level between 0.0 and 1.0</returns>
