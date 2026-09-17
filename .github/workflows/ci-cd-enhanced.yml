@@ -110,7 +110,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
 
     - name: Build solution
       run: |
@@ -173,7 +175,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
     
     - name: Build for analysis
       run: |
@@ -210,7 +214,9 @@ jobs:
       run: dotnet tool install -g dotnet-format
     
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
     
     - name: Check code formatting
       run: dotnet format ${{ env.SOLUTION_PATH }} --verify-no-changes --verbosity diagnostic --exclude examples/
@@ -241,7 +247,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
     
     - name: Build solution
       run: |
@@ -277,7 +285,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
+        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
 
     - name: Build for packaging
       run: |
