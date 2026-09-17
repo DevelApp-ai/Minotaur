@@ -132,7 +132,8 @@ jobs:
 
     - name: Generate coverage report
       if: always()
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+      continue-on-error: true
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.1
       with:
         reports: './TestResults/**/coverage.cobertura.xml'
         targetdir: './CoverageReport'
