@@ -67,7 +67,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
         // Check for required program declaration
         if (!_hasProgramDeclaration)
         {
-            AddError(null, "PV001", "Missing PROC declaration (main procedure)", ValidationSeverity.Error);
+            AddError("PV001", "Missing PROC declaration (main procedure)", ValidationSeverity.Error);
         }
                 return new UnparseValidationResult
         {

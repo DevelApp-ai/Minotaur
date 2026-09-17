@@ -67,7 +67,7 @@ public class RustValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnaly
         // Check for required main function
         if (!_hasMainFunction)
         {
-            AddError(null, "RV001", "Missing main function (fn main)", ValidationSeverity.Warning);
+            AddError("RV001", "Missing main function (fn main)", ValidationSeverity.Warning);
         }
                 return new UnparseValidationResult
         {

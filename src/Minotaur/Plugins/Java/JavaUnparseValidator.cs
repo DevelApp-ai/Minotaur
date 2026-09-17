@@ -14,6 +14,7 @@
 
 using Minotaur.Core;
 using Minotaur.Visitors;
+using UnparseValidationError = Minotaur.Plugins.UnparseValidationError;
 
 namespace Minotaur.Plugins.Java;
 

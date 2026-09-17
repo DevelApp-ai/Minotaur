@@ -67,12 +67,12 @@ public class GoValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalysi
         // Check for required package declaration
         if (!_hasPackageDeclaration)
         {
-            AddError(null, "GV001", "Missing package declaration", ValidationSeverity.Error);
+            AddError("GV001", "Missing package declaration", ValidationSeverity.Error);
         }
                 // Check for main function (for main package)
         if (!_hasMainFunction)
         {
-            AddWarning(null, "GV002", "Missing main function (for executable)", ValidationSeverity.Warning);
+            AddWarning("GV002", "Missing main function (for executable)", ValidationSeverity.Warning);
         }
                 return new UnparseValidationResult
         {
@@ -158,8 +158,7 @@ public class GoValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalysi
         if (nodeType == "function_declaration")
         {
             // Check if this is main function
-            var nameNode = childNodes.Count > 0 ? childNodes[0] : null;
-            if (nameNode != null && nameNode.GetSourceText().ToString() == "main")
+            if (childNodes.Count > 0 && childNodes[0].GetSourceText().ToString() == "main")
             {
                 _hasMainFunction = true;
             }

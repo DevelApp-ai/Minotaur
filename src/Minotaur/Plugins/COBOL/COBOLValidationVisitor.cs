@@ -71,11 +71,11 @@ public class COBOLValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnal
         // Check for required divisions
         if (!_hasIdentificationDivision)
         {
-            AddError(null, "CV001", "Missing IDENTIFICATION DIVISION", ValidationSeverity.Error);
+            AddError("CV001", "Missing IDENTIFICATION DIVISION", ValidationSeverity.Error);
         }
                 if (!_hasProcedureDivision)
         {
-            AddError(null, "CV002", "Missing PROCEDURE DIVISION", ValidationSeverity.Error);
+            AddError("CV002", "Missing PROCEDURE DIVISION", ValidationSeverity.Error);
         }
                 return new UnparseValidationResult
         {
