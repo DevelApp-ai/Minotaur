@@ -14,7 +14,6 @@
 
 using Minotaur.Core;
 using Minotaur.Visitors;
-using UnparseValidationError = Minotaur.Plugins.UnparseValidationError;
 
 namespace Minotaur.Plugins.Java;
 
@@ -24,7 +23,7 @@ namespace Minotaur.Plugins.Java;
 /// </summary>
 public class JavaUnparseValidator : CognitiveGraphVisitorBase
 {
-    private readonly List<UnparseValidationError> _errors = new();
+    private readonly List<Minotaur.Plugins.UnparseValidationError> _errors = new();
     private readonly Stack<string> _contextStack = new();
     private int _braceDepth = 0;
     private int _parenDepth = 0;
@@ -35,7 +34,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
     /// </summary>
     /// <param name="graph">The cognitive graph to validate.</param>
     /// <returns>List of validation errors, if any.</returns>
-    public List<UnparseValidationError> Validate(CognitiveGraphNode graph)
+    public List<Minotaur.Plugins.UnparseValidationError> Validate(CognitiveGraphNode graph)
     {
         _errors.Clear();
         _contextStack.Clear();
@@ -45,7 +44,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
         
         if (graph == null)
         {
-            _errors.Add(new UnparseValidationError
+            _errors.Add(new Minotaur.Plugins.UnparseValidationError
             {
                 Message = "Cannot validate null graph",
                 NodeId = "null",
@@ -59,7 +58,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
         
         if (_braceDepth != 0)
         {
-            _errors.Add(new UnparseValidationError
+            _errors.Add(new Minotaur.Plugins.UnparseValidationError
             {
                 Message = $"Unbalanced braces: {_braceDepth} unclosed braces",
                 NodeId = "root",
@@ -70,7 +69,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
         
         if (_parenDepth != 0)
         {
-            _errors.Add(new UnparseValidationError
+            _errors.Add(new Minotaur.Plugins.UnparseValidationError
             {
                 Message = $"Unbalanced parentheses: {_parenDepth} unclosed parentheses",
                 NodeId = "root",
@@ -81,7 +80,7 @@ public class JavaUnparseValidator : CognitiveGraphVisitorBase
         
         if (_bracketDepth != 0)
         {
-            _errors.Add(new UnparseValidationError
+            _errors.Add(new Minotaur.Plugins.UnparseValidationError
             {
                 Message = $"Unbalanced brackets: {_bracketDepth} unclosed brackets",
                 NodeId = "root",

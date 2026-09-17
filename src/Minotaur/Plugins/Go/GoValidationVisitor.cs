@@ -250,7 +250,7 @@ public class GoValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalysi
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _errors.Add(error);
     }
@@ -274,6 +274,20 @@ public class GoValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalysi
     /// <summary>
     /// Adds a warning to the validation result.
     /// </summary>
+    private void AddWarning(string code, string message, ValidationSeverity severity)
+    {
+        var warning = new UnparseValidationError
+        {
+            Code = code,
+            Message = message,
+            Severity = severity,
+            NodeType = string.Empty,
+            SourceStart = 0,
+            SourceLength = 0
+        };
+        _warnings.Add(warning);
+    }
+
     private void AddWarning(CognitiveGraph.Accessors.SymbolNode node, string code, string message, ValidationSeverity severity)
     {
         var warning = new UnparseValidationError
@@ -283,7 +297,7 @@ public class GoValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalysi
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _warnings.Add(warning);
     }

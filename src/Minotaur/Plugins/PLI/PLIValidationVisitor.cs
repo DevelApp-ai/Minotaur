@@ -245,7 +245,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _errors.Add(error);
     }
@@ -278,7 +278,7 @@ public class PLIValidationVisitor : SymbolicAnalysisVisitorBase, ISymbolicAnalys
             Severity = severity,
             NodeType = node.NodeType.ToString(),
             SourceStart = node.SourceStart,
-            SourceLength = node?.SourceLength ?? 0
+            SourceLength = node.SourceLength
         };
                 _warnings.Add(warning);
     }
