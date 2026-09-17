@@ -151,7 +151,7 @@ public class SymbolSearchService : ISymbolSearchService
                 // Match words (identifiers)
                 new SymbolPattern { Pattern = @"\b([a-zA-Z_][a-zA-Z0-9_]*)\b", SymbolType = SymbolType.Identifier },
                 // Match quoted strings
-                new SymbolPattern { Pattern = @"\"([^\"]*)\"", SymbolType = SymbolType.String },
+                new SymbolPattern { Pattern = @"""([^""]*)""", SymbolType = SymbolType.String },
                 // Match numbers
                 new SymbolPattern { Pattern = @"\b(\d+(\.\d+)?([eE][+-]?\d+)?)\b", SymbolType = SymbolType.Number }
             },
@@ -337,7 +337,7 @@ public class SymbolSearchService : ISymbolSearchService
                         new SymbolPattern { Pattern = @"^\s*func\s*\(", SymbolType = SymbolType.Method },
                         new SymbolPattern { Pattern = @"^\s*var\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+", SymbolType = SymbolType.Variable },
                         new SymbolPattern { Pattern = @"^\s*const\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+", SymbolType = SymbolType.Constant },
-                        new SymbolPattern { Pattern = @"^\s*import\s+\"([^\"]+)\"", SymbolType = SymbolType.Import }
+                        new SymbolPattern { Pattern = @"^\s*import\s+""([^""]+)""", SymbolType = SymbolType.Import }
                     },
                     ReferencePatterns = new List<SymbolPattern>
                     {
