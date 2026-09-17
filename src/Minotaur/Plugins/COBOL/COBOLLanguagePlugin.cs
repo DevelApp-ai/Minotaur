@@ -53,7 +53,8 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     public string[] SupportedExtensions => new[] { ".cob", ".cbl", ".COB", ".CBL" };
 
     /// <summary>
-    /// Converts a cognitive graph representation back to COBOL source code.
+    /// Converts a cognitive graph representati
+on back to COBOL source code.
     /// </summary>
     /// <param name="graph">The cognitive graph node to unparse.</param>
     /// <returns>A task that represents the asynchronous unparse operation, containing the generated COBOL code.</returns>
@@ -101,7 +102,8 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         });
 
         // COBOL procedure division
-        rules.GenerationRules.Add(new CodeGenerationRule
+        rules.Ge
+nerationRules.Add(new CodeGenerationRule
         {
             NodeType = "procedure_division",
             GenerationTemplate = "       PROCEDURE DIVISION.\n",
@@ -152,7 +154,8 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "display_statement",
-            GenerationTemplate = "       DISPLAY {message}.\n",
+            Gen
+erationTemplate = "       DISPLAY {message}.\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Upper", ["Margin"] = 8 }
         });
 
@@ -200,7 +203,8 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         rules.GenerationRules.Add(new CodeGenerationRule
         {
             NodeType = "file_description_entry",
-            GenerationTemplate = "       FD {name}\n           {clauses}.\n",
+            GenerationTemplat
+e = "       FD {name}\n           {clauses}.\n",
             GenerationHints = new Dictionary<string, object> { ["Case"] = "Upper", ["Margin"] = 8 }
         });
 
@@ -249,7 +253,8 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             NodeType = "slash_comment",
             GenerationTemplate = "       /{comment_text}/\n",
-            GenerationHints = new Dictionary<string, object> { ["Margin"] = 8 }
+      
+      GenerationHints = new Dictionary<string, object> { ["Margin"] = 8 }
         });
 
         await Task.CompletedTask;
@@ -264,14 +269,7 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         return new CodeFormattingOptions
         {
             IndentSize = 4,
-            UseTabs = false,
-            BraceStyle = "COBOL",
-            IndentBraces = false,
-            IndentCaseLabels = false,
-            NewLineAfterSemicolon = false,
-            SpaceAfterKeywords = true,
-            SpaceBeforeBraces = false,
-            LanguageSpecificOptions = new Dictionary<string, object>
+            CosmeticOptions = new Dictionary<string, object>
             {
                 ["COBOLVersion"] = "COBOL85",
                 ["Margin"] = 8,
@@ -309,7 +307,8 @@ public class COBOLLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
         {
             CanUnparse = localResult.IsValid,
             Errors = canonicalErrors,
-            Warnings = canonicalWarnings
+            Warnings = canonicalWarni
+ngs
         };
     }
 
@@ -320,6 +319,38 @@ public async Task<Minotaur.Plugins.UnparseValidationResult> ValidateGraphForUnpa
         await Task.CompletedTask;
         var localResult = _validationVisitor.GetValidationResult();
         return MapToCanonicalResult(localResult);
+    }
+
+    /// <summary>
+    /// Performs COBOL-specific symbolic analysis (minimal Phase 2 implementation).
+    /// </summary>
+    public List<SymbolicError> AnalyzeSymbolic(string sourceCode, List<SymbolicConstraint> constraints)
+    {
+        return new List<SymbolicError>();
+    }
+
+    /// <summary>
+    /// Gets COBOL-specific error patterns (minimal Phase 2 implementation).
+    /// </summary>
+    public List<ErrorPattern> GetErrorPatterns()
+    {
+        return new List<ErrorPattern>();
+    }
+
+    /// <summary>
+    /// Gets the confidence level for a specific error type in COBOL (minimal Phase 2 implementation).
+    /// </summary>
+    public double GetErrorConfidence(SymbolicErrorType errorType)
+    {
+        return 0.0;
+    }
+
+    /// <summary>
+    /// Generates test cases for a specific COBOL error (minimal Phase 2 implementation).
+    /// </summary>
+    public List<TestCase> GenerateTestCases(SymbolicError error, string sourceCode)
+    {
+        return new List<TestCase>();
     }
 
     /// <summary>
