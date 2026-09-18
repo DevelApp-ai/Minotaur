@@ -254,6 +254,11 @@ public class UnparseContext
     }
 
     /// <summary>
+    /// Gets the last character written to the output, or null if the output is empty.
+    /// </summary>
+    public char? LastChar => _output.Length == 0 ? null : _output[_output.Length - 1];
+
+    /// <summary>
     /// Gets the current output as a string.
     /// </summary>
     /// <returns>The generated output.</returns>
@@ -285,8 +290,28 @@ internal class UnparseVisitor : CognitiveGraphVisitorBase
         _context = context;
     }
 
+    /// <summary>
+    /// Node types that emit inline source text without their own spacing.
+    /// When several of these are visited consecutively, a separating space
+    /// is inserted so the regenerated code remains tokenizable. (Operator
+    /// nodes handle their own spacing.)
+    /// </summary>
+    private static readonly string[] InlineTextNodeTypes =
+    {
+        "identifier", "literal", "terminal", "keyword"
+    };
+
     public override void Visit(CognitiveGraphNode node)
     {
+        // Separate consecutive inline tokens so the unparsed output can be
+        // re-parsed (round-trip fidelity).
+        if (InlineTextNodeTypes.Contains(node.NodeType)
+            && _context.LastChar.HasValue
+            && !char.IsWhiteSpace(_context.LastChar.Value))
+        {
+            _context.Write(" ");
+        }
+
         // First unparse this node
         if (_strategies.TryGetValue(node.NodeType, out var strategy))
         {
