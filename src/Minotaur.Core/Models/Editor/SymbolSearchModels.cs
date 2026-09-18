@@ -87,7 +87,9 @@ public enum SymbolType
     /// <summary>Null literal</summary>
     Null,
     /// <summary>Global symbol</summary>
-    Global
+    Global,
+    /// <summary>Static member (Rust)</summary>
+    Static
 }
 
 /// <summary>

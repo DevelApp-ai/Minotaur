@@ -149,6 +149,35 @@ public class NodeAmbiguityInfo
 
     /// <summary>Gets or sets the currently selected PackedNode index.</summary>
     public int? SelectedPackedNode { get; set; }
+
+    /// <summary>
+    /// Gets or sets detailed information about each PackedNode alternative.
+    /// </summary>
+    public List<PackedNodeInfo> PackedNodes { get; set; } = new();
+}
+
+/// <summary>
+/// Detailed information about a single PackedNode alternative.
+/// </summary>
+public class PackedNodeInfo
+{
+    /// <summary>Gets or sets the index of this PackedNode within its SymbolNode.</summary>
+    public int Index { get; set; }
+
+    /// <summary>Gets or sets the parser rule ID that produced this PackedNode.</summary>
+    public int RuleId { get; set; }
+
+    /// <summary>Gets or sets the parser rule name that produced this PackedNode.</summary>
+    public string RuleName { get; set; } = string.Empty;
+
+    /// <summary>Gets or sets the IDs of the child SymbolNodes.</summary>
+    public List<string> ChildNodeIds { get; set; } = new();
+
+    /// <summary>Gets or sets whether this PackedNode is valid.</summary>
+    public bool IsValid { get; set; } = true;
+
+    /// <summary>Gets or sets whether this is the preferred interpretation.</summary>
+    public bool IsPreferred { get; set; } = false;
 }
 
 /// <summary>
