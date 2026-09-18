@@ -46,7 +46,7 @@ public class GrammarGeneratorTests
     public void GrammarGenerator_GenerateGrammarFile_CreatesValidOutput()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             Language = "TestLang",
@@ -98,7 +98,7 @@ public class GrammarGeneratorTests
     public void GrammarGenerator_GenerateGrammarFile_IncludesMetadata()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             Language = "TestLang",
@@ -122,7 +122,7 @@ public class GrammarGeneratorTests
     public void GrammarGenerator_GenerateGrammarFile_HandlesKeywords()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             Language = "TestLang",
@@ -160,7 +160,7 @@ public class GrammarGeneratorTests
     public void GrammarGenerator_GenerateGrammarFile_HandlesWhitespaceTokens()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             Language = "TestLang",
@@ -188,7 +188,7 @@ public class GrammarGeneratorTests
     public void GrammarGenerator_GenerateGrammarFile_HandlesEmptyGrammar()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "EmptyGrammar",
             Language = "Empty"
@@ -206,7 +206,7 @@ public class GrammarGeneratorTests
     public void GrammarGenerator_GenerateGrammarFile_IncludesExamples()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             Language = "TestLang",

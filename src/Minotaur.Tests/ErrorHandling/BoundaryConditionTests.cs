@@ -186,7 +186,7 @@ public class BoundaryConditionTests
     public void BoundaryCondition_EmptyGrammar_CreatesValidStructure()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "Empty",
             Language = "None"
