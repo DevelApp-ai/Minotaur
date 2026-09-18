@@ -69,7 +69,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithEmptyProductionRulesList_ReturnsError()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -99,7 +99,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithoutStartRule_ReturnsWarning()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -130,7 +130,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithUndefinedTokenReference_ReturnsError()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -156,7 +156,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithUndefinedRuleReference_ReturnsError()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -182,7 +182,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithUnusedToken_ReturnsWarning()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -214,7 +214,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithLeftRecursion_ReturnsError()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -248,7 +248,7 @@ public class GrammarValidatorTests
     {
         // Arrange
         var alternatives = Enumerable.Range(1, 15).Select(i => $"<option{i}>").ToList();
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -291,7 +291,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithBuiltInTokens_DoesNotReportErrors()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
@@ -319,7 +319,7 @@ public class GrammarValidatorTests
     public async Task ValidateGrammarAsync_WithComplexGrammar_ValidatesSuccessfully()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "ComplexLanguage",
             ProductionRules = new ProductionRules
@@ -368,9 +368,9 @@ public class GrammarValidatorTests
         Assert.False(result.IsValid);
     }
 
-    private Grammar CreateValidGrammar()
+    private Minotaur.GrammarGeneration.Models.Grammar CreateValidGrammar()
     {
-        return new Grammar
+        return new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             ProductionRules = new ProductionRules
