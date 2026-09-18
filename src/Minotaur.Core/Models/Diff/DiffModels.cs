@@ -20,6 +20,17 @@ namespace Minotaur.Core.Models.Diff;
 /// <summary>
 /// Types of diff changes.
 /// </summary>
+/// <summary>
+/// Display mode for diff visualization.
+/// </summary>
+public enum DiffViewMode
+{
+    /// <summary>Show old and new text side by side.</summary>
+    SideBySide,
+    /// <summary>Show changes inline in a single column.</summary>
+    Inline
+}
+
 public enum DiffChangeType
 {
     /// <summary>No change (equal)</summary>
@@ -427,25 +438,25 @@ public class Tokenizer
                 if (match != null)
                 {
                     // Skip whitespace before the match
-                    if (match.Start > position)
+                    if (match.Index > position)
                     {
-                        tokens.Add(CreateWhitespaceToken(text, position, match.Start - position, line, column));
-                        column += match.Start - position;
-                        position = match.Start;
+                        tokens.Add(CreateWhitespaceToken(text, position, match.Index - position, line, column));
+                        column += match.Index - position;
+                        position = match.Index;
                     }
 
                     tokens.Add(new Token
                     {
                         Type = pattern.Type,
                         Value = match.Value,
-                        StartPosition = match.Start,
+                        StartPosition = match.Index,
                         Length = match.Length,
                         Line = line,
                         Column = column
                     });
 
                     column += match.Length;
-                    position = match.Start + match.Length;
+                    position = match.Index + match.Length;
                     matched = true;
                     break;
                 }

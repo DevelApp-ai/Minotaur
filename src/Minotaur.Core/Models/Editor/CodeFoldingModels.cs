@@ -111,7 +111,17 @@ public enum FoldType
     /// <summary>Impl (Rust)</summary>
     Impl,
     /// <summary>Match (Rust)</summary>
-    Match
+    Match,
+    /// <summary>With block (Python)</summary>
+    With,
+    /// <summary>While loop (Rust)</summary>
+    While,
+    /// <summary>For loop (Rust)</summary>
+    For,
+    /// <summary>Synchronized block (Java)</summary>
+    Synchronized,
+    /// <summary>Static initializer block (Java)</summary>
+    Static
 }
 
 /// <summary>

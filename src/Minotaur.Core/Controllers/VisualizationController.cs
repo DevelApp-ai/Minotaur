@@ -12,7 +12,8 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
  */
 
-using CognitiveGraph;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Minotaur.Core.Models.Visualization;
 using Minotaur.Core.Services.Visualization;
@@ -80,8 +81,22 @@ public class VisualizationController : ControllerBase
             // For demonstration, we'll create a mock CognitiveGraph
             // that demonstrates ambiguity through PackedNodes
             
-            var visualization = CreateMockVisualization(request);
-            
+            // Try the real visualizer first. A graph cannot be built yet
+            // (no parser is wired into the controller), so a null graph is
+            // passed; the visualizer signals this with ArgumentNullException
+            // and we fall back to mock data.
+            CognitiveGraphVisualization? visualization = null;
+            try
+            {
+                visualization = _visualizer.GenerateVisualization(null!, request.Options);
+            }
+            catch (ArgumentNullException)
+            {
+                // No CognitiveGraph available yet - fall through to mock data.
+            }
+
+            visualization ??= CreateMockVisualization(request);
+
             return Ok(visualization);
         }
         catch (Exception ex)
@@ -116,8 +131,24 @@ public class VisualizationController : ControllerBase
             // 2. Build the CognitiveGraph
             // 3. Get ambiguity points from the visualizer
             
+            // Try the real visualizer first (see GetVisualization).
+            List<NodeAmbiguityInfo>? ambiguities = null;
+            try
+            {
+                ambiguities = _visualizer.GetAmbiguityPoints(null!);
+            }
+            catch (ArgumentNullException)
+            {
+                // No CognitiveGraph available yet - fall through to mock data.
+            }
+
+            if (ambiguities != null)
+            {
+                return Ok(ambiguities);
+            }
+
             // For now, return mock data
-            var ambiguities = new List<NodeAmbiguityInfo>
+            ambiguities = new List<NodeAmbiguityInfo>
             {
                 new NodeAmbiguityInfo
                 {
@@ -125,26 +156,22 @@ public class VisualizationController : ControllerBase
                     IsAmbiguous = true,
                     Location = new CodeLocation
                     {
-                        Start = new Position { Line = 3, Column = 5, Offset = 20 },
-                        End = new Position { Line = 3, Column = 15, Offset = 30 }
+                        Line = 3, Column = 5, Offset = 20, Length = 10
                     },
                     AlternativeCount = 2,
-                    PackedNodes = new List<PackedNodeInfo>
+                    Alternatives = new List<PackedNodeAlternative>
                     {
-                        new PackedNodeInfo
+                        new PackedNodeAlternative
                         {
                             Index = 0,
-                            RuleId = 101,
-                            RuleName = "method_declaration",
-                            ChildNodeIds = new List<string> { "6", "7" },
-                            IsValid = true
+                            ChildCount = 2,
+                            IsValid = true,
+                            IsPreferred = true
                         },
-                        new PackedNodeInfo
+                        new PackedNodeAlternative
                         {
                             Index = 1,
-                            RuleId = 102,
-                            RuleName = "function_expression",
-                            ChildNodeIds = new List<string> { "8" },
+                            ChildCount = 1,
                             IsValid = true
                         }
                     }
@@ -180,22 +207,32 @@ public class VisualizationController : ControllerBase
         try
         {
             // In a real implementation, this would return all paths
+            // Try the real visualizer first (see GetVisualization).
+            List<InterpretationPath>? paths = null;
+            try
+            {
+                paths = _visualizer.GetAllInterpretationPaths(null!);
+            }
+            catch (ArgumentNullException)
+            {
+                // No CognitiveGraph available yet - fall through to mock data.
+            }
+
+            if (paths != null)
+            {
+                return Ok(paths);
+            }
+
             // For now, return mock data
-            var paths = new List<InterpretationPath>
+            paths = new List<InterpretationPath>
             {
                 new InterpretationPath
                 {
-                    Id = "path_0",
-                    Choices = new Dictionary<ulong, int> { [5] = 0 },
-                    AppliedRules = new List<string> { "compilation_unit", "class_declaration", "method_declaration" },
-                    IsValid = true
+                    NodeChoices = new Dictionary<string, int> { ["5"] = 0 }
                 },
                 new InterpretationPath
                 {
-                    Id = "path_1",
-                    Choices = new Dictionary<ulong, int> { [5] = 1 },
-                    AppliedRules = new List<string> { "compilation_unit", "class_declaration", "function_expression" },
-                    IsValid = true
+                    NodeChoices = new Dictionary<string, int> { ["5"] = 1 }
                 }
             };
 
@@ -232,20 +269,41 @@ public class VisualizationController : ControllerBase
             // 1. Load the CognitiveGraph
             // 2. Apply the selected PackedNode choices
             // 3. Generate visualization for that specific path
-            
-            // For now, return mock data
-            var visualization = CreateMockVisualization(new VisualizationRequest
+
+            // Try the real visualizer first (see GetVisualization).
+            CognitiveGraphVisualization? visualization = null;
+            try
             {
-                SourceCode = request.SourceCode,
-                GrammarName = request.GrammarName
-            });
-            
+                // Resolve the requested path if possible
+                List<InterpretationPath>? allPaths = null;
+                try
+                {
+                    allPaths = _visualizer.GetAllInterpretationPaths(null!);
+                }
+                catch (ArgumentNullException)
+                {
+                    // No CognitiveGraph available yet.
+                }
+
+                var path = allPaths?.FirstOrDefault() ?? new InterpretationPath();
+                visualization = _visualizer.GenerateSingleInterpretation(null!, path);
+            }
+            catch (ArgumentNullException)
+            {
+                // No CognitiveGraph available yet - fall through to mock data.
+            }
+
+            if (visualization == null)
+            {
+                visualization = CreateMockVisualization(new VisualizationRequest
+                {
+                    SourceCode = request.SourceCode,
+                    GrammarName = request.GrammarName
+                });
+            }
+
             // Filter to show only the selected path
-            visualization.Mode = VisualizationMode.ShowSelectedInterpretation;
-            
-            // In a real implementation, we would filter the edges
-            // For mock, we'll just mark it
-            visualization.GraphData.Properties["selectedPath"] = request.PathId;
+            visualization.Options.Mode = VisualizationMode.ShowSelectedInterpretation;
 
             return Ok(visualization);
         }
@@ -300,8 +358,7 @@ public class VisualizationController : ControllerBase
                         AlternativeCount = 2,
                         Location = new CodeLocation
                         {
-                            Start = new Position { Line = 3, Column = 5, Offset = 20 },
-                            End = new Position { Line = 3, Column = 15, Offset = 30 }
+                            Line = 3, Column = 5, Offset = 20, Length = 10
                         }
                     },
                     // Child nodes for PackedNode[0] (method_declaration interpretation)
@@ -351,42 +408,39 @@ public class VisualizationController : ControllerBase
                     }
                 }
             },
-            Ambiguities = new Dictionary<string, NodeAmbiguityInfo>
+            AmbiguityPoints = new List<NodeAmbiguityInfo>
             {
-                ["5"] = new NodeAmbiguityInfo
+                new NodeAmbiguityInfo
                 {
                     NodeId = "5",
                     IsAmbiguous = true,
                     Location = new CodeLocation
                     {
-                        Start = new Position { Line = 3, Column = 5, Offset = 20 },
-                        End = new Position { Line = 3, Column = 15, Offset = 30 }
+                        Line = 3, Column = 5, Offset = 20, Length = 10
                     },
                     AlternativeCount = 2,
-                    PackedNodes = new List<PackedNodeInfo>
+                    Alternatives = new List<PackedNodeAlternative>
                     {
-                        new PackedNodeInfo
+                        new PackedNodeAlternative
                         {
                             Index = 0,
-                            RuleId = 101,
-                            RuleName = "method_declaration",
-                            ChildNodeIds = new List<string> { "6", "7" },
-                            IsValid = true
+                            ChildCount = 2,
+                            IsValid = true,
+                            IsPreferred = true
                         },
-                        new PackedNodeInfo
+                        new PackedNodeAlternative
                         {
                             Index = 1,
-                            RuleId = 102,
-                            RuleName = "function_expression",
-                            ChildNodeIds = new List<string> { "8" },
+                            ChildCount = 1,
                             IsValid = true
                         }
                     }
                 }
             },
-            Mode = VisualizationMode.ShowAllInterpretations,
-            HasAmbiguities = true,
-            AmbiguityCount = 1
+            Options = new VisualizationOptions
+            {
+                Mode = VisualizationMode.ShowAllInterpretations
+            }
         };
     }
 
