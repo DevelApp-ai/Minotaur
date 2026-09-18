@@ -49,7 +49,7 @@
             <div class="list-group list-group-flush">
                 @foreach (var token in filteredTokens)
                 {
-                    <div class="list-group-item token-item @(selectedToken?.Id == token.Id ? "active" : "")" 
+                    <div class="list-group-item token-item @(editingToken?.Id == token.Id ? "active" : "")" 
                          @onclick="() => SelectToken(token)">
                         <div class="token-header">
                             <span class="token-name">@token.Name</span>
@@ -73,11 +73,11 @@
     </div>
 
     <!-- Token Editor Panel -->
-    @if (selectedToken != null)
+    @if (editingToken != null)
     {
         <div class="token-editor-panel">
             <div class="panel-header">
-                <h6>Edit Token: @selectedToken.Name</h6>
+                <h6>Edit Token: @editingToken.Name</h6>
                 <button class="btn btn-sm btn-outline-danger" @onclick="DeleteToken">
                     <i class="bi bi-trash"></i> Delete
                 </button>
@@ -87,7 +87,7 @@
                 <div class="mb-3">
                     <label class="form-label">Name</label>
                     <input type="text" class="form-control" 
-                           @bind="selectedToken.Name" 
+                           @bind="editingToken.Name" 
                            @bind:event="oninput">
                 </div>
 
@@ -95,7 +95,7 @@
                     <label class="form-label">Pattern (Regex)</label>
                     <input type="text" class="form-control" 
                            placeholder="e.g., [a-zA-Z_][a-zA-Z0-9_]*" 
-                           @bind="selectedToken.Pattern" 
+                           @bind="editingToken.Pattern" 
                            @bind:event="oninput">
                     <div class="form-text">Regular expression pattern for matching this token</div>
                 </div>
@@ -103,7 +103,7 @@
                 <div class="mb-3">
                     <label class="form-label">Description</label>
                     <textarea class="form-control" rows="2" 
-                              @bind="selectedToken.Description" 
+                              @bind="editingToken.Description" 
                               @bind:event="oninput"></textarea>
                 </div>
 
@@ -111,7 +111,7 @@
                     <div class="col-md-6">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" 
-                                   @bind="selectedToken.IsTerminal" 
+                                   @bind="editingToken.IsTerminal" 
                                    id="isTerminal">
                             <label class="form-check-label" for="isTerminal">
                                 Is Terminal
@@ -121,7 +121,7 @@
                     <div class="col-md-6">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" 
-                                   @bind="selectedToken.IsSkippable" 
+                                   @bind="editingToken.IsSkippable" 
                                    id="isSkippable">
                             <label class="form-check-label" for="isSkippable">
                                 Is Skippable
@@ -133,14 +133,14 @@
                 <div class="mb-3">
                     <label class="form-label">Priority</label>
                     <input type="number" class="form-control" 
-                           @bind="selectedToken.Priority" 
+                           @bind="editingToken.Priority" 
                            @bind:event="oninput">
                     <div class="form-text">Higher priority tokens are matched first</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Category</label>
-                    <select class="form-select" @bind="selectedToken.Category">
+                    <select class="form-select" @bind="editingToken.Category">
                         <option value="">None</option>
                         <option value="keyword">Keyword</option>
                         <option value="identifier">Identifier</option>
@@ -156,9 +156,9 @@
                     <label class="form-label">Color</label>
                     <div class="input-group">
                         <input type="color" class="form-control form-control-color" 
-                               @bind="selectedToken.Color" 
+                               @bind="editingToken.Color" 
                                @bind:event="oninput">
-                        <span class="input-group-text">@selectedToken.Color</span>
+                        <span class="input-group-text">@editingToken.Color</span>
                     </div>
                 </div>
             </div>
