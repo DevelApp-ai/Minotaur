@@ -57,6 +57,29 @@ public class PluginInfo
 
     /// <summary>Gets or sets the icon for the plugin.</summary>
     public string? Icon { get; set; }
+    /// <summary>Gets or sets the plugin category (e.g., language, visualization, export).</summary>
+    public string Category { get; set; } = string.Empty;
+    /// <summary>Gets or sets the plugin website URL.</summary>
+    public string WebsiteUrl { get; set; } = string.Empty;
+    /// <summary>Gets or sets the plugin documentation text.</summary>
+    public string Documentation { get; set; } = string.Empty;
+    /// <summary>Gets or sets whether this plugin is enabled.</summary>
+    public bool IsEnabled { get; set; } = true;
+
+    /// <summary>Gets or sets whether the plugin is currently installed locally.</summary>
+    public bool IsInstalled { get; set; }
+    /// <summary>Gets or sets the install date.</summary>
+    public DateTime InstallDate { get; set; } = DateTime.UtcNow;
+    /// <summary>Gets or sets the download count.</summary>
+    public int Downloads { get; set; }
+    /// <summary>Gets or sets the rating.</summary>
+    public double Rating { get; set; }
+    /// <summary>Gets or sets the tags.</summary>
+    public List<string> Tags { get; set; } = new();
+    /// <summary>Gets or sets the changelog entries.</summary>
+    public List<ChangelogEntry> Changelog { get; set; } = new();
+    /// <summary>Gets or sets the configurable settings.</summary>
+    public List<PluginConfiguration> Configuration { get; set; } = new();
 
     /// <summary>Gets or sets the license of the plugin.</summary>
     public string? License { get; set; }
@@ -234,21 +257,50 @@ public class PluginCompatibility
     /// <summary>Gets or sets the recommended action.</summary>
     public string? RecommendedAction { get; set; }
 }
-
 /// <summary>
-/// Represents plugin configuration.
+/// A single configurable plugin setting.
 /// </summary>
 public class PluginConfiguration
 {
-    /// <summary>Gets or sets the plugin ID.</summary>
-    public string PluginId { get; set; } = string.Empty;
+    /// <summary>Gets or sets the setting key.</summary>
+    public string Key { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the configuration values.</summary>
-    public Dictionary<string, object> Settings { get; set; } = new();
+    /// <summary>Gets or sets the display name.</summary>
+    public string DisplayName { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets whether the plugin is enabled.</summary>
-    public bool IsEnabled { get; set; } = true;
+    /// <summary>Gets or sets the description.</summary>
+    public string Description { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the priority.</summary>
-    public int Priority { get; set; } = 0;
+    /// <summary>Gets or sets the value type (e.g. string, boolean, number).</summary>
+    public string Type { get; set; } = "string";
+
+    /// <summary>Gets or sets the current value.</summary>
+    public object? Value { get; set; }
+
+    /// <summary>Gets or sets the default value.</summary>
+    public object? DefaultValue { get; set; }
+
+    /// <summary>Gets or sets the allowed options.</summary>
+    public List<string> Options { get; set; } = new();
+
+    /// <summary>Gets or sets whether the setting is required.</summary>
+    public bool IsRequired { get; set; } = false;
+
+    /// <summary>
+    /// Creates a copy of this configuration entry.
+    /// </summary>
+    public PluginConfiguration Clone()
+    {
+        return new PluginConfiguration
+        {
+            Key = Key,
+            DisplayName = DisplayName,
+            Description = Description,
+            Type = Type,
+            Value = Value,
+            DefaultValue = DefaultValue,
+            Options = new List<string>(Options),
+            IsRequired = IsRequired
+        };
+    }
 }

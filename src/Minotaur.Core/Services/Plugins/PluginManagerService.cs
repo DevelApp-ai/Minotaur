@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Minotaur.Core.Models.Plugins;
 using Minotaur.Plugins;
 
@@ -180,11 +181,9 @@ public class PluginManagerService : IPluginManagerService
                     return new PluginInfo
                     {
                         Id = plugin.LanguageId,
-                        Name = plugin.LanguageName,
+                        Name = plugin.DisplayName,
                         Type = plugin.GetType().Name,
-                        Version = plugin.Version,
-                        Author = plugin.Author,
-                        Description = plugin.Description,
+                        Version = plugin.GetType().Assembly.GetName().Version?.ToString() ?? "1.0.0",
                         AssemblyPath = assemblyPath,
                         IsLoaded = _loadedPlugins.ContainsKey(plugin.LanguageId),
                         Dependencies = GetAssemblyDependencies(assembly)
@@ -408,8 +407,12 @@ public class PluginManagerService : IPluginManagerService
     /// </summary>
     public List<ILanguagePlugin> GetPluginsWithFeature(string feature)
     {
+        // ILanguagePlugin does not expose a feature list; treat the feature
+        // as a file extension (e.g. ".rs") and match it against the
+        // plugin's supported extensions.
+        var normalized = feature.StartsWith(".") ? feature : "." + feature;
         return _loadedPlugins.Values
-            .Where(p => p.SupportedFeatures.Contains(feature, StringComparer.OrdinalIgnoreCase))
+            .Where(p => p.SupportedExtensions.Any(e => string.Equals(e, normalized, StringComparison.OrdinalIgnoreCase)))
             .ToList();
     }
 

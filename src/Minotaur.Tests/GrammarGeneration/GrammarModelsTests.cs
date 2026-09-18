@@ -216,7 +216,7 @@ public class GrammarModelsTests
     public void Grammar_Constructor_InitializesWithDefaults()
     {
         // Arrange & Act
-        var grammar = new Grammar();
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar();
 
         // Assert
         Assert.IsNotNull(grammar);
@@ -231,7 +231,7 @@ public class GrammarModelsTests
     public void Grammar_Properties_CanBeSet()
     {
         // Arrange & Act
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             Language = "TestLang",
@@ -248,7 +248,7 @@ public class GrammarModelsTests
     public void Grammar_Metadata_CanBePopulated()
     {
         // Arrange
-        var grammar = new Grammar();
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar();
 
         // Act
         grammar.Metadata["Author"] = "Test Author";

@@ -28,7 +28,7 @@ public class GrammarIntegrationTests
     public void Grammar_CompleteWorkflow_CreatesValidGrammar()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "CompleteTest",
             Language = "TestLang",
@@ -79,7 +79,7 @@ public class GrammarIntegrationTests
     public void Grammar_WithComplexProductionRules_GeneratesCorrectly()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "ComplexGrammar",
             Language = "TestLang",
@@ -130,7 +130,7 @@ public class GrammarIntegrationTests
     public void Grammar_WithAllTokenTypes_GeneratesCompletely()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "AllTypes",
             Language = "Complete",
@@ -236,7 +236,7 @@ public class GrammarIntegrationTests
     public void Grammar_WithVersion_IncludesInOutput()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "VersionedGrammar",
             Language = "Test",
@@ -279,7 +279,7 @@ public class GrammarIntegrationTests
     public void Grammar_LargeNumberOfRules_HandlesCorrectly()
     {
         // Arrange
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "LargeGrammar",
             Language = "Test",

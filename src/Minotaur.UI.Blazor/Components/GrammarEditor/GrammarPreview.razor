@@ -105,19 +105,19 @@
             <ul class="nav nav-tabs nav-tabs-sm">
                 <li class="nav-item">
                     <button class="nav-link @(activeTab == "tokens" ? "active" : "")" 
-                            @onclick="() => SetActiveTab("tokens")">
+                            @onclick='() => SetActiveTab("tokens")'>
                         Tokens
                     </button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link @(activeTab == "rules" ? "active" : "")" 
-                            @onclick="() => SetActiveTab("rules")">
+                            @onclick='() => SetActiveTab("rules")'>
                         Rules
                     </button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link @(activeTab == "ambiguous" ? "active" : "")" 
-                            @onclick="() => SetActiveTab("ambiguous")">
+                            @onclick='() => SetActiveTab("ambiguous")'>
                         Ambiguous
                     </button>
                 </li>
@@ -128,9 +128,9 @@
             @if (activeTab == "tokens")
             {
                 <div class="token-quick-list">
-                    @foreach (var token in Grammar?.Tokens.OrderBy(t => t.Name) ?? new List<TokenDefinition>())
+                    @foreach (var token in Grammar?.Tokens.OrderBy(t => t.Name) ?? Enumerable.Empty<TokenDefinition>())
                     {
-                        <div class="token-quick-item" @onclick="() => NavigateToToken(token)">
+                        <div class="token-quick-item" @onclick="() => NavigateToToken.InvokeAsync(token.Name)">
                             <span class="token-symbol" style="color: @token.Color;">@GetTokenSymbol(token)</span>
                             <span class="token-name">@token.Name</span>
                             <span class="token-count">@token.Pattern.Length</span>
@@ -141,9 +141,9 @@
             else if (activeTab == "rules")
             {
                 <div class="rule-quick-list">
-                    @foreach (var rule in Grammar?.Rules.OrderBy(r => r.Name) ?? new List<RuleDefinition>())
+                    @foreach (var rule in Grammar?.Rules.OrderBy(r => r.Name) ?? Enumerable.Empty<RuleDefinition>())
                     {
-                        <div class="rule-quick-item" @onclick="() => NavigateToRule(rule)">
+                        <div class="rule-quick-item" @onclick="() => NavigateToRule.InvokeAsync(rule.Name)">
                             <span class="rule-name">@rule.Name</span>
                             <span class="rule-type">@rule.Category</span>
                         </div>
@@ -155,7 +155,7 @@
                 <div class="ambiguous-list">
                     @foreach (var rule in GetAmbiguousRules())
                     {
-                        <div class="ambiguous-item" @onclick="() => NavigateToRule(rule)">
+                        <div class="ambiguous-item" @onclick="() => NavigateToRule.InvokeAsync(rule.Name)">
                             <span class="ambiguous-icon"><i class="bi bi-exclamation-triangle-fill text-warning"></i></span>
                             <span class="ambiguous-name">@rule.Name</span>
                             <span class="ambiguous-count">@rule.Pattern.Count(c => c == '|') + 1 alternatives</span>
@@ -470,9 +470,9 @@
         return 100 - GetTerminalPercentage();
     }
 
-    private List<RuleDefinition> GetAmbiguousRules()
+    private IEnumerable<RuleDefinition> GetAmbiguousRules()
     {
-        return Grammar?.Rules.Where(r => r.IsAmbiguous).ToList() ?? new List<RuleDefinition>();
+        return Grammar?.Rules.Where(r => r.IsAmbiguous).ToList() ?? Enumerable.Empty<RuleDefinition>();
     }
 
     private string GetTokenSymbol(TokenDefinition token)

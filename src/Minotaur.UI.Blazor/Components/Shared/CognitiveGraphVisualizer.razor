@@ -79,9 +79,8 @@
             @if (ShowAmbiguityDetails)
             {
                 <div class="details-body">
-                    @foreach (var kvp in Visualization.Ambiguities)
+                    @foreach (var ambiguity in Visualization.AmbiguityPoints)
                     {
-                        var ambiguity = kvp.Value;
                         <div class="ambiguity-item">
                             <div class="item-header">
                                 <strong>SymbolNode @ambiguity.NodeId</strong>
@@ -89,7 +88,7 @@
                             </div>
                             <div class="item-location">
                                 <small class="text-muted">
-                                    <i class="bi bi-geo-alt"></i> Line @ambiguity.Location.Start.Line, Column @ambiguity.Location.Start.Column
+                                    <i class="bi bi-geo-alt"></i> Line @ambiguity.Location.Line, Column @ambiguity.Location.Column
                                 </small>
                             </div>
                             <div class="packednodes-list">
@@ -232,7 +231,7 @@
     [JSInvokable]
     public async Task HandlePackedNodeSelected(string nodeId, int packedNodeIndex)
     {
-        if (Visualization?.Ambiguities.TryGetValue(nodeId, out var ambiguity) == true)
+        if (Visualization?.AmbiguityPoints.FirstOrDefault(a => a.NodeId == nodeId) is { } ambiguity)
         {
             if (packedNodeIndex >= 0 && packedNodeIndex < ambiguity.PackedNodes.Count)
             {

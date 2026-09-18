@@ -52,7 +52,7 @@
             <div class="list-group list-group-flush">
                 @foreach (var rule in filteredRules)
                 {
-                    <div class="list-group-item rule-item @(selectedRule?.Id == rule.Id ? "active" : "")" 
+                    <div class="list-group-item rule-item @(editingRule?.Id == rule.Id ? "active" : "")" 
                          @onclick="() => SelectRule(rule)">
                         <div class="rule-header">
                             <span class="rule-name">@rule.Name</span>
@@ -76,11 +76,11 @@
     </div>
 
     <!-- Rule Editor Panel -->
-    @if (selectedRule != null)
+    @if (editingRule != null)
     {
         <div class="rule-editor-panel">
             <div class="panel-header">
-                <h6>Edit Rule: @selectedRule.Name</h6>
+                <h6>Edit Rule: @editingRule.Name</h6>
                 <button class="btn btn-sm btn-outline-danger" @onclick="DeleteRule">
                     <i class="bi bi-trash"></i> Delete
                 </button>
@@ -90,7 +90,7 @@
                 <div class="mb-3">
                     <label class="form-label">Name</label>
                     <input type="text" class="form-control" 
-                           @bind="selectedRule.Name" 
+                           @bind="editingRule.Name" 
                            @bind:event="oninput">
                 </div>
 
@@ -98,7 +98,7 @@
                     <label class="form-label">Pattern</label>
                     <input type="text" class="form-control" 
                            placeholder="e.g., expression = expression '+' expression" 
-                           @bind="selectedRule.Pattern" 
+                           @bind="editingRule.Pattern" 
                            @bind:event="oninput">
                     <div class="form-text">Rule pattern in StepParser syntax</div>
                 </div>
@@ -106,7 +106,7 @@
                 <div class="mb-3">
                     <label class="form-label">Description</label>
                     <textarea class="form-control" rows="2" 
-                              @bind="selectedRule.Description" 
+                              @bind="editingRule.Description" 
                               @bind:event="oninput"></textarea>
                 </div>
 
@@ -114,7 +114,7 @@
                     <div class="col-md-6">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" 
-                                   @bind="selectedRule.IsTerminal" 
+                                   @bind="editingRule.IsTerminal" 
                                    id="isTerminal">
                             <label class="form-check-label" for="isTerminal">
                                 Is Terminal
@@ -124,7 +124,7 @@
                     <div class="col-md-6">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" 
-                                   @bind="selectedRule.IsAmbiguous" 
+                                   @bind="editingRule.IsAmbiguous" 
                                    id="isAmbiguous">
                             <label class="form-check-label" for="isAmbiguous">
                                 Allow Ambiguity
@@ -136,14 +136,14 @@
                 <div class="mb-3">
                     <label class="form-label">Priority</label>
                     <input type="number" class="form-control" 
-                           @bind="selectedRule.Priority" 
+                           @bind="editingRule.Priority" 
                            @bind:event="oninput">
                     <div class="form-text">Higher priority rules are applied first</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Category</label>
-                    <select class="form-select" @bind="selectedRule.Category">
+                    <select class="form-select" @bind="editingRule.Category">
                         <option value="">None</option>
                         <option value="expression">Expression</option>
                         <option value="statement">Statement</option>
@@ -158,14 +158,14 @@
                     <label class="form-label">Return Type</label>
                     <input type="text" class="form-control" 
                            placeholder="e.g., Expression" 
-                           @bind="selectedRule.ReturnType" 
+                           @bind="editingRule.ReturnType" 
                            @bind:event="oninput">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Parameters</label>
                     <div class="parameters-list">
-                        @foreach (var param in selectedRule.Parameters)
+                        @foreach (var param in editingRule.Parameters)
                         {
                             <div class="parameter-item">
                                 <input type="text" class="form-control form-control-sm" 
@@ -193,7 +193,7 @@
                     <label class="form-label">Action Code</label>
                     <textarea class="form-control" rows="4" 
                               placeholder="Custom code to execute when this rule is matched" 
-                              @bind="selectedRule.ActionCode" 
+                              @bind="editingRule.ActionCode" 
                               @bind:event="oninput"></textarea>
                 </div>
             </div>

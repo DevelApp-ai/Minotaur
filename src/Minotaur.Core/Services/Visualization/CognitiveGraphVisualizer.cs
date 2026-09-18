@@ -15,26 +15,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CognitiveGraph;
+using CognitiveGraph.Accessors;
+using Microsoft.Extensions.Logging;
 using Minotaur.Core.Models.Visualization;
+using CGraph = CognitiveGraph.CognitiveGraph;
 
 namespace Minotaur.Core.Services.Visualization;
 
 /// <summary>
-/// Implementation of ICognitiveGraphVisualizer for visualizing CognitiveGraph
-/// with native ambiguity support through PackedNode structures.
+/// Implementation of <see cref="ICognitiveGraphVisualizer"/> for visualizing
+/// CognitiveGraph with native ambiguity support through PackedNode structures.
 /// 
 /// This service preserves all ambiguity in the parse by showing all PackedNode
-/// alternatives, allowing users to see all possible interpretations of the source code.
+/// alternatives, allowing users to see all possible interpretations of the
+/// source code.
 /// </summary>
 public class CognitiveGraphVisualizer : ICognitiveGraphVisualizer
 {
-    private readonly ILogger<CognitiveGraphVisualizer> _logger;
+    private readonly ILogger<CognitiveGraphVisualizer>? _logger;
 
     /// <summary>
-    /// Initializes a new instance of the CognitiveGraphVisualizer.
+    /// Initializes a new instance.
     /// </summary>
-    public CognitiveGraphVisualizer(ILogger<CognitiveGraphVisualizer> logger)
+    public CognitiveGraphVisualizer(ILogger<CognitiveGraphVisualizer>? logger = null)
     {
         _logger = logger;
     }
@@ -44,71 +47,80 @@ public class CognitiveGraphVisualizer : ICognitiveGraphVisualizer
     /// Preserves all PackedNode alternatives.
     /// </summary>
     public CognitiveGraphVisualization GenerateVisualization(
-        CognitiveGraph graph,
+        CGraph graph,
         VisualizationOptions? options = null)
     {
+        ArgumentNullException.ThrowIfNull(graph);
         options ??= new VisualizationOptions();
+
+        var sourceText = graph.GetSourceText() ?? string.Empty;
+        var nodeOffsets = CollectAllNodeOffsets(graph);
 
         var visualization = new CognitiveGraphVisualization
         {
-            GraphName = graph.Name,
-            GrammarName = graph.GrammarName,
-            SourceCode = graph.SourceCode,
+            GraphName = "cognitive-graph",
+            GrammarName = string.Empty,
+            SourceCode = sourceText,
             Options = options
         };
 
         // Process all SymbolNodes
-        var nodeMap = new Dictionary<SymbolNode, GraphNode>();
-        
-        foreach (var symbolNode in graph.AllNodes)
+        var nodeMap = new Dictionary<uint, GraphNode>(nodeOffsets.Count);
+
+        foreach (var offset in nodeOffsets)
         {
-            var graphNode = CreateGraphNode(symbolNode, options);
-            nodeMap[symbolNode] = graphNode;
-            visualization.Nodes.Add(graphNode);
+            var symbolNode = graph.GetNodeAt(offset);
+            var graphNode = CreateGraphNode(symbolNode, sourceText);
+            nodeMap[offset] = graphNode;
+            visualization.GraphData.Nodes.Add(graphNode);
         }
 
         // Process all PackedNodes and create edges
         var edgeId = 0;
-        foreach (var symbolNode in graph.AllNodes)
+        foreach (var offset in nodeOffsets)
         {
-            if (symbolNode.PackedNodes == null || symbolNode.PackedNodes.Count == 0)
+            var symbolNode = graph.GetNodeAt(offset);
+            var packedNodes = symbolNode.GetPackedNodes();
+            if (packedNodes.Count == 0)
                 continue;
 
-            var sourceNode = nodeMap[symbolNode];
+            var sourceNode = nodeMap[offset];
 
             // Check if this node has multiple PackedNodes (ambiguity)
-            if (symbolNode.PackedNodes.Count > 1)
+            if (packedNodes.Count > 1)
             {
                 sourceNode.IsAmbiguous = true;
-                sourceNode.AlternativeCount = symbolNode.PackedNodes.Count;
+                sourceNode.AlternativeCount = packedNodes.Count;
             }
 
             // Create edges for each PackedNode
-            for (int i = 0; i < symbolNode.PackedNodes.Count; i++)
+            for (int i = 0; i < packedNodes.Count; i++)
             {
-                var packedNode = symbolNode.PackedNodes[i];
-                
+                var packedNode = packedNodes[i];
+                var childNodes = packedNode.GetChildNodes();
+
                 // Create edges to child SymbolNodes
-                foreach (var child in packedNode.Children)
+                foreach (var child in childNodes)
                 {
-                    if (child != null && nodeMap.TryGetValue(child, out var targetNode))
+                    if (child.Offset != 0 && nodeMap.TryGetValue(child.Offset, out var targetNode))
                     {
                         var edge = new GraphEdge
                         {
                             Id = $"edge_{edgeId++}",
                             Source = sourceNode.Id,
                             Target = targetNode.Id,
-                            Type = GetEdgeType(packedNode),
+                            Type = GetEdgeType(packedNodes.Count),
                             Weight = 1,
-                            IsAlternative = symbolNode.PackedNodes.Count > 1,
-                            PackedNodeIndex = i
+                            IsAlternative = packedNodes.Count > 1,
+                            PackedNodeIndex = i,
+                            RuleId = packedNode.RuleID
                         };
-                        
+
                         // Add edge properties
                         edge.Properties["packedNodeIndex"] = i;
-                        edge.Properties["isAmbiguous"] = symbolNode.PackedNodes.Count > 1;
-                        
-                        visualization.Edges.Add(edge);
+                        edge.Properties["isAmbiguous"] = packedNodes.Count > 1;
+
+                        visualization.GraphData.Edges.Add(edge);
                     }
                 }
             }
@@ -116,7 +128,7 @@ public class CognitiveGraphVisualizer : ICognitiveGraphVisualizer
 
         // Add ambiguity information
         visualization.AmbiguityPoints = GetAmbiguityPoints(graph);
-        visualization.InterpretationPaths = options.Mode == VisualizationMode.ListAllInterpretations 
+        visualization.InterpretationPaths = options.Mode == VisualizationMode.ShowAllInterpretations
             ? GetAllInterpretationPaths(graph)
             : new List<InterpretationPath>();
 
@@ -126,36 +138,44 @@ public class CognitiveGraphVisualizer : ICognitiveGraphVisualizer
     /// <summary>
     /// Get all ambiguity points (nodes with multiple PackedNodes).
     /// </summary>
-    public List<NodeAmbiguityInfo> GetAmbiguityPoints(CognitiveGraph graph)
+    public List<NodeAmbiguityInfo> GetAmbiguityPoints(CGraph graph)
     {
-        var ambiguities = new List<NodeAmbiguityInfo>();
+        ArgumentNullException.ThrowIfNull(graph);
 
-        foreach (var symbolNode in graph.AllNodes)
+        var ambiguities = new List<NodeAmbiguityInfo>();
+        var sourceText = graph.GetSourceText() ?? string.Empty;
+
+        foreach (var offset in CollectAllNodeOffsets(graph))
         {
-            if (symbolNode.PackedNodes != null && symbolNode.PackedNodes.Count > 1)
+            var symbolNode = graph.GetNodeAt(offset);
+            var packedNodes = symbolNode.GetPackedNodes();
+
+            if (packedNodes.Count > 1)
             {
+                var (line, column) = GetLineColumn(sourceText, symbolNode.SourceStart);
                 var ambiguity = new NodeAmbiguityInfo
                 {
-                    NodeId = symbolNode.Id,
-                    NodeName = symbolNode.Text,
-                    NodeType = symbolNode.Kind.ToString(),
-                    AlternativeCount = symbolNode.PackedNodes.Count,
+                    NodeId = GetNodeId(offset),
+                    NodeName = symbolNode.GetSourceText().ToString(),
+                    NodeType = symbolNode.NodeType.ToString(),
+                    IsAmbiguous = true,
+                    AlternativeCount = packedNodes.Count,
                     Location = new CodeLocation
                     {
-                        Line = symbolNode.StartLine,
-                        Column = symbolNode.StartColumn,
-                        Length = symbolNode.Text?.Length ?? 0
+                        Line = line,
+                        Column = column,
+                        Offset = (int)symbolNode.SourceStart,
+                        Length = (int)symbolNode.SourceLength
                     }
                 };
 
                 // Add information about each PackedNode
-                for (int i = 0; i < symbolNode.PackedNodes.Count; i++)
+                for (int i = 0; i < packedNodes.Count; i++)
                 {
-                    var packedNode = symbolNode.PackedNodes[i];
                     var alternative = new PackedNodeAlternative
                     {
                         Index = i,
-                        ChildCount = packedNode.Children?.Count ?? 0,
+                        ChildCount = packedNodes[i].GetChildNodes().Count,
                         IsPreferred = i == 0 // First is usually preferred
                     };
                     ambiguity.Alternatives.Add(alternative);
@@ -172,83 +192,64 @@ public class CognitiveGraphVisualizer : ICognitiveGraphVisualizer
     /// Get all possible interpretation paths through the graph.
     /// Each path represents one way to resolve all ambiguities.
     /// </summary>
-    public List<InterpretationPath> GetAllInterpretationPaths(CognitiveGraph graph)
+    public List<InterpretationPath> GetAllInterpretationPaths(CGraph graph)
     {
-        var paths = new List<InterpretationPath>();
-        var ambiguityNodes = graph.AllNodes
-            .Where(n => n.PackedNodes != null && n.PackedNodes.Count > 1)
-            .ToList();
+        ArgumentNullException.ThrowIfNull(graph);
 
-        if (!ambiguityNodes.Any())
+        var paths = new List<InterpretationPath>();
+
+        // Enumerate ambiguous node offsets
+        var ambiguousOffsets = new List<uint>();
+        foreach (var offset in CollectAllNodeOffsets(graph))
         {
-            // No ambiguity, single path
+            if (graph.GetNodeAt(offset).GetPackedNodes().Count > 1)
+                ambiguousOffsets.Add(offset);
+        }
+
+        if (ambiguousOffsets.Count == 0)
+        {
+            // No ambiguity, single (empty) path
             paths.Add(new InterpretationPath());
             return paths;
         }
 
-        // Generate all combinations of PackedNode choices
-        GenerateAllPaths(graph.Root, new InterpretationPath(), paths);
+        // Generate all combinations of PackedNode choices across ambiguous
+        // nodes. The result count is the product of the alternative counts,
+        // so cap it to avoid runaway memory on heavily ambiguous graphs.
+        const int maxPaths = 10_000;
+
+        var choices = new int[ambiguousOffsets.Count];
+        var alternativeCounts = ambiguousOffsets
+            .Select(o => graph.GetNodeAt(o).GetPackedNodes().Count)
+            .ToArray();
+
+        while (true)
+        {
+            var path = new InterpretationPath();
+            for (int i = 0; i < ambiguousOffsets.Count; i++)
+                path.NodeChoices[GetNodeId(ambiguousOffsets[i])] = choices[i];
+            paths.Add(path);
+
+            if (paths.Count >= maxPaths)
+                break;
+
+            // Increment the combination counter
+            int position = choices.Length - 1;
+            while (position >= 0)
+            {
+                choices[position]++;
+                if (choices[position] < alternativeCounts[position])
+                    break;
+                choices[position] = 0;
+                position--;
+            }
+
+            // All combinations exhausted
+            if (position < 0)
+                break;
+        }
 
         return paths;
-    }
-
-    /// <summary>
-    /// Recursively generate all interpretation paths.
-    /// </summary>
-    private void GenerateAllPaths(
-        SymbolNode node,
-        InterpretationPath currentPath,
-        List<InterpretationPath> allPaths)
-    {
-        if (node == null)
-            return;
-
-        // If this node has multiple PackedNodes, we need to branch
-        if (node.PackedNodes != null && node.PackedNodes.Count > 1)
-        {
-            // Create a new path for each PackedNode choice
-            for (int i = 0; i < node.PackedNodes.Count; i++)
-            {
-                var newPath = currentPath.Clone();
-                newPath.NodeChoices[node.Id] = i;
-                
-                // Recursively process children of this PackedNode
-                foreach (var child in node.PackedNodes[i].Children)
-                {
-                    GenerateAllPaths(child, newPath, allPaths);
-                }
-                
-                // If this is a leaf ambiguity node, add the path
-                if (node.PackedNodes[i].Children.Count == 0)
-                {
-                    allPaths.Add(newPath);
-                }
-            }
-        }
-        else
-        {
-            // Single PackedNode, continue with current path
-            if (node.PackedNodes != null && node.PackedNodes.Count == 1)
-            {
-                currentPath.NodeChoices[node.Id] = 0;
-            }
-            
-            // Process children
-            if (node.PackedNodes != null && node.PackedNodes.Count > 0)
-            {
-                foreach (var child in node.PackedNodes[0].Children)
-                {
-                    GenerateAllPaths(child, currentPath, allPaths);
-                }
-            }
-            
-            // If this is a leaf node, add the path
-            if (node.PackedNodes == null || node.PackedNodes.Count == 0 ||
-                node.PackedNodes[0].Children.Count == 0)
-            {
-                allPaths.Add(currentPath.Clone());
-            }
-        }
     }
 
     /// <summary>
@@ -256,77 +257,88 @@ public class CognitiveGraphVisualizer : ICognitiveGraphVisualizer
     /// Shows only the selected PackedNode choices.
     /// </summary>
     public CognitiveGraphVisualization GenerateSingleInterpretation(
-        CognitiveGraph graph,
+        CGraph graph,
         InterpretationPath path)
     {
+        ArgumentNullException.ThrowIfNull(graph);
+        ArgumentNullException.ThrowIfNull(path);
+
         var options = new VisualizationOptions
         {
             ShowAllAlternatives = false,
             HighlightAmbiguities = true,
-            Mode = VisualizationMode.ShowSingleInterpretation
+            Mode = VisualizationMode.ShowSelectedInterpretation
         };
+
+        var sourceText = graph.GetSourceText() ?? string.Empty;
+        var nodeOffsets = CollectAllNodeOffsets(graph);
 
         var visualization = new CognitiveGraphVisualization
         {
-            GraphName = graph.Name,
-            GrammarName = graph.GrammarName,
-            SourceCode = graph.SourceCode,
+            GraphName = "cognitive-graph",
+            GrammarName = string.Empty,
+            SourceCode = sourceText,
             Options = options,
             SelectedPath = path
         };
 
         // Process all SymbolNodes
-        var nodeMap = new Dictionary<SymbolNode, GraphNode>();
-        
-        foreach (var symbolNode in graph.AllNodes)
+        var nodeMap = new Dictionary<uint, GraphNode>(nodeOffsets.Count);
+
+        foreach (var offset in nodeOffsets)
         {
-            var graphNode = CreateGraphNode(symbolNode, options);
-            nodeMap[symbolNode] = graphNode;
-            visualization.Nodes.Add(graphNode);
+            var symbolNode = graph.GetNodeAt(offset);
+            var graphNode = CreateGraphNode(symbolNode, sourceText);
+            nodeMap[offset] = graphNode;
+            visualization.GraphData.Nodes.Add(graphNode);
         }
 
         // Process only the selected PackedNode paths
         var edgeId = 0;
-        foreach (var symbolNode in graph.AllNodes)
+        foreach (var offset in nodeOffsets)
         {
-            if (symbolNode.PackedNodes == null || symbolNode.PackedNodes.Count == 0)
+            var symbolNode = graph.GetNodeAt(offset);
+            var packedNodes = symbolNode.GetPackedNodes();
+            if (packedNodes.Count == 0)
                 continue;
 
-            var sourceNode = nodeMap[symbolNode];
+            var sourceNode = nodeMap[offset];
 
             // Get the selected PackedNode index for this node
-            int selectedIndex = 0;
-            if (path.NodeChoices.TryGetValue(symbolNode.Id, out var choice))
+            var selectedIndex = 0;
+            if (path.NodeChoices.TryGetValue(GetNodeId(offset), out var choice))
             {
                 selectedIndex = choice;
             }
 
             // Only process the selected PackedNode
-            if (selectedIndex < symbolNode.PackedNodes.Count)
+            if (selectedIndex < packedNodes.Count)
             {
-                var packedNode = symbolNode.PackedNodes[selectedIndex];
-                
+                var packedNode = packedNodes[selectedIndex];
+                var childNodes = packedNode.GetChildNodes();
+
                 // Create edges to child SymbolNodes
-                foreach (var child in packedNode.Children)
+                foreach (var child in childNodes)
                 {
-                    if (child != null && nodeMap.TryGetValue(child, out var targetNode))
+                    if (child.Offset != 0 && nodeMap.TryGetValue(child.Offset, out var targetNode))
                     {
                         var edge = new GraphEdge
                         {
                             Id = $"edge_{edgeId++}",
                             Source = sourceNode.Id,
                             Target = targetNode.Id,
-                            Type = GetEdgeType(packedNode),
+                            Type = "selected",
                             Weight = 1,
                             IsAlternative = false,
-                            PackedNodeIndex = selectedIndex
+                            PackedNodeIndex = selectedIndex,
+                            RuleId = packedNode.RuleID
                         };
-                        
+
                         // Mark as selected path
                         edge.Properties["isSelected"] = true;
                         edge.Properties["packedNodeIndex"] = selectedIndex;
-                        
-                        visualization.Edges.Add(edge);
+
+                        visualization.GraphData.Edges.Add(edge);
                     }
                 }
             }
@@ -336,52 +348,122 @@ public class CognitiveGraphVisualizer : ICognitiveGraphVisualizer
     }
 
     /// <summary>
+    /// Collects the offsets of all SymbolNodes reachable from the root node,
+    /// traversing every PackedNode alternative (breadth-first).
+    /// </summary>
+    private static List<uint> CollectAllNodeOffsets(CGraph graph)
+    {
+        var result = new List<uint>();
+        var visited = new HashSet<uint>();
+        var queue = new Queue<uint>();
+
+        var statistics = graph.GetStatistics();
+        if (statistics.NodeCount == 0)
+            return result;
+
+        var root = graph.GetRootNode();
+        queue.Enqueue(root.Offset);
+        visited.Add(root.Offset);
+
+        while (queue.Count > 0)
+        {
+            var offset = queue.Dequeue();
+            result.Add(offset);
+
+            var symbolNode = graph.GetNodeAt(offset);
+            var packedNodes = symbolNode.GetPackedNodes();
+
+            for (int i = 0; i < packedNodes.Count; i++)
+            {
+                var childNodes = packedNodes[i].GetChildNodes();
+                for (int c = 0; c < childNodes.Count; c++)
+                {
+                    var childOffset = childNodes[c].Offset;
+                    if (childOffset != 0 && visited.Add(childOffset))
+                    {
+                        queue.Enqueue(childOffset);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Creates a GraphNode from a SymbolNode.
     /// </summary>
-    private GraphNode CreateGraphNode(SymbolNode symbolNode, VisualizationOptions options)
+    private static GraphNode CreateGraphNode(SymbolNode symbolNode, string sourceText)
     {
+        var (line, column) = GetLineColumn(sourceText, symbolNode.SourceStart);
+        var text = symbolNode.GetSourceText().ToString();
+
         var node = new GraphNode
         {
-            Id = symbolNode.Id,
-            Type = symbolNode.Kind.ToString(),
-            Name = symbolNode.Text ?? string.Empty,
-            FullName = symbolNode.FullName,
+            Id = GetNodeId(symbolNode.Offset),
+            Type = symbolNode.NodeType.ToString(),
+            Name = text,
             Size = 10,
             Location = new CodeLocation
             {
-                Line = symbolNode.StartLine,
-                Column = symbolNode.StartColumn,
-                Length = symbolNode.Text?.Length ?? 0
+                Line = line,
+                Column = column,
+                Offset = (int)symbolNode.SourceStart,
+                Length = (int)symbolNode.SourceLength
             }
         };
 
         // Add properties
-        node.Properties["symbolId"] = symbolNode.SymbolId;
-        node.Properties["kind"] = symbolNode.Kind.ToString();
-        
-        if (symbolNode.Value != null)
+        node.Properties["symbolId"] = symbolNode.SymbolID;
+        node.Properties["nodeType"] = symbolNode.NodeType;
+        node.Properties["sourceStart"] = symbolNode.SourceStart;
+        node.Properties["sourceLength"] = symbolNode.SourceLength;
+
+        if (text.Length > 0)
         {
-            node.Properties["value"] = symbolNode.Value.ToString();
+            node.Properties["value"] = text;
         }
 
         return node;
     }
 
     /// <summary>
-    /// Gets the edge type based on the PackedNode.
+    /// Gets the edge type based on the number of PackedNode alternatives.
     /// </summary>
-    private string GetEdgeType(PackedNode packedNode)
+    private static string GetEdgeType(int packedNodeCount)
     {
-        if (packedNode == null)
-            return "default";
-
-        // Check if this is a specific type of relationship
-        if (packedNode.IsAmbiguous)
+        if (packedNodeCount > 1)
             return "ambiguous";
-        
-        if (packedNode.IsPreferred)
-            return "preferred";
 
         return "default";
+    }
+
+    /// <summary>
+    /// Creates a stable node identifier from a SymbolNode offset.
+    /// </summary>
+    private static string GetNodeId(uint offset) => $"node_{offset}";
+
+    /// <summary>
+    /// Computes 1-based line and column numbers for a source offset.
+    /// </summary>
+    private static (int Line, int Column) GetLineColumn(string sourceText, uint offset)
+    {
+        if (string.IsNullOrEmpty(sourceText) || offset == 0)
+            return (1, 1);
+
+        var limit = (int)Math.Min(offset, (uint)sourceText.Length);
+        var line = 1;
+        var lastLineStart = 0;
+
+        for (int i = 0; i < limit; i++)
+        {
+            if (sourceText[i] == '\n')
+            {
+                line++;
+                lastLineStart = i + 1;
+            }
+        }
+
+        return (line, limit - lastLineStart + 1);
     }
 }

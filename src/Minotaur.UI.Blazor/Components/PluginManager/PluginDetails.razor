@@ -147,10 +147,10 @@
                                         @if (config.Type == "boolean")
                                         {
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" 
-                                                       id="@config.Key" 
-                                                       @bind="config.Value" 
-                                                       @bind:event="onchange">
+                                                <input class="form-check-input" type="checkbox"
+                                                       id="@config.Key"
+                                                       checked='@(config.Value?.ToString() == "true")'
+                                                       @onchange="e => OnConfigBoolChanged(config, e)">
                                                 <label class="form-check-label" for="@config.Key">
                                                     @(config.Value?.ToString().ToLower() == "true" ? "Enabled" : "Disabled")
                                                 </label>
@@ -158,24 +158,24 @@
                                         }
                                         else if (config.Type == "number")
                                         {
-                                            <input type="number" class="form-control form-control-sm" 
-                                                   id="@config.Key" 
-                                                   @bind="config.Value" 
-                                                   @bind:event="oninput">
+                                            <input type="number" class="form-control form-control-sm"
+                                                   id="@config.Key"
+                                                   value="@config.Value?.ToString()"
+                                                   @oninput="e => config.Value = e.Value.ToString()">
                                         }
                                         else if (config.Type == "string")
                                         {
-                                            <input type="text" class="form-control form-control-sm" 
-                                                   id="@config.Key" 
-                                                   @bind="config.Value" 
-                                                   @bind:event="oninput">
+                                            <input type="text" class="form-control form-control-sm"
+                                                   id="@config.Key"
+                                                   value="@config.Value?.ToString()"
+                                                   @oninput="e => config.Value = e.Value.ToString()">
                                         }
                                         else if (config.Type == "select")
                                         {
-                                            <select class="form-select form-select-sm" 
-                                                    id="@config.Key" 
-                                                    @bind="config.Value" 
-                                                    @bind:event="onchange">
+                                            <select class="form-select form-select-sm"
+                                                    id="@config.Key"
+                                                    value="@config.Value?.ToString()"
+                                                    @onchange="e => config.Value = e.Value.ToString()">
                                                 @foreach (var option in config.Options ?? new List<string>())
                                                 {
                                                     <option value="@option">@option</option>
@@ -514,6 +514,11 @@
     private void Close()
     {
         OnClose.InvokeAsync();
+    }
+
+    private void OnConfigBoolChanged(PluginConfiguration config, ChangeEventArgs e)
+    {
+        config.Value = (bool)e.Value ? "true" : "false";
     }
 
     private void InstallPlugin()

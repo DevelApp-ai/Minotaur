@@ -134,25 +134,25 @@
                 <ul class="nav nav-tabs nav-tabs-sm">
                     <li class="nav-item">
                         <button class="nav-link @(activeView == "graph" ? "active" : "")" 
-                                @onclick="() => SetActiveView("graph")">
+                                @onclick='() => SetActiveView("graph")'>
                             <i class="bi bi-diagram-3"></i> Graph
                         </button>
                     </li>
                     <li class="nav-item">
                         <button class="nav-link @(activeView == "tree" ? "active" : "")" 
-                                @onclick="() => SetActiveView("tree")">
+                                @onclick='() => SetActiveView("tree")'>
                             <i class="bi bi-tree"></i> Tree
                         </button>
                     </li>
                     <li class="nav-item">
                         <button class="nav-link @(activeView == "tokens" ? "active" : "")" 
-                                @onclick="() => SetActiveView("tokens")">
+                                @onclick='() => SetActiveView("tokens")'>
                             <i class="bi bi-fonts"></i> Tokens
                         </button>
                     </li>
                     <li class="nav-item">
                         <button class="nav-link @(activeView == "log" ? "active" : "")" 
-                                @onclick="() => SetActiveView("log")">
+                                @onclick='() => SetActiveView("log")'>
                             <i class="bi bi-terminal"></i> Log
                         </button>
                     </li>
@@ -504,9 +504,9 @@
                     new GraphEdge { Id = "5-8-1", Source = "5", Target = "8", Type = "alternative", IsAlternative = true, PackedNodeIndex = 1, RuleId = 102 }
                 }
             },
-            Ambiguities = new Dictionary<string, NodeAmbiguityInfo>
+            AmbiguityPoints = new List<NodeAmbiguityInfo>
             {
-                ["5"] = new NodeAmbiguityInfo
+                new NodeAmbiguityInfo
                 {
                     NodeId = "5",
                     IsAmbiguous = true,
@@ -518,7 +518,10 @@
                     }
                 }
             },
-            Mode = VisualizationMode.ShowAllInterpretations
+            Options = new VisualizationOptions
+            {
+                Mode = VisualizationMode.ShowAllInterpretations
+            }
         };
     }
 

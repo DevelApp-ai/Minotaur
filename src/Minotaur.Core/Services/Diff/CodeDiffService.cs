@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using Minotaur.Core.Models.Diff;
 
 namespace Minotaur.Core.Services.Diff;
 
@@ -479,7 +481,7 @@ public class CodeDiffService : ICodeDiffService
             // Find token diffs that correspond to this line
             var lineTokenDiffs = tokenDiff.Where(td => 
                 (change.OldLineNumber > 0 && td.OldTokenIndex >= 0 && 
-                 GetLineFromPosition(change.OldText, td.Token.StartPosition) == change.OldLineNumber) ||
+                 GetLineFromPosition(change.Text, td.Token.StartPosition) == change.OldLineNumber) ||
                 (change.NewLineNumber > 0 && td.NewTokenIndex >= 0 &&
                  GetLineFromPosition(change.Text, td.Token.StartPosition) == change.NewLineNumber)).ToList();
 

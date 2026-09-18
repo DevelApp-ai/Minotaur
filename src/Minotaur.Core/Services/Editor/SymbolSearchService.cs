@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using Minotaur.Core.Models.Editor;
 
 namespace Minotaur.Core.Services.Editor;
 

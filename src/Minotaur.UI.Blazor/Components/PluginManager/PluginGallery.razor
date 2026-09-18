@@ -36,27 +36,27 @@
     <div class="categories-nav">
         <div class="nav-scroller">
             <button class="btn btn-sm @(selectedCategory == "" ? "btn-primary" : "btn-outline-secondary")" 
-                    @onclick="() => selectedCategory = """>
+                    @onclick='() => selectedCategory = ""'>
                 All
             </button>
             <button class="btn btn-sm @(selectedCategory == "language" ? "btn-primary" : "btn-outline-secondary")" 
-                    @onclick="() => selectedCategory = "language"">
+                    @onclick='() => selectedCategory = "language"'>
                 <i class="bi bi-translate"></i> Language
             </button>
             <button class="btn btn-sm @(selectedCategory == "visualization" ? "btn-primary" : "btn-outline-secondary")" 
-                    @onclick="() => selectedCategory = "visualization"">
+                    @onclick='() => selectedCategory = "visualization"'>
                 <i class="bi bi-diagram-3"></i> Visualization
             </button>
             <button class="btn btn-sm @(selectedCategory == "export" ? "btn-primary" : "btn-outline-secondary")" 
-                    @onclick="() => selectedCategory = "export"">
+                    @onclick='() => selectedCategory = "export"'>
                 <i class="bi bi-box-arrow-up-right"></i> Export
             </button>
             <button class="btn btn-sm @(selectedCategory == "analysis" ? "btn-primary" : "btn-outline-secondary")" 
-                    @onclick="() => selectedCategory = "analysis"">
+                    @onclick='() => selectedCategory = "analysis"'>
                 <i class="bi bi-graph-up"></i> Analysis
             </button>
             <button class="btn btn-sm @(selectedCategory == "theme" ? "btn-primary" : "btn-outline-secondary")" 
-                    @onclick="() => selectedCategory = "theme"">
+                    @onclick='() => selectedCategory = "theme"'>
                 <i class="bi bi-palette"></i> Theme
             </button>
         </div>

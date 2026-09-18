@@ -377,11 +377,11 @@
                    (filterStatus == "disabled" && !p.IsEnabled))
         .OrderBy(p => sortBy switch
         {
-            "name" => p.Name,
-            "version" => p.Version,
-            "date" => p.InstallDate,
-            "status" => p.IsEnabled ? 0 : 1,
-            _ => p.Name
+            "name" => (IComparable)p.Name,
+            "version" => (IComparable)p.Version,
+            "date" => (IComparable)p.InstallDate,
+            "status" => (IComparable)(p.IsEnabled ? 0 : 1),
+            _ => (IComparable)p.Name
         })
         .ToList();
 

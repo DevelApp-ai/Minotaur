@@ -45,6 +45,7 @@
  * @implements IDisposable - To clean up event handlers
  * *@
 
+@using SymbolInfo = Minotaur.Core.Models.Editor.SymbolInfo
 @using Minotaur.Core.Models.Editor
 @using Minotaur.Core.Services.Editor
 @using Microsoft.AspNetCore.Components
@@ -244,7 +245,6 @@
         }
         else if (e.CtrlKey && e.Key == "f")
         {
-            e.PreventDefault();
             // Focus the search input
         }
     }

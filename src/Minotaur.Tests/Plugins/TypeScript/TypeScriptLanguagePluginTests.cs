@@ -13,6 +13,7 @@
  */
 
 using Minotaur.Core;
+using Minotaur.Analysis.Symbolic;
 using Minotaur.Plugins.TypeScript;
 using Xunit;
 
@@ -105,7 +106,7 @@ public class TypeScriptLanguagePluginTests
     [Fact]
     public void GetErrorConfidence_ShouldReturnValue()
     {
-        var confidence = _plugin.GetErrorConfidence(Analysis.Symbolic.SymbolicErrorType.NullPointerAccess);
+        var confidence = _plugin.GetErrorConfidence(SymbolicErrorType.NullPointerAccess);
         
         Assert.True(confidence >= 0.0 && confidence <= 1.0);
     }
@@ -113,9 +114,9 @@ public class TypeScriptLanguagePluginTests
     [Fact]
     public void GenerateTestCases_ShouldReturnTestCases()
     {
-        var error = new Analysis.Symbolic.SymbolicError(
-            Analysis.Symbolic.SymbolicErrorType.NullPointerAccess,
-            new Analysis.Symbolic.SourceLocation(1, 1),
+        var error = new SymbolicError(
+            SymbolicErrorType.NullPointerAccess,
+            new SourceLocation(1, 1),
             "Test error",
             0.5);
         

@@ -24,12 +24,12 @@ namespace Minotaur.Tests.GrammarGeneration;
 [TestClass]
 public class ParseErrorAnalyzerTests
 {
-    private Grammar _testGrammar = null!;
+    private Minotaur.GrammarGeneration.Models.Grammar _testGrammar = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _testGrammar = new Grammar
+        _testGrammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "TestGrammar",
             Version = "1.0",
