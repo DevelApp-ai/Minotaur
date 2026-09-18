@@ -366,7 +366,7 @@ public class SyntaxHighlightingService : ISyntaxHighlightingService
     /// <summary>
     /// Gets the highlighting rules for a specific language.
     /// </summary>
-    public LanguageHighlightingRules GetLanguageRules(string languageId)
+    public LanguageHighlightingRules? GetLanguageRules(string languageId)
     {
         if (string.IsNullOrEmpty(languageId))
             return null;
@@ -498,12 +498,12 @@ public class SyntaxHighlightingService : ISyntaxHighlightingService
     public string GetCssClass(TokenType tokenType, Theme theme, ColorScheme colorScheme)
     {
         var baseClass = GetBaseCssClass(tokenType);
-        
+
         if (theme == Theme.Dark)
             return $"{baseClass} dark-theme";
         else if (theme == Theme.Light)
             return $"{baseClass} light-theme";
-        
+
         return baseClass;
     }
 
@@ -627,7 +627,7 @@ public interface ISyntaxHighlightingService
     /// <summary>
     /// Gets the highlighting rules for a specific language.
     /// </summary>
-    LanguageHighlightingRules GetLanguageRules(string languageId);
+    LanguageHighlightingRules? GetLanguageRules(string languageId);
 
     /// <summary>
     /// Gets all supported languages for syntax highlighting.

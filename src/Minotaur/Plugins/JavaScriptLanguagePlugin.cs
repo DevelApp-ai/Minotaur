@@ -153,6 +153,3 @@ public class JavaScriptLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     }
 }
 
-/// <summary>
-/// Built-in Python language plugin for unparsing and compiler backend generation
-/// </summary>

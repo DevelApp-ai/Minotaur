@@ -51,11 +51,11 @@ public class TypeScriptLanguagePluginTests
     public async Task GenerateCompilerBackendRulesAsync_ShouldReturnTypeScriptRules()
     {
         var rules = await _plugin.GenerateCompilerBackendRulesAsync();
-        
+
         Assert.NotNull(rules);
         Assert.Equal("typescript", rules.LanguageId);
         Assert.NotEmpty(rules.GenerationRules);
-        
+
         // Check for key TypeScript rules
         var ruleTypes = rules.GenerationRules.Select(r => r.NodeType).ToList();
         Assert.Contains("interface_declaration", ruleTypes);
@@ -67,7 +67,7 @@ public class TypeScriptLanguagePluginTests
     public void GetFormattingOptions_ShouldReturnTypeScriptOptions()
     {
         var options = _plugin.GetFormattingOptions();
-        
+
         Assert.NotNull(options);
         Assert.Equal("spaces", options.IndentStyle);
         Assert.Equal(2, options.IndentSize);
@@ -79,7 +79,7 @@ public class TypeScriptLanguagePluginTests
     public async Task ValidateGraphForUnparsingAsync_NullGraph_ShouldReturnError()
     {
         var result = await _plugin.ValidateGraphForUnparsingAsync(null!);
-        
+
         Assert.False(result.CanUnparse);
         Assert.Contains(result.Errors, e => e.NodeId == "null");
     }
@@ -89,9 +89,9 @@ public class TypeScriptLanguagePluginTests
     {
         var sourceCode = "interface Test { name: string; } ";
         var constraints = new List<SymbolicConstraint>();
-        
+
         var errors = _plugin.AnalyzeSymbolic(sourceCode, constraints);
-        
+
         Assert.NotNull(errors);
     }
 
@@ -99,7 +99,7 @@ public class TypeScriptLanguagePluginTests
     public void GetErrorPatterns_ShouldReturnPatterns()
     {
         var patterns = _plugin.GetErrorPatterns();
-        
+
         Assert.NotNull(patterns);
     }
 
@@ -107,7 +107,7 @@ public class TypeScriptLanguagePluginTests
     public void GetErrorConfidence_ShouldReturnValue()
     {
         var confidence = _plugin.GetErrorConfidence(SymbolicErrorType.NullPointerAccess);
-        
+
         Assert.True(confidence >= 0.0 && confidence <= 1.0);
     }
 
@@ -119,9 +119,9 @@ public class TypeScriptLanguagePluginTests
             new SourceLocation(1, 1),
             "Test error",
             0.5);
-        
+
         var testCases = _plugin.GenerateTestCases(error, "test code");
-        
+
         Assert.NotNull(testCases);
     }
 }
@@ -136,7 +136,7 @@ public class TypeScriptUnparseVisitorTests
     {
         var visitor = new TypeScriptUnparseVisitor();
         var code = visitor.GetGeneratedCode();
-        
+
         Assert.Equal(string.Empty, code);
     }
 }
@@ -152,7 +152,7 @@ public class TypeScriptUnparseValidatorTests
     public void Validate_NullGraph_ShouldReturnError()
     {
         var errors = _validator.Validate(null!);
-        
+
         Assert.NotEmpty(errors);
         Assert.Contains(errors, e => e.NodeId == "null");
     }

@@ -152,7 +152,7 @@
                                                        checked='@(config.Value?.ToString() == "true")'
                                                        @onchange="e => OnConfigBoolChanged(config, e)">
                                                 <label class="form-check-label" for="@config.Key">
-                                                    @(config.Value?.ToString().ToLower() == "true" ? "Enabled" : "Disabled")
+                                                    @(config.Value?.ToString()?.ToLower() == "true" ? "Enabled" : "Disabled")
                                                 </label>
                                             </div>
                                         }
@@ -161,21 +161,21 @@
                                             <input type="number" class="form-control form-control-sm"
                                                    id="@config.Key"
                                                    value="@config.Value?.ToString()"
-                                                   @oninput="e => config.Value = e.Value.ToString()">
+                                                   @oninput="e => config.Value = e.Value?.ToString() ?? string.Empty">
                                         }
                                         else if (config.Type == "string")
                                         {
                                             <input type="text" class="form-control form-control-sm"
                                                    id="@config.Key"
                                                    value="@config.Value?.ToString()"
-                                                   @oninput="e => config.Value = e.Value.ToString()">
+                                                   @oninput="e => config.Value = e.Value?.ToString() ?? string.Empty">
                                         }
                                         else if (config.Type == "select")
                                         {
                                             <select class="form-select form-select-sm"
                                                     id="@config.Key"
                                                     value="@config.Value?.ToString()"
-                                                    @onchange="e => config.Value = e.Value.ToString()">
+                                                    @onchange="e => config.Value = e.Value?.ToString() ?? string.Empty">
                                                 @foreach (var option in config.Options ?? new List<string>())
                                                 {
                                                     <option value="@option">@option</option>
@@ -518,7 +518,7 @@
 
     private void OnConfigBoolChanged(PluginConfiguration config, ChangeEventArgs e)
     {
-        config.Value = (bool)e.Value ? "true" : "false";
+        config.Value = e.Value is bool b && b ? "true" : "false";
     }
 
     private void InstallPlugin()
@@ -554,9 +554,9 @@
         }
     }
 
-    private string GetPluginIcon(PluginInfo plugin)
+    private string GetPluginIcon(PluginInfo? plugin)
     {
-        return plugin.Category switch
+        return plugin?.Category switch
         {
             "language" => "bi-translate",
             "visualization" => "bi-diagram-3",

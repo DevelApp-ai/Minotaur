@@ -42,7 +42,7 @@ public class PluginManagerService : IPluginManagerService
     public PluginManagerService(ILogger<PluginManagerService> logger)
     {
         _logger = logger;
-        
+
         // Add default plugin directories
         AddDefaultPluginDirectories();
     }
@@ -162,23 +162,24 @@ public class PluginManagerService : IPluginManagerService
     /// <summary>
     /// Gets plugin information from an assembly file.
     /// </summary>
-    private async Task<PluginInfo?> GetPluginInfoFromAssemblyAsync(string assemblyPath)
+    private Task<PluginInfo?> GetPluginInfoFromAssemblyAsync(string assemblyPath)
     {
         try
         {
             // Load the assembly using AssemblyLoadContext for isolation
             var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-            
+
             // Look for ILanguagePlugin implementations
             foreach (var type in assembly.GetTypes())
             {
-                if (typeof(ILanguagePlugin).IsAssignableFrom(type) && 
+                if (typeof(ILanguagePlugin).IsAssignableFrom(type) &&
                     !type.IsInterface && !type.IsAbstract)
                 {
                     // Create an instance to get metadata
-                    var plugin = (ILanguagePlugin)Activator.CreateInstance(type);
-                    
-                    return new PluginInfo
+                    var plugin = Activator.CreateInstance(type) as ILanguagePlugin;
+                    if (plugin == null) continue;
+
+                    return Task.FromResult<PluginInfo?>(new PluginInfo
                     {
                         Id = plugin.LanguageId,
                         Name = plugin.DisplayName,
@@ -187,7 +188,7 @@ public class PluginManagerService : IPluginManagerService
                         AssemblyPath = assemblyPath,
                         IsLoaded = _loadedPlugins.ContainsKey(plugin.LanguageId),
                         Dependencies = GetAssemblyDependencies(assembly)
-                    };
+                    });
                 }
             }
         }
@@ -196,7 +197,7 @@ public class PluginManagerService : IPluginManagerService
             _logger.LogWarning(ex, "Error inspecting assembly: {Assembly}", assemblyPath);
         }
 
-        return null;
+        return Task.FromResult<PluginInfo?>(null);
     }
 
     /// <summary>
@@ -207,9 +208,9 @@ public class PluginManagerService : IPluginManagerService
         try
         {
             return assembly.GetReferencedAssemblies()
-                .Select(a => a.Name)
-                .Where(n => !n.StartsWith("System") && 
-                           !n.StartsWith("Microsoft") && 
+                .Select(a => a.Name ?? string.Empty)
+                .Where(n => !n.StartsWith("System") &&
+                           !n.StartsWith("Microsoft") &&
                            !n.StartsWith("netstandard") &&
                            !n.StartsWith("System") &&
                            !n.StartsWith("mscorlib"))
@@ -241,12 +242,12 @@ public class PluginManagerService : IPluginManagerService
     /// <summary>
     /// Loads a plugin from its PluginInfo.
     /// </summary>
-    private async Task<bool> LoadPluginFromInfoAsync(PluginInfo pluginInfo)
+    private Task<bool> LoadPluginFromInfoAsync(PluginInfo pluginInfo)
     {
         if (_loadedPlugins.ContainsKey(pluginInfo.Id))
         {
             _logger.LogInformation("Plugin already loaded: {PluginId}", pluginInfo.Id);
-            return true;
+            return Task.FromResult(true);
         }
 
         try
@@ -258,29 +259,30 @@ public class PluginManagerService : IPluginManagerService
             // Find and instantiate the plugin
             foreach (var type in assembly.GetTypes())
             {
-                if (typeof(ILanguagePlugin).IsAssignableFrom(type) && 
+                if (typeof(ILanguagePlugin).IsAssignableFrom(type) &&
                     !type.IsInterface && !type.IsAbstract)
                 {
-                    var plugin = (ILanguagePlugin)Activator.CreateInstance(type);
+                    var plugin = Activator.CreateInstance(type) as ILanguagePlugin;
+                    if (plugin == null) continue;
                     _loadedPlugins[pluginInfo.Id] = plugin;
-                    
-                    _logger.LogInformation("Successfully loaded plugin: {PluginId} ({PluginName})", 
+
+                    _logger.LogInformation("Successfully loaded plugin: {PluginId} ({PluginName})",
                         pluginInfo.Id, pluginInfo.Name);
-                    
-                    return true;
+
+                    return Task.FromResult(true);
                 }
             }
 
             _logger.LogWarning("No ILanguagePlugin implementation found in: {Assembly}", pluginInfo.AssemblyPath);
             _loadedAssemblies.Remove(pluginInfo.Id);
-            return false;
+            return Task.FromResult(false);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading plugin: {PluginId}", pluginInfo.Id);
             if (_loadedAssemblies.ContainsKey(pluginInfo.Id))
                 _loadedAssemblies.Remove(pluginInfo.Id);
-            return false;
+            return Task.FromResult(false);
         }
     }
 
@@ -307,7 +309,7 @@ public class PluginManagerService : IPluginManagerService
                 // cannot be unloaded. For true unloading, we'd need a custom
                 // AssemblyLoadContext. For now, we just remove the reference.
                 _loadedAssemblies.Remove(pluginId);
-                
+
                 _logger.LogInformation("Plugin unloaded: {PluginId}", pluginId);
             }
 
@@ -327,7 +329,7 @@ public class PluginManagerService : IPluginManagerService
     {
         // Unload first
         UnloadPlugin(pluginId);
-        
+
         // Then load
         return await LoadPluginAsync(pluginId);
     }

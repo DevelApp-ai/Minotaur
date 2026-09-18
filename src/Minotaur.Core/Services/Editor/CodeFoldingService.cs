@@ -199,7 +199,7 @@ public class CodeFoldingService : ICodeFoldingService
     public List<FoldableRegion> IdentifyFoldableRegions(string sourceCode, string languageId)
     {
         var regions = new List<FoldableRegion>();
-        
+
         if (string.IsNullOrEmpty(sourceCode) || string.IsNullOrEmpty(languageId))
             return regions;
 
@@ -212,7 +212,7 @@ public class CodeFoldingService : ICodeFoldingService
         for (int i = 0; i < lines.Length; i++)
         {
             var line = lines[i];
-            
+
             // Check each pattern
             foreach (var pattern in patterns)
             {
@@ -227,7 +227,7 @@ public class CodeFoldingService : ICodeFoldingService
                     while (stack.Count > 0)
                     {
                         var (startPattern, startLine) = stack.Pop();
-                        
+
                         // Only match if this is the corresponding end pattern
                         if (startPattern.EndPattern == pattern.EndPattern ||
                             startPattern.Pattern == pattern.Pattern)
@@ -251,7 +251,7 @@ public class CodeFoldingService : ICodeFoldingService
 
         // Sort by start line
         regions.Sort((a, b) => a.StartLine.CompareTo(b.StartLine));
-        
+
         return regions;
     }
 
@@ -360,7 +360,7 @@ public class CodeFoldingService : ICodeFoldingService
     {
         var typeName = region.Type.ToString();
         var startText = region.StartText;
-        
+
         // Truncate start text if too long
         if (startText.Length > 50)
             startText = startText.Substring(0, 47) + "...";

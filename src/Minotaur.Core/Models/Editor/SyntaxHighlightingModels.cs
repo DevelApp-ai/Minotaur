@@ -373,7 +373,7 @@ public class LanguageHighlightingRules
     /// <summary>
     /// Gets a rule by its pattern.
     /// </summary>
-    public TokenHighlightingRule GetRuleByPattern(string pattern)
+    public TokenHighlightingRule? GetRuleByPattern(string pattern)
     {
         return TokenRules.Find(r => r.Pattern == pattern);
     }
@@ -508,7 +508,7 @@ public class HighlightedText
 
             // Add the span
             var spanText = span.GetText(SourceText);
-            var cssClass = string.IsNullOrEmpty(span.CssClass) ? 
+            var cssClass = string.IsNullOrEmpty(span.CssClass) ?
                 $"{cssClassPrefix}-{span.TokenType.ToString().ToLower()}" : span.CssClass;
             var style = string.Empty;
 

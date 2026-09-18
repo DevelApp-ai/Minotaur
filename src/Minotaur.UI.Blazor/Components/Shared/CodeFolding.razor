@@ -94,10 +94,10 @@
     public EventCallback OnFoldStateChanged { get; set; }
 
     [Inject]
-    public ICodeFoldingService FoldingService { get; set; }
+    public ICodeFoldingService FoldingService { get; set; } = null!;
 
     [Inject]
-    public IJSRuntime JSRuntime { get; set; }
+    public IJSRuntime JSRuntime { get; set; } = null!;
 
     private ElementReference codeContainer;
     private List<FoldableRegion> FoldableRegions { get; set; } = new List<FoldableRegion>();
@@ -202,7 +202,7 @@
         };
     }
 
-    private FoldableRegion FindRegionAtLine(int lineNumber)
+    private FoldableRegion? FindRegionAtLine(int lineNumber)
     {
         // Line numbers are 0-based internally
         return FoldableRegions.FirstOrDefault(r => r.StartLine - 1 == lineNumber);

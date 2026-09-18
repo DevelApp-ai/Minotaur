@@ -150,7 +150,7 @@
     public EventCallback<DiffViewMode> OnViewModeChanged { get; set; }
 
     [Inject]
-    public ICodeDiffService DiffService { get; set; }
+    public ICodeDiffService DiffService { get; set; } = null!;
 
     private DiffResult DiffResult { get; set; } = new DiffResult();
     private string ThemeClass => GetThemeClass();
@@ -197,7 +197,6 @@
         return builder =>
         {
             var oldLineNum = 1;
-            var changeIndex = 0;
 
             foreach (var change in DiffResult.Changes)
             {

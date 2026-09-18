@@ -27,7 +27,7 @@ namespace Minotaur.Core.Services.Marketplace
         /// </summary>
         /// <param name="message">Error message</param>
         /// <param name="innerException">Inner exception</param>
-        public MarketplaceException(string message, Exception innerException) 
+        public MarketplaceException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
@@ -40,6 +40,6 @@ namespace Minotaur.Core.Services.Marketplace
         /// <summary>
         /// Error code from the API response
         /// </summary>
-        public string ErrorCode { get; set; }
+        public string ErrorCode { get; set; } = string.Empty;
     }
 }

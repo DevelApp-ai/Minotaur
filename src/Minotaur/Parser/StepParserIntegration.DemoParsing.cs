@@ -398,10 +398,4 @@ public partial class StepParserIntegration
             AddLocationInformation(child, locationMap);
         }
     }
-
-    /// <summary>
-    /// Invokes the StepParser using reflection to handle unknown API structure.
-    /// </summary>
-    /// <param name="sourceCode">The source code to parse.</param>
-    /// <param name="version">The cognitive graph version to use (V1 or V2).</param>
 }

@@ -24,7 +24,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<html><body><% Response.Write(\"Hello\") %></body></html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
         Assert.NotEmpty(result.Children);
     }
@@ -34,7 +34,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<%@ LANGUAGE=VBScript %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -43,7 +43,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Dim x : x = 10 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -52,7 +52,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<%= userName %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -61,7 +61,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<!--#include file=\"header.asp\" -->";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -74,7 +74,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userId = Request.QueryString(\"id\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -83,7 +83,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userName = Request.Form(\"name\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -92,7 +92,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% sessionId = Request.Cookies(\"session\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -101,7 +101,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% method = Request.ServerVariables(\"REQUEST_METHOD\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -110,7 +110,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Response.Write(\"Hello\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -119,7 +119,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Response.Redirect(\"/login.asp\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -128,7 +128,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Session(\"UserName\") = \"John\" %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -137,7 +137,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% path = Server.MapPath(\"/images\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -146,7 +146,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Application.Lock() %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -159,7 +159,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Set conn = Server.CreateObject(\"ADODB.Connection\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -168,7 +168,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Dim conn : Set conn = Server.CreateObject(\"ADODB.Connection\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -177,7 +177,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Set rs = Server.CreateObject(\"ADODB.Recordset\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -186,7 +186,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Set cmd = Server.CreateObject(\"ADODB.Command\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -195,7 +195,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Set fso = Server.CreateObject(\"Scripting.FileSystemObject\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -204,7 +204,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Set obj = Server.CreateObject(\"MyCompany.MyComponent\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -217,7 +217,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% On Error Resume Next %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -226,7 +226,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% On Error GoTo ErrorHandler %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -235,7 +235,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% errorCode = Err.Number %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -244,7 +244,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% errorDesc = Err.Description %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -257,7 +257,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Dim userName As String %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -266,7 +266,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Dim userName As String, userId As Integer %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -275,7 +275,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Private myVar : Public sharedVar %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -284,7 +284,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Dim str As String, num As Integer, dbl As Double, bln As Boolean, dt As Date %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -293,7 +293,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userName = \"John\" %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -302,7 +302,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Set obj = Server.CreateObject(\"ADODB.Connection\") %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -311,7 +311,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = @"<% If userId <> """" Then Response.Write(""Valid"") End If %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -320,7 +320,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = @"<% If x > 0 Then Response.Write(""Positive"") Else Response.Write(""Zero or Negative"") End If %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -329,7 +329,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = @"<% If x > 0 Then Response.Write(""Positive"") ElseIf x < 0 Then Response.Write(""Negative"") Else Response.Write(""Zero"") End If %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -338,7 +338,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% For i = 1 To 10 : Response.Write(i) : Next %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -347,7 +347,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% For i = 1 To 10 Step 2 : Response.Write(i) : Next %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -356,7 +356,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% While i < 10 : Response.Write(i) : i = i + 1 : Wend %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -365,7 +365,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Do While i < 10 : Response.Write(i) : i = i + 1 : Loop %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -374,7 +374,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = @"<% Select Case userType Case ""Admin"" : Response.Write(""Admin"") Case ""User"" : Response.Write(""User"") Case Else : Response.Write(""Unknown"") End Select %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -383,7 +383,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = @"<% With Request : userId = .QueryString(""id"") : End With %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -392,7 +392,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% myFunction() %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -401,7 +401,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% Call myFunction() %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -410,7 +410,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% ' This is a comment %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -423,7 +423,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% var userName = \"John\"; %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -432,7 +432,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% var userName = \"John\", userId = 123; %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -441,7 +441,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userName = \"John\"; %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -450,7 +450,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% if (userId != \"\") { Response.Write(\"Valid\"); } %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -459,7 +459,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% if (x > 0) { Response.Write(\"Positive\"); } else { Response.Write(\"Zero or Negative\"); } %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -468,7 +468,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% for (var i = 0; i < 10; i++) { Response.Write(i); } %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -477,7 +477,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% while (i < 10) { Response.Write(i); i++; } %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -486,7 +486,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% try { Response.Write(\"Test\"); } catch (e) { Response.Write(\"Error: \" + e); } %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -495,7 +495,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% switch (userType) { case \"Admin\": Response.Write(\"Admin\"); break; default: Response.Write(\"Unknown\"); } %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -504,7 +504,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% with (Request) { var userId = QueryString(\"id\"); } %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -513,7 +513,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% // This is a comment %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -523,7 +523,7 @@ public class ClassicAspGrammarTests
         var sourceCode = @"<% /* This is a
                multi-line comment */ %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -536,7 +536,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userName = \"John\" %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -545,7 +545,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userName = 'John' %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -554,7 +554,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userId = 123 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -563,7 +563,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% price = 19.99 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -572,7 +572,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% isValid = True %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -581,7 +581,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% userName = Nothing %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -590,7 +590,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% color = &HFF0000 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -599,7 +599,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% permissions = &O755 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -608,7 +608,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% startDate = #01/01/2024# %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -621,7 +621,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% result = a + b - c * d / e %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -630,7 +630,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% if a = b or a <> b or a > b or a < b Then %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -639,7 +639,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% if a And b Or c Xor d Then %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -648,7 +648,7 @@ public class ClassicAspGrammarTests
     {
         var sourceCode = "<% fullName = firstName & \" \" & lastName %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -667,7 +667,7 @@ public class ClassicAspGrammarTests
 </body>
 </html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -685,7 +685,7 @@ function test() { return true; }
 </body>
 </html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -703,7 +703,7 @@ body { color: red; }
 </body>
 </html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -745,7 +745,7 @@ Set conn = Nothing
 </body>
 </html>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -763,7 +763,7 @@ End If
 On Error GoTo 0
 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 
@@ -779,7 +779,7 @@ Else
 End If
 %>";
         var result = await _integration.ParseToCognitiveGraphAsync(sourceCode);
-        
+
         Assert.NotNull(result);
     }
 

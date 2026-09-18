@@ -201,6 +201,3 @@ public class CSharpLanguagePlugin : ILanguagePlugin, ISymbolicAnalysisPlugin
     }
 }
 
-/// <summary>
-/// Built-in JavaScript language plugin for unparsing and compiler backend generation
-/// </summary>

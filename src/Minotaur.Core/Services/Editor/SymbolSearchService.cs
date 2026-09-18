@@ -42,7 +42,7 @@ public class SymbolSearchService : ISymbolSearchService
     /// <summary>
     /// Builds a symbol index for the given source code.
     /// </summary>
-    public SymbolSearchIndex BuildIndex(string sourceCode, string languageId, string filePath = null)
+    public SymbolSearchIndex BuildIndex(string sourceCode, string languageId, string? filePath = null)
     {
         var index = new SymbolSearchIndex
         {
@@ -62,7 +62,7 @@ public class SymbolSearchService : ISymbolSearchService
         foreach (var rule in languageRules.SymbolPatterns)
         {
             var matches = Regex.Matches(sourceCode, rule.Pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
-            
+
             foreach (Match match in matches)
             {
                 if (match.Groups.Count > 1)
@@ -75,9 +75,9 @@ public class SymbolSearchService : ISymbolSearchService
                     var endColumn = GetColumn(sourceCode, match.Index + match.Length);
 
                     // Check if this symbol already exists
-                    var existing = index.Symbols.FirstOrDefault(s => 
-                        s.Name == symbolName && 
-                        s.Line == startLine && 
+                    var existing = index.Symbols.FirstOrDefault(s =>
+                        s.Name == symbolName &&
+                        s.Line == startLine &&
                         s.Column == startColumn);
 
                     if (existing == null)
@@ -86,7 +86,7 @@ public class SymbolSearchService : ISymbolSearchService
                         {
                             Name = symbolName,
                             Type = symbolType,
-                            FilePath = filePath,
+                            FilePath = filePath ?? string.Empty,
                             Line = startLine + 1, // 1-based
                             Column = startColumn + 1,
                             StartPosition = match.Index,
@@ -103,7 +103,7 @@ public class SymbolSearchService : ISymbolSearchService
         foreach (var rule in languageRules.ReferencePatterns)
         {
             var matches = Regex.Matches(sourceCode, rule.Pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
-            
+
             foreach (Match match in matches)
             {
                 if (match.Groups.Count > 1)
@@ -118,7 +118,7 @@ public class SymbolSearchService : ISymbolSearchService
                     index.References.Add(new SymbolReference
                     {
                         SymbolName = symbolName,
-                        FilePath = filePath,
+                        FilePath = filePath ?? string.Empty,
                         Line = startLine + 1,
                         Column = startColumn + 1,
                         StartPosition = match.Index,
@@ -388,7 +388,7 @@ public class SymbolSearchService : ISymbolSearchService
 
         // Simple scope detection based on indentation
         var leadingSpaces = line.Substring(0, column).Length - line.Substring(0, column).TrimStart().Length;
-        
+
         if (leadingSpaces == 0)
             return "global";
         else if (leadingSpaces < 4)
@@ -404,7 +404,7 @@ public class SymbolSearchService : ISymbolSearchService
     /// <summary>
     /// Searches for symbols matching the given query.
     /// </summary>
-    public List<SymbolInfo> SearchSymbols(string query, string languageId = null, SymbolType? typeFilter = null)
+    public List<SymbolInfo> SearchSymbols(string query, string? languageId = null, SymbolType? typeFilter = null)
     {
         var results = new List<SymbolInfo>();
 
@@ -445,14 +445,14 @@ public class SymbolSearchService : ISymbolSearchService
         }
 
         // Sort by relevance (exact match first, then contains)
-        results.Sort((a, b) => 
+        results.Sort((a, b) =>
         {
             var aMatch = a.Name.Equals(query, StringComparison.OrdinalIgnoreCase) ? 0 : 1;
             var bMatch = b.Name.Equals(query, StringComparison.OrdinalIgnoreCase) ? 0 : 1;
-            
+
             if (aMatch != bMatch)
                 return aMatch.CompareTo(bMatch);
-            
+
             return a.Name.CompareTo(b.Name);
         });
 
@@ -488,7 +488,7 @@ public class SymbolSearchService : ISymbolSearchService
     /// <summary>
     /// Gets all references to a specific symbol.
     /// </summary>
-    public List<SymbolReference> GetSymbolReferences(string symbolName, string languageId = null)
+    public List<SymbolReference> GetSymbolReferences(string symbolName, string? languageId = null)
     {
         var results = new List<SymbolReference>();
 
@@ -528,7 +528,7 @@ public class SymbolSearchService : ISymbolSearchService
     /// <summary>
     /// Gets the definition of a symbol.
     /// </summary>
-    public SymbolInfo GetSymbolDefinition(string symbolName, string filePath, int line, int column)
+    public SymbolInfo? GetSymbolDefinition(string symbolName, string filePath, int line, int column)
     {
         if (string.IsNullOrEmpty(symbolName) || string.IsNullOrEmpty(filePath))
             return null;
@@ -640,7 +640,7 @@ public class SymbolSearchService : ISymbolSearchService
     /// <summary>
     /// Gets the symbol at a specific position in a file.
     /// </summary>
-    public SymbolInfo GetSymbolAtPosition(string filePath, int line, int column)
+    public SymbolInfo? GetSymbolAtPosition(string filePath, int line, int column)
     {
         if (string.IsNullOrEmpty(filePath))
             return null;
@@ -686,12 +686,12 @@ public interface ISymbolSearchService
     /// <summary>
     /// Builds a symbol index for the given source code.
     /// </summary>
-    SymbolSearchIndex BuildIndex(string sourceCode, string languageId, string filePath = null);
+    SymbolSearchIndex BuildIndex(string sourceCode, string languageId, string? filePath = null);
 
     /// <summary>
     /// Searches for symbols matching the given query.
     /// </summary>
-    List<SymbolInfo> SearchSymbols(string query, string languageId = null, SymbolType? typeFilter = null);
+    List<SymbolInfo> SearchSymbols(string query, string? languageId = null, SymbolType? typeFilter = null);
 
     /// <summary>
     /// Searches for symbols in a specific file.
@@ -701,17 +701,17 @@ public interface ISymbolSearchService
     /// <summary>
     /// Gets all references to a specific symbol.
     /// </summary>
-    List<SymbolReference> GetSymbolReferences(string symbolName, string languageId = null);
+    List<SymbolReference> GetSymbolReferences(string symbolName, string? languageId = null);
 
     /// <summary>
     /// Gets the definition of a symbol.
     /// </summary>
-    SymbolInfo GetSymbolDefinition(string symbolName, string filePath, int line, int column);
+    SymbolInfo? GetSymbolDefinition(string symbolName, string filePath, int line, int column);
 
     /// <summary>
     /// Gets the symbol at a specific position in a file.
     /// </summary>
-    SymbolInfo GetSymbolAtPosition(string filePath, int line, int column);
+    SymbolInfo? GetSymbolAtPosition(string filePath, int line, int column);
 
     /// <summary>
     /// Gets all symbols of a specific type in a file.

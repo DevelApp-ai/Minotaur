@@ -462,22 +462,12 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Publish to NuGet.org
-      # Skipped (not failed) while the NUGET_API_KEY repo secret is unset.
-      # Set the secret to enable NuGet.org publishing.
-      if: ${{ secrets.NUGET_API_KEY != '' }}
-      run: |
-        echo "Publishing to NuGet.org..."
-        dotnet nuget push ./packages/*.nupkg \
-          --api-key ${{ secrets.NUGET_API_KEY }} \
-          --source https://api.nuget.org/v3/index.json \
-          --skip-duplicate
-      env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    # Publishing target is GitHub Packages ONLY (#72): DevelApp consumers (e.g. Golem)
+    # authenticate to https://nuget.pkg.github.com/DevelApp-ai/index.json.
+    # There is intentionally no NuGet.org publish step.
 
     - name: Create GitHub Release Assets
       uses: softprops/action-gh-release@v1
-      if: always()
       with:
         files: ./packages/*.nupkg
       env:
@@ -557,15 +547,6 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Publish v1.0.0 to NuGet.org
-      run: |
-        echo "Publishing v1.0.0 to NuGet.org..."
-        dotnet nuget push ./packages/*.nupkg \
-          --api-key ${{ secrets.NUGET_API_KEY }} \
-          --source https://api.nuget.org/v3/index.json \
-          --skip-duplicate
-      env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
   cleanup:
     runs-on: ubuntu-latest
