@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -67,7 +68,7 @@ namespace Minotaur.Core.Services.Marketplace
                 // Create the tar.gz package
                 var packageStream = new MemoryStream();
                 
-                using (var archive = new TarArchive(packageStream, TarArchiveMode.Create))
+                using (var archive = new TarArchive(packageStream, TarArchive.TarArchiveMode.Create))
                 {
                     await AddDirectoryToTarAsync(archive, packageDir, "", cancellationToken);
                 }
@@ -126,7 +127,7 @@ namespace Minotaur.Core.Services.Marketplace
                 var prop = type.GetProperty(propName);
                 if (prop == null)
                 {
-                    result.MissingFields = Array.Append(result.MissingFields, propName);
+                    result.MissingFields = result.MissingFields.Append(propName).ToArray();
                     result.IsValid = false;
                 }
                 else
@@ -134,7 +135,7 @@ namespace Minotaur.Core.Services.Marketplace
                     var value = prop.GetValue(grammarDefinition);
                     if (value == null || string.IsNullOrWhiteSpace(value?.ToString()))
                     {
-                        result.MissingFields = Array.Append(result.MissingFields, propName);
+                        result.MissingFields = result.MissingFields.Append(propName).ToArray();
                         result.IsValid = false;
                     }
                 }
