@@ -12,12 +12,14 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
  */
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Minotaur.Core.Controllers;
 using Minotaur.Core.Models.Visualization;
 using Minotaur.Core.Services.Visualization;
 using Moq;
+using CGraph = CognitiveGraph.CognitiveGraph;
 using Xunit;
 
 namespace Minotaur.Tests.Visualization;
@@ -64,7 +66,7 @@ public class VisualizationControllerTests
             }
         };
 
-        _visualizerMock.Setup(v => v.GenerateVisualization(It.IsAny<object>(), It.IsAny<VisualizationOptions>()))
+        _visualizerMock.Setup(v => v.GenerateVisualization(It.IsAny<CGraph>(), It.IsAny<VisualizationOptions>()))
             .Returns(expectedVisualization);
 
         // Act
@@ -117,7 +119,7 @@ public class VisualizationControllerTests
             }
         };
 
-        _visualizerMock.Setup(v => v.GetAmbiguityPoints(It.IsAny<object>()))
+        _visualizerMock.Setup(v => v.GetAmbiguityPoints(It.IsAny<CGraph>()))
             .Returns(expectedAmbiguities);
 
         // Act
@@ -144,17 +146,15 @@ public class VisualizationControllerTests
         {
             new InterpretationPath
             {
-                Id = "path_0",
-                IsValid = true
+                NodeChoices = new Dictionary<string, int>()
             },
             new InterpretationPath
             {
-                Id = "path_1",
-                IsValid = true
+                NodeChoices = new Dictionary<string, int>()
             }
         };
 
-        _visualizerMock.Setup(v => v.GetAllInterpretationPaths(It.IsAny<object>()))
+        _visualizerMock.Setup(v => v.GetAllInterpretationPaths(It.IsAny<CGraph>()))
             .Returns(expectedPaths);
 
         // Act
@@ -179,10 +179,10 @@ public class VisualizationControllerTests
 
         var expectedVisualization = new CognitiveGraphVisualization
         {
-            Mode = VisualizationMode.ShowSelectedInterpretation
+            Options = new VisualizationOptions { Mode = VisualizationMode.ShowSelectedInterpretation }
         };
 
-        _visualizerMock.Setup(v => v.GenerateSingleInterpretation(It.IsAny<object>(), It.IsAny<InterpretationPath>()))
+        _visualizerMock.Setup(v => v.GenerateSingleInterpretation(It.IsAny<CGraph>(), It.IsAny<InterpretationPath>()))
             .Returns(expectedVisualization);
 
         // Act
@@ -191,7 +191,7 @@ public class VisualizationControllerTests
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnValue = Assert.IsType<CognitiveGraphVisualization>(okResult.Value);
-        Assert.Equal(VisualizationMode.ShowSelectedInterpretation, returnValue.Mode);
+        Assert.Equal(VisualizationMode.ShowSelectedInterpretation, returnValue.Options.Mode);
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public class VisualizationControllerTests
             GrammarName = "TestGrammar"
         };
 
-        _visualizerMock.Setup(v => v.GenerateVisualization(It.IsAny<object>(), It.IsAny<VisualizationOptions>()))
+        _visualizerMock.Setup(v => v.GenerateVisualization(It.IsAny<CGraph>(), It.IsAny<VisualizationOptions>()))
             .Throws<Exception>();
 
         // Act
@@ -226,7 +226,7 @@ public class VisualizationControllerTests
             GrammarName = "TestGrammar"
         };
 
-        _visualizerMock.Setup(v => v.GetAmbiguityPoints(It.IsAny<object>()))
+        _visualizerMock.Setup(v => v.GetAmbiguityPoints(It.IsAny<CGraph>()))
             .Throws<Exception>();
 
         // Act
@@ -248,7 +248,7 @@ public class VisualizationControllerTests
             GrammarName = "TestGrammar"
         };
 
-        _visualizerMock.Setup(v => v.GetAllInterpretationPaths(It.IsAny<object>()))
+        _visualizerMock.Setup(v => v.GetAllInterpretationPaths(It.IsAny<CGraph>()))
             .Throws<Exception>();
 
         // Act
@@ -271,7 +271,7 @@ public class VisualizationControllerTests
             PathId = "path_0"
         };
 
-        _visualizerMock.Setup(v => v.GenerateSingleInterpretation(It.IsAny<object>(), It.IsAny<InterpretationPath>()))
+        _visualizerMock.Setup(v => v.GenerateSingleInterpretation(It.IsAny<CGraph>(), It.IsAny<InterpretationPath>()))
             .Throws<Exception>();
 
         // Act

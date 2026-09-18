@@ -1,26 +1,29 @@
 /*
  * This file is part of Minotaur.
+ *
  * Minotaur is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
  * Minotaur is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
+ *
  * You should have received a copy of the GNU Affero General Public License
- * along with Minotaur. If not, see <https://www.gnu.org/licenses/>. 
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
-using Minotaur.Core.Models.Visualization;
 using System.Text.Json;
+using Minotaur.Core.Models.Visualization;
 using Xunit;
 
 namespace Minotaur.Tests.Visualization;
 
 /// <summary>
 /// Tests for GraphData models.
-/// 
+///
 /// These tests verify that the visualization models:
 /// 1. Can be created with default values
 /// 2. Can be serialized and deserialized
@@ -54,37 +57,42 @@ public class GraphDataModelTests
         Assert.Equal(string.Empty, node.Id);
         Assert.Equal(string.Empty, node.Type);
         Assert.Equal(string.Empty, node.Name);
-        Assert.Null(node.FullName);
-        Assert.NotNull(node.Properties);
-        Assert.Empty(node.Properties);
-        Assert.Null(node.Group);
-        Assert.Equal(10, node.Size);
         Assert.False(node.IsAmbiguous);
         Assert.Equal(0, node.AlternativeCount);
         Assert.NotNull(node.Location);
+        Assert.NotNull(node.Properties);
     }
 
     [Fact]
-    public void GraphNode_AmbiguousNode_HasCorrectProperties()
+    public void GraphNode_CustomValues_SetsCorrectly()
     {
         // Act
         var node = new GraphNode
         {
-            Id = "1",
-            Type = "expression",
-            Name = "a+b",
+            Id = "node_1",
+            Type = "compilation_unit",
+            Name = "root",
             IsAmbiguous = true,
-            AlternativeCount = 2,
-            Size = 15
+            AlternativeCount = 3,
+            Location = new CodeLocation
+            {
+                Line = 4,
+                Column = 2,
+                Offset = 40,
+                Length = 12
+            }
         };
 
         // Assert
-        Assert.Equal("1", node.Id);
-        Assert.Equal("expression", node.Type);
-        Assert.Equal("a+b", node.Name);
+        Assert.Equal("node_1", node.Id);
+        Assert.Equal("compilation_unit", node.Type);
+        Assert.Equal("root", node.Name);
         Assert.True(node.IsAmbiguous);
-        Assert.Equal(2, node.AlternativeCount);
-        Assert.Equal(15, node.Size);
+        Assert.Equal(3, node.AlternativeCount);
+        Assert.Equal(4, node.Location.Line);
+        Assert.Equal(2, node.Location.Column);
+        Assert.Equal(40, node.Location.Offset);
+        Assert.Equal(12, node.Location.Length);
     }
 
     [Fact]
@@ -98,37 +106,34 @@ public class GraphDataModelTests
         Assert.Equal(string.Empty, edge.Source);
         Assert.Equal(string.Empty, edge.Target);
         Assert.Equal(string.Empty, edge.Type);
-        Assert.Equal(1, edge.Weight);
-        Assert.NotNull(edge.Properties);
-        Assert.Empty(edge.Properties);
         Assert.False(edge.IsAlternative);
         Assert.Equal(0, edge.PackedNodeIndex);
         Assert.Equal(0u, edge.RuleId);
     }
 
     [Fact]
-    public void GraphEdge_AlternativeEdge_HasCorrectProperties()
+    public void GraphEdge_CustomValues_SetsCorrectly()
     {
         // Act
         var edge = new GraphEdge
         {
-            Id = "1-2-0",
+            Id = "edge_1",
             Source = "1",
             Target = "2",
-            Type = "alternative",
+            Type = "hierarchy",
             IsAlternative = true,
-            PackedNodeIndex = 0,
-            RuleId = 101
+            PackedNodeIndex = 1,
+            RuleId = 100
         };
 
         // Assert
-        Assert.Equal("1-2-0", edge.Id);
+        Assert.Equal("edge_1", edge.Id);
         Assert.Equal("1", edge.Source);
         Assert.Equal("2", edge.Target);
-        Assert.Equal("alternative", edge.Type);
+        Assert.Equal("hierarchy", edge.Type);
         Assert.True(edge.IsAlternative);
-        Assert.Equal(0, edge.PackedNodeIndex);
-        Assert.Equal(101u, edge.RuleId);
+        Assert.Equal(1, edge.PackedNodeIndex);
+        Assert.Equal(100u, edge.RuleId);
     }
 
     [Fact]
@@ -138,37 +143,29 @@ public class GraphDataModelTests
         var location = new CodeLocation();
 
         // Assert
-        Assert.NotNull(location.Start);
-        Assert.NotNull(location.End);
+        Assert.Equal(1, location.Line);
+        Assert.Equal(1, location.Column);
+        Assert.Equal(0, location.Offset);
+        Assert.Equal(0, location.Length);
     }
 
     [Fact]
-    public void Position_DefaultConstructor_SetsDefaultValues()
+    public void CodeLocation_CustomValues_SetsCorrectly()
     {
         // Act
-        var position = new Position();
-
-        // Assert
-        Assert.Equal(1, position.Line);
-        Assert.Equal(1, position.Column);
-        Assert.Equal(0, position.Offset);
-    }
-
-    [Fact]
-    public void Position_CustomValues_SetsCorrectly()
-    {
-        // Act
-        var position = new Position
+        var location = new CodeLocation
         {
             Line = 5,
             Column = 10,
-            Offset = 20
+            Offset = 20,
+            Length = 7
         };
 
         // Assert
-        Assert.Equal(5, position.Line);
-        Assert.Equal(10, position.Column);
-        Assert.Equal(20, position.Offset);
+        Assert.Equal(5, location.Line);
+        Assert.Equal(10, location.Column);
+        Assert.Equal(20, location.Offset);
+        Assert.Equal(7, location.Length);
     }
 
     [Fact]
@@ -198,8 +195,10 @@ public class GraphDataModelTests
             AlternativeCount = 2,
             Location = new CodeLocation
             {
-                Start = new Position { Line = 3, Column = 5, Offset = 20 },
-                End = new Position { Line = 3, Column = 15, Offset = 30 }
+                Line = 3,
+                Column = 5,
+                Offset = 20,
+                Length = 10
             },
             PackedNodes = new List<PackedNodeInfo>
             {
@@ -212,9 +211,9 @@ public class GraphDataModelTests
         Assert.Equal("5", ambiguity.NodeId);
         Assert.True(ambiguity.IsAmbiguous);
         Assert.Equal(2, ambiguity.AlternativeCount);
-        Assert.Equal(3, ambiguity.Location.Start.Line);
-        Assert.Equal(5, ambiguity.Location.Start.Column);
-        Assert.Equal(20, ambiguity.Location.Start.Offset);
+        Assert.Equal(3, ambiguity.Location.Line);
+        Assert.Equal(5, ambiguity.Location.Column);
+        Assert.Equal(20, ambiguity.Location.Offset);
         Assert.Equal(2, ambiguity.PackedNodes.Count);
     }
 
@@ -226,7 +225,7 @@ public class GraphDataModelTests
 
         // Assert
         Assert.Equal(0, packedNode.Index);
-        Assert.Equal(0u, packedNode.RuleId);
+        Assert.Equal(0, packedNode.RuleId);
         Assert.Equal(string.Empty, packedNode.RuleName);
         Assert.NotNull(packedNode.ChildNodeIds);
         Assert.Empty(packedNode.ChildNodeIds);
@@ -248,7 +247,7 @@ public class GraphDataModelTests
 
         // Assert
         Assert.Equal(1, packedNode.Index);
-        Assert.Equal(102u, packedNode.RuleId);
+        Assert.Equal(102, packedNode.RuleId);
         Assert.Equal("function_expression", packedNode.RuleName);
         Assert.Equal(2, packedNode.ChildNodeIds.Count);
         Assert.True(packedNode.IsValid);
@@ -262,9 +261,9 @@ public class GraphDataModelTests
 
         // Assert
         Assert.NotNull(visualization.GraphData);
-        Assert.NotNull(visualization.Ambiguities);
-        Assert.Empty(visualization.Ambiguities);
-        Assert.Equal(VisualizationMode.ShowAllInterpretations, visualization.Mode);
+        Assert.NotNull(visualization.AmbiguityPoints);
+        Assert.Empty(visualization.AmbiguityPoints);
+        Assert.Equal(VisualizationMode.ShowAllInterpretations, visualization.Options.Mode);
         Assert.False(visualization.HasAmbiguities);
         Assert.Equal(0, visualization.AmbiguityCount);
     }
@@ -282,17 +281,17 @@ public class GraphDataModelTests
                     new GraphNode { Id = "1", IsAmbiguous = true, AlternativeCount = 2 }
                 }
             },
-            Ambiguities = new Dictionary<string, NodeAmbiguityInfo>
+            AmbiguityPoints = new List<NodeAmbiguityInfo>
             {
-                ["1"] = new NodeAmbiguityInfo { NodeId = "1", IsAmbiguous = true, AlternativeCount = 2 }
+                new NodeAmbiguityInfo { NodeId = "1", IsAmbiguous = true, AlternativeCount = 2 }
             },
-            Mode = VisualizationMode.ShowAllInterpretations
+            Options = new VisualizationOptions { Mode = VisualizationMode.ShowAllInterpretations }
         };
 
         // Assert
         Assert.True(visualization.HasAmbiguities);
         Assert.Equal(1, visualization.AmbiguityCount);
-        Assert.Equal(VisualizationMode.ShowAllInterpretations, visualization.Mode);
+        Assert.Equal(VisualizationMode.ShowAllInterpretations, visualization.Options.Mode);
     }
 
     [Fact]
@@ -323,8 +322,10 @@ public class GraphDataModelTests
                     AlternativeCount = 0,
                     Location = new CodeLocation
                     {
-                        Start = new Position { Line = 1, Column = 1, Offset = 0 },
-                        End = new Position { Line = 1, Column = 10, Offset = 9 }
+                        Line = 1,
+                        Column = 1,
+                        Offset = 0,
+                        Length = 9
                     }
                 }
             },
@@ -368,9 +369,9 @@ public class GraphDataModelTests
                 SourceCode = "test code",
                 GrammarName = "TestGrammar"
             },
-            Ambiguities = new Dictionary<string, NodeAmbiguityInfo>
+            AmbiguityPoints = new List<NodeAmbiguityInfo>
             {
-                ["1"] = new NodeAmbiguityInfo
+                new NodeAmbiguityInfo
                 {
                     NodeId = "1",
                     IsAmbiguous = true,
@@ -382,7 +383,7 @@ public class GraphDataModelTests
                     }
                 }
             },
-            Mode = VisualizationMode.ShowAllInterpretations
+            Options = new VisualizationOptions { Mode = VisualizationMode.ShowAllInterpretations }
         };
 
         // Act
@@ -393,10 +394,10 @@ public class GraphDataModelTests
         Assert.NotNull(deserialized);
         Assert.Equal(original.GraphData.SourceCode, deserialized.GraphData.SourceCode);
         Assert.Equal(original.GraphData.GrammarName, deserialized.GraphData.GrammarName);
-        Assert.Single(deserialized.Ambiguities);
+        Assert.Single(deserialized.AmbiguityPoints);
         Assert.True(deserialized.HasAmbiguities);
         Assert.Equal(1, deserialized.AmbiguityCount);
-        Assert.Equal(2, deserialized.Ambiguities["1"].AlternativeCount);
+        Assert.Equal(2, deserialized.AmbiguityPoints[0].AlternativeCount);
     }
 
     [Fact]
@@ -406,12 +407,9 @@ public class GraphDataModelTests
         var path = new InterpretationPath();
 
         // Assert
-        Assert.Equal(string.Empty, path.Id);
-        Assert.NotNull(path.Choices);
-        Assert.Empty(path.Choices);
-        Assert.NotNull(path.AppliedRules);
-        Assert.Empty(path.AppliedRules);
-        Assert.True(path.IsValid);
+        Assert.NotNull(path.NodeChoices);
+        Assert.Empty(path.NodeChoices);
+        Assert.Equal(0, path.AmbiguityCount);
     }
 
     [Fact]
@@ -420,54 +418,35 @@ public class GraphDataModelTests
         // Act
         var path = new InterpretationPath
         {
-            Id = "path_0",
-            Choices = new Dictionary<ulong, int>
+            NodeChoices = new Dictionary<string, int>
             {
-                [5] = 0,
-                [10] = 1
-            },
-            AppliedRules = new List<string> { "rule1", "rule2" },
-            IsValid = true
+                ["node_5"] = 0,
+                ["node_10"] = 1
+            }
         };
 
         // Assert
-        Assert.Equal("path_0", path.Id);
-        Assert.Equal(2, path.Choices.Count);
-        Assert.Equal(0, path.Choices[5]);
-        Assert.Equal(1, path.Choices[10]);
-        Assert.Equal(2, path.AppliedRules.Count);
-        Assert.True(path.IsValid);
+        Assert.Equal(2, path.NodeChoices.Count);
+        Assert.Equal(0, path.NodeChoices["node_5"]);
+        Assert.Equal(1, path.NodeChoices["node_10"]);
+        Assert.Equal(2, path.AmbiguityCount);
     }
 
     [Fact]
-    public void VisualizationOptions_DefaultConstructor_SetsDefaultValues()
+    public void InterpretationPath_Clone_CreatesIndependentCopy()
     {
-        // Act
-        var options = new VisualizationOptions();
-
-        // Assert
-        Assert.True(options.ShowAllAlternatives);
-        Assert.True(options.HighlightAmbiguities);
-        Assert.Equal(VisualizationMode.ShowAllInterpretations, options.Mode);
-        Assert.Equal("default", options.ColorScheme);
-    }
-
-    [Fact]
-    public void VisualizationOptions_CustomValues_SetsCorrectly()
-    {
-        // Act
-        var options = new VisualizationOptions
+        // Arrange
+        var path = new InterpretationPath
         {
-            ShowAllAlternatives = false,
-            HighlightAmbiguities = false,
-            Mode = VisualizationMode.ShowAmbiguityOnly,
-            ColorScheme = "dark"
+            NodeChoices = new Dictionary<string, int> { ["node_1"] = 1 }
         };
 
+        // Act
+        var clone = path.Clone();
+        clone.NodeChoices["node_1"] = 0;
+
         // Assert
-        Assert.False(options.ShowAllAlternatives);
-        Assert.False(options.HighlightAmbiguities);
-        Assert.Equal(VisualizationMode.ShowAmbiguityOnly, options.Mode);
-        Assert.Equal("dark", options.ColorScheme);
+        Assert.Equal(1, path.NodeChoices["node_1"]);
+        Assert.Equal(0, clone.NodeChoices["node_1"]);
     }
 }
