@@ -15,6 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using Minotaur.Core.Models.Editor;
 using Minotaur.Core.Models;
 
 namespace Minotaur.Core.Services.Editor;
@@ -27,7 +29,6 @@ public class SyntaxHighlightingService : ISyntaxHighlightingService
 {
     private readonly Dictionary<string, LanguageHighlightingRules> _languageRules;
     private readonly SyntaxHighlightingConfiguration _configuration;
-    private readonly Dictionary<string, TokenTypeInfo> _tokenTypeCache = new();
 
     /// <summary>
     /// Initializes a new instance of the SyntaxHighlightingService.
@@ -400,7 +401,6 @@ public class SyntaxHighlightingService : ISyntaxHighlightingService
             return;
 
         _languageRules[rules.LanguageId] = rules;
-        _tokenTypeCache.Clear();
     }
 
     /// <summary>
@@ -412,7 +412,6 @@ public class SyntaxHighlightingService : ISyntaxHighlightingService
             return;
 
         _languageRules.Remove(languageId);
-        _tokenTypeCache.Clear();
     }
 
     /// <summary>
@@ -444,7 +443,7 @@ public class SyntaxHighlightingService : ISyntaxHighlightingService
 
         foreach (var rule in sortedRules)
         {
-            var matches = rule.Pattern.Matches(text);
+            var matches = System.Text.RegularExpressions.Regex.Matches(text, rule.Pattern);
             foreach (Match match in matches)
             {
                 // Check if this span overlaps with existing spans

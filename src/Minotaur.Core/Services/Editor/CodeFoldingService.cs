@@ -15,6 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using Minotaur.Core.Models.Editor;
 
 namespace Minotaur.Core.Services.Editor;
 
@@ -143,7 +145,7 @@ public class CodeFoldingService : ICodeFoldingService
             new FoldableRegion { Pattern = @"^\s*DO\s*;", EndPattern = @"^\s*END\s*;", Type = FoldType.DoGroup, Priority = 80, IsMultiline = true },
             new FoldableRegion { Pattern = @"^\s*DO\s+WHILE\s*\(", EndPattern = @"^\s*END\s*;", Type = FoldType.DoWhile, Priority = 80, IsMultiline = true },
             new FoldableRegion { Pattern = @"^\s*DO\s+\w+\s*=\s*\w+\s+TO\s+\w+", EndPattern = @"^\s*END\s*;", Type = FoldType.DoFor, Priority = 80, IsMultiline = true },
-            new FoldableRule { Pattern = @"^\s*SELECT\s*\(", EndPattern = @"^\s*END\s*;", Type = FoldType.Select, Priority = 75, IsMultiline = true },
+            new FoldableRegion { Pattern = @"^\s*SELECT\s*\(", EndPattern = @"^\s*END\s*;", Type = FoldType.Select, Priority = 75, IsMultiline = true },
             new FoldableRegion { Pattern = @"^\s*IF\s+.*\s+THEN\s*;", EndPattern = @"^\s*END\s*;", Type = FoldType.Conditional, Priority = 70, IsMultiline = true },
             new FoldableRegion { Pattern = @"^\s*ON\s+\w+", EndPattern = @"^\s*END\s*;", Type = FoldType.Exception, Priority = 65, IsMultiline = true },
             new FoldableRegion { Pattern = @"^\s*\w+:\s*TASK\s*;", EndPattern = @"^\s*END\s+\w+", Type = FoldType.Task, Priority = 60, IsMultiline = true }
