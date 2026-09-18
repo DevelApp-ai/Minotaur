@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
@@ -33,8 +34,8 @@ namespace Minotaur.Core.Services.Marketplace
         /// </summary>
         public async Task<Stream> ExportGrammarPackageAsync(
             object grammarDefinition,
-            string outputPath = null,
-            GrammarExportOptions options = null,
+            string? outputPath = null,
+            GrammarExportOptions? options = null,
             CancellationToken cancellationToken = default)
         {
             // Validate the grammar
@@ -42,7 +43,7 @@ namespace Minotaur.Core.Services.Marketplace
             if (!validation.IsValid)
             {
                 throw new MarketplaceException(string.Join(
-                    Environment.NewLine, 
+                    Environment.NewLine,
                     validation.Errors));
             }
 
@@ -67,7 +68,7 @@ namespace Minotaur.Core.Services.Marketplace
 
                 // Create the tar.gz package
                 var packageStream = new MemoryStream();
-                
+
                 using (var archive = new TarArchive(packageStream, TarArchive.TarArchiveMode.Create))
                 {
                     await AddDirectoryToTarAsync(archive, packageDir, "", cancellationToken);
@@ -102,7 +103,7 @@ namespace Minotaur.Core.Services.Marketplace
         /// <summary>
         /// Validate a grammar definition before export
         /// </summary>
-        public async Task<GrammarValidationResult> ValidateGrammarAsync(
+        public Task<GrammarValidationResult> ValidateGrammarAsync(
             object grammarDefinition,
             CancellationToken cancellationToken = default)
         {
@@ -113,7 +114,7 @@ namespace Minotaur.Core.Services.Marketplace
             {
                 result.IsValid = false;
                 result.Errors = new[] { "Grammar definition cannot be null" };
-                return result;
+                return Task.FromResult(result);
             }
 
             // Use reflection to check for required properties
@@ -141,20 +142,20 @@ namespace Minotaur.Core.Services.Marketplace
                 }
             }
 
-            return result;
+            return Task.FromResult(result);
         }
 
         /// <summary>
         /// Create metadata for a grammar package
         /// </summary>
-        public GrammarMetadata CreateMetadata(object grammarDefinition, GrammarExportOptions options)
+        public GrammarMetadata CreateMetadata(object grammarDefinition, GrammarExportOptions? options)
         {
             var type = grammarDefinition.GetType();
             var metadata = new GrammarMetadata
             {
-                Name = GetPropertyValue<string>(grammarDefinition, "Name"),
+                Name = GetPropertyValue<string>(grammarDefinition, "Name") ?? string.Empty,
                 Vendor = options?.Vendor ?? GetPropertyValue<string>(grammarDefinition, "Vendor") ?? "unknown",
-                DisplayName = GetPropertyValue<string>(grammarDefinition, "DisplayName"),
+                DisplayName = GetPropertyValue<string>(grammarDefinition, "DisplayName") ?? string.Empty,
                 Version = options?.Version ?? GetPropertyValue<string>(grammarDefinition, "Version") ?? "1.0.0",
                 MinotaurVersion = options?.MinotaurVersion ?? GetPropertyValue<string>(grammarDefinition, "MinotaurVersion") ?? ">=1.0.0",
                 Description = options?.Description ?? GetPropertyValue<string>(grammarDefinition, "Description") ?? string.Empty,
@@ -180,9 +181,9 @@ namespace Minotaur.Core.Services.Marketplace
         {
             // This is a placeholder - actual implementation would depend on the grammar definition structure
             // For now, we'll create a basic structure
-            
+
             var type = grammarDefinition.GetType();
-            
+
             // Create a basic grammar file
             var grammarContent = GetGrammarContent(grammarDefinition);
             var grammarFilePath = Path.Combine(outputDirectory, "grammar.grammar");
@@ -235,13 +236,13 @@ namespace Minotaur.Core.Services.Marketplace
             CancellationToken cancellationToken)
         {
             var files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories);
-            
+
             foreach (var filePath in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 var relativePath = Path.GetRelativePath(directoryPath, filePath);
-                var archiveEntryName = string.IsNullOrEmpty(entryName) 
+                var archiveEntryName = string.IsNullOrEmpty(entryName)
                     ? relativePath.Replace('\\', '/')
                     : Path.Combine(entryName, relativePath).Replace('\\', '/');
 
@@ -254,6 +255,7 @@ namespace Minotaur.Core.Services.Marketplace
         /// <summary>
         /// Helper to get property value using reflection
         /// </summary>
+        [return: MaybeNull]
         private T GetPropertyValue<T>(object obj, string propertyName)
         {
             if (obj == null || string.IsNullOrEmpty(propertyName))
@@ -264,7 +266,7 @@ namespace Minotaur.Core.Services.Marketplace
                 return default;
 
             var value = prop.GetValue(obj);
-            return (T)value;
+            return (T)value!;
         }
 
         /// <summary>
@@ -301,8 +303,8 @@ namespace Minotaur.Core.Services.Marketplace
         /// </summary>
         private class TarEntry
         {
-            public string Name { get; set; }
-            public string FilePath { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public string FilePath { get; set; } = string.Empty;
 
             public static TarEntry CreateEntryFromFile(string filePath)
             {

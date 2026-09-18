@@ -314,7 +314,7 @@
     public EventCallback<TokenDefinition?> SelectedTokenChanged { get; set; }
 
     private string searchText = string.Empty;
-    private TokenDefinition? editingToken;
+    private TokenDefinition? editingToken = null;
     private TokenDefinition? originalToken;
 
     private List<TokenDefinition> filteredTokens =>

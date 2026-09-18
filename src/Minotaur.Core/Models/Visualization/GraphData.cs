@@ -265,10 +265,10 @@ public enum VisualizationMode
 {
     /// <summary>Show all nodes and all PackedNode edges.</summary>
     ShowAllInterpretations,
-    
+
     /// <summary>Show only the currently selected PackedNode path.</summary>
     ShowSelectedInterpretation,
-    
+
     /// <summary>Show only ambiguity points.</summary>
     ShowAmbiguityOnly
 }

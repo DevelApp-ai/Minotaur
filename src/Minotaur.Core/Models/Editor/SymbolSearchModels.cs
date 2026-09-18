@@ -313,7 +313,7 @@ public class SymbolReference
     /// <summary>
     /// Gets or sets the symbol information (if resolved).
     /// </summary>
-    public SymbolInfo SymbolInfo { get; set; } = null;
+    public SymbolInfo? SymbolInfo { get; set; }
 
     /// <summary>
     /// Gets the length of the reference.
@@ -547,7 +547,7 @@ public class SymbolSearchResult
     /// <summary>
     /// Gets or sets the language filter (if any).
     /// </summary>
-    public string LanguageFilter { get; set; } = string.Empty;
+    public string? LanguageFilter { get; set; }
 
     /// <summary>
     /// Gets or sets the type filter (if any).
@@ -606,7 +606,7 @@ public class SymbolSearchQuery
     /// <summary>
     /// Gets or sets the language filter (null for all languages).
     /// </summary>
-    public string LanguageFilter { get; set; } = null;
+    public string? LanguageFilter { get; set; }
 
     /// <summary>
     /// Gets or sets the type filter (null for all types).

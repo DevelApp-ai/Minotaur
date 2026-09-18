@@ -50,11 +50,11 @@ public class JavaLanguagePluginTests
     public async Task GenerateCompilerBackendRulesAsync_ShouldReturnJavaRules()
     {
         var rules = await _plugin.GenerateCompilerBackendRulesAsync();
-        
+
         Assert.NotNull(rules);
         Assert.Equal("java", rules.LanguageId);
         Assert.NotEmpty(rules.GenerationRules);
-        
+
         // Check for key Java rules
         var ruleTypes = rules.GenerationRules.Select(r => r.NodeType).ToList();
         Assert.Contains("class_declaration", ruleTypes);
@@ -66,7 +66,7 @@ public class JavaLanguagePluginTests
     public void GetFormattingOptions_ShouldReturnJavaOptions()
     {
         var options = _plugin.GetFormattingOptions();
-        
+
         Assert.NotNull(options);
         Assert.Equal("spaces", options.IndentStyle);
         Assert.Equal(4, options.IndentSize);
@@ -78,7 +78,7 @@ public class JavaLanguagePluginTests
     public async Task ValidateGraphForUnparsingAsync_NullGraph_ShouldReturnError()
     {
         var result = await _plugin.ValidateGraphForUnparsingAsync(null!);
-        
+
         Assert.False(result.CanUnparse);
         Assert.Contains(result.Errors, e => e.NodeId == "null");
     }
@@ -88,9 +88,9 @@ public class JavaLanguagePluginTests
     {
         var sourceCode = "public class Test { public void method() { } } ";
         var constraints = new List<SymbolicConstraint>();
-        
+
         var errors = _plugin.AnalyzeSymbolic(sourceCode, constraints);
-        
+
         Assert.NotNull(errors);
     }
 
@@ -98,7 +98,7 @@ public class JavaLanguagePluginTests
     public void GetErrorPatterns_ShouldReturnPatterns()
     {
         var patterns = _plugin.GetErrorPatterns();
-        
+
         Assert.NotNull(patterns);
     }
 
@@ -106,7 +106,7 @@ public class JavaLanguagePluginTests
     public void GetErrorConfidence_ShouldReturnValue()
     {
         var confidence = _plugin.GetErrorConfidence(SymbolicErrorType.NullPointerAccess);
-        
+
         Assert.True(confidence >= 0.0 && confidence <= 1.0);
     }
 
@@ -118,9 +118,9 @@ public class JavaLanguagePluginTests
             new SourceLocation(1, 1),
             "Test error",
             0.5);
-        
+
         var testCases = _plugin.GenerateTestCases(error, "test code");
-        
+
         Assert.NotNull(testCases);
     }
 }
@@ -135,7 +135,7 @@ public class JavaUnparseVisitorTests
     {
         var visitor = new JavaUnparseVisitor();
         var code = visitor.GetGeneratedCode();
-        
+
         Assert.Equal(string.Empty, code);
     }
 }
@@ -151,7 +151,7 @@ public class JavaUnparseValidatorTests
     public void Validate_NullGraph_ShouldReturnError()
     {
         var errors = _validator.Validate(null!);
-        
+
         Assert.NotEmpty(errors);
         Assert.Contains(errors, e => e.NodeId == "null");
     }

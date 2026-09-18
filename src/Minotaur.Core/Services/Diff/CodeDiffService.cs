@@ -182,14 +182,14 @@ public class CodeDiffService : ICodeDiffService
     /// <summary>
     /// Computes the difference between two strings.
     /// </summary>
-    public DiffResult ComputeDiff(string oldText, string newText, string languageId = null)
+    public DiffResult ComputeDiff(string oldText, string newText, string? languageId = null)
     {
         var oldLines = SplitLines(oldText);
         var newLines = SplitLines(newText);
 
         // Use LCS (Longest Common Subsequence) algorithm for diff
         var lcs = FindLCS(oldLines, newLines);
-        
+
         // Build diff from LCS
         var diff = BuildDiffFromLCS(oldLines, newLines, lcs);
 
@@ -203,7 +203,7 @@ public class CodeDiffService : ICodeDiffService
         {
             OldText = oldText,
             NewText = newText,
-            LanguageId = languageId,
+            LanguageId = languageId ?? string.Empty,
             Changes = diff,
             OldLineCount = oldLines.Count,
             NewLineCount = newLines.Count
@@ -479,11 +479,11 @@ public class CodeDiffService : ICodeDiffService
         foreach (var change in group)
         {
             // Find token diffs that correspond to this line
-            var lineTokenDiffs = tokenDiff.Where(td => 
-                (change.OldLineNumber > 0 && td.OldTokenIndex >= 0 && 
-                 GetLineFromPosition(change.Text, td.Token.StartPosition) == change.OldLineNumber) ||
+            var lineTokenDiffs = tokenDiff.Where(td =>
+                (change.OldLineNumber > 0 && td.OldTokenIndex >= 0 &&
+                 GetLineFromPosition(change.Text, td.Token?.StartPosition ?? -1) == change.OldLineNumber) ||
                 (change.NewLineNumber > 0 && td.NewTokenIndex >= 0 &&
-                 GetLineFromPosition(change.Text, td.Token.StartPosition) == change.NewLineNumber)).ToList();
+                 GetLineFromPosition(change.Text, td.Token?.StartPosition ?? -1) == change.NewLineNumber)).ToList();
 
             change.TokenChanges = lineTokenDiffs;
         }
@@ -516,8 +516,6 @@ public class CodeDiffService : ICodeDiffService
     public string FormatAsSideBySideHtml(DiffResult diffResult, string cssClassPrefix = "diff")
     {
         var sb = new StringBuilder();
-        var oldLineNum = 1;
-        var newLineNum = 1;
 
         sb.AppendLine("<div class=\"" + cssClassPrefix + "-container\">");
         sb.AppendLine("  <div class=\"" + cssClassPrefix + "-header\">");
@@ -536,12 +534,12 @@ public class CodeDiffService : ICodeDiffService
                 sb.Append("\" data-line=\"" + change.OldLineNumber + "\">");
                 sb.Append("      <div class=\"" + cssClassPrefix + "-line-number\">" + change.OldLineNumber + "</div>");
                 sb.Append("      <div class=\"" + cssClassPrefix + "-line-content");
-                
+
                 if (change.Type == DiffChangeType.Deleted)
                     sb.Append(" " + cssClassPrefix + "-deleted\"");
                 else
                     sb.Append("\"");
-                
+
                 sb.Append(">" + EscapeHtml(change.Text) + "</div>");
                 sb.Append("    </div>");
             }
@@ -561,12 +559,12 @@ public class CodeDiffService : ICodeDiffService
                 sb.Append("\" data-line=\"" + change.NewLineNumber + "\">");
                 sb.Append("      <div class=\"" + cssClassPrefix + "-line-number\">" + change.NewLineNumber + "</div>");
                 sb.Append("      <div class=\"" + cssClassPrefix + "-line-content");
-                
+
                 if (change.Type == DiffChangeType.Inserted)
                     sb.Append(" " + cssClassPrefix + "-inserted\"");
                 else
                     sb.Append("\"");
-                
+
                 sb.Append(">" + EscapeHtml(change.NewLineNumber > 0 ? change.Text : "") + "</div>");
                 sb.Append("    </div>");
             }
@@ -643,7 +641,7 @@ public class CodeDiffService : ICodeDiffService
     /// <summary>
     /// Gets the tokenizer for a language.
     /// </summary>
-    public Tokenizer GetTokenizer(string languageId)
+    public Tokenizer? GetTokenizer(string languageId)
     {
         if (string.IsNullOrEmpty(languageId))
             return null;
@@ -673,7 +671,7 @@ public interface ICodeDiffService
     /// <summary>
     /// Computes the difference between two strings.
     /// </summary>
-    DiffResult ComputeDiff(string oldText, string newText, string languageId = null);
+    DiffResult ComputeDiff(string oldText, string newText, string? languageId = null);
 
     /// <summary>
     /// Formats the diff as side-by-side HTML.
@@ -688,7 +686,7 @@ public interface ICodeDiffService
     /// <summary>
     /// Gets the tokenizer for a language.
     /// </summary>
-    Tokenizer GetTokenizer(string languageId);
+    Tokenizer? GetTokenizer(string languageId);
 
     /// <summary>
     /// Tokenizes text using the specified language's tokenizer.

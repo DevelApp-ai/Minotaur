@@ -20,8 +20,8 @@ namespace Minotaur.Core.Services.Marketplace
         /// <returns>Stream containing the grammar package or null if saved to file</returns>
         Task<Stream> ExportGrammarPackageAsync(
             object grammarDefinition,
-            string outputPath = null,
-            GrammarExportOptions options = null,
+            string? outputPath = null,
+            GrammarExportOptions? options = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -48,14 +48,14 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class GrammarExportOptions
     {
-        public string Vendor { get; set; }
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string Description { get; set; }
+        public string Vendor { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public string License { get; set; } = "MIT";
         public string[] Tags { get; set; } = Array.Empty<string>();
-        public string MinotaurVersion { get; set; }
-        public string MainFile { get; set; }
+        public string MinotaurVersion { get; set; } = string.Empty;
+        public string MainFile { get; set; } = string.Empty;
         public string PricingModel { get; set; } = "free";
         public decimal Price { get; set; } = 0;
     }
@@ -76,14 +76,14 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class InstalledGrammar
     {
-        public string Vendor { get; set; }
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string DisplayName { get; set; }
-        public string Description { get; set; }
-        public string License { get; set; }
-        public string[] Tags { get; set; }
-        public string Path { get; set; }
+        public string Vendor { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string License { get; set; } = string.Empty;
+        public string[] Tags { get; set; } = Array.Empty<string>();
+        public string Path { get; set; } = string.Empty;
         public DateTime InstalledAt { get; set; }
         public string Source { get; set; } = "marketplace";
     }

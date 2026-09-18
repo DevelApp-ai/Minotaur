@@ -107,7 +107,7 @@
     public EventCallback<int> OnLineClicked { get; set; }
 
     [Inject]
-    public ISyntaxHighlightingService HighlightingService { get; set; }
+    public ISyntaxHighlightingService HighlightingService { get; set; } = null!;
 
     private string HighlightedHtml { get; set; } = string.Empty;
     private int LineCount { get; set; } = 0;

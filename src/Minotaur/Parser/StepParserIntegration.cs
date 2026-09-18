@@ -22,6 +22,7 @@ using System.Linq;
 
 namespace Minotaur.Parser;
 
+/// <summary>
 /// Configuration for the parsing process
 /// </summary>
 public class ParserConfiguration
@@ -59,6 +60,7 @@ public class ParserConfiguration
 /// Integrates with DevelApp.StepLexer and DevelApp.StepParser NuGet packages (1.12.0).
 /// Provides seamless conversion between source code and cognitive graphs for editing.
 /// Uses the RuntimePluggableClassFactory system for extensible language support.
+/// </summary>
 
 public partial class StepParserIntegration : IDisposable
 {
@@ -152,6 +154,7 @@ public partial class StepParserIntegration : IDisposable
             };
         }
     }
+    /// <summary>
     /// Releases all resources used by the StepParserIntegration and disposes of the plugin manager.
     /// </summary>
     public void Dispose()
@@ -166,6 +169,7 @@ public partial class StepParserIntegration : IDisposable
 
 /// <summary>
 /// Result of source code validation
+/// </summary>
 
 public class ParseValidationResult
 {

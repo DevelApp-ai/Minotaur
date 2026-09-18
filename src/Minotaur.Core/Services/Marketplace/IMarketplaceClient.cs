@@ -20,7 +20,7 @@ namespace Minotaur.Core.Services.Marketplace
         /// <summary>
         /// API key for authentication
         /// </summary>
-        string ApiKey { get; set; }
+        string? ApiKey { get; set; }
 
         /// <summary>
         /// Timeout for API requests in milliseconds
@@ -35,8 +35,8 @@ namespace Minotaur.Core.Services.Marketplace
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Search results with matching grammars</returns>
         Task<GrammarSearchResult> SearchGrammarsAsync(
-            string query = null,
-            GrammarFilter filter = null,
+            string? query = null,
+            GrammarFilter? filter = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -47,10 +47,10 @@ namespace Minotaur.Core.Services.Marketplace
         /// <param name="version">Optional version (defaults to latest)</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Grammar information</returns>
-        Task<GrammarInfo> GetGrammarAsync(
+        Task<GrammarInfo?> GetGrammarAsync(
             string vendor,
             string name,
-            string version = null,
+            string? version = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Minotaur.Core.Services.Marketplace
         Task<Stream> DownloadGrammarPackageAsync(
             string vendor,
             string name,
-            string version = null,
+            string? version = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -137,8 +137,8 @@ namespace Minotaur.Core.Services.Marketplace
         Task<PurchaseResult> PurchaseGrammarAsync(
             string vendor,
             string name,
-            string version = null,
-            string paymentMethodId = null,
+            string? version = null,
+            string? paymentMethodId = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Minotaur.Core.Services.Marketplace
             string vendor,
             string name,
             int rating,
-            string comment = null,
+            string? comment = null,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Minotaur.Core.Services.Marketplace
         Task<bool> CheckAccessAsync(
             string vendor,
             string name,
-            string version = null,
+            string? version = null,
             CancellationToken cancellationToken = default);
     }
 
@@ -189,8 +189,8 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class GrammarFilter
     {
-        public string[] Tags { get; set; }
-        public string PricingModel { get; set; }
+        public string[] Tags { get; set; } = Array.Empty<string>();
+        public string PricingModel { get; set; } = string.Empty;
         public string SortBy { get; set; } = "created_at";
         public string SortOrder { get; set; } = "desc";
         public int Page { get; set; } = 1;
@@ -202,8 +202,8 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class GrammarSearchResult
     {
-        public IEnumerable<GrammarInfo> Grammars { get; set; }
-        public PaginationInfo Pagination { get; set; }
+        public IEnumerable<GrammarInfo> Grammars { get; set; } = null!;
+        public PaginationInfo Pagination { get; set; } = null!;
     }
 
     /// <summary>
@@ -222,17 +222,17 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class GrammarMetadata
     {
-        public string Name { get; set; }
-        public string Vendor { get; set; }
-        public string DisplayName { get; set; }
-        public string Version { get; set; }
-        public string MinotaurVersion { get; set; }
-        public string Description { get; set; }
-        public string License { get; set; }
-        public string[] Tags { get; set; }
-        public string MainFile { get; set; }
-        public Dictionary<string, string> Dependencies { get; set; }
-        public string Documentation { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Vendor { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
+        public string MinotaurVersion { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string License { get; set; } = string.Empty;
+        public string[] Tags { get; set; } = Array.Empty<string>();
+        public string MainFile { get; set; } = string.Empty;
+        public Dictionary<string, string> Dependencies { get; set; } = new();
+        public string Documentation { get; set; } = string.Empty;
         public string PricingModel { get; set; } = "free";
         public decimal Price { get; set; } = 0;
     }
@@ -243,12 +243,12 @@ namespace Minotaur.Core.Services.Marketplace
     public class PublishResult
     {
         public bool Success { get; set; }
-        public string GrammarId { get; set; }
-        public string Vendor { get; set; }
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string Message { get; set; }
-        public string Error { get; set; }
+        public string GrammarId { get; set; } = string.Empty;
+        public string Vendor { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public string Error { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -257,13 +257,13 @@ namespace Minotaur.Core.Services.Marketplace
     public class PurchaseResult
     {
         public bool Success { get; set; }
-        public string TransactionId { get; set; }
-        public string GrammarId { get; set; }
+        public string TransactionId { get; set; } = string.Empty;
+        public string GrammarId { get; set; } = string.Empty;
         public decimal Amount { get; set; }
-        public string Currency { get; set; }
-        public string Status { get; set; }
-        public string Message { get; set; }
-        public string Error { get; set; }
+        public string Currency { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public string Error { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -271,13 +271,13 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class PurchasedGrammar
     {
-        public string GrammarId { get; set; }
-        public string Vendor { get; set; }
-        public string Name { get; set; }
-        public string Version { get; set; }
+        public string GrammarId { get; set; } = string.Empty;
+        public string Vendor { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Version { get; set; } = string.Empty;
         public DateTime PurchasedAt { get; set; }
         public DateTime? ExpiresAt { get; set; }
-        public string AccessType { get; set; }
+        public string AccessType { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -286,12 +286,12 @@ namespace Minotaur.Core.Services.Marketplace
     public class ReviewResult
     {
         public bool Success { get; set; }
-        public string ReviewId { get; set; }
+        public string ReviewId { get; set; } = string.Empty;
         public int Rating { get; set; }
-        public string Comment { get; set; }
+        public string Comment { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
-        public string Message { get; set; }
-        public string Error { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string Error { get; set; } = string.Empty;
     }
 
     /// <summary>
@@ -299,10 +299,10 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class GrammarReviews
     {
-        public IEnumerable<GrammarReview> Reviews { get; set; }
+        public IEnumerable<GrammarReview> Reviews { get; set; } = null!;
         public int TotalReviews { get; set; }
         public double AverageRating { get; set; }
-        public PaginationInfo Pagination { get; set; }
+        public PaginationInfo Pagination { get; set; } = null!;
     }
 
     /// <summary>
@@ -310,12 +310,12 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class GrammarReview
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public int Rating { get; set; }
-        public string Comment { get; set; }
+        public string Comment { get; set; } = string.Empty;
         public bool IsVerifiedPurchase { get; set; }
         public DateTime CreatedAt { get; set; }
-        public GrammarReviewUser User { get; set; }
+        public GrammarReviewUser User { get; set; } = null!;
     }
 
     /// <summary>
@@ -323,9 +323,9 @@ namespace Minotaur.Core.Services.Marketplace
     /// </summary>
     public class GrammarReviewUser
     {
-        public string Username { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
         public bool IsVerified { get; set; }
     }
 }

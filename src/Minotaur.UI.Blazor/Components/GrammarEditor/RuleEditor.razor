@@ -372,7 +372,7 @@
 
     private string searchText = string.Empty;
     private bool showOnlyTerminals = false;
-    private RuleDefinition? editingRule;
+    private RuleDefinition? editingRule = null;
     private RuleDefinition? originalRule;
 
     private List<RuleDefinition> filteredRules =>

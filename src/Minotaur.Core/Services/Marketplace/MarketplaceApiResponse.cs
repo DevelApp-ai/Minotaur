@@ -12,16 +12,16 @@ namespace Minotaur.Core.Services.Marketplace
         public bool Success { get; set; }
 
         [JsonPropertyName("data")]
-        public T Data { get; set; }
+        public T Data { get; set; } = default!;
 
         [JsonPropertyName("message")]
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
 
         [JsonPropertyName("error")]
-        public string Error { get; set; }
+        public string Error { get; set; } = string.Empty;
 
         [JsonPropertyName("pagination")]
-        public PaginationInfo Pagination { get; set; }
+        public PaginationInfo Pagination { get; set; } = null!;
     }
 
     /// <summary>
@@ -30,6 +30,6 @@ namespace Minotaur.Core.Services.Marketplace
     public class GrammarInfoResponse
     {
         [JsonPropertyName("grammar")]
-        public GrammarInfo Grammar { get; set; }
+        public GrammarInfo Grammar { get; set; } = null!;
     }
 }

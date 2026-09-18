@@ -181,7 +181,7 @@
     public EventCallback<string> OnSearchPerformed { get; set; }
 
     [Inject]
-    public ISymbolSearchService SearchService { get; set; }
+    public ISymbolSearchService SearchService { get; set; } = null!;
 
     private string SearchQuery { get; set; } = string.Empty;
     private string LanguageFilter { get; set; } = string.Empty;
@@ -289,7 +289,7 @@
 
             await OnSearchPerformed.InvokeAsync(SearchQuery);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Handle error
             Results = new SymbolSearchResult

@@ -68,7 +68,7 @@ public class VisualizationController : ControllerBase
     [ProducesResponseType(typeof(CognitiveGraphVisualization), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetVisualization(
+    public Task<IActionResult> GetVisualization(
         [FromBody] VisualizationRequest request)
     {
         try
@@ -80,7 +80,7 @@ public class VisualizationController : ControllerBase
             //
             // For demonstration, we'll create a mock CognitiveGraph
             // that demonstrates ambiguity through PackedNodes
-            
+
             // Try the real visualizer first. A graph cannot be built yet
             // (no parser is wired into the controller), so a null graph is
             // passed; the visualizer signals this with ArgumentNullException
@@ -97,17 +97,17 @@ public class VisualizationController : ControllerBase
 
             visualization ??= CreateMockVisualization(request);
 
-            return Ok(visualization);
+            return Task.FromResult<IActionResult>(Ok(visualization));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating CognitiveGraph visualization");
-            return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
             {
                 Error = "Internal server error",
                 Message = ex.Message,
                 Details = ex.ToString()
-            });
+            }));
         }
     }
 
@@ -121,7 +121,7 @@ public class VisualizationController : ControllerBase
     /// <returns>List of ambiguity points.</returns>
     [HttpPost("ambiguities")]
     [ProducesResponseType(typeof(List<NodeAmbiguityInfo>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAmbiguityPoints(
+    public Task<IActionResult> GetAmbiguityPoints(
         [FromBody] VisualizationRequest request)
     {
         try
@@ -130,7 +130,7 @@ public class VisualizationController : ControllerBase
             // 1. Parse the source code
             // 2. Build the CognitiveGraph
             // 3. Get ambiguity points from the visualizer
-            
+
             // Try the real visualizer first (see GetVisualization).
             List<NodeAmbiguityInfo>? ambiguities = null;
             try
@@ -144,7 +144,7 @@ public class VisualizationController : ControllerBase
 
             if (ambiguities != null)
             {
-                return Ok(ambiguities);
+                return Task.FromResult<IActionResult>(Ok(ambiguities));
             }
 
             // For now, return mock data
@@ -178,16 +178,16 @@ public class VisualizationController : ControllerBase
                 }
             };
 
-            return Ok(ambiguities);
+            return Task.FromResult<IActionResult>(Ok(ambiguities));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting ambiguity points");
-            return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
             {
                 Error = "Internal server error",
                 Message = ex.Message
-            });
+            }));
         }
     }
 
@@ -201,7 +201,7 @@ public class VisualizationController : ControllerBase
     /// <returns>List of interpretation paths.</returns>
     [HttpPost("interpretations")]
     [ProducesResponseType(typeof(List<InterpretationPath>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetInterpretationPaths(
+    public Task<IActionResult> GetInterpretationPaths(
         [FromBody] VisualizationRequest request)
     {
         try
@@ -220,7 +220,7 @@ public class VisualizationController : ControllerBase
 
             if (paths != null)
             {
-                return Ok(paths);
+                return Task.FromResult<IActionResult>(Ok(paths));
             }
 
             // For now, return mock data
@@ -236,16 +236,16 @@ public class VisualizationController : ControllerBase
                 }
             };
 
-            return Ok(paths);
+            return Task.FromResult<IActionResult>(Ok(paths));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting interpretation paths");
-            return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
             {
                 Error = "Internal server error",
                 Message = ex.Message
-            });
+            }));
         }
     }
 
@@ -260,7 +260,7 @@ public class VisualizationController : ControllerBase
     /// <returns>Visualization data for the selected interpretation.</returns>
     [HttpPost("select-interpretation")]
     [ProducesResponseType(typeof(CognitiveGraphVisualization), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SelectInterpretation(
+    public Task<IActionResult> SelectInterpretation(
         [FromBody] InterpretationSelectionRequest request)
     {
         try
@@ -305,16 +305,16 @@ public class VisualizationController : ControllerBase
             // Filter to show only the selected path
             visualization.Options.Mode = VisualizationMode.ShowSelectedInterpretation;
 
-            return Ok(visualization);
+            return Task.FromResult<IActionResult>(Ok(visualization));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error selecting interpretation");
-            return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponse
             {
                 Error = "Internal server error",
                 Message = ex.Message
-            });
+            }));
         }
     }
 
@@ -325,36 +325,36 @@ public class VisualizationController : ControllerBase
         {
             GraphData = new GraphData
             {
-                SourceCode = request.SourceCode.Length > 50 
-                    ? request.SourceCode[..50] + "..." 
+                SourceCode = request.SourceCode.Length > 50
+                    ? request.SourceCode[..50] + "..."
                     : request.SourceCode,
                 GrammarName = request.GrammarName,
                 Nodes = new List<GraphNode>
                 {
                     // Root SymbolNode
-                    new GraphNode { 
-                        Id = "1", 
-                        Type = "compilation_unit", 
-                        Name = "compilation_unit", 
-                        Group = "declaration", 
-                        Size = 15 
+                    new GraphNode {
+                        Id = "1",
+                        Type = "compilation_unit",
+                        Name = "compilation_unit",
+                        Group = "declaration",
+                        Size = 15
                     },
                     // Class SymbolNode
-                    new GraphNode { 
-                        Id = "2", 
-                        Type = "class_declaration", 
-                        Name = "TestClass", 
-                        Group = "declaration", 
-                        Size = 12 
+                    new GraphNode {
+                        Id = "2",
+                        Type = "class_declaration",
+                        Name = "TestClass",
+                        Group = "declaration",
+                        Size = 12
                     },
                     // AMBIGUOUS SymbolNode (has 2 PackedNodes)
-                    new GraphNode { 
-                        Id = "5", 
-                        Type = "expression", 
-                        Name = "a+b*c", 
-                        Group = "expression", 
-                        Size = 10, 
-                        IsAmbiguous = true, 
+                    new GraphNode {
+                        Id = "5",
+                        Type = "expression",
+                        Name = "a+b*c",
+                        Group = "expression",
+                        Size = 10,
+                        IsAmbiguous = true,
                         AlternativeCount = 2,
                         Location = new CodeLocation
                         {
@@ -375,34 +375,34 @@ public class VisualizationController : ControllerBase
                     
                     // ALTERNATIVE edges from ambiguous node (SymbolNode 5)
                     // PackedNode[0] edges (method_declaration interpretation)
-                    new GraphEdge { 
-                        Id = "5-6-0", 
-                        Source = "5", 
-                        Target = "6", 
-                        Type = "alternative", 
-                        Weight = 1, 
-                        IsAlternative = true, 
+                    new GraphEdge {
+                        Id = "5-6-0",
+                        Source = "5",
+                        Target = "6",
+                        Type = "alternative",
+                        Weight = 1,
+                        IsAlternative = true,
                         PackedNodeIndex = 0,
                         RuleId = 101
                     },
-                    new GraphEdge { 
-                        Id = "5-7-0", 
-                        Source = "5", 
-                        Target = "7", 
-                        Type = "alternative", 
-                        Weight = 1, 
-                        IsAlternative = true, 
+                    new GraphEdge {
+                        Id = "5-7-0",
+                        Source = "5",
+                        Target = "7",
+                        Type = "alternative",
+                        Weight = 1,
+                        IsAlternative = true,
                         PackedNodeIndex = 0,
                         RuleId = 101
                     },
                     // PackedNode[1] edges (function_expression interpretation)
-                    new GraphEdge { 
-                        Id = "5-8-1", 
-                        Source = "5", 
-                        Target = "8", 
-                        Type = "alternative", 
-                        Weight = 1, 
-                        IsAlternative = true, 
+                    new GraphEdge {
+                        Id = "5-8-1",
+                        Source = "5",
+                        Target = "8",
+                        Type = "alternative",
+                        Weight = 1,
+                        IsAlternative = true,
                         PackedNodeIndex = 1,
                         RuleId = 102
                     }

@@ -142,7 +142,7 @@ public class TokenDiff
     /// <summary>
     /// Gets or sets the token.
     /// </summary>
-    public Token Token { get; set; } = null;
+    public Token? Token { get; set; }
 
     /// <summary>
     /// Creates a string representation of this token diff.
@@ -419,7 +419,7 @@ public class Tokenizer
     public List<Token> Tokenize(string text)
     {
         var tokens = new List<Token>();
-        
+
         if (string.IsNullOrEmpty(text))
             return tokens;
 
@@ -493,7 +493,7 @@ public class Tokenizer
     /// <summary>
     /// Matches a pattern at the given position.
     /// </summary>
-    private System.Text.RegularExpressions.Match MatchPattern(string text, int position, TokenPattern pattern)
+    private System.Text.RegularExpressions.Match? MatchPattern(string text, int position, TokenPattern pattern)
     {
         if (string.IsNullOrEmpty(pattern.Pattern))
             return null;
@@ -503,10 +503,10 @@ public class Tokenizer
             options |= System.Text.RegularExpressions.RegexOptions.Multiline;
 
         var regex = new System.Text.RegularExpressions.Regex(pattern.Pattern, options);
-        
+
         // Try to match at the current position
         var match = regex.Match(text, position);
-        
+
         if (match.Success && match.Index == position)
             return match;
 
