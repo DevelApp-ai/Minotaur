@@ -8,6 +8,32 @@
 
 Minotaur is a powerful compiler-compiler platform that revolutionizes grammar development through automated grammar generation, error-driven refinement, and comprehensive language analysis capabilities.
 
+## 📚 Grammar Library
+
+The grammar definitions that used to live in this repository's `grammars/` folder now live in their own repository:
+**[Minotaur-Grammars](https://github.com/DevelApp-ai/Minotaur-Grammars)**.
+
+That repository contains:
+- **Programming-language grammars** (C#, Java, Python, Rust, JavaScript, and more)
+- **Natural-language grammars** (Danish, Swedish, German, etc.) — **optional downloadable content**, fetched only if needed
+- **Compiler-compiler base grammars** (ANTLR, bison, yacc, flex, lex, MBNF)
+- **Postal code grammars** with tests
+
+### Natural-language grammars: positioning
+
+Natural-language grammars are **not** demo data — they are a deliberate product
+direction, delivered as optional downloads so the core distribution stays lean:
+
+- Minotaur can parse **documentation and other natural-language texts** with the
+  same compiler-compiler engine used for programming languages.
+- A key use case is **LLM data preparation**: adding semantic understanding as
+  *first-level data* in the parsed output, instead of leaving semantics as
+  accidental data linking in downstream pipelines.
+- Grammars are downloaded on demand from Minotaur-Grammars (and, going forward,
+  via the Minotaur-Marketplace); nothing is bundled with the engine.
+
+Grammars are data files; nothing in the Minotaur source tree depends on the `grammars/` folder, so this move does not affect the build or tests.
+
 ## 🚀 Key Features
 
 ### Automated Grammar Generation
