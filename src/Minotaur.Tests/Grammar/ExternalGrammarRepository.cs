@@ -15,6 +15,7 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Linq;
 using System.Net.Http.Headers;
 
 namespace Minotaur.Tests.Grammar;
@@ -101,7 +102,12 @@ public sealed class ExternalGrammarRepository : IDisposable
         string content;
         try
         {
-            using var response = await _httpClient.GetAsync(_baseUrl + Uri.EscapeUriString(relativePath));
+            // Escape each path segment separately (slashes are separators,
+            // not data). Uri.EscapeDataString per segment; Uri.EscapeUriString
+            // is obsolete (SYSLIB0013).
+            var escapedPath = string.Join("/",
+                relativePath.Split('/').Select(Uri.EscapeDataString));
+            using var response = await _httpClient.GetAsync(_baseUrl + escapedPath);
             if (!response.IsSuccessStatusCode)
             {
                 throw new ExternalGrammarUnavailableException(
