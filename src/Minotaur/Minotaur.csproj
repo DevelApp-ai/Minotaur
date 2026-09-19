@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.12" />
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.13" />
     <!-- Graph editor backend moved to CognitiveGraph repository -->
     <!-- <PackageReference Include="DevelApp.CognitiveGraph.Editor" Version="2.0.0" /> -->
     <PackageReference Include="DevelApp.RuntimePluggableClassFactory.Interface" Version="2.0.1" />
