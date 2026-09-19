@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.12" />
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.13" />
   </ItemGroup>
 
   <ItemGroup>
