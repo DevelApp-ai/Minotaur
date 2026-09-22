@@ -466,6 +466,20 @@ jobs:
     # authenticate to https://nuget.pkg.github.com/DevelApp-ai/index.json.
     # There is intentionally no NuGet.org publish step.
 
+    - name: Create GitHub Release Assets
+      uses: softprops/action-gh-release@v2
+      with:
+        # The assets step must target the same release as 'Create GitHub Release':
+        # - release published -> the release's own tag
+        # - workflow_dispatch stable release -> v1.0.0
+        # - push to main -> the GitVersion-derived tag
+        tag_name: ${{ github.event.release.tag_name || (github.event_name == 'workflow_dispatch' && '1.0.0' || format('v{0}', needs.calculate-version.outputs.version)) }}
+        # Re-uploading the same nupkg to an existing release overwrites instead of 422-ing
+        overwrite_files: true
+        files: ./packages/*.nupkg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # Manual job to create v1.0.0 release from main branch
   create-stable-release:
     runs-on: ubuntu-latest
