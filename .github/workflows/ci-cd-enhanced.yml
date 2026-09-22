@@ -358,7 +358,7 @@ jobs:
         path: ./packages
 
     - name: Create Pre-release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -411,7 +411,7 @@ jobs:
       if: |
         (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
         (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -489,7 +489,7 @@ jobs:
         dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./packages -p:PackageVersion=1.0.0
 
     - name: Create v1.0.0 Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: v1.0.0
         name: "Minotaur v1.0.0 - First Stable Release"
