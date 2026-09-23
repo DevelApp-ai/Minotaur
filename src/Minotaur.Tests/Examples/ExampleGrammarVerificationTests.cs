@@ -112,9 +112,8 @@ public sealed class ExampleGrammarVerificationTests
         // under src/ mentions the legacy .gf extension.
         var srcCsFiles = Directory.EnumerateFiles(Path.Join(root, "src"), "*.cs", SearchOption.AllDirectories)
             .Where(f => !f.EndsWith("ExampleGrammarVerificationTests.cs", StringComparison.Ordinal));
-        foreach (var file in srcCsFiles)
+        foreach (var content in srcCsFiles.Select(File.ReadAllText))
         {
-            var content = File.ReadAllText(file);
             Assert.DoesNotContain(".gf\"", content);
         }
     }
