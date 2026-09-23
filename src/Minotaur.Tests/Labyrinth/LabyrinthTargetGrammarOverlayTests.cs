@@ -45,7 +45,7 @@ public sealed class LabyrinthTargetGrammarOverlayTests
     {
         var dir = Path.Join(root, "targets", target.Directory.Replace('/', Path.DirectorySeparatorChar));
         var baseFile = Path.Combine(dir, target.MainFile);
-        var extensionFile = Path.Combine(dir, "Labyrinth.extension");
+        var extensionFile = Path.Join(dir, "Labyrinth.extension");
         Assert.True(File.Exists(baseFile), $"{target.MainFile} was not downloaded from Minotaur-Grammars at build time.");
         Assert.True(File.Exists(extensionFile), $"Labyrinth.extension for {target.MainFile} was not downloaded from Minotaur-Grammars at build time (it is committed next to the grammar; Minotaur-Grammars issue #184).");
         return (File.ReadAllText(baseFile), extensionFile);
