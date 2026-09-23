@@ -52,18 +52,22 @@ public sealed class LabyrinthTargetGrammarOverlayTests
     }
 
     [Fact]
-    public void Registry_ListsTheInitialTargetGrammars()
+    public void Registry_CoversAllProgrammingLanguages()
     {
         var dirs = Minotaur.Labyrinth.LabyrinthTargetGrammars.All.Select(t => t.Directory).ToList();
-        Assert.Equal(8, dirs.Count);
+        Assert.Equal(36, dirs.Count);
+        Assert.All(dirs, d => Assert.StartsWith("programming-languages/", d));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("extensionfile"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("folderproject"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("grammarfile"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("sample"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("dotnetproject"));
+        // spot-check a few languages across the alphabet
+        Assert.Contains("programming-languages/c17", dirs);
         Assert.Contains("programming-languages/csharp10", dirs);
-        Assert.Contains("programming-languages/typescript", dirs);
-        Assert.Contains("programming-languages/javascriptes2022", dirs);
-        Assert.Contains("programming-languages/python311", dirs);
-        Assert.Contains("programming-languages/java17", dirs);
-        Assert.Contains("programming-languages/go119", dirs);
-        Assert.Contains("programming-languages/rust2021", dirs);
-        Assert.Contains("programming-languages/cpp20", dirs);
+        Assert.Contains("programming-languages/kotlin", dirs);
+        Assert.Contains("programming-languages/swift", dirs);
+        Assert.Contains("programming-languages/xml", dirs);
     }
 
     [Theory]
