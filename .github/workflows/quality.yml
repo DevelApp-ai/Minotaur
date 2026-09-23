@@ -183,4 +183,17 @@ jobs:
       run: dotnet build src/Minotaur.sln --no-restore --configuration Release
     
     - name: Run tests
-      run: dotnet test src/Minotaur.sln --no-build --configuration Release --verbosity normal
+      shell: bash
+      run: |
+        # Surface failed tests as GitHub annotations: on the public job page the
+        # raw log requires sign-in, but annotations are visible to everyone
+        set +e
+        dotnet test src/Minotaur.sln --no-build --configuration Release --verbosity normal 2>&1 | tee /tmp/test-output.txt
+        test_exit=${PIPESTATUS[0]}
+        set -e
+        if [ "$test_exit" -ne 0 ]; then
+          grep -E '^\s+Failed [A-Za-z]' /tmp/test-output.txt | head -10 | while IFS= read -r line; do
+            printf '::error title=Failed test::%s\n' "$(printf '%s' "$line" | sed 's/^[[:space:]]*//' | tr -d '\r' | head -c 240)"
+          done
+          exit "$test_exit"
+        fi

@@ -147,6 +147,14 @@ jobs:
             grep -B 2 -A 30 -E "^\s+Failed [A-Za-z].*|Test host process crashed|The active test run was aborted|Failed!|Failed:.*[1-9]" /tmp/test-output.txt | head -300
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          # GitHub annotations ARE visible on the public job page (the raw log
+          # and step summary are not), so surface the failed tests there too
+          grep -E '^\s+Failed [A-Za-z]' /tmp/test-output.txt | head -10 | while IFS= read -r line; do
+            printf '::error title=Failed test::%s\n' "$(printf '%s' "$line" | sed 's/^[[:space:]]*//' | tr -d '\r' | head -c 240)"
+          done
+          grep -E 'Test host process crashed|The active test run was aborted' /tmp/test-output.txt | head -3 | while IFS= read -r line; do
+            printf '::error::%s\n' "$(printf '%s' "$line" | tr -d '\r' | head -c 240)"
+          done
           exit "$test_exit"
         fi
 
