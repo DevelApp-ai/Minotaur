@@ -29,13 +29,13 @@ public sealed class LabyrinthTargetGrammarOverlayTests
     private static string FindGrammarsRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "Grammars")))
+        while (dir is not null && !Directory.Exists(Path.Join(dir.FullName, "Grammars")))
         {
             dir = dir.Parent;
         }
 
         Assert.True(dir is not null, "Grammars directory not found; the build-time download target should copy it.");
-        return Path.Combine(dir.FullName, "Grammars");
+        return Path.Join(dir.FullName, "Grammars");
     }
 
     public static IEnumerable<object[]> Targets() =>
