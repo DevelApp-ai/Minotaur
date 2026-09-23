@@ -30,7 +30,12 @@ public sealed class LabyrinthTaintFinding
     /// </summary>
     public IReadOnlyList<ILabyrinthMatchNode> Path { get; }
 
-    internal LabyrinthTaintFinding(
+    /// <summary>
+    /// Creates a finding. Public so hosts and the reporting layer (issue #105)
+    /// can construct findings — e.g. from a persisted scan — without going
+    /// through the taint engine.
+    /// </summary>
+    public LabyrinthTaintFinding(
         string ruleId,
         LabyrinthSeverity severity,
         string message,
