@@ -31,8 +31,36 @@
                   DestinationFolder="$(LabyrinthGrammarDir)" />
     <DownloadFile SourceUrl="$(LabyrinthGrammarsRoot)/data-config/yaml/YAML.grammar"
                   DestinationFolder="$(LabyrinthGrammarDir)" />
+
+    <!--
+      Labyrinth target grammars: the languages Labyrinth security-check rules
+      are written against (LabyrinthTargetGrammars). Each target grammar is
+      downloaded together with its optional Labyrinth.extension overlay, which
+      adds the pattern operators ($NAME metavariable, ... ellipsis) on top of
+      the language grammar via StepParser overlay composition
+      (DevelApp-ai/ENFAStepLexer-StepParser#65, #66; Minotaur-Grammars#184).
+    -->
+    <ItemGroup>
+      <LabyrinthTargetGrammar Include="programming-languages/csharp10" MainFile="CSharp10.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/typescript" MainFile="TypeScript.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/javascriptes2022" MainFile="JavaScriptES2022.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/python311" MainFile="Python311.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/java17" MainFile="Java17.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/go119" MainFile="Go119.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/rust2021" MainFile="Rust2021.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/cpp20" MainFile="Cpp20.grammar" />
+    </ItemGroup>
+    <MakeDir Directories="@(LabyrinthTargetGrammar->'$(LabyrinthGrammarDir)\targets\%(Identity)')" />
+    <DownloadFile SourceUrl="$(LabyrinthGrammarsRoot)/%(LabyrinthTargetGrammar.Identity)/%(LabyrinthTargetGrammar.MainFile)"
+                  DestinationFolder="@(LabyrinthTargetGrammar->'$(LabyrinthGrammarDir)\targets\%(Identity)')" />
+    <DownloadFile SourceUrl="$(LabyrinthGrammarsRoot)/%(LabyrinthTargetGrammar.Identity)/Labyrinth.extension"
+                  DestinationFolder="@(LabyrinthTargetGrammar->'$(LabyrinthGrammarDir)\targets\%(Identity)')" />
+
     <ItemGroup>
       <None Include="$(LabyrinthGrammarDir)\*.grammar"
+            CopyToOutputDirectory="PreserveNewest"
+            Visible="false" />
+      <None Include="$(LabyrinthGrammarDir)\targets\**\*.*"
             CopyToOutputDirectory="PreserveNewest"
             Visible="false" />
     </ItemGroup>
