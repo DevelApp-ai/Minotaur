@@ -288,7 +288,7 @@ public sealed class LabyrinthDynamicLinqConditionTests
         var rule = TaintRule(
             sources: new[] { "ReceiveData($SRC)" },
             sinks: new[] { "ExecuteAction($PREFIX, $TARGET)" },
-            propagators: new[]
+            propagators: new (string Pattern, string From, string To, string? Condition)[]
             {
                 ("$TARGET = FormatString($SRC)", "SRC", "TARGET", "node.Arguments[1].Name == \"FormatString\""),
             });
@@ -319,7 +319,7 @@ public sealed class LabyrinthDynamicLinqConditionTests
         var rule = TaintRule(
             sources: new[] { "ReceiveData($SRC)" },
             sinks: new[] { "ExecuteAction($PREFIX, $TARGET)" },
-            propagators: new[]
+            propagators: new (string Pattern, string From, string To, string? Condition)[]
             {
                 ("$TARGET = FormatString($SRC)", "SRC", "TARGET", "node.NodeType == \"NoSuchType\""),
             });
