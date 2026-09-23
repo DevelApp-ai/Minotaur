@@ -1,0 +1,19 @@
+rules:
+  - id: custom-grammar-injection
+    severity: ERROR
+    message: "Untrusted data flows into a critical execution sink."
+    type: taint
+    sources:
+      - pattern: "ReceiveData($DATA)"
+    sinks:
+      - pattern: "ExecuteAction(..., $DATA, ...)"
+    sanitizers:
+      - pattern: "VerifyIntegrity($DATA)"
+    propagators:
+      - pattern: "$TARGET = FormatString($SRC)"
+        from: $SRC
+        to: $TARGET
+  - id: advanced-size-check
+    type: search
+    pattern: "AllocateMemory($SIZE)"
+    condition: "node.Arguments[0].Value > 1024 && node.Parent.Type != 'SafeBlock'"
