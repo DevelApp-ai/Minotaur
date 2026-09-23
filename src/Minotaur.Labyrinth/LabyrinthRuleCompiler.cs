@@ -16,11 +16,39 @@ public sealed class CompiledLabyrinthPropagator
     /// <summary>The metavariable taint state flows to (validated to occur in <see cref="Pattern"/>).</summary>
     public string To { get; }
 
-    internal CompiledLabyrinthPropagator(LabyrinthPatternAst pattern, string from, string to)
+    /// <summary>
+    /// Optional Dynamic LINQ condition (issue #104) evaluated against the matched
+    /// node before the propagator transfers taint. Null when the entry has none.
+    /// </summary>
+    public string? Condition { get; }
+
+    internal CompiledLabyrinthPropagator(LabyrinthPatternAst pattern, string from, string to, string? condition)
     {
         Pattern = pattern;
         From = from;
         To = to;
+        Condition = condition;
+    }
+}
+
+/// <summary>
+/// A parsed taint pattern entry with its optional Dynamic LINQ condition
+/// (issue #104): the pattern mini-AST plus the <c>condition</c> string of the
+/// YAML entry, kept together so the expression compiler can merge both into
+/// one delegate.
+/// </summary>
+public sealed class CompiledLabyrinthPatternEntry
+{
+    /// <summary>The parsed pattern.</summary>
+    public LabyrinthPatternAst Pattern { get; }
+
+    /// <summary>The entry's optional Dynamic LINQ condition; null when absent.</summary>
+    public string? Condition { get; }
+
+    internal CompiledLabyrinthPatternEntry(LabyrinthPatternAst pattern, string? condition)
+    {
+        Pattern = pattern;
+        Condition = condition;
     }
 }
 
@@ -39,14 +67,19 @@ public sealed class CompiledLabyrinthRule
     /// </summary>
     public LabyrinthPatternAst? SearchPattern { get; }
 
-    /// <summary>The parsed taint source patterns.</summary>
-    public IReadOnlyList<LabyrinthPatternAst> Sources { get; }
+    /// <summary>
+    /// The search rule's optional Dynamic LINQ condition (issue #104); null when absent.
+    /// </summary>
+    public string? SearchCondition { get; }
 
-    /// <summary>The parsed taint sink patterns.</summary>
-    public IReadOnlyList<LabyrinthPatternAst> Sinks { get; }
+    /// <summary>The parsed taint source patterns with their optional conditions.</summary>
+    public IReadOnlyList<CompiledLabyrinthPatternEntry> Sources { get; }
 
-    /// <summary>The parsed taint sanitizer patterns.</summary>
-    public IReadOnlyList<LabyrinthPatternAst> Sanitizers { get; }
+    /// <summary>The parsed taint sink patterns with their optional conditions.</summary>
+    public IReadOnlyList<CompiledLabyrinthPatternEntry> Sinks { get; }
+
+    /// <summary>The parsed taint sanitizer patterns with their optional conditions.</summary>
+    public IReadOnlyList<CompiledLabyrinthPatternEntry> Sanitizers { get; }
 
     /// <summary>The parsed, validated taint propagators.</summary>
     public IReadOnlyList<CompiledLabyrinthPropagator> Propagators { get; }
@@ -68,15 +101,17 @@ public sealed class CompiledLabyrinthRule
     internal CompiledLabyrinthRule(
         LabyrinthRule rule,
         LabyrinthPatternAst? searchPattern,
-        IReadOnlyList<LabyrinthPatternAst> sources,
-        IReadOnlyList<LabyrinthPatternAst> sinks,
-        IReadOnlyList<LabyrinthPatternAst> sanitizers,
+        string? searchCondition,
+        IReadOnlyList<CompiledLabyrinthPatternEntry> sources,
+        IReadOnlyList<CompiledLabyrinthPatternEntry> sinks,
+        IReadOnlyList<CompiledLabyrinthPatternEntry> sanitizers,
         IReadOnlyList<CompiledLabyrinthPropagator> propagators,
         IReadOnlyList<string> metavariables,
         IReadOnlyDictionary<string, int> metavariableOccurrences)
     {
         Rule = rule;
         SearchPattern = searchPattern;
+        SearchCondition = searchCondition;
         Sources = sources;
         Sinks = sinks;
         Sanitizers = sanitizers;
@@ -141,9 +176,10 @@ public static class LabyrinthRuleCompiler
         return new CompiledLabyrinthRule(
             rule,
             searchPattern,
-            sources: Array.Empty<LabyrinthPatternAst>(),
-            sinks: Array.Empty<LabyrinthPatternAst>(),
-            sanitizers: Array.Empty<LabyrinthPatternAst>(),
+            searchCondition: rule.Condition,
+            sources: Array.Empty<CompiledLabyrinthPatternEntry>(),
+            sinks: Array.Empty<CompiledLabyrinthPatternEntry>(),
+            sanitizers: Array.Empty<CompiledLabyrinthPatternEntry>(),
             propagators: Array.Empty<CompiledLabyrinthPropagator>(),
             metavariables,
             occurrences);
@@ -157,13 +193,14 @@ public static class LabyrinthRuleCompiler
         var propagators = CompilePropagators(rule.Propagators, parser);
 
         var metavariables = CollectMetavariables(
-            sources.Concat(sinks).Concat(sanitizers).SelectMany(a => a.Metavariables)
+            sources.Concat(sinks).Concat(sanitizers).SelectMany(e => e.Pattern.Metavariables)
                 .Concat(propagators.SelectMany(p => p.Pattern.Metavariables)),
             out var occurrences);
 
         return new CompiledLabyrinthRule(
             rule,
             searchPattern: null,
+            searchCondition: null,
             sources,
             sinks,
             sanitizers,
@@ -172,15 +209,15 @@ public static class LabyrinthRuleCompiler
             occurrences);
     }
 
-    private static IReadOnlyList<LabyrinthPatternAst> ParseEntries(
+    private static IReadOnlyList<CompiledLabyrinthPatternEntry> ParseEntries(
         List<LabyrinthPatternEntry>? entries, string role, LabyrinthPatternParser parser)
     {
         if (entries is null)
         {
-            return Array.Empty<LabyrinthPatternAst>();
+            return Array.Empty<CompiledLabyrinthPatternEntry>();
         }
 
-        var asts = new List<LabyrinthPatternAst>(entries.Count);
+        var asts = new List<CompiledLabyrinthPatternEntry>(entries.Count);
         foreach (var entry in entries)
         {
             if (entry is null)
@@ -190,7 +227,7 @@ public static class LabyrinthRuleCompiler
 
             try
             {
-                asts.Add(parser.ParsePattern(entry.Pattern));
+                asts.Add(new CompiledLabyrinthPatternEntry(parser.ParsePattern(entry.Pattern), entry.Condition));
             }
             catch (LabyrinthRuleException ex)
             {
@@ -236,7 +273,7 @@ public static class LabyrinthRuleCompiler
                     $"Propagator pattern '{propagator.Pattern}' does not contain its 'to' metavariable '${to}'.");
             }
 
-            compiled.Add(new CompiledLabyrinthPropagator(ast, from, to));
+            compiled.Add(new CompiledLabyrinthPropagator(ast, from, to, propagator.Condition));
         }
 
         return compiled;

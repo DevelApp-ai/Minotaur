@@ -68,8 +68,9 @@ public struct LabyrinthTaintBindings
             Grow(Count + 1);
         }
 
-        _keys[Count] = name;
-        _values[Count] = node;
+        // Grow always leaves backing arrays in place for at least one more entry.
+        _keys![Count] = name;
+        _values![Count] = node;
         Count++;
         return true;
     }
@@ -78,10 +79,14 @@ public struct LabyrinthTaintBindings
     public readonly LabyrinthTaintBindings Clone()
     {
         var clone = new LabyrinthTaintBindings();
-        clone.EnsureCapacity(Count);
-        Array.Copy(_keys, clone._keys, Count);
-        Array.Copy(_values, clone._values, Count);
-        clone.Count = Count;
+        if (Count > 0 && _keys is not null)
+        {
+            clone.EnsureCapacity(Count);
+            Array.Copy(_keys, clone._keys!, Count);
+            Array.Copy(_values!, clone._values!, Count);
+            clone.Count = Count;
+        }
+
         return clone;
     }
 
@@ -109,14 +114,14 @@ public struct LabyrinthTaintBindings
         var size = pooled == 0 ? capacity : pooled;
         var newKeys = Rent(size, KeyPool);
         var newValues = Rent(size, ValuePool);
-        if (Count > 0)
+        if (Count > 0 && _keys is not null)
         {
             Array.Copy(_keys, newKeys, Count);
-            Array.Copy(_values, newValues, Count);
-            if (_keys is not null && _keys != newKeys)
+            Array.Copy(_values!, newValues, Count);
+            if (_keys != newKeys)
             {
                 Return(_keys, KeyPool);
-                Return(_values, ValuePool);
+                Return(_values!, ValuePool);
             }
         }
 

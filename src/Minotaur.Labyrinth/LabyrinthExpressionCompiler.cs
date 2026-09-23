@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Exceptions;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
@@ -83,6 +85,13 @@ public sealed class LabyrinthCompiledMatchers
 /// <item>Assignment: <c>$TARGET = FormatString($SRC)</c> ⇒ matches <c>Assignment</c> nodes, binding both sides.</item>
 /// <item>Bare metavariable <c>$DATA</c> (binds anything) or bare identifier <c>Require</c> (name equality).</item>
 /// </list>
+/// <para>
+/// Any pattern may carry an optional Dynamic LINQ condition (issue #104):
+/// a string-based C# logical expression over the matched node (parameter
+/// name <c>node</c>), parsed with System.Linq.Dynamic.Core at initialization
+/// and appended to the pattern expression tree before compilation, so the
+/// condition runs as compiled code inside the same delegate.
+/// </para>
 /// Argument lists support metavariables, ellipsis (<c>...</c> = zero or more
 /// arguments) and identifier/number/string literals. Arguments between two
 /// ellipses (<c>ExecuteAction(..., $DATA, ...)</c>) bind to any argument via
@@ -126,14 +135,16 @@ public sealed class LabyrinthExpressionCompiler
     {
         ArgumentNullException.ThrowIfNull(rule);
 
-        var sources = rule.Sources.Select(a => Compile(rule.Rule.Id, a)).ToArray();
-        var sinks = rule.Sinks.Select(a => Compile(rule.Rule.Id, a)).ToArray();
-        var sanitizers = rule.Sanitizers.Select(a => Compile(rule.Rule.Id, a)).ToArray();
+        var sources = rule.Sources.Select(e => Compile(rule.Rule.Id, e.Pattern, e.Condition)).ToArray();
+        var sinks = rule.Sinks.Select(e => Compile(rule.Rule.Id, e.Pattern, e.Condition)).ToArray();
+        var sanitizers = rule.Sanitizers.Select(e => Compile(rule.Rule.Id, e.Pattern, e.Condition)).ToArray();
         var propagators = rule.Propagators
-            .Select(p => new LabyrinthCompiledPropagator(Compile(rule.Rule.Id, p.Pattern), p.From, p.To))
+            .Select(p => new LabyrinthCompiledPropagator(Compile(rule.Rule.Id, p.Pattern, p.Condition), p.From, p.To))
             .ToArray();
 
-        var search = rule.SearchPattern is null ? null : Compile(rule.Rule.Id, rule.SearchPattern);
+        var search = rule.SearchPattern is null
+            ? null
+            : Compile(rule.Rule.Id, rule.SearchPattern, rule.SearchCondition);
 
         return new LabyrinthCompiledMatchers(rule.Rule, search, sources, sinks, sanitizers, propagators);
     }
@@ -144,11 +155,25 @@ public sealed class LabyrinthExpressionCompiler
     /// </summary>
     /// <exception cref="LabyrinthRuleException">Thrown when the pattern has an unsupported shape.</exception>
     public Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool> Compile(string ruleId, LabyrinthPatternAst pattern)
+        => Compile(ruleId, pattern, condition: null);
+
+    /// <summary>
+    /// Compiles one pattern with an optional Dynamic LINQ condition (issue #104)
+    /// into a single native delegate: the condition expression is appended to
+    /// the pattern expression tree before compilation, so both run inside one
+    /// compiled call. Delegates are cached by rule id, pattern hash and
+    /// condition hash.
+    /// </summary>
+    /// <exception cref="LabyrinthRuleException">
+    /// Thrown when the pattern has an unsupported shape, or when the condition
+    /// cannot be parsed by Dynamic LINQ (fail fast at initialization).
+    /// </exception>
+    public Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool> Compile(string ruleId, LabyrinthPatternAst pattern, string? condition)
     {
         ArgumentNullException.ThrowIfNull(pattern);
 
-        var key = ruleId + "-" + PatternHash(pattern.Pattern);
-        return _cache.GetOrAdd(key, _ => BuildMatcher(pattern));
+        var key = ruleId + "-" + PatternHash(pattern.Pattern + "|" + (condition ?? string.Empty));
+        return _cache.GetOrAdd(key, _ => BuildMatcher(pattern, condition));
     }
 
     /// <summary>The number of distinct compiled delegates currently cached.</summary>
@@ -160,13 +185,51 @@ public sealed class LabyrinthExpressionCompiler
         return Convert.ToHexString(hash, 0, 8);
     }
 
-    private static Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool> BuildMatcher(LabyrinthPatternAst pattern)
+    private static Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool> BuildMatcher(LabyrinthPatternAst pattern, string? condition)
     {
         var node = Expression.Parameter(typeof(ILabyrinthMatchNode), "node");
         var ctx = Expression.Parameter(typeof(LabyrinthMatchContext), "ctx");
 
         var body = BuildBody(pattern, node, ctx);
+        if (!string.IsNullOrWhiteSpace(condition))
+        {
+            body = AndAlso(body, ParseCondition(condition, node));
+        }
+
         return Expression.Lambda<Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>>(body, node, ctx).Compile();
+    }
+
+    /// <summary>
+    /// Parses a Dynamic LINQ condition (issue #104) into an expression tree
+    /// over the matched node. Parsed at initialization — a malformed or
+    /// unsupported condition fails fast with a clear rule error instead of a
+    /// runtime crash mid-analysis.
+    /// </summary>
+    private static Expression ParseCondition(string condition, ParameterExpression node)
+    {
+        try
+        {
+            // The condition sees exactly one parameter: the matched node. It
+            // cannot name types, assemblies or arbitrary static members —
+            // Dynamic LINQ resolves only members of the node contract.
+            var parsed = DynamicExpressionParser.ParseLambda(
+                new ParsingConfig(),
+                new[] { node },
+                typeof(bool),
+                condition);
+
+            return parsed.Body;
+        }
+        catch (ParseException ex)
+        {
+            throw new LabyrinthRuleException(
+                $"Invalid Dynamic LINQ condition '{condition}': {ex.Message}", ex);
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or NotSupportedException)
+        {
+            throw new LabyrinthRuleException(
+                $"Unsupported Dynamic LINQ condition '{condition}': {ex.Message}", ex);
+        }
     }
 
     private static Expression BuildBody(LabyrinthPatternAst pattern, ParameterExpression node, ParameterExpression ctx)
