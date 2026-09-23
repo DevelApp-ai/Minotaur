@@ -262,7 +262,8 @@ public class ProjectLoader : IProjectLoader
 
     /// <inheritdoc />
     public Task<IEnumerable<ProjectType>> DetectProjectTypesAsync(string path)
-    {        var detectedTypes = new List<ProjectType>();
+    {
+        var detectedTypes = new List<ProjectType>();
 
         if (File.Exists(path))
         {

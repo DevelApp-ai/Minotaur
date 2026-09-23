@@ -97,8 +97,8 @@ HTML_TAG_OPEN = <[a-zA-Z][a-zA-Z0-9]*
         var result = GrammarExtensionLoader.Parse(SampleExtension, "HTMLEmbedded");
         var extension = result.Extension!;
 
-        Assert.IsTrue(extension.ContextRules.ContainsKey("CSS"));
-        var cssSelector = extension.ContextRules["CSS"].Single(e => e.Name == "CSS_SELECTOR");
+        Assert.IsTrue(extension.ContextRules.TryGetValue("CSS", out var cssEntries));
+        var cssSelector = cssEntries.Single(e => e.Name == "CSS_SELECTOR");
         Assert.AreEqual("CSS", cssSelector.Context);
         Assert.AreEqual("[.#]?[a-zA-Z][a-zA-Z0-9_-]*", cssSelector.Pattern);
         CollectionAssert.Contains(extension.Removals.ToList(), "CSS_COMMENT");
@@ -214,7 +214,7 @@ TOKEN = [a-z]+
         // Uses the repository's own extension files to guard against regressions
         // in the extension corpus (issue #88, item 7).
         var repoRoot = FindRepoRoot();
-        var extensionsDirectory = Path.Combine(repoRoot, "extensions");
+        var extensionsDirectory = Path.Join(repoRoot, "extensions");
 
         if (!Directory.Exists(extensionsDirectory))
         {
@@ -234,7 +234,7 @@ TOKEN = [a-z]+
     private static string FindRepoRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !Directory.Exists(Path.Combine(directory.FullName, "extensions")))
+        while (directory is not null && !Directory.Exists(Path.Join(directory.FullName, "extensions")))
         {
             directory = directory.Parent;
         }

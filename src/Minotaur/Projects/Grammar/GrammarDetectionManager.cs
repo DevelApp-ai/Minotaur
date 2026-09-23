@@ -183,10 +183,9 @@ public class GrammarDetectionManager : IDisposable
                 continue;
             }
 
-            foreach (var file in Directory.EnumerateFiles(directoryPath, "*.extension", SearchOption.TopDirectoryOnly))
-            {
-                found.Add(Path.GetFullPath(file));
-            }
+            found.UnionWith(Directory
+                .EnumerateFiles(directoryPath, "*.extension", SearchOption.TopDirectoryOnly)
+                .Select(Path.GetFullPath));
         }
 
         var result = found.ToList();

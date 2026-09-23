@@ -156,7 +156,9 @@ public static class GrammarExtensionLoader
             {
                 results.Add(await LoadFromFileAsync(filePath));
             }
-            catch (Exception ex)
+            // Record I/O failures as per-file parse errors instead of letting
+            // one unreadable file abort the whole directory load.
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
             {
                 results.Add(new ExtensionParseResult
                 {
@@ -612,12 +614,12 @@ internal static class GrammarExtensionHeaderExtensions
 {
     public static void SetEmbeddedLanguagesFromHeader(this GrammarExtension extension, string value)
     {
-        foreach (var language in value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        foreach (var language in value.Split(
+                     ',',
+                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                     .Where(language => !extension.EmbeddedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase)))
         {
-            if (!extension.EmbeddedLanguages.Contains(language, StringComparer.OrdinalIgnoreCase))
-            {
-                extension.EmbeddedLanguages.Add(language);
-            }
+            extension.EmbeddedLanguages.Add(language);
         }
     }
 }
