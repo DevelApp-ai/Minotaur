@@ -43,7 +43,7 @@ public sealed class LabyrinthTargetGrammarOverlayTests
 
     private static (string BaseContent, string ExtensionPath) LoadTarget(Minotaur.Labyrinth.LabyrinthTargetGrammar target, string root)
     {
-        var dir = Path.Combine(root, "targets", target.Directory.Replace('/', Path.DirectorySeparatorChar));
+        var dir = Path.Join(root, "targets", target.Directory.Replace('/', Path.DirectorySeparatorChar));
         var baseFile = Path.Combine(dir, target.MainFile);
         var extensionFile = Path.Combine(dir, "Labyrinth.extension");
         Assert.True(File.Exists(baseFile), $"{target.MainFile} was not downloaded from Minotaur-Grammars at build time.");
