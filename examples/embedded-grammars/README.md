@@ -16,34 +16,38 @@ This example illustrates:
 
 ```
 examples/embedded-grammars/
-├── grammars/                 # Grammar definitions
+├── grammars/                 # Grammar definitions (legacy .gf format, see below)
 │   ├── html_base.gf         # Base HTML grammar
 │   ├── javascript.gf        # JavaScript grammar
 │   ├── css.gf              # CSS grammar
 │   └── html_embedded.gf     # Composite HTML grammar with embedded languages
-├── html-samples/            # Example HTML files
-│   ├── simple.html         # Simple HTML with basic JS and CSS
-│   ├── complex.html        # Complex HTML with advanced features
-│   └── real-world.html     # Real-world example
-├── generated-parsers/       # Generated parsers for all target languages
-│   ├── c/                  # C parser implementation
-│   ├── cpp/                # C++ parser implementation
-│   ├── java/               # Java parser implementation
-│   ├── csharp/             # C# parser implementation
-│   ├── python/             # Python parser implementation
-│   ├── javascript/         # JavaScript parser implementation
-│   ├── rust/               # Rust parser implementation
-│   ├── go/                 # Go parser implementation
-│   └── wasm/               # WebAssembly parser implementation
-├── tests/                  # Test files and validation
-│   ├── parser-tests.ts     # Parser validation tests
-│   ├── performance-tests.ts # Performance benchmarks
-│   └── cross-language-tests.ts # Cross-language consistency tests
-└── docs/                   # Documentation
-    ├── grammar-design.md   # Grammar design documentation
-    ├── parsing-strategy.md # Parsing strategy explanation
-    └── usage-examples.md   # Usage examples and tutorials
+├── html-examples/            # Example HTML files
+│   ├── simple-example.html  # Simple HTML with basic JS and CSS
+│   └── complex-example.html # Complex HTML with advanced features
+├── docs/                    # Documentation
+│   ├── EmbeddedGrammarGuide.md  # Embedded grammar guide
+│   └── QuickStartGuide.md       # Quick start guide
+└── package.json             # Package manifest of the original TypeScript demo
+                             # (its src/ and tests/ scripts are not part of this repo)
 ```
+
+## Grammar File Format Status (issue #89)
+
+The `.gf` files in `grammars/` use a **legacy** grammar format — `@FormatType: Minotaur`
+headers with `grammar Name { ... }` blocks and annotations such as `@Inherits`,
+`@InheritanceStrategy`, `@ExtensionPoint` and `@ContextSwitch`. They were migrated
+from the old Minotaur codebase and are **not parseable by the current
+StepLexer/StepParser pipeline**, which works exclusively with `.grammar` files
+(EBNF format) owned by the external [Minotaur-Grammars](https://github.com/DevelApp-ai/Minotaur-Grammars)
+repository. The current-format counterpart of `html_embedded.gf` is
+`HTMLEmbedded.grammar` (see `examples/grammar-config/minotaur.grammar.json`).
+
+The `.gf` files are kept as **reference material** for the embedded-grammar feature
+design. Structural verification (balanced grammar blocks, resolvable `@Inherits`
+references) is codified in
+`src/Minotaur.Tests/Examples/ExampleGrammarVerificationTests.cs`. The legacy
+TypeScript tooling referenced by `package.json` (parser generation for 9 target
+languages, `generated-parsers/`, `tests/*.ts`) is not part of this repository.
 
 ## Key Features Demonstrated
 
