@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    <PackageReference Include="DevelApp.StepLexer" Version="1.32.0" />
+    <PackageReference Include="DevelApp.StepParser" Version="1.32.0" />
   </ItemGroup>
 
   <!--

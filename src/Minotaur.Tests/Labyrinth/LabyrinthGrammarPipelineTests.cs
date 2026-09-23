@@ -7,8 +7,8 @@ namespace Minotaur.Tests.Labyrinth;
 /// Verifies that the grammars Labyrinth rules depend on are fetched from
 /// Minotaur-Grammars at build time and load through the real DevelApp.StepParser
 /// pipeline (maintainer direction: no hand-rolled pattern lexer/parser, and
-/// Minotaur does not embed grammars). Full metavariable/ellipsis pattern parsing
-/// lands with ENFAStepLexer-StepParser#65/#66.
+/// Minotaur does not embed grammars). Pattern parsing into mini-ASTs is covered
+/// by <see cref="LabyrinthPatternParserTests"/>.
 /// </summary>
 public sealed class LabyrinthGrammarPipelineTests
 {

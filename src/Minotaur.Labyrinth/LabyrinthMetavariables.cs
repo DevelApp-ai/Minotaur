@@ -3,14 +3,16 @@ using System.Text.RegularExpressions;
 namespace Minotaur.Labyrinth;
 
 /// <summary>
-/// Textual metavariable extraction for Labyrinth patterns. Schema-validation only.
+/// Textual metavariable extraction for Labyrinth patterns. Schema-validation only:
+/// this helper answers "which $NAME metavariables does this pattern mention?"
+/// quickly and without a target grammar, which is what the YAML loader needs.
 /// <para>
-/// Pattern bodies themselves are parsed by the DevelApp.StepLexer/StepParser pipeline
-/// with the target grammar once metavariable/ellipsis token support and grammar
-/// overlay/composition land there (ENFAStepLexer-StepParser#65, #66). Until then,
-/// patterns stay opaque strings in Layer 1; this helper only answers
-/// "which $NAME metavariables does this pattern mention?" for propagator
-/// from/to binding checks.
+/// The real pattern parsing (pattern snippets to mini-ASTs through the
+/// DevelApp.StepLexer/StepParser pipeline with the target grammar, including
+/// metavariable and ellipsis tokens, landed with ENFAStepLexer-StepParser
+/// #65/#66 and lives in <see cref="LabyrinthPatternParser"/> and
+/// <see cref="LabyrinthRuleCompiler"/>; use those whenever a target grammar is
+/// available.
 /// </para>
 /// </summary>
 public static partial class LabyrinthMetavariables
