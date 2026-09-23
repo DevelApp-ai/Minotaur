@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text.Json;
 using Xunit;
 
@@ -131,9 +132,10 @@ public sealed class ExampleGrammarVerificationTests
         // The example config is the current-format counterpart of the legacy
         // .gf files: every grammar reference points at a .grammar file.
         Assert.EndsWith(".grammar", rootElement.GetProperty("defaultGrammar").GetString());
-        foreach (var mapping in rootElement.GetProperty("extensionMappings").EnumerateObject())
+        foreach (var grammar in rootElement.GetProperty("extensionMappings")
+                     .EnumerateObject()
+                     .Select(mapping => mapping.Value.GetProperty("grammar").GetString()))
         {
-            var grammar = mapping.Value.GetProperty("grammar").GetString();
             Assert.EndsWith(".grammar", grammar);
         }
     }
