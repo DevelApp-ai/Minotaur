@@ -12,6 +12,7 @@
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
     <PackageReference Include="DevelApp.StepLexer" Version="1.32.0" />
     <PackageReference Include="DevelApp.StepParser" Version="1.32.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.4" />
   </ItemGroup>
 
   <!--

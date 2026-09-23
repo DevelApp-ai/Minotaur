@@ -195,11 +195,12 @@ public sealed class LabyrinthPatternParserTests
         var compiled = LabyrinthRuleCompiler.Compile(TaintRule(), parser);
 
         Assert.Null(compiled.SearchPattern);
-        Assert.Equal("ReceiveData($DATA)", Assert.Single(compiled.Sources).Pattern);
-        Assert.Equal("IDENTIFIER LPAREN METAVARIABLE RPAREN", NodeTypes(Assert.Single(compiled.Sources)));
+        var source = Assert.Single(compiled.Sources);
+        Assert.Equal("ReceiveData($DATA)", source.Pattern.Pattern);
+        Assert.Equal("IDENTIFIER LPAREN METAVARIABLE RPAREN", NodeTypes(source.Pattern));
         Assert.Equal(
             "IDENTIFIER LPAREN ELLIPSIS COMMA METAVARIABLE COMMA ELLIPSIS RPAREN",
-            NodeTypes(Assert.Single(compiled.Sinks)));
+            NodeTypes(Assert.Single(compiled.Sinks).Pattern));
         Assert.Single(compiled.Sanitizers);
 
         var propagator = Assert.Single(compiled.Propagators);
@@ -253,7 +254,7 @@ public sealed class LabyrinthPatternParserTests
         using var parser = CreateParser();
 
         var rule = TaintRule();
-        rule.Propagators[0].From = "$MISSING";
+        rule.Propagators![0].From = "$MISSING";
 
         var ex = Assert.Throws<LabyrinthRuleException>(() => LabyrinthRuleCompiler.Compile(rule, parser));
         Assert.Contains("'from' metavariable '$MISSING'", ex.Message);
@@ -265,7 +266,7 @@ public sealed class LabyrinthPatternParserTests
         using var parser = CreateParser();
 
         var rule = TaintRule();
-        rule.Propagators[0].To = "$MISSING";
+        rule.Propagators![0].To = "$MISSING";
 
         var ex = Assert.Throws<LabyrinthRuleException>(() => LabyrinthRuleCompiler.Compile(rule, parser));
         Assert.Contains("'to' metavariable '$MISSING'", ex.Message);
@@ -277,7 +278,7 @@ public sealed class LabyrinthPatternParserTests
         using var parser = CreateParser();
 
         var rule = TaintRule();
-        rule.Sinks[0].Pattern = "ExecuteAction(..., ###, ...)";
+        rule.Sinks![0].Pattern = "ExecuteAction(..., ###, ...)";
 
         Assert.Throws<LabyrinthRuleException>(() => LabyrinthRuleCompiler.Compile(rule, parser));
     }

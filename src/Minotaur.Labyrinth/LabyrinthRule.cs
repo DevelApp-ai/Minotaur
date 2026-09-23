@@ -60,6 +60,13 @@ public sealed class LabyrinthPropagatorEntry
     /// The metavariable the taint state flows to (e.g. <c>$TARGET</c>). Must occur in <see cref="Pattern"/>.
     /// </summary>
     public string To { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Optional Dynamic LINQ condition (issue #104): a string-based C# logical
+    /// expression evaluated against the matched node. The propagator only
+    /// transfers taint when both its pattern and this condition match.
+    /// </summary>
+    public string? Condition { get; set; }
 }
 
 /// <summary>

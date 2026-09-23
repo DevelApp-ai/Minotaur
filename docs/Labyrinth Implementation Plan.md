@@ -9,7 +9,7 @@ Every delivery lands as a pull request; this file is updated with each layer.
 | 1 — Rule schema & pattern parsing | Semgrep-style YAML schema, metavariable/ellipsis tokens, target-grammar pattern parsing via StepLexer/StepParser | #101 | Done |
 | 2 — Expression-tree compilation | Pattern mini-ASTs compiled to native delegates (`Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>`) with delegate caching | #102 | Done |
 | 3 — Taint traversal engine | Fixed-point worklist over the DFG: source identification, propagation, sanitizer pruning, propagator transfer, sink confirmation with full source→sink paths, pooled metavariable bindings, interprocedural flow via host-provided edges | #103 | Done |
-| 4 — Dynamic LINQ conditions | `condition:` escape hatch on patterns via System.Linq.Dynamic.Core, merged into the compiled pipeline | #104 | Planned |
+| 4 — Dynamic LINQ conditions | `condition:` escape hatch on search rules and per source/sink/sanitizer/propagator entry, parsed via System.Linq.Dynamic.Core at initialization and appended to the pattern expression tree before compilation; malformed conditions fail fast with clear rule errors | #104 | Done |
 | 5 — Reporting & CI/CD | Finding model consumers: console output, SARIF for GitHub code scanning, exit codes/baselines, rule-pack directory loading, rule-author guide | #105 | Planned |
 
 ## Layer 3 design notes (#103)
