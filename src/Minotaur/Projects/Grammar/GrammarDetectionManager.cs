@@ -15,6 +15,7 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
+using Minotaur.Core.Models.Grammar;
 using Minotaur.Projects.Grammar.Detectors;
 
 namespace Minotaur.Projects.Grammar;
@@ -26,7 +27,9 @@ public class GrammarDetectionManager : IDisposable
 {
     private readonly CompositeGrammarDetector _primaryDetector;
     private readonly Dictionary<string, GrammarConfiguration> _configurationCache;
+    private readonly Dictionary<string, IReadOnlyList<string>> _extensionCache;
     private readonly string[] _configurationFileNames = { "minotaur.grammar.json", ".minotaur.grammar.json", "grammar.config.json" };
+    private readonly string[] _defaultExtensionDirectoryNames = { "extensions", ".minotaur/extensions" };
     private bool _disposed;
 
     /// <summary>
@@ -37,6 +40,7 @@ public class GrammarDetectionManager : IDisposable
     {
         _primaryDetector = primaryDetector ?? CompositeGrammarDetector.CreateDefault();
         _configurationCache = new Dictionary<string, GrammarConfiguration>();
+        _extensionCache = new Dictionary<string, IReadOnlyList<string>>();
     }
 
     /// <summary>
@@ -140,6 +144,77 @@ public class GrammarDetectionManager : IDisposable
     public void ClearConfigurationCache()
     {
         _configurationCache.Clear();
+        _extensionCache.Clear();
+    }
+
+    /// <summary>
+    /// Discovers grammar extension files (<c>.extension</c>) for a project
+    /// (Minotaur issue #88, item 4). Searches the default
+    /// <c>extensions/</c> and <c>.minotaur/extensions/</c> directories plus
+    /// any <c>ExtensionSearchPaths</c> declared in the project's grammar
+    /// configuration.
+    /// </summary>
+    /// <param name="projectRootPath">The project root path.</param>
+    /// <returns>The paths of all discovered extension files (deduplicated).</returns>
+    public async Task<IReadOnlyList<string>> DiscoverGrammarExtensionsAsync(string projectRootPath)
+    {
+        if (_extensionCache.TryGetValue(projectRootPath, out var cached))
+        {
+            return cached;
+        }
+
+        var configuration = await GetConfigurationAsync(projectRootPath);
+        var searchPaths = new List<string>(_defaultExtensionDirectoryNames);
+
+        if (configuration?.ExtensionSearchPaths is { Count: > 0 })
+        {
+            searchPaths.AddRange(configuration.ExtensionSearchPaths);
+        }
+
+        var found = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var searchPath in searchPaths)
+        {
+            var directoryPath = Path.IsPathRooted(searchPath)
+                ? searchPath
+                : Path.Join(projectRootPath, searchPath);
+
+            if (!Directory.Exists(directoryPath))
+            {
+                continue;
+            }
+
+            foreach (var file in Directory.EnumerateFiles(directoryPath, "*.extension", SearchOption.TopDirectoryOnly))
+            {
+                found.Add(Path.GetFullPath(file));
+            }
+        }
+
+        var result = found.ToList();
+        _extensionCache[projectRootPath] = result;
+        return result;
+    }
+
+    /// <summary>
+    /// Discovers and loads all grammar extensions for a project, parsing each
+    /// discovered <c>.extension</c> file.
+    /// </summary>
+    /// <param name="projectRootPath">The project root path.</param>
+    /// <returns>The successfully parsed extensions, keyed by file path.</returns>
+    public async Task<IReadOnlyDictionary<string, GrammarExtension>> LoadGrammarExtensionsAsync(string projectRootPath)
+    {
+        var extensionPaths = await DiscoverGrammarExtensionsAsync(projectRootPath);
+        var extensions = new Dictionary<string, GrammarExtension>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var extensionPath in extensionPaths)
+        {
+            var result = await GrammarExtensionLoader.LoadFromFileAsync(extensionPath);
+            if (result.Success && result.Extension is not null)
+            {
+                extensions[extensionPath] = result.Extension;
+            }
+        }
+
+        return extensions;
     }
 
     /// <summary>

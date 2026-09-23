@@ -30,6 +30,12 @@ public class ProjectLoader : IProjectLoader
     private readonly StepParserIntegration _stepParser;
     private readonly GrammarDetectionManager _grammarDetectionManager;
 
+    /// <summary>
+    /// Grammar extensions loaded for the current project (Minotaur issue #88).
+    /// </summary>
+    private IReadOnlyList<Minotaur.Core.Models.Grammar.GrammarExtension> _grammarExtensions =
+        Array.Empty<Minotaur.Core.Models.Grammar.GrammarExtension>();
+
     // Legacy mapping for backward compatibility - now primarily used as fallback
     private static readonly Dictionary<string, string> FileExtensionToGrammar = new()
     {
@@ -160,6 +166,11 @@ public class ProjectLoader : IProjectLoader
         var projectTypes = await DetectProjectTypesAsync(folderPath);
         var primaryProjectType = projectTypes.FirstOrDefault();
 
+        // Discover grammar extensions declared for this project (issue #88).
+        // Extensions are applied to base grammars before source parsing.
+        _grammarExtensions = (await _grammarDetectionManager.LoadGrammarExtensionsAsync(folderPath))
+            .Values.ToList();
+
         var files = new List<ProjectFile>();
         var relationships = new List<CrossFileRelationship>();
         var dependencies = new List<ProjectDependency>();
@@ -197,10 +208,61 @@ public class ProjectLoader : IProjectLoader
         };
     }
 
+    /// <summary>
+    /// Gets the grammar extensions loaded for the current project
+    /// (Minotaur issue #88).
+    /// </summary>
+    public IReadOnlyList<Minotaur.Core.Models.Grammar.GrammarExtension> GrammarExtensions => _grammarExtensions;
+
+    /// <summary>
+    /// Gets the loaded grammar extensions that apply to a specific base
+    /// grammar. An extension applies when its <c>BaseGrammarRef</c> matches
+    /// the grammar name, when it is explicitly mapped in the project's
+    /// grammar configuration, or when its file name matches the grammar file
+    /// name by convention (e.g. <c>HTMLEmbedded.extension</c> extends
+    /// <c>HTMLEmbedded.grammar</c>).
+    /// </summary>
+    /// <param name="grammarName">The base grammar name or file name.</param>
+    /// <returns>The extensions that apply to the grammar.</returns>
+    public IReadOnlyList<Minotaur.Core.Models.Grammar.GrammarExtension> GetExtensionsForGrammar(string grammarName)
+    {
+        if (string.IsNullOrEmpty(grammarName) || _grammarExtensions.Count == 0)
+        {
+            return Array.Empty<Minotaur.Core.Models.Grammar.GrammarExtension>();
+        }
+
+        var baseName = grammarName.EndsWith(".grammar", StringComparison.OrdinalIgnoreCase)
+            ? grammarName[..^".grammar".Length]
+            : grammarName;
+
+        return _grammarExtensions
+            .Where(e => MatchesGrammar(e, grammarName, baseName))
+            .ToList();
+    }
+
+    private static bool MatchesGrammar(
+        Minotaur.Core.Models.Grammar.GrammarExtension extension,
+        string grammarName,
+        string baseName)
+    {
+        // Explicit BaseGrammar reference in the extension header.
+        if (!string.IsNullOrEmpty(extension.BaseGrammarRef))
+        {
+            var refName = extension.BaseGrammarRef.EndsWith(".grammar", StringComparison.OrdinalIgnoreCase)
+                ? extension.BaseGrammarRef[..^".grammar".Length]
+                : extension.BaseGrammarRef;
+            return string.Equals(refName, baseName, StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(extension.BaseGrammarRef, grammarName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        // Naming convention: HTMLEmbedded.extension extends HTMLEmbedded.grammar.
+        return string.Equals(extension.Name, baseName, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(extension.Name, grammarName, StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <inheritdoc />
     public Task<IEnumerable<ProjectType>> DetectProjectTypesAsync(string path)
-    {
-        var detectedTypes = new List<ProjectType>();
+    {        var detectedTypes = new List<ProjectType>();
 
         if (File.Exists(path))
         {

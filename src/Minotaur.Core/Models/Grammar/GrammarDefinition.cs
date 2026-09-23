@@ -65,6 +65,12 @@ public class GrammarDefinition
     /// <summary>Gets or sets whether this grammar has been modified since last save.</summary>
     public bool IsModified { get; set; } = false;
 
+    /// <summary>
+    /// Gets or sets the names of grammar extensions applied to this grammar
+    /// (Minotaur issue #88).
+    /// </summary>
+    public List<string> AppliedExtensions { get; set; } = new();
+
     /// <summary>Gets the start rule.</summary>
     public RuleDefinition? StartRule => Rules.FirstOrDefault(r => r.Id == StartRuleId || r.IsStartRule);
 
@@ -101,7 +107,8 @@ public class GrammarDefinition
             ModifiedDate = ModifiedDate,
             Properties = new Dictionary<string, object>(Properties),
             FilePath = FilePath,
-            IsModified = IsModified
+            IsModified = IsModified,
+            AppliedExtensions = new List<string>(AppliedExtensions)
         };
     }
 

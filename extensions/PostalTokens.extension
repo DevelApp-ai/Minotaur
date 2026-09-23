@@ -1,3 +1,22 @@
-﻿Grammar: CEBNF
+Grammar: CEBNF
+ContextAware: false
+BaseGrammar: Postal
 
+/* PostalTokens extension: shared postal token definitions. */
+/* Extends the base Postal grammar with common postal token patterns. */
+/* TODO(work-in-progress, Minotaur issue #88 item 7): extend with context-specific */
+/* token groups (e.g. US vs DK addressing) once the Postal grammar lands. */
 
+/* Common postal tokens */
+POSTAL_CODE_DK = [0-9]{4}
+POSTAL_CODE_US = [0-9]{5}(-[0-9]{4})?
+POSTAL_CODE_GENERIC = [A-Z0-9][A-Z0-9\- ]{2,9}
+CITY_NAME = [a-zA-Z][a-zA-Z\- ]*
+STREET_NAME = [a-zA-Z0-9][a-zA-Z0-9\-\. ]*
+STREET_NUMBER = [0-9]{1,4}[a-zA-Z]?
+FLOOR_DESIGNATOR = (st|mf|sal|[0-9]+(\.|-|\. )?th)
+COUNTRY_CODE = [A-Z]{2}
+
+/* Whitespace and delimiters */
+WHITESPACE = [\s\t\n\r]+
+COMMA = ,
