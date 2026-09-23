@@ -22,6 +22,36 @@ This directory contains various examples and test cases for Minotaur functionali
 
 **Note**: These examples may deliberately contain syntax errors, incomplete code, or malformed grammar definitions for testing error handling and grammar generation capabilities. They are excluded from standard code quality checks.
 
+## Verification Status (issue #89)
+
+The example files were verified against the current StepLexer/StepParser pipeline. Results:
+
+### Legacy `.gf` grammar files (`embedded-grammars/grammars/*.gf`)
+
+The `.gf` format (`@FormatType: Minotaur` headers, `grammar Name { ... }` blocks with
+`@Inherits`, `@ExtensionPoint`, `@ContextSwitch` annotations) is a **legacy format**,
+migrated from the old Minotaur codebase. It is not a planned or supported format:
+
+- No parser, loader or validator in the current codebase can read `.gf` files —
+  `ProjectLoader`, `GrammarDetectionManager` and `GrammarConfiguration` exclusively
+  reference `.grammar` files (see `src/Minotaur.Tests/Examples/ExampleGrammarVerificationTests.cs`,
+  which codifies this).
+- The current-format counterparts live in the external **Minotaur-Grammars** repository
+  (e.g. `HTMLEmbedded.grammar` for HTML with embedded languages, referenced by
+  `examples/grammar-config/minotaur.grammar.json`).
+- The files are kept as **reference material** for the embedded-grammar feature.
+  Structural verification (see the test suite) confirms all four files are complete —
+  balanced grammar blocks, valid format headers, and `html_embedded.gf`'s
+  `@Inherits: HTMLBase, JavaScript, CSS` resolves to the sibling grammar names.
+
+### Example data files
+
+All non-grammar example data was validated: the JSON examples parse as valid JSON,
+the CSV examples have consistent column counts (quote-aware), and the postal,
+Hyperlambda, arithmetic and embedded-HTML test files exist and are non-empty.
+The intentional-error cases documented above remain unmarked; see the
+[contributing guidelines](#contributing) for the `.error`/`error_cases/` convention.
+
 ## Usage
 
 These examples serve multiple purposes:
