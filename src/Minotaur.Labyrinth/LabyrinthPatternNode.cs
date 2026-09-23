@@ -88,9 +88,9 @@ public sealed class LabyrinthPatternAst
 
         var seen = new HashSet<string>();
         var names = new List<string>();
-        foreach (var node in nodes)
+        foreach (var node in nodes.Where(n => n.Kind == LabyrinthPatternNodeKind.Metavariable))
         {
-            if (node.Kind == LabyrinthPatternNodeKind.Metavariable && seen.Add(node.MetavariableName))
+            if (seen.Add(node.MetavariableName))
             {
                 names.Add(node.MetavariableName);
             }

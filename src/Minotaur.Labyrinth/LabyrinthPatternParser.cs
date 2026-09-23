@@ -32,25 +32,19 @@ public sealed class LabyrinthPatternParser : IDisposable
     public LabyrinthPatternParser(string grammarContent, string grammarName = "target grammar")
     {
         _engine = new StepParserEngine();
-        try
-        {
-            _engine.LoadGrammarFromContent(grammarContent, grammarName);
+        _engine.LoadGrammarFromContent(grammarContent, grammarName);
 
-            // The grammar loader tolerates unrecognized content (it silently
-            // produces an empty grammar), so verify the grammar is real before
-            // the pattern tokens are injected (they would mask the emptiness).
-            if (_engine.CurrentGrammar is null || _engine.CurrentGrammar.TokenRules.Count == 0)
-            {
-                throw new InvalidOperationException("no token rules were found");
-            }
-
-            _engine.EnablePatternTokens();
-        }
-        catch (Exception ex)
+        // The grammar loader tolerates unrecognized content (it silently
+        // produces an empty grammar), so verify the grammar is real before
+        // the pattern tokens are injected (they would mask the emptiness).
+        if (_engine.CurrentGrammar is null || _engine.CurrentGrammar.TokenRules.Count == 0)
         {
             _engine.Dispose();
-            throw new LabyrinthRuleException($"Failed to load Labyrinth target grammar '{grammarName}': {ex.Message}", ex);
+            throw new LabyrinthRuleException(
+                $"Failed to load Labyrinth target grammar '{grammarName}': no token rules were found.");
         }
+
+        _engine.EnablePatternTokens();
     }
 
     /// <summary>
@@ -72,15 +66,9 @@ public sealed class LabyrinthPatternParser : IDisposable
             return new LabyrinthPatternAst(pattern ?? string.Empty, Array.Empty<LabyrinthPatternNode>());
         }
 
-        StepParsingResult result;
-        try
-        {
-            result = _engine.Parse(pattern, "pattern");
-        }
-        catch (Exception ex)
-        {
-            throw new LabyrinthRuleException($"Failed to lex Labyrinth pattern '{pattern}': {ex.Message}", ex);
-        }
+        // StepParserEngine.Parse is exception-safe: internal failures come
+        // back as ParserInternalError diagnostics instead of throwing.
+        var result = _engine.Parse(pattern, "pattern");
 
         var lexerError = result.Diagnostics.FirstOrDefault(d =>
             d.Code == DiagnosticCodes.LexerUnexpectedInput || d.Code == DiagnosticCodes.LexerStalled);
