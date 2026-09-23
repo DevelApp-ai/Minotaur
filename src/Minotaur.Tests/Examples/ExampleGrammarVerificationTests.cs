@@ -174,9 +174,8 @@ public sealed class ExampleGrammarVerificationTests
         Assert.True(lines.Count > 1, $"{relativePath}: expected a header row and data rows");
 
         var columns = -1;
-        foreach (var line in lines)
+        foreach (var fieldCount in lines.Select(line => SplitCsvLine(line).Count))
         {
-            var fieldCount = SplitCsvLine(line).Count;
             if (columns == -1)
             {
                 columns = fieldCount;
