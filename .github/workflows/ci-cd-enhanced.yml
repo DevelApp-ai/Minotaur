@@ -127,13 +127,28 @@ jobs:
       run: |
         # --no-restore: the build above already restored; the implicit restore here
         # can hit the same transient GitHub Packages NU1301 issues the lint job guards against
+        set +e
         dotnet test ${{ env.SOLUTION_PATH }} \
           --configuration Release \
           --no-build \
           --no-restore \
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults/ \
-          --logger "trx;LogFileName=test-results.trx"
+          --logger "trx;LogFileName=test-results.trx" \
+          --logger "console;verbosity=normal" 2>&1 | tee /tmp/test-output.txt
+        test_exit=${PIPESTATUS[0]}
+        set -e
+        # Surface failed tests in the job summary (GitHub does not annotate
+        # dotnet test failures, and the raw log is truncated for large runs)
+        if [ "$test_exit" -ne 0 ]; then
+          {
+            echo "## Failed tests (from dotnet test console output)"
+            echo '```'
+            grep -B 2 -A 30 -E "^\s+Failed [A-Za-z].*|Test host process crashed|The active test run was aborted|Failed!|Failed:.*[1-9]" /tmp/test-output.txt | head -300
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$test_exit"
+        fi
 
     - name: Generate coverage report
       if: always()
