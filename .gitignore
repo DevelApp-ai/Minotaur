@@ -425,3 +425,6 @@ build_output.txt
 
 # Backup files
 *.backup
+
+# Build-time downloaded grammars (fetched from Minotaur-Grammars by Minotaur.Labyrinth.csproj)
+src/Minotaur.Labyrinth/Grammars/

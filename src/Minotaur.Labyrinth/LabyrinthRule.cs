@@ -144,7 +144,7 @@ public sealed class LabyrinthRuleSet
         var seen = new HashSet<string>();
         foreach (var p in EnumeratePatterns(rule))
         {
-            foreach (var name in LabyrinthPatternLexer.MetavariableNames(p))
+            foreach (var name in LabyrinthMetavariables.NamesIn(p))
             {
                 if (seen.Add(name))
                 {

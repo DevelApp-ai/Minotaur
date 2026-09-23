@@ -158,10 +158,7 @@ public sealed class LabyrinthRuleLoader
         {
             errors.Add($"{label} ({rule.Id}): search rules require a 'pattern'.");
         }
-        else
-        {
-            ValidatePattern(rule.Pattern, label, rule.Id, "pattern", errors);
-        }
+
     }
 
     private static void ValidateTaintRule(LabyrinthRule rule, string label, List<string> errors)
@@ -206,9 +203,7 @@ public sealed class LabyrinthRuleLoader
                     continue;
                 }
 
-                ValidatePattern(prop.Pattern, propLabel, rule.Id, "pattern", errors);
-
-                var defined = LabyrinthPatternLexer.DistinctMetavariableNames(prop.Pattern);
+                var defined = LabyrinthMetavariables.DistinctNamesIn(prop.Pattern);
                 foreach (var (name, key) in new[] { (prop.From, "from"), (prop.To, "to") })
                 {
                     var normalized = name?.TrimStart('$') ?? string.Empty;
@@ -235,22 +230,8 @@ public sealed class LabyrinthRuleLoader
             {
                 errors.Add($"{label}.{ruleId}.{key}[{i}]: 'pattern' is required.");
             }
-            else
-            {
-                ValidatePattern(entry.Pattern, label, ruleId, $"{key}[{i}]", errors);
-            }
+
         }
     }
 
-    private static void ValidatePattern(string pattern, string label, string ruleId, string key, List<string> errors)
-    {
-        try
-        {
-            _ = LabyrinthPatternParser.Parse(pattern);
-        }
-        catch (LabyrinthRuleException ex)
-        {
-            errors.Add($"{label}.{ruleId}.{key}: {ex.Message}");
-        }
-    }
 }
