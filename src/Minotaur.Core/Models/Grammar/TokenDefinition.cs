@@ -54,6 +54,12 @@ public class TokenDefinition
     public Dictionary<string, object> Properties { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the grammar extension provenance for this token, if the
+    /// token was added, removed, or overridden by a grammar extension.
+    /// </summary>
+    public ExtensionProvenance? ExtensionProvenance { get; set; }
+
+    /// <summary>
     /// Creates a deep copy of this token definition.
     /// </summary>
     public TokenDefinition Clone()
@@ -70,7 +76,8 @@ public class TokenDefinition
             Category = Category,
             Color = Color,
             IsCaseSensitive = IsCaseSensitive,
-            Properties = new Dictionary<string, object>(Properties)
+            Properties = new Dictionary<string, object>(Properties),
+            ExtensionProvenance = ExtensionProvenance
         };
     }
 

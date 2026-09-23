@@ -63,6 +63,12 @@ public class RuleDefinition
     public Dictionary<string, object> Properties { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the grammar extension provenance for this rule, if the
+    /// rule was added, removed, or overridden by a grammar extension.
+    /// </summary>
+    public ExtensionProvenance? ExtensionProvenance { get; set; }
+
+    /// <summary>
     /// Creates a deep copy of this rule definition.
     /// </summary>
     public RuleDefinition Clone()
@@ -82,7 +88,8 @@ public class RuleDefinition
             Parameters = Parameters.Select(p => p.Clone()).ToList(),
             IsStartRule = IsStartRule,
             IsAbstract = IsAbstract,
-            Properties = new Dictionary<string, object>(Properties)
+            Properties = new Dictionary<string, object>(Properties),
+            ExtensionProvenance = ExtensionProvenance
         };
     }
 

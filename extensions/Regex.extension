@@ -1,3 +1,31 @@
-﻿Grammar: CEBNF
+Grammar: CEBNF
+ContextAware: false
+BaseGrammar: Regex
 
-<Regex> ::=
+/* Regex extension: token definitions for regular expression literals. */
+/* TODO(work-in-progress, Minotaur issue #88 item 7): production bodies below cover */
+/* the common subset; backreferences and named groups can be added once the */
+/* Regex grammar (DevelApp-ai/Minotaur-Grammars) is finalized. */
+
+/* Regex literal tokens */
+REGEX_LITERAL = /[^/\n\\]*/
+REGEX_ANCHOR = (\^|\$)
+REGEX_CHAR_CLASS = \[[^\]]*\]
+REGEX_QUANTIFIER = ([*+?]|\{[0-9]+(,[0-9]+)?\})
+REGEX_GROUP = \([^)]*\)
+REGEX_ALTERNATION = \|
+REGEX_ESCAPE = \\[^0-9]
+REGEX_DOT = \.
+REGEX_FLAGS = /[gimsuvy]*
+
+/* Character class internals */
+REGEX_CLASS_RANGE = [a-zA-Z0-9]-[a-zA-Z0-9]
+REGEX_CLASS_NEGATION = \^
+
+/* Production rules */
+<Regex> ::= <REGEX_LITERAL> <REGEX_FLAGS>
+<RegexBody> ::= <RegexAlternation>
+<RegexAlternation> ::= <RegexSequence> (<REGEX_ALTERNATION> <RegexSequence>)*
+<RegexSequence> ::= <RegexQuantified>*
+<RegexQuantified> ::= <RegexAtom> <REGEX_QUANTIFIER>?
+<RegexAtom> ::= <REGEX_LITERAL> | <REGEX_CHAR_CLASS> | <REGEX_GROUP> | <REGEX_DOT> | <REGEX_ANCHOR> | <REGEX_ESCAPE>

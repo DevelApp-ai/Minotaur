@@ -19,6 +19,7 @@ using System.Text.Json;
 using CognitiveGraph;
 using CognitiveGraph.Schema;
 using CognitiveGraph.Accessors;
+using Minotaur.Core.Models.Grammar;
 using Minotaur.Visitors;
 
 namespace Minotaur.Core;
@@ -82,6 +83,13 @@ public abstract class CognitiveGraphNode
     /// Gets or sets the source position information for this node.
     /// </summary>
     public SourcePosition? SourcePosition { get; set; }
+
+    /// <summary>
+    /// Gets or sets the grammar extension provenance for this node: which
+    /// extension (if any) added, removed, or overrode the rule or token this
+    /// node was produced from (Minotaur issue #88, item 6).
+    /// </summary>
+    public ExtensionProvenance? ExtensionProvenance { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the CognitiveGraphNode class.

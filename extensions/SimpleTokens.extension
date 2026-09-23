@@ -1,2 +1,22 @@
-﻿Grammar: BNF
+Grammar: BNF
+ContextAware: false
+BaseGrammar: Simple
 
+/* SimpleTokens extension: basic token definitions in plain BNF. */
+/* TODO(work-in-progress, Minotaur issue #88 item 7): keep in sync with the */
+/* Simple grammar in DevelApp-ai/Minotaur-Grammars. */
+
+/* Simple tokens */
+IDENTIFIER = [a-zA-Z_][a-zA-Z0-9_]*
+NUMBER = [0-9]+
+STRING = "[^"]*"
+WHITESPACE = [\s\t\n\r]+
+
+/* Punctuation */
+LPAREN = \(
+RPAREN = \)
+LBRACE = \{
+RBRACE = \}
+SEMICOLON = ;
+COMMA = ,
+ASSIGN = =

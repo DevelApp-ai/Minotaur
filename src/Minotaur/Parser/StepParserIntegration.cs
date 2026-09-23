@@ -16,6 +16,7 @@
  */
 
 using Minotaur.Core;
+using Minotaur.Core.Models.Grammar;
 using Minotaur.Plugins;
 using System.Reflection;
 using System.Linq;
@@ -54,6 +55,18 @@ public class ParserConfiguration
     /// V2: optimized for large-scale project analysis (requires CognitiveGraph 1.1.0+).
     /// </summary>
     public CognitiveGraphVersion GraphVersion { get; set; } = CognitiveGraphVersion.Auto;
+
+    /// <summary>
+    /// Paths to grammar extension files (<c>.extension</c>) that should be
+    /// applied to the base grammar before parsing (Minotaur issue #88).
+    /// </summary>
+    public List<string> GrammarExtensionPaths { get; set; } = new();
+
+    /// <summary>
+    /// The merge strategy used when resolving name collisions between the base
+    /// grammar and applied grammar extensions.
+    /// </summary>
+    public ExtensionMergeStrategy ExtensionMergeStrategy { get; set; } = ExtensionMergeStrategy.Replace;
 }
 
 /// <summary>

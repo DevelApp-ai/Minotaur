@@ -70,6 +70,67 @@ public class GrammarConfiguration
     public List<string> GrammarSearchPaths { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the search paths for grammar extension files
+    /// (<c>.extension</c>), relative to the project root (Minotaur issue #88).
+    /// Defaults are <c>extensions</c> and <c>.minotaur/extensions</c>.
+    /// </summary>
+    [JsonPropertyName("extensionSearchPaths")]
+    public List<string> ExtensionSearchPaths { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets explicit mappings from a base grammar name to the
+    /// grammar extension files that should be applied to it. Extension file
+    /// names are resolved against the extension search paths.
+    /// </summary>
+    [JsonPropertyName("grammarExtensionMappings")]
+    public Dictionary<string, List<string>> GrammarExtensionMappings { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether <c>.extension</c> files in the
+    /// extension search paths should be auto-discovered and associated with
+    /// base grammars by naming convention (e.g. <c>HTMLEmbedded.extension</c>
+    /// extends <c>HTMLEmbedded.grammar</c>). Default is true.
+    /// </summary>
+    [JsonPropertyName("autoDiscoverExtensions")]
+    public bool AutoDiscoverExtensions { get; set; } = true;
+
+    /// <summary>
+    /// Gets the extension file names configured for a base grammar.
+    /// </summary>
+    /// <param name="grammarName">The base grammar name.</param>
+    /// <returns>The extension file names mapped to the grammar, or an empty list.</returns>
+    public IReadOnlyList<string> GetExtensionsForGrammar(string grammarName)
+    {
+        if (string.IsNullOrEmpty(grammarName))
+        {
+            return Array.Empty<string>();
+        }
+
+        // Try exact match first, then match on grammar name without extension.
+        if (GrammarExtensionMappings.TryGetValue(grammarName, out var exact))
+        {
+            return exact;
+        }
+
+        var baseName = grammarName.EndsWith(".grammar", StringComparison.OrdinalIgnoreCase)
+            ? grammarName[..^".grammar".Length]
+            : grammarName;
+
+        foreach (var (key, value) in GrammarExtensionMappings)
+        {
+            var keyBase = key.EndsWith(".grammar", StringComparison.OrdinalIgnoreCase)
+                ? key[..^".grammar".Length]
+                : key;
+            if (string.Equals(keyBase, baseName, StringComparison.OrdinalIgnoreCase))
+            {
+                return value;
+            }
+        }
+
+        return Array.Empty<string>();
+    }
+
+    /// <summary>
     /// Gets or sets additional metadata for the configuration.
     /// </summary>
     [JsonPropertyName("metadata")]
