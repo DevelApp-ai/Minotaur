@@ -265,13 +265,14 @@ public sealed class LabyrinthExpressionCompilerTests
         var matcher = new LabyrinthExpressionCompiler().Compile("perf", Parse("ExecuteAction(..., $DATA, ...)"));
         var node = Call("ExecuteAction", Ident("flag"), Ident("payload"), Ident("mode"));
 
-        // Best-of-3: CI runners are 2-core and heavily contended (CPU steal),
+        // Best-of-5: CI runners are 2-core and heavily contended (CPU steal),
         // which can transiently inflate a single measurement well above the
-        // steady-state cost. Taking the best attempt measures the matcher's
-        // actual capability while keeping the strict nanosecond-scale gate.
+        // steady-state cost — especially under coverage instrumentation.
+        // Taking the best attempt measures the matcher's actual capability
+        // while keeping the strict nanosecond-scale gate.
         const int warmup = 100_000;
         const int iterations = 1_000_000;
-        const int maxAttempts = 3;
+        const int maxAttempts = 5;
 
         var context = new LabyrinthMatchContext();
         double nanosecondsPerNode = double.MaxValue;
