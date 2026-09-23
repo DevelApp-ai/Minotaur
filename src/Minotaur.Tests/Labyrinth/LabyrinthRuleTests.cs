@@ -237,8 +237,8 @@ public sealed class LabyrinthRuleLoaderTests
 
 /// <summary>
 /// Tests for <see cref="LabyrinthMetavariables"/> (schema-validation helper only;
-/// pattern bodies are parsed by DevelApp.StepParser with the target grammar once
-/// ENFAStepLexer-StepParser#65/#66 land).
+/// pattern bodies are parsed into mini-ASTs by <see cref="LabyrinthPatternParser"/>
+/// and <see cref="LabyrinthRuleCompiler"/> with the target grammar).
 /// </summary>
 public sealed class LabyrinthMetavariablesTests
 {
