@@ -72,15 +72,11 @@ public sealed class LabyrinthBaseline
             throw new LabyrinthRuleException("Invalid baseline file: missing 'fingerprints' array.");
         }
 
-        var fingerprints = new List<string>();
-        foreach (var item in array.EnumerateArray())
-        {
-            var value = item.GetString();
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                fingerprints.Add(value);
-            }
-        }
+        var fingerprints = array.EnumerateArray()
+            .Select(item => item.GetString())
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value!)
+            .ToList();
 
         return new LabyrinthBaseline(fingerprints);
     }

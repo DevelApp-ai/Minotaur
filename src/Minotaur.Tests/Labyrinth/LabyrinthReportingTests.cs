@@ -173,18 +173,18 @@ public sealed class LabyrinthReportingTests
     [Fact]
     public void RulePack_TryLoadDirectory_ReportsErrorsPerRule_AndLoadsValidRules()
     {
-        var dir = Path.Combine(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
+        var dir = Path.Join(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {
-            File.WriteAllText(Path.Combine(dir, "good.yaml"), """
+            File.WriteAllText(Path.Join(dir, "good.yaml"), """
                 rules:
                   - id: good-rule
                     severity: ERROR
                     type: search
                     pattern: "DoThing($X)"
                 """);
-            File.WriteAllText(Path.Combine(dir, "bad.yaml"), """
+            File.WriteAllText(Path.Join(dir, "bad.yaml"), """
                 rules:
                   - id: broken-rule-1
                     severity: HIGH
@@ -214,7 +214,7 @@ public sealed class LabyrinthReportingTests
     [Fact]
     public void RulePack_TryLoadDirectory_DetectsDuplicateRuleIds_AcrossFiles()
     {
-        var dir = Path.Combine(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
+        var dir = Path.Join(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {
@@ -225,8 +225,8 @@ public sealed class LabyrinthReportingTests
                     type: search
                     pattern: "DoThing($X)"
                 """;
-            File.WriteAllText(Path.Combine(dir, "a.yaml"), yaml);
-            File.WriteAllText(Path.Combine(dir, "b.yaml"), yaml);
+            File.WriteAllText(Path.Join(dir, "a.yaml"), yaml);
+            File.WriteAllText(Path.Join(dir, "b.yaml"), yaml);
 
             var result = new LabyrinthRulePackLoader().TryLoadDirectory(dir);
 
@@ -251,11 +251,11 @@ public sealed class LabyrinthReportingTests
     [Fact]
     public void RulePack_LoadDirectory_ThrowsWithAllErrors_WhenInvalid()
     {
-        var dir = Path.Combine(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
+        var dir = Path.Join(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {
-            File.WriteAllText(Path.Combine(dir, "bad.yaml"), """
+            File.WriteAllText(Path.Join(dir, "bad.yaml"), """
                 rules:
                   - id: broken-rule
                     severity: SUPERBAD
@@ -275,19 +275,19 @@ public sealed class LabyrinthReportingTests
     [Fact]
     public void RulePack_LoadDirectory_MergesValidPack()
     {
-        var dir = Path.Combine(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
+        var dir = Path.Join(Path.GetTempPath(), "labyrinth-pack-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(dir);
         try
         {
-            Directory.CreateDirectory(Path.Combine(dir, "sub"));
-            File.WriteAllText(Path.Combine(dir, "a.yaml"), """
+            Directory.CreateDirectory(Path.Join(dir, "sub"));
+            File.WriteAllText(Path.Join(dir, "a.yaml"), """
                 rules:
                   - id: rule-a
                     severity: WARNING
                     type: search
                     pattern: "DoThing($X)"
                 """);
-            File.WriteAllText(Path.Combine(dir, "sub", "b.yml"), """
+            File.WriteAllText(Path.Join(dir, "sub", "b.yml"), """
                 rules:
                   - id: rule-b
                     severity: ERROR
