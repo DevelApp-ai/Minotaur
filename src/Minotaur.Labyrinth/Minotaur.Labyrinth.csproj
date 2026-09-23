@@ -4,11 +4,35 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Description>Labyrinth rule engine Layer 1: YAML rule schema and Semgrep-style pattern tokenization (metavariables, ellipsis) for the Minotaur SAST rule language.</Description>
+    <Description>Labyrinth rule engine Layer 1: Semgrep-style YAML rule schema for the Minotaur SAST rule language. Pattern bodies are parsed by the DevelApp.StepLexer/StepParser pipeline with the target grammar.</Description>
+    <LabyrinthGrammarsRoot>https://raw.githubusercontent.com/DevelApp-ai/Minotaur-Grammars/main</LabyrinthGrammarsRoot>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
+
+  <!--
+    Grammars are owned by the Minotaur-Grammars repository and copied at build
+    time (per maintainer direction: Minotaur does not embed grammars). Disable
+    locally with -p:SkipGrammarDownload=true.
+  -->
+  <Target Name="DownloadLabyrinthGrammars"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(SkipGrammarDownload)' != 'true'">
+    <PropertyGroup>
+      <LabyrinthGrammarDir>$(MSBuildProjectDirectory)\Grammars</LabyrinthGrammarDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(LabyrinthGrammarDir)" />
+    <DownloadFile SourceUrl="$(LabyrinthGrammarsRoot)/specialized/labyrinth/Labyrinth.grammar"
+                  DestinationFolder="$(LabyrinthGrammarDir)" />
+    <DownloadFile SourceUrl="$(LabyrinthGrammarsRoot)/data-config/yaml/YAML.grammar"
+                  DestinationFolder="$(LabyrinthGrammarDir)" />
+    <ItemGroup>
+      <None Include="$(LabyrinthGrammarDir)\*.grammar"
+            CopyToOutputDirectory="PreserveNewest"
+            Visible="false" />
+    </ItemGroup>
+  </Target>
 
 </Project>

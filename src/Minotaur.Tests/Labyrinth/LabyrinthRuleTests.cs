@@ -236,140 +236,44 @@ public sealed class LabyrinthRuleLoaderTests
 }
 
 /// <summary>
-/// Tests for <see cref="LabyrinthPatternLexer"/> and <see cref="LabyrinthPatternParser"/>.
+/// Tests for <see cref="LabyrinthMetavariables"/> (schema-validation helper only;
+/// pattern bodies are parsed by DevelApp.StepParser with the target grammar once
+/// ENFAStepLexer-StepParser#65/#66 land).
 /// </summary>
-public sealed class LabyrinthPatternLexerTests
+public sealed class LabyrinthMetavariablesTests
 {
     [Fact]
-    public void Tokenize_MetavariableAndEllipsis_AreDedicatedTokenKinds()
+    public void NamesIn_ReturnsAllNamesInOrder_WithDuplicates()
     {
-        var tokens = LabyrinthPatternLexer.Tokenize("ExecuteAction(..., $DATA, ...)");
-
-        Assert.Equal(7, tokens.Count);
-        Assert.Equal(LabyrinthTokenKind.Literal, tokens[0].Kind);
-        Assert.Equal("ExecuteAction(", tokens[0].Text);
-        Assert.Equal(LabyrinthTokenKind.Ellipsis, tokens[1].Kind);
-        Assert.Equal("...", tokens[1].Text);
-        Assert.Equal(LabyrinthTokenKind.Literal, tokens[2].Kind);
-        Assert.Equal(", ", tokens[2].Text);
-        Assert.Equal(LabyrinthTokenKind.Metavariable, tokens[3].Kind);
-        Assert.Equal("DATA", tokens[3].Text);
-        Assert.Equal(LabyrinthTokenKind.Literal, tokens[4].Kind);
-        Assert.Equal(", ", tokens[4].Text);
-        Assert.Equal(LabyrinthTokenKind.Ellipsis, tokens[5].Kind);
-        Assert.Equal(LabyrinthTokenKind.Literal, tokens[6].Kind);
-        Assert.Equal(")", tokens[6].Text);
-    }
-
-    [Fact]
-    public void Tokenize_PlainSnippet_IsSingleLiteral()
-    {
-        var tokens = LabyrinthPatternLexer.Tokenize("checkout");
-
-        var token = Assert.Single(tokens);
-        Assert.Equal(LabyrinthTokenKind.Literal, token.Kind);
-        Assert.Equal("checkout", token.Text);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void Tokenize_EmptyPattern_Throws(string pattern)
-    {
-        Assert.Throws<LabyrinthRuleException>(() => LabyrinthPatternLexer.Tokenize(pattern));
-    }
-
-    [Fact]
-    public void Tokenize_DanglingDollar_ThrowsWithPosition()
-    {
-        var ex = Assert.Throws<LabyrinthRuleException>(() => LabyrinthPatternLexer.Tokenize("f($)"));
-
-        Assert.Contains("Invalid metavariable at position 2", ex.Message);
-    }
-
-    [Fact]
-    public void Tokenize_LowercaseMetavariable_Throws()
-    {
-        // Labyrinth metavariables are uppercase by design (grammar: $[A-Z_][A-Z0-9_]*)
-        Assert.Throws<LabyrinthRuleException>(() => LabyrinthPatternLexer.Tokenize("f($data)"));
-    }
-
-    [Fact]
-    public void Tokenize_ReconstructedLiteral_ConcatenatesToSource()
-    {
-        var pattern = "$TARGET = FormatString($SRC)";
-
-        var tokens = LabyrinthPatternLexer.Tokenize(pattern);
-        Assert.Equal(string.Concat(tokens.Select(t => t.Kind switch
-        {
-            LabyrinthTokenKind.Metavariable => "$" + t.Text,
-            LabyrinthTokenKind.Ellipsis => "...",
-            _ => t.Text
-        })), pattern);
-    }
-
-    [Fact]
-    public void MetavariableNames_PreservesOrderAndDuplicates()
-    {
-        var names = LabyrinthPatternLexer.MetavariableNames("f($A, $B, $A)");
-
+        var names = LabyrinthMetavariables.NamesIn("f($A, $B, $A)");
         Assert.Equal(new[] { "A", "B", "A" }, names);
     }
 
     [Fact]
-    public void DistinctMetavariableNames_RemovesDuplicates()
+    public void NamesIn_EmptyOrNull_ReturnsEmpty()
     {
-        var names = LabyrinthPatternLexer.DistinctMetavariableNames("f($A, $B, $A)");
+        Assert.Empty(LabyrinthMetavariables.NamesIn(null));
+        Assert.Empty(LabyrinthMetavariables.NamesIn(""));
+        Assert.Empty(LabyrinthMetavariables.NamesIn("no metas here"));
+    }
 
+    [Fact]
+    public void NamesIn_LowercaseIdentifier_IsNotAMetavariable()
+    {
+        Assert.Empty(LabyrinthMetavariables.NamesIn("f($data)"));
+    }
+
+    [Fact]
+    public void NamesIn_TrailingDollarAlone_IsIgnored()
+    {
+        Assert.Equal(new[] { "A" }, LabyrinthMetavariables.NamesIn("f($A, $)"));
+    }
+
+    [Fact]
+    public void DistinctNamesIn_RemovesDuplicates_PreservingFirstOccurrence()
+    {
+        var names = LabyrinthMetavariables.DistinctNamesIn("f($A, $B, $A)");
         Assert.Equal(new[] { "A", "B" }, names);
-    }
-
-    [Fact]
-    public void Parse_BuildsMiniAstWithMetavariables()
-    {
-        var ast = LabyrinthPatternParser.Parse("ExecuteAction(..., $DATA, ...)");
-
-        Assert.Equal(7, ast.Nodes.Count);
-        Assert.IsType<LabyrinthPatternNode.Literal>(ast.Nodes[0]);
-        Assert.IsType<LabyrinthPatternNode.Ellipsis>(ast.Nodes[1]);
-        Assert.Equal(new[] { "DATA" }, ast.Metavariables);
-        Assert.True(ast.HasEllipsis);
-        Assert.Equal("ExecuteAction(..., $DATA, ...)", ast.Source);
-    }
-
-    [Fact]
-    public void Parse_AssignmentSnippet_BindsBothMetavariables()
-    {
-        var ast = LabyrinthPatternParser.Parse("$TARGET = FormatString($SRC)");
-
-        Assert.Equal(new[] { "TARGET", "SRC" }, ast.Metavariables);
-        Assert.False(ast.HasEllipsis);
-    }
-
-    [Fact]
-    public void RuleSet_DefinedMetavariables_CoversAllSections()
-    {
-        var loader = new LabyrinthRuleLoader();
-        var rule = Assert.Single(loader.Load("""
-            rules:
-              - id: mv-scope
-                type: taint
-                message: "m"
-                sources:
-                  - pattern: "ReceiveData($DATA)"
-                sinks:
-                  - pattern: "ExecuteAction(..., $DATA, ...)"
-                sanitizers:
-                  - pattern: "VerifyIntegrity($DATA)"
-                propagators:
-                  - pattern: "$TARGET = FormatString($SRC)"
-                    from: $SRC
-                    to: $TARGET
-            """).Rules);
-
-        var metas = LabyrinthRuleSet.DefinedMetavariables(rule).ToList();
-
-        Assert.Equal(new[] { "DATA", "TARGET", "SRC" }, metas);
     }
 }
 
