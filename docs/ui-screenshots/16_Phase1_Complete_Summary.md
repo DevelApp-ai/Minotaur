@@ -1,3 +1,8 @@
+---
+layout: default
+title: Minotaur Phase 1 Complete — Grammar Visualization
+---
+
 # Phase 1 Complete: Grammar Visualization
 
 **Status:** 🟢 **100% COMPLETE**  
@@ -63,7 +68,8 @@ Phase 1 of the Minotaur visualization roadmap has been successfully completed. B
 **User Benefits:**
 - Visual parse tree exploration
 - Export to graph visualization tools
-- Interactive collapse/expand
+- Interactive co
+llapse/expand
 - Clear visual hierarchy
 
 ## Integration Points
@@ -139,7 +145,8 @@ Work has begun on Phase 2: Full Project Analysis
 
 **Already Implemented:**
 - ✅ ProjectLoaderService backend (45% of Phase 2)
-- ✅ Multi-threaded file processing
+- ✅ Multi-threaded
+ file processing
 - ✅ Progress reporting system
 - ✅ Basic complexity metrics
 - ✅ Language detection

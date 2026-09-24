@@ -1,3 +1,8 @@
+---
+layout: default
+title: Minotaur UI Flow Documentation
+---
+
 # Minotaur UI Flow Documentation
 
 This document provides a comprehensive overview of all implemented UI pages in the Minotaur web application, focusing on the web deployment.
@@ -36,7 +41,8 @@ The following visualization features are planned for future releases:
 - **Advanced Grammar Visualization**: Interactive syntax tree visualization with zoom and navigation
 - **Real-time Collaboration**: Live multi-user editing with presence indicators
 
-> **Note**: The current screenshots show the UI framework and design. Some features display sample/mockup data to demonstrate the intended user experience. Full backend integration for grammar parsing, railroad diagram generation, and complete project loading is under active development.
+> **Note**: The current screenshots show the UI framework and design. Some features display sample/mockup data to demonstrate the intended user experience. Full backend integration for grammar parsing, railroad diagram 
+generation, and complete project loading is under active development.
 
 ## Table of Contents
 
@@ -91,11 +97,12 @@ The following visualization features are planned for future releases:
 - **Analysis Tab**: Displays grammar metrics (total rules, terminal/non-terminal rules, cyclomatic complexity)
 - **Errors Tab**: Shows parsing errors with line/column information and context
 
-> **Planned Enhancement**: Railroad diagram visualization for grammar rules. This will provide a graphical representation of each rule's syntax structure, making it easier to understand and validate grammar patterns at a glance. Users will be able to click on any rule to see its railroad diagram representation.
+> **Planned Enhancement**: Railroad diagram visualization for grammar rules. This will provide a graphical representation of each rule's syntax structure
+, making it easier to understand and validate grammar patterns at a glance. Users will be able to click on any rule to see its railroad diagram representation.
 
 **Screenshot:**
 
-![Grammar Editor](https://github.com/user-attachments/assets/e4673e7f-3dda-4760-99ac-ccc14ca2cc49)
+![Grammar Editor](02_Grammar_Editor.png)
 
 ---
 
@@ -128,7 +135,7 @@ The following visualization features are planned for future releases:
 
 **Screenshot:**
 
-![Marketplace](https://github.com/user-attachments/assets/ad55d198-2556-4598-87b6-45a6a4b5f479)
+![Marketplace](03_Marketplace.png)
 
 ---
 
@@ -148,7 +155,7 @@ The following visualization features are planned for future releases:
 
 **Screenshot:**
 
-![StepParser Integration](https://github.com/user-attachments/assets/2b6ece7b-4b99-4e32-974d-c881fde525d9)
+![StepParser Integration](04_StepParser_Integration.png)
 
 ---
 
@@ -174,7 +181,7 @@ The following visualization features are planned for future releases:
 
 **Screenshot:**
 
-![Plugin Manager](https://github.com/user-attachments/assets/bf8be746-cf7c-4847-aa4f-a902c1b41c83)
+![Plugin Manager](05_Plugin_Manager.png)
 
 ---
 
@@ -202,14 +209,15 @@ The Project Manager currently displays a UI framework with sample projects. When
 - **Project-wide Analysis**: Analyze relationships, dependencies, and architecture across the entire project
 - **Batch Grammar Application**: Apply grammar rules to multiple files simultaneously
 - **Project Statistics**: Display comprehensive metrics (total files, lines of code, complexity scores)
-- **Visual Project Graph**: Interactive visualization of project structure and dependencies
+- **Visual Project Graph**: Interactive visualization of project struct
+ure and dependencies
 - **Incremental Parsing**: Efficiently re-parse only changed files during development
 
 > **Note**: The current view shows the UI design and intended workflow. Full backend integration for complete project loading and parsing is in development. This will enable users to load entire projects and view comprehensive analysis results without stepping through files individually.
 
 **Screenshot:**
 
-![Project Manager](https://github.com/user-attachments/assets/2b6ece7b-4b99-4e32-974d-c881fde525d9)
+![Project Manager](06_Project_Manager.png)
 
 ---
 
@@ -246,7 +254,8 @@ The Project Manager currently displays a UI framework with sample projects. When
 
 **Screenshot:**
 
-![Symbolic Analyzer](https://github.com/user-attachments/assets/2b6ece7b-4b99-4e32-974d-c881fde525d9)
+![Symbolic Analyzer](https://githu
+b.com/user-attachments/assets/2b6ece7b-4b99-4e32-974d-c881fde525d9)
 
 ---
 
@@ -273,7 +282,7 @@ The Project Manager currently displays a UI framework with sample projects. When
 
 **Screenshot:**
 
-![Interactive Tutorial](https://github.com/user-attachments/assets/2b6ece7b-4b99-4e32-974d-c881fde525d9)
+![Interactive Tutorial](08_Tutorial.png)
 
 ---
 
@@ -314,11 +323,12 @@ The Project Manager currently displays a UI framework with sample projects. When
 
 **Screenshot:**
 
-![Version Control](https://github.com/user-attachments/assets/2b6ece7b-4b99-4e32-974d-c881fde525d9)
+![Version Control](09_Version_Control.png)
 
 ---
 
-## 10. Additional Pages
+## 1
+0. Additional Pages
 
 ### Counter Demo
 **URL:** `/counter`
@@ -389,7 +399,8 @@ The navigation menu also includes authentication-aware features:
 - **Forms:** Clean input fields with labels and placeholders
 - **Tables/Lists:** Striped or bordered for readability
 - **Badges:** Color-coded badges for status indicators
-- **Tabs:** Horizontal tab navigation for multi-view interfaces
+- **Tabs:** Horizontal tab
+ navigation for multi-view interfaces
 
 ---
 
@@ -448,7 +459,8 @@ The Minotaur development team is actively working on enhanced visualization feat
 - **Project-wide Metrics Dashboard**: Comprehensive analytics across entire codebase
   - Code coverage by grammar rules
   - Complexity heatmaps
-  - Dependency visualization with interactive graphs
+  - Dependency visualization with inte
+ractive graphs
   - Quality trends over time
 
 ### Phase 3: Advanced IDE Features (Planned Q3)

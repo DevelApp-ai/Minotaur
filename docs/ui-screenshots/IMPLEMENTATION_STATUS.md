@@ -1,3 +1,8 @@
+---
+layout: default
+title: Minotaur Implementation Status — Visualization Features
+---
+
 # Implementation Status - Visualization Features
 
 **Last Updated:** 2025-10-27 21:00:00 UTC
@@ -50,7 +55,8 @@ This document tracks the implementation progress of the three-phase visualizatio
 **Features:**
 - [x] Basic SVG tree rendering
 - [x] Integration into Grammar Editor UI (new "Tree" tab)
-- [x] SyntaxTreeVisualization.razor component created
+- [x] SyntaxTreeVisualization.razor c
+omponent created
 - [x] Hierarchical layout algorithm
 - [x] Color-coded nodes by type
 - [x] Expand/Collapse All controls
@@ -107,7 +113,8 @@ This document tracks the implementation progress of the three-phase visualizatio
 - [x] **Real-time progress bar with percentage**
 - [x] **Language distribution visualization**
 - [ ] Advanced complexity metrics
-- [ ] Caching for large projects
+- [ ] Caching for la
+rge projects
 - [ ] Incremental parsing on file changes
 
 **Completed:**
@@ -155,7 +162,8 @@ This document tracks the implementation progress of the three-phase visualizatio
 
 **Dependencies:**
 - SVG generation library (✅ native C# implementation)
-- Tree layout algorithm (✅ basic hierarchical layout)
+- Tree layout algorithm (✅ basic hiera
+rchical layout)
 - GraphML export (✅ XML generation)
 - StepParser integration (⏳ pending)
 
@@ -229,7 +237,8 @@ This document tracks the implementation progress of the three-phase visualizatio
 5. Add historical tracking and trend analysis
 
 **Dependencies:**
-- Metrics calculation library
+- Metri
+cs calculation library
 - Chart/visualization library
 - Data persistence for historical trends
 
@@ -307,7 +316,8 @@ This document tracks the implementation progress of the three-phase visualizatio
 
 | Phase | Status | Progress | Target | Notes |
 |-------|--------|----------|--------|-------|
-| Phase 1 | 🟡 In Progress | 58% | Q1 2025 | Railroad diagrams 75%, Syntax tree 40% |
+| Phase 1 | 🟡 In Progress | 58% | Q1 2025 | Railroad diagr
+ams 75%, Syntax tree 40% |
 | Phase 2 | 🟡 Partial | 20% | Q2 2025 | UI framework only |
 | Phase 3 | 🔴 Not Started | 5% | Q3 2025 | Basic UI only |
 
@@ -374,7 +384,8 @@ This document tracks the implementation progress of the three-phase visualizatio
 - Or Blazor-native tree component library
 
 **For Project Loading:**
-- Roslyn for C# parsing
+- R
+oslyn for C# parsing
 - ANTLR for other languages
 - Multi-threading libraries (Task Parallel Library)
 

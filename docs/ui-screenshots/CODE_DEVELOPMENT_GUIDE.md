@@ -1,3 +1,8 @@
+---
+layout: default
+title: Minotaur Code Development Guide
+---
+
 # Minotaur for Code Development - User Guide
 
 This guide shows how to use Minotaur as an IDE for developing and analyzing your application code, where the focus is on your code rather than on grammar development.
@@ -55,7 +60,8 @@ The grammar is already established (either built-in or from marketplace), and yo
 4. **Start Analysis**
    - Click "Start Analysis"
    - View results in tabs:
-     - **Overview**: Metrics (symbols, complexity, dependencies, quality score)
+     - **Overview**: Metric
+s (symbols, complexity, dependencies, quality score)
      - **Symbol Table**: Hierarchical view of all code symbols
      - **Dependencies**: Visual dependency graph
      - **Cognitive Graph**: AST visualization of code structure
@@ -138,7 +144,8 @@ The grammar is already established (either built-in or from marketplace), and yo
    - Paste the code you want to understand
    - The grammar is automatically selected based on language
 
-2. **Parse the Code**
+2. **Parse th
+e Code**
    - Click "Parse" to generate cognitive graph
    - View parsing steps one by one
 
@@ -207,7 +214,8 @@ The grammar is already established (either built-in or from marketplace), and yo
 
 ## Code Development Best Practices
 
-### 1. Start with Project-Level Analysis
+### 
+1. Start with Project-Level Analysis
 - Use **Project Manager** to get the big picture
 - Understand overall architecture
 - Identify hot spots and problem areas
@@ -279,7 +287,8 @@ The grammar is already established (either built-in or from marketplace), and yo
 - `F5` - Re-run analysis
 
 ### Performance Tips
-- For large projects, use file filtering
+- For large projects,
+ use file filtering
 - Enable incremental analysis mode
 - Cache analysis results
 - Use project-wide analysis during low-activity periods
