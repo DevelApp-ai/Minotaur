@@ -1,7 +1,10 @@
-# Jekyll configuration for GitHub Pages
-# Using Leap Day theme
+# Jekyll configuration for GitHub Pages.
+#
+# Unified format shared by the DevelApp-ai ecosystem Pages sites:
+# Minotaur, CognitiveGraph, ENFAStepLexer-StepParser and Minotaur-Grammars
+# all use this same layout — only title/description and the repo-specific
+# `exclude` list differ. Keep them in sync when changing this file.
 
-# Theme configuration
 theme: jekyll-theme-leap-day
 title: Minotaur
 description: Advanced Compiler-Compiler Platform
@@ -9,6 +12,10 @@ show_downloads: true
 
 # Repository information
 repository: DevelApp-ai/Minotaur
+github:
+  repository_name: "Minotaur"
+  repository_nwo: "DevelApp-ai/Minotaur"
+  owner_name: "DevelApp-ai"
 
 # Site URL for sitemap generation
 url: https://develapp-ai.github.io
@@ -16,27 +23,52 @@ baseurl: /Minotaur
 
 # Build settings
 markdown: kramdown
+highlighter: rouge
 kramdown:
   input: GFM
-  syntax_highlighter: rouge
+  hard_wrap: false
 
-# Plugins
+# Plugins (GitHub Pages supported plugins only)
 plugins:
   - jekyll-sitemap
+
+# Render every Markdown file with the theme layout: the root README and
+# everything under docs/ becomes a themed page, so the full documentation
+# set is browsable on the site, not just the files a theme links by default.
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+
+# Site navigation (used by the theme where supported; also serves as the
+# canonical link list kept identical across the ecosystem sites)
+navigation:
+  - title: Home
+    url: /
+  - title: GitHub
+    url: https://github.com/DevelApp-ai/Minotaur
 
 # Exclude files from processing
 exclude:
   - .git
   - .github
   - .gitignore
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+@@EXCLUDES@@
   - src/
   - examples/
-  - grammars/
   - extensions/
+  - old_docs/
+  - tools/
+  - grammars/
+  - GitVersion.yml
   - build_output.txt
   - verify_release_fix.md
-  - GitVersion.yml
-  - LICENSE
   - "*.csproj"
   - "*.sln"
   - "*.backup"
