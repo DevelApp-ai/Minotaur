@@ -25,6 +25,13 @@ For the full project overview, see the
 - [SAST Rule Language Evaluation](docs/SAST%20Rule%20Language%20Evaluation) — evaluation of the SAST rule language
 - [Generated File Header](docs/generatedfileheadertext) — header text used in generated files
 
+## 🖥️ UI Documentation
+
+- [UI Flow](docs/ui-screenshots/UI_FLOW) — guided tour of all UI pages, with screenshots
+- [Code Development Guide](docs/ui-screenshots/CODE_DEVELOPMENT_GUIDE) — using Minotaur to analyze and develop your application code
+- [Implementation Status](docs/ui-screenshots/IMPLEMENTATION_STATUS) — progress of the visualization features (Phases 1–3)
+- [Phase 1 Complete Summary](docs/ui-screenshots/16_Phase1_Complete_Summary) — wrap-up of the grammar visualization phase
+
 ## 🧩 Related repositories
 
 - [Minotaur-Grammars](https://github.com/DevelApp-ai/Minotaur-Grammars) — the consolidated grammar library (single home for grammar definitions)
