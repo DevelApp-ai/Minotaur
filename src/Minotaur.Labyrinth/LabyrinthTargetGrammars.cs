@@ -49,7 +49,7 @@ public static class LabyrinthTargetGrammars
         new() { Directory = "programming-languages/go119", MainFile = "Go119.grammar" },
         new() { Directory = "programming-languages/haskell", MainFile = "Haskell.grammar" },
         new() { Directory = "programming-languages/htmlembedded", MainFile = "HTMLEmbedded.grammar" },
-        new() { Directory = "programming-languages/java", MainFile = "Java.grammar" },
+        new() { Directory = "programming-languages/java8", MainFile = "Java8.grammar" },
         new() { Directory = "programming-languages/java17", MainFile = "Java17.grammar" },
         new() { Directory = "programming-languages/javascript", MainFile = "JavaScript.grammar" },
         new() { Directory = "programming-languages/javascriptes2022", MainFile = "JavaScriptES2022.grammar" },
