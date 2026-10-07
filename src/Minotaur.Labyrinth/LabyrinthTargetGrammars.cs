@@ -31,7 +31,9 @@ public static class LabyrinthTargetGrammars
     /// Every language grammar under <c>programming-languages/</c> in Minotaur-Grammars
     /// (36 languages; Minotaur-Grammars issue #184 and follow-up PR #187). The
     /// meta/project grammars (extensionfile, folderproject, grammarfile,
-    /// sample, dotnetproject) are intentionally excluded.
+    /// sample, dotnetproject) are intentionally excluded. The Java target is
+    /// the versioned <c>java8</c> grammar (Java SE 8), replacing the unversioned
+    /// legacy <c>java</c> grammar (Minotaur-Grammars issue #189).
     /// </summary>
     public static readonly IReadOnlyList<LabyrinthTargetGrammar> All = new LabyrinthTargetGrammar[]
     {
