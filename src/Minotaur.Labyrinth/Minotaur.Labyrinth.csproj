@@ -55,7 +55,7 @@
       <LabyrinthTargetGrammar Include="programming-languages/go119" MainFile="Go119.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/haskell" MainFile="Haskell.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/htmlembedded" MainFile="HTMLEmbedded.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/java" MainFile="Java.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/java8" MainFile="Java8.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/java17" MainFile="Java17.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/javascript" MainFile="JavaScript.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/javascriptes2022" MainFile="JavaScriptES2022.grammar" />
@@ -93,5 +93,4 @@
             Visible="false" />
     </ItemGroup>
   </Target>
-
 </Project>

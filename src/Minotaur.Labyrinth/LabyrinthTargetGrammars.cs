@@ -31,7 +31,9 @@ public static class LabyrinthTargetGrammars
     /// Every language grammar under <c>programming-languages/</c> in Minotaur-Grammars
     /// (36 languages; Minotaur-Grammars issue #184 and follow-up PR #187). The
     /// meta/project grammars (extensionfile, folderproject, grammarfile,
-    /// sample, dotnetproject) are intentionally excluded.
+    /// sample, dotnetproject) are intentionally excluded. The Java target is
+    /// the versioned <c>java8</c> grammar (Java SE 8), replacing the unversioned
+    /// legacy <c>java</c> grammar (Minotaur-Grammars issue #189).
     /// </summary>
     public static readonly IReadOnlyList<LabyrinthTargetGrammar> All = new LabyrinthTargetGrammar[]
     {
@@ -49,7 +51,7 @@ public static class LabyrinthTargetGrammars
         new() { Directory = "programming-languages/go119", MainFile = "Go119.grammar" },
         new() { Directory = "programming-languages/haskell", MainFile = "Haskell.grammar" },
         new() { Directory = "programming-languages/htmlembedded", MainFile = "HTMLEmbedded.grammar" },
-        new() { Directory = "programming-languages/java", MainFile = "Java.grammar" },
+        new() { Directory = "programming-languages/java8", MainFile = "Java8.grammar" },
         new() { Directory = "programming-languages/java17", MainFile = "Java17.grammar" },
         new() { Directory = "programming-languages/javascript", MainFile = "JavaScript.grammar" },
         new() { Directory = "programming-languages/javascriptes2022", MainFile = "JavaScriptES2022.grammar" },
