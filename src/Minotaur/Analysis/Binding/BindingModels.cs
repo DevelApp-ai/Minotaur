@@ -173,12 +173,9 @@ public class GrammarBindingProfile
             return;
         }
 
-        foreach (var property in roles.EnumerateObject())
+        foreach (var property in roles.EnumerateObject().Where(property => property.Value.ValueKind == JsonValueKind.String))
         {
-            if (property.Value.ValueKind == JsonValueKind.String)
-            {
-                SetRole(profile, ruleName, property.Name, property.Value.GetString()!);
-            }
+            SetRole(profile, ruleName, property.Name, property.Value.GetString()!);
         }
     }
 
