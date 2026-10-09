@@ -214,7 +214,8 @@ public class SemanticBinder
 
     /// <summary>
     /// Finds the text carrying a name inside a production: the first terminal
-    /// with the annotated token type, falling back to the first identifier node.
+    /// with the annotated token type, falling back to the first identifier
+    /// node (IdentifierNode or a terminal typed as "identifier").
     /// </summary>
     private static string? FindNameText(NonTerminalNode node, string? tokenType)
     {
@@ -227,7 +228,9 @@ public class SemanticBinder
             }
         }
 
-        var identifier = FindTerminal(node, t => t is IdentifierNode);
+        var identifier = FindTerminal(node, t =>
+            t is IdentifierNode ||
+            string.Equals(t.TokenType, "identifier", StringComparison.OrdinalIgnoreCase));
         return identifier?.Text;
     }
 
