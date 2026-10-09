@@ -105,6 +105,7 @@ public class SemanticBinderTests
                   "declarations": {
                     "class_definition": { "name": "identifier" }
                   },
+                  "containers": ["module_block"],
                   "imports": {
                     "import_statement": { "import": "dotted_name" }
                   },
