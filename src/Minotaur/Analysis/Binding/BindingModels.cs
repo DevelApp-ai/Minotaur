@@ -17,6 +17,7 @@
 
 using System.Linq;
 using System.Text.Json;
+using System.Linq;
 
 namespace Minotaur.Analysis.Binding;
 
@@ -138,12 +139,9 @@ public class GrammarBindingProfile
         {
             if (containers.ValueKind == JsonValueKind.Array)
             {
-                foreach (var element in containers.EnumerateArray())
+                foreach (var element in containers.EnumerateArray().Where(element => element.ValueKind == JsonValueKind.String))
                 {
-                    if (element.ValueKind == JsonValueKind.String)
-                    {
-                        profile.ContainerRules.Add(element.GetString()!);
-                    }
+                    profile.ContainerRules.Add(element.GetString()!);
                 }
             }
             else if (containers.ValueKind == JsonValueKind.Object)
