@@ -18,7 +18,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Minotaur.Analysis.Binding;
 using Minotaur.Core;
-using Minotaur.GrammarGeneration.Models;
 
 namespace Minotaur.Tests.Analysis.Binding;
 
@@ -29,9 +28,9 @@ public class SemanticBinderTests
     /// C#-shaped grammar annotations: namespace declarations, using directives,
     /// class declarations with a base list.
     /// </summary>
-    private static Grammar CreateCSharpLikeGrammar()
+    private static Minotaur.GrammarGeneration.Models.Grammar CreateCSharpLikeGrammar()
     {
-        return new Grammar
+        return new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "CSharpLike",
             Language = "csharp-like",
@@ -62,9 +61,9 @@ public class SemanticBinderTests
     /// Java-shaped grammar annotations: package declarations, import statements,
     /// class declarations with an extends clause.
     /// </summary>
-    private static Grammar CreateJavaLikeGrammar()
+    private static Minotaur.GrammarGeneration.Models.Grammar CreateJavaLikeGrammar()
     {
-        return new Grammar
+        return new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "JavaLike",
             Language = "java-like",
@@ -93,9 +92,9 @@ public class SemanticBinderTests
     /// Python-shaped grammar annotations: module-level nesting, import statements,
     /// class definitions with an inheritance list.
     /// </summary>
-    private static Grammar CreatePythonLikeGrammar()
+    private static Minotaur.GrammarGeneration.Models.Grammar CreatePythonLikeGrammar()
     {
-        return new Grammar
+        return new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "PythonLike",
             Language = "python-like",
@@ -241,7 +240,7 @@ public class SemanticBinderTests
     {
         // A "new language" (e.g. from Minotaur-Marketplace): all binding behavior
         // comes from annotations; the SemanticBinder code is untouched.
-        var grammar = new Grammar
+        var grammar = new Minotaur.GrammarGeneration.Models.Grammar
         {
             Name = "FictionalLang",
             Language = "fictional",
