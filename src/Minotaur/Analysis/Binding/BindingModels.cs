@@ -116,21 +116,21 @@ public class GrammarBindingProfile
             }
         }
 
-        foreach (var (ruleName, roles) in ReadObject(root, "declarations"))
+        foreach (var property in ReadObject(root, "declarations"))
         {
-            profile.DeclarationRules.Add(ruleName);
-            CollectRoles(profile, ruleName, roles);
+            profile.DeclarationRules.Add(property.Name);
+            CollectRoles(profile, property.Name, property.Value);
         }
 
-        foreach (var (ruleName, roles) in ReadObject(root, "imports"))
+        foreach (var property in ReadObject(root, "imports"))
         {
-            profile.ImportRules.Add(ruleName);
-            CollectRoles(profile, ruleName, roles);
+            profile.ImportRules.Add(property.Name);
+            CollectRoles(profile, property.Name, property.Value);
         }
 
-        foreach (var (ruleName, roles) in ReadObject(root, "references"))
+        foreach (var property in ReadObject(root, "references"))
         {
-            CollectRoles(profile, ruleName, roles);
+            CollectRoles(profile, property.Name, property.Value);
         }
 
         if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("containers", out var containers))
@@ -147,10 +147,10 @@ public class GrammarBindingProfile
             }
             else if (containers.ValueKind == JsonValueKind.Object)
             {
-                foreach (var (ruleName, roles) in containers.EnumerateObject())
+                foreach (var property in containers.EnumerateObject())
                 {
-                    profile.ContainerRules.Add(ruleName);
-                    CollectRoles(profile, ruleName, roles);
+                    profile.ContainerRules.Add(property.Name);
+                    CollectRoles(profile, property.Name, property.Value);
                 }
             }
         }
@@ -205,17 +205,16 @@ public class GrammarBindingProfile
         return Enumerable.Empty<JsonElement>();
     }
 
-    private static IEnumerable<(string RuleName, JsonElement Roles)> ReadObject(JsonElement root, string name)
+    private static IEnumerable<JsonProperty> ReadObject(JsonElement root, string name)
     {
         if (root.ValueKind == JsonValueKind.Object &&
             root.TryGetProperty(name, out var obj) &&
             obj.ValueKind == JsonValueKind.Object)
         {
-            foreach (var property in obj.EnumerateObject())
-            {
-                yield return (property.Name, property.Value);
-            }
+            return obj.EnumerateObject();
         }
+
+        return Enumerable.Empty<JsonProperty>();
     }
 }
 
