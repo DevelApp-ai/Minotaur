@@ -15,6 +15,7 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Linq;
 using System.Text.Json;
 
 namespace Minotaur.Analysis.Binding;
@@ -358,18 +359,16 @@ public class ScopeAwareSymbolTable
                 : null;
         }
 
-        foreach (var container in scopeContainers)
+        foreach (var symbol in scopeContainers.Select(container => FindInContainer(container, name)))
         {
-            var symbol = FindInContainer(container, name);
             if (symbol != null)
             {
                 return symbol;
             }
         }
 
-        foreach (var container in importedContainers)
+        foreach (var symbol in importedContainers.Select(container => FindInContainer(container, name)))
         {
-            var symbol = FindInContainer(container, name);
             if (symbol != null)
             {
                 return symbol;
