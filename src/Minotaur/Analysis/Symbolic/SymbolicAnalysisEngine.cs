@@ -18,6 +18,7 @@
 using Minotaur.Core;
 using Minotaur.GrammarGeneration.Models;
 using Minotaur.Plugins;
+using Minotaur.Parser;
 
 namespace Minotaur.Analysis.Symbolic;
 
@@ -31,6 +32,14 @@ public class SymbolicAnalysisEngine
     private readonly object? _stepParser;
     private readonly LanguagePluginManager _pluginManager;
     private readonly ConstraintSolver _constraintSolver;
+
+    /// <summary>
+    /// When true (the default), AnalyzeCode parses the source through the real
+    /// StepParser pipeline into a cognitive graph. The mock graph path is isolated
+    /// behind this flag for tests that need a deterministic graph without parser
+    /// availability (Minotaur issue #121).
+    /// </summary>
+    public bool UseRealParser { get; set; } = true;
 
     public SymbolicAnalysisEngine(object? stepParser = null, LanguagePluginManager? pluginManager = null)
     {
@@ -51,19 +60,22 @@ public class SymbolicAnalysisEngine
         try
         {
             // Step 1: Parse code if parser is available
-            CognitiveGraphNode? ast = null;
-            if (_stepParser != null)
+            CognitiveGraphNode? graph = null;
+            if (UseRealParser)
             {
-                // In a real implementation, this would integrate with StepParser
-                // For now, we'll create a mock AST structure
-                ast = CreateMockAst(sourceCode, language);
+                graph = ParseWithRealParser(sourceCode, language);
+            }
+            else if (_stepParser != null)
+            {
+                // Mock path, isolated for tests that need a deterministic graph
+                graph = CreateMockCognitiveGraph(sourceCode, language);
             }
 
-            // Step 2: Extract symbolic constraints from AST
-            var constraints = ExtractConstraints(ast, sourceCode, language);
+            // Step 2: Extract symbolic constraints from the cognitive graph
+            var constraints = ExtractConstraints(graph, sourceCode, language);
 
             // Step 3: Analyze execution paths
-            executionPaths = AnalyzeExecutionPaths(constraints, ast);
+            executionPaths = AnalyzeExecutionPaths(constraints, graph);
 
             // Step 4: Detect potential errors using language-specific analysis
             errors.AddRange(PerformLanguageSpecificAnalysis(sourceCode, language, constraints));
@@ -115,13 +127,60 @@ public class SymbolicAnalysisEngine
         // No need to register them here as they're integrated into the language plugins
     }
 
-    private CognitiveGraphNode CreateMockAst(string sourceCode, string language)
+    private CognitiveGraphNode CreateMockCognitiveGraph(string sourceCode, string language)
     {
-        // Mock AST creation - in real implementation, this would use StepParser
+        // Mock graph, isolated behind UseRealParser=false for deterministic tests
         return new NonTerminalNode("program", 0);
     }
 
-    private List<SymbolicConstraint> ExtractConstraints(CognitiveGraphNode? ast, string sourceCode, string language)
+    /// <summary>
+    /// Parses source code through the real StepParser pipeline and binds the
+    /// resulting cognitive graph with the grammar-driven semantic binder
+    /// (Minotaur issue #121). Binding is driven by annotations in the supplied
+    /// grammar's metadata; without a grammar, no binding occurs.
+    /// </summary>
+    public async Task<Binding.BindingResult> ParseAndBindAsync(string sourceCode, string language, Grammar? grammar = null)
+    {
+        var graph = await ParseWithRealParserAsync(sourceCode, language);
+
+        var binder = new Binding.SemanticBinder(
+            language,
+            grammar != null ? Binding.GrammarBindingProfile.FromGrammar(grammar) : new Binding.GrammarBindingProfile());
+        binder.BindFile(graph, $"{language}://inline");
+        binder.ResolvePendingReferences();
+        return binder.Result;
+    }
+
+    private CognitiveGraphNode ParseWithRealParser(string sourceCode, string language)
+    {
+        return ParseWithRealParserAsync(sourceCode, language).GetAwaiter().GetResult();
+    }
+
+    private async Task<CognitiveGraphNode> ParseWithRealParserAsync(string sourceCode, string language)
+    {
+        var integration = _stepParser as StepParserIntegration;
+        var ownsIntegration = integration == null;
+        if (integration == null)
+        {
+            integration = new StepParserIntegration(new ParserConfiguration { Language = language });
+        }
+
+        try
+        {
+            var graph = await integration.ParseToCognitiveGraphAsync(sourceCode);
+            graph.Metadata["language"] = language;
+            return graph;
+        }
+        finally
+        {
+            if (ownsIntegration)
+            {
+                integration.Dispose();
+            }
+        }
+    }
+
+    private List<SymbolicConstraint> ExtractConstraints(CognitiveGraphNode? graph, string sourceCode, string language)
     {
         var constraints = new List<SymbolicConstraint>();
 
@@ -130,9 +189,9 @@ public class SymbolicAnalysisEngine
         constraints.AddRange(ExtractControlFlowConstraints(sourceCode));
         constraints.AddRange(ExtractDataFlowConstraints(sourceCode));
 
-        if (ast != null)
+        if (graph != null)
         {
-            constraints.AddRange(ExtractAstConstraints(ast));
+            constraints.AddRange(ExtractGraphConstraints(graph));
         }
 
         return constraints;
@@ -238,34 +297,34 @@ public class SymbolicAnalysisEngine
         return constraints;
     }
 
-    private List<SymbolicConstraint> ExtractAstConstraints(CognitiveGraphNode ast)
+    private List<SymbolicConstraint> ExtractGraphConstraints(CognitiveGraphNode graph)
     {
         var constraints = new List<SymbolicConstraint>();
 
-        // Walk the AST and extract structural constraints
-        WalkAstForConstraints(ast, constraints);
+        // Walk the cognitive graph and extract structural constraints
+        WalkGraphForConstraints(graph, constraints);
 
         return constraints;
     }
 
-    private void WalkAstForConstraints(CognitiveGraphNode node, List<SymbolicConstraint> constraints)
+    private void WalkGraphForConstraints(CognitiveGraphNode node, List<SymbolicConstraint> constraints)
     {
         // Add constraint based on node type
         constraints.Add(new SymbolicConstraint(
             ConstraintType.StructuralPattern,
             new SourceLocation(1, 1),
-            $"AST node: {node.GetType().Name}",
+            $"Graph node: {node.GetType().Name}",
             node.ToString() ?? string.Empty
         ));
 
         // Recursively walk children
         foreach (var child in node.Children)
         {
-            WalkAstForConstraints(child, constraints);
+            WalkGraphForConstraints(child, constraints);
         }
     }
 
-    private List<ExecutionPath> AnalyzeExecutionPaths(List<SymbolicConstraint> constraints, CognitiveGraphNode? ast)
+    private List<ExecutionPath> AnalyzeExecutionPaths(List<SymbolicConstraint> constraints, CognitiveGraphNode? graph)
     {
         var paths = new List<ExecutionPath>();
 
