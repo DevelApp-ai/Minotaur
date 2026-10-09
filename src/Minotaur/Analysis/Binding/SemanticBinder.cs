@@ -103,28 +103,28 @@ public class SemanticBinder
     private void Walk(CognitiveGraphNode node, FileBindingContext context)
     {
         var isNonTerminal = node is NonTerminalNode nonTerminal;
-        var ruleName = isNonTerminal ? ((NonTerminalNode)node).RuleName : string.Empty;
+        var ruleName = isNonTerminal ? nonTerminal.RuleName : string.Empty;
 
         if (isNonTerminal && Profile.DeclarationRules.Contains(ruleName))
         {
-            HandleDeclaration((NonTerminalNode)node, context);
+            HandleDeclaration(nonTerminal, context);
         }
 
         if (isNonTerminal && Profile.ImportRules.Contains(ruleName))
         {
-            HandleImport((NonTerminalNode)node, context);
+            HandleImport(nonTerminal, context);
         }
 
         if (isNonTerminal && Profile.ContainerRules.Contains(ruleName))
         {
-            HandleContainer((NonTerminalNode)node, context);
+            HandleContainer(nonTerminal, context);
             return;
         }
 
         if (isNonTerminal && Profile.TryGetRoles(ruleName, out var roles) &&
             roles.TryGetValue(ReferenceRole, out var referenceTokenType))
         {
-            HandleReference((NonTerminalNode)node, referenceTokenType, context);
+            HandleReference(nonTerminal, referenceTokenType, context);
         }
         else if (!isNonTerminal && node is TerminalNode terminal &&
                  Profile.ReferenceTokenTypes.Contains(terminal.TokenType))
