@@ -16,6 +16,7 @@
  */
 
 using Minotaur.Core;
+using System.Linq;
 
 namespace Minotaur.Analysis.Binding;
 
@@ -241,16 +242,9 @@ public class SemanticBinder
             return terminal;
         }
 
-        foreach (var child in node.Children)
-        {
-            var found = FindTerminal(child, predicate);
-            if (found != null)
-            {
-                return found;
-            }
-        }
-
-        return null;
+        return node.Children
+            .Select(child => FindTerminal(child, predicate))
+            .FirstOrDefault(found => found != null);
     }
 
     /// <summary>
