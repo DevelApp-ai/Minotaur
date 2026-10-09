@@ -210,11 +210,11 @@ public class SemanticBinderTests
         var file1 = new NonTerminalNode("module", 0);
         var mod1 = new NonTerminalNode("module_block", 0);
         mod1.AddChild(Text("dotted_name", "identifier", "models.one"));
-        mod1.AddChild(CreateClassDeclaration("A", "class"));
+        mod1.AddChild(CreateClassDeclaration("A", "class", "class_definition"));
         file1.AddChild(mod1);
         var mod2 = new NonTerminalNode("module_block", 0);
         mod2.AddChild(Text("dotted_name", "identifier", "models.two"));
-        mod2.AddChild(CreateClassDeclaration("A", "class"));
+        mod2.AddChild(CreateClassDeclaration("A", "class", "class_definition"));
         file1.AddChild(mod2);
         binder.BindFile(file1, "file1.py");
 
@@ -222,7 +222,7 @@ public class SemanticBinderTests
         var import = new NonTerminalNode("import_statement", 0);
         import.AddChild(Text("dotted_name", "dotted_name", "models.two"));
         file2.AddChild(import);
-        var classB = CreateClassDeclaration("B", "class");
+        var classB = CreateClassDeclaration("B", "class", "class_definition");
         var bases = new NonTerminalNode("inheritance_list", 0);
         bases.AddChild(Text("identifier_list", "identifier", "A"));
         classB.AddChild(bases);
@@ -252,7 +252,9 @@ public class SemanticBinderTests
                   "declarations": {
                     "entity_declaration": { "name": "symbol_name" }
                   },
-                  "containers": ["domain_declaration"],
+                  "containers": {
+                    "domain_declaration": { "container": "domain_path" }
+                  },
                   "imports": {
                     "expose_directive": { "import": "domain_path" }
                   },
@@ -355,9 +357,9 @@ public class SemanticBinderTests
         Assert.AreEqual("csharp-like|N1.A", reference.ResolvedSymbolId);
     }
 
-    private static NonTerminalNode CreateClassDeclaration(string name, string keyword)
+    private static NonTerminalNode CreateClassDeclaration(string name, string keyword, string ruleName = "class_declaration")
     {
-        var node = new NonTerminalNode("class_declaration", 0);
+        var node = new NonTerminalNode(ruleName, 0);
         node.AddChild(new TerminalNode(keyword, "keyword"));
         node.AddChild(new TerminalNode(name, "identifier"));
         return node;
