@@ -156,12 +156,10 @@ public class GrammarBindingProfile
 
         foreach (var element in ReadArray(root, "typeDeclarationTokens"))
         {
-            if (element.ValueKind == JsonValueKind.String)
+        foreach (var element in ReadArray(root, "typeDeclarationTokens")
+            .Where(element => element.ValueKind == JsonValueKind.String))
             {
-                profile.TypeDeclarationTokens.Add(element.GetString()!);
-            }
-        }
-
+            profile.TypeDeclarationTokens.Add(element.GetString()!);
         return profile;
     }
 
