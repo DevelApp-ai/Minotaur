@@ -15,9 +15,7 @@
  * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Linq;
 using System.Text.Json;
-using System.Linq;
 
 namespace Minotaur.Analysis.Binding;
 
@@ -110,9 +108,12 @@ public class GrammarBindingProfile
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
 
-        foreach (var element in ReadArray(root, "scopeOpeners").Where(element => element.ValueKind == JsonValueKind.String))
+        foreach (var element in ReadArray(root, "scopeOpeners"))
         {
-            profile.ScopeOpeners.Add(element.GetString()!);
+            if (element.ValueKind == JsonValueKind.String)
+            {
+                profile.ScopeOpeners.Add(element.GetString()!);
+            }
         }
 
         foreach (var property in ReadObject(root, "declarations"))
@@ -136,9 +137,12 @@ public class GrammarBindingProfile
         {
             if (containers.ValueKind == JsonValueKind.Array)
             {
-                foreach (var element in containers.EnumerateArray().Where(element => element.ValueKind == JsonValueKind.String))
+                foreach (var element in containers.EnumerateArray())
                 {
-                    profile.ContainerRules.Add(element.GetString()!);
+                    if (element.ValueKind == JsonValueKind.String)
+                    {
+                        profile.ContainerRules.Add(element.GetString()!);
+                    }
                 }
             }
             else if (containers.ValueKind == JsonValueKind.Object)
@@ -153,10 +157,12 @@ public class GrammarBindingProfile
 
         foreach (var element in ReadArray(root, "typeDeclarationTokens"))
         {
-        foreach (var element in ReadArray(root, "typeDeclarationTokens")
-            .Where(element => element.ValueKind == JsonValueKind.String))
+            if (element.ValueKind == JsonValueKind.String)
             {
-            profile.TypeDeclarationTokens.Add(element.GetString()!);
+                profile.TypeDeclarationTokens.Add(element.GetString()!);
+            }
+        }
+
         return profile;
     }
 
@@ -167,9 +173,12 @@ public class GrammarBindingProfile
             return;
         }
 
-        foreach (var property in roles.EnumerateObject().Where(property => property.Value.ValueKind == JsonValueKind.String))
+        foreach (var property in roles.EnumerateObject())
         {
-            SetRole(profile, ruleName, property.Name, property.Value.GetString()!);
+            if (property.Value.ValueKind == JsonValueKind.String)
+            {
+                SetRole(profile, ruleName, property.Name, property.Value.GetString()!);
+            }
         }
     }
 
@@ -352,16 +361,18 @@ public class ScopeAwareSymbolTable
                 : null;
         }
 
-        foreach (var symbol in scopeContainers.Select(container => FindInContainer(container, name)))
+        foreach (var container in scopeContainers)
         {
+            var symbol = FindInContainer(container, name);
             if (symbol != null)
             {
                 return symbol;
             }
         }
 
-        foreach (var symbol in importedContainers.Select(container => FindInContainer(container, name)))
+        foreach (var container in importedContainers)
         {
+            var symbol = FindInContainer(container, name);
             if (symbol != null)
             {
                 return symbol;
