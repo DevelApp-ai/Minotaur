@@ -16,7 +16,6 @@
  */
 
 using Minotaur.Core;
-using System.Linq;
 
 namespace Minotaur.Analysis.Binding;
 
@@ -104,28 +103,28 @@ public class SemanticBinder
     private void Walk(CognitiveGraphNode node, FileBindingContext context)
     {
         var isNonTerminal = node is NonTerminalNode nonTerminal;
-        var ruleName = isNonTerminal ? nonTerminal.RuleName : string.Empty;
+        var ruleName = isNonTerminal ? ((NonTerminalNode)node).RuleName : string.Empty;
 
         if (isNonTerminal && Profile.DeclarationRules.Contains(ruleName))
         {
-            HandleDeclaration(nonTerminal, context);
+            HandleDeclaration((NonTerminalNode)node, context);
         }
 
         if (isNonTerminal && Profile.ImportRules.Contains(ruleName))
         {
-            HandleImport(nonTerminal, context);
+            HandleImport((NonTerminalNode)node, context);
         }
 
         if (isNonTerminal && Profile.ContainerRules.Contains(ruleName))
         {
-            HandleContainer(nonTerminal, context);
+            HandleContainer((NonTerminalNode)node, context);
             return;
         }
 
         if (isNonTerminal && Profile.TryGetRoles(ruleName, out var roles) &&
             roles.TryGetValue(ReferenceRole, out var referenceTokenType))
         {
-            HandleReference(nonTerminal, referenceTokenType, context);
+            HandleReference((NonTerminalNode)node, referenceTokenType, context);
         }
         else if (!isNonTerminal && node is TerminalNode terminal &&
                  Profile.ReferenceTokenTypes.Contains(terminal.TokenType))
@@ -242,9 +241,16 @@ public class SemanticBinder
             return terminal;
         }
 
-        return node.Children
-            .Select(child => FindTerminal(child, predicate))
-            .FirstOrDefault(found => found != null);
+        foreach (var child in node.Children)
+        {
+            var found = FindTerminal(child, predicate);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
