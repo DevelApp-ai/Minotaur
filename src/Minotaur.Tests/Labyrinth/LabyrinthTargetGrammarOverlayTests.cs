@@ -18,6 +18,7 @@ namespace Minotaur.Tests.Labyrinth;
 public sealed class LabyrinthTargetGrammarOverlayTests
 {
     private readonly ITestOutputHelper _output;
+
     private static readonly string[] OperatorTokens = ["LABYRINTH_METAVAR", "LABYRINTH_ELLIPSIS"];
     private static readonly string[] OperatorRules = ["labyrinth-metavar", "labyrinth-ellipsis"];
 
@@ -33,7 +34,6 @@ public sealed class LabyrinthTargetGrammarOverlayTests
         {
             dir = dir.Parent;
         }
-
         Assert.True(dir is not null, "Grammars directory not found; the build-time download target should copy it.");
         return Path.Join(dir.FullName, "Grammars");
     }
@@ -76,17 +76,14 @@ public sealed class LabyrinthTargetGrammarOverlayTests
     {
         var (_, extensionPath) = LoadTarget(target, FindGrammarsRoot());
         var result = await Minotaur.Projects.Grammar.GrammarExtensionLoader.LoadFromFileAsync(extensionPath);
-
         Assert.True(result.Success, $"{target.MainFile}: {string.Join("; ", result.Errors.Select(e => e.ToString()))}");
         var extension = result.Extension!;
         Assert.Equal(target.MainFile, extension.BaseGrammarRef);
         Assert.Equal(ExtensionMergeStrategy.Additive, extension.MergeStrategy);
-
         foreach (var token in OperatorTokens)
         {
             Assert.Contains(extension.Entries, e => e.Name == token && !e.IsRule);
         }
-
         foreach (var rule in OperatorRules)
         {
             Assert.Contains(extension.Entries, e => e.Name == rule && e.IsRule);
@@ -120,7 +117,6 @@ public sealed class LabyrinthTargetGrammarOverlayTests
         {
             Assert.Contains(merged.Grammar.TokenRules, r => r.Name == token);
         }
-
         foreach (var rule in OperatorRules)
         {
             Assert.Contains(merged.Grammar.ProductionRules, r => r.Name == rule);
@@ -134,8 +130,12 @@ public sealed class LabyrinthTargetGrammarOverlayTests
         var (baseContent, extensionPath) = LoadTarget(target, FindGrammarsRoot());
         var extension = (await Minotaur.Projects.Grammar.GrammarExtensionLoader.LoadFromFileAsync(extensionPath)).Extension!;
 
+        // A fresh loader for the standalone base parse: EBNF normalization
+        // numbers synthesized helper rules per loader instance, so both this
+        // parse and ComposeWithOverlayContent's internal re-parse must start
+        // from helper counter zero to produce identical helper names.
         var loader = new GrammarLoader();
-        var baseGrammar = loader.ParseGrammarContent(baseContent, target.MainFile);
+        var baseGrammar = new GrammarLoader().ParseGrammarContent(baseContent, target.MainFile);
         var overlayContent = GrammarExtensionOverlayRenderer.RenderOverlay(extension);
         var merged = loader.ComposeWithOverlayContent(baseContent, overlayContent, OverlayConflictResolution.Additive,
             baseFileName: target.MainFile).Grammar;
