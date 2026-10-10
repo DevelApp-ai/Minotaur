@@ -23,7 +23,6 @@ public sealed class LabyrinthPatternParserTests
         Grammar: TestLang
         TokenSplitter: Space
         FormatType: EBNF
-
         <WS> ::= /[ \t\r\n]+/ => { skip(); }
         <IDENTIFIER> ::= /[a-zA-Z][a-zA-Z0-9]*/
         <NUMBER> ::= /[0-9]+/
@@ -31,7 +30,6 @@ public sealed class LabyrinthPatternParserTests
         <RPAREN> ::= ")"
         <COMMA> ::= ","
         <EQUALS> ::= "="
-
         <expr> ::= <term> ;
         <term> ::= IDENTIFIER | NUMBER | LPAREN | RPAREN | COMMA | EQUALS ;
         """;
@@ -133,7 +131,10 @@ public sealed class LabyrinthPatternParserTests
     {
         using var parser = CreateParser();
 
-        var ex = Assert.Throws<LabyrinthRuleException>(() => parser.ParsePattern("###"));
+        // '@' is not matched by any token rule of the target grammar (nor by
+        // the StepParser default comment rule, which only covers '#' lines),
+        // so the lexer cannot tokenize the input.
+        var ex = Assert.Throws<LabyrinthRuleException>(() => parser.ParsePattern("@@@"));
         Assert.Contains("cannot be tokenized", ex.Message);
     }
 
@@ -202,7 +203,6 @@ public sealed class LabyrinthPatternParserTests
             "IDENTIFIER LPAREN ELLIPSIS COMMA METAVARIABLE COMMA ELLIPSIS RPAREN",
             NodeTypes(Assert.Single(compiled.Sinks).Pattern));
         Assert.Single(compiled.Sanitizers);
-
         var propagator = Assert.Single(compiled.Propagators);
         Assert.Equal("SRC", propagator.From);
         Assert.Equal("TARGET", propagator.To);
@@ -238,6 +238,7 @@ public sealed class LabyrinthPatternParserTests
             Pattern = "ReadConfig($PATH)",
             Condition = "node.Arguments[0].Value != \"safe\""
         };
+
         var compiled = LabyrinthRuleCompiler.Compile(rule, parser);
 
         Assert.NotNull(compiled.SearchPattern);
@@ -278,7 +279,7 @@ public sealed class LabyrinthPatternParserTests
         using var parser = CreateParser();
 
         var rule = TaintRule();
-        rule.Sinks![0].Pattern = "ExecuteAction(..., ###, ...)";
+        rule.Sinks![0].Pattern = "ExecuteAction(..., @@@, ...)";
 
         Assert.Throws<LabyrinthRuleException>(() => LabyrinthRuleCompiler.Compile(rule, parser));
     }
