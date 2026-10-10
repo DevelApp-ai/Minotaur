@@ -158,17 +158,26 @@ public class SymbolicAnalysisEngine
 
     private async Task<CognitiveGraphNode> ParseWithRealParserAsync(string sourceCode, string language)
     {
-        if (_stepParser is StepParserIntegration integration)
+        var integration = _stepParser as StepParserIntegration;
+        var ownsIntegration = integration == null;
+        if (integration == null)
+        {
+            integration = new StepParserIntegration(new ParserConfiguration { Language = language });
+        }
+
+        try
         {
             var graph = await integration.ParseToCognitiveGraphAsync(sourceCode);
             graph.Metadata["language"] = language;
             return graph;
         }
-
-        using var ownedIntegration = new StepParserIntegration(new ParserConfiguration { Language = language });
-        var ownedGraph = await ownedIntegration.ParseToCognitiveGraphAsync(sourceCode);
-        ownedGraph.Metadata["language"] = language;
-        return ownedGraph;
+        finally
+        {
+            if (ownsIntegration)
+            {
+                integration.Dispose();
+            }
+        }
     }
 
     private List<SymbolicConstraint> ExtractConstraints(CognitiveGraphNode? graph, string sourceCode, string language)
