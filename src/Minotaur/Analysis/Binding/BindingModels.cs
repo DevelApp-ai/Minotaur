@@ -110,12 +110,9 @@ public class GrammarBindingProfile
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
 
-        foreach (var element in ReadArray(root, "scopeOpeners"))
+        foreach (var element in ReadArray(root, "scopeOpeners").Where(element => element.ValueKind == JsonValueKind.String))
         {
-            if (element.ValueKind == JsonValueKind.String)
-            {
-                profile.ScopeOpeners.Add(element.GetString()!);
-            }
+            profile.ScopeOpeners.Add(element.GetString()!);
         }
 
         foreach (var property in ReadObject(root, "declarations"))
