@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,11 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.13" />
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.14" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Minotaur\Minotaur.csproj" />
   </ItemGroup>
-
 </Project>
