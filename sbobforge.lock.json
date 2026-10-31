@@ -1,0 +1,16 @@
+{
+  "sbobIrVersion": 1,
+  "Grammars": {
+    "csharp": {
+      "Version": "4.11.0",
+      "Sha256": ""
+    },
+    "dotnet-catalog": {
+      "Version": "1",
+      "Sha256": "9e252dccf873aa0a38a50d8d980b98ebdf7ddad43f5ed3176c8a4d97ba3bc2e2"
+    }
+  },
+  "Minotaur": {
+    "Version": "1.5.0"
+  }
+}
