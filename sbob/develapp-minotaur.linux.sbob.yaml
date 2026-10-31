@@ -1,0 +1,21 @@
+apiVersion: spdx.softwarecomposition.kubescape.io/v1beta1
+kind: ContainerProfile
+metadata:
+  name: develapp-minotaur.linux
+  namespace: develapp
+  annotations:
+    kubescape.io/managed-by: User
+    develapp.io/binding: package-purl
+    develapp.io/generator: sbobforge@0.1.0
+    develapp.io/grammar-lock-sha256: 9a6214bd03adead0ab5b581044a579a36be72563884790f5f5a7788197b5603c
+    develapp.io/behavior-hash: dba76bc1572b41f6737b7eb8c01ba30e36f7432b49caeaa2cce3b376e30b5e18
+spec:
+  architectures: [amd64]
+  imageID: pkg:nuget/develapp.minotaur@1.5.21
+  opens:
+    - path: /tmp/sample1.sscript
+      flags: [O_WRONLY, O_CREAT, O_TRUNC]
+    - path: /tmp/sample2.sscript
+      flags: [O_WRONLY, O_CREAT, O_TRUNC]
+    - path: /tmp/sample3.sscript
+      flags: [O_WRONLY, O_CREAT, O_TRUNC]

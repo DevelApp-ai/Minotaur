@@ -1,0 +1,1355 @@
+{
+  "SbobIrVersion": 1,
+  "BehaviorHash": "dba76bc1572b41f6737b7eb8c01ba30e36f7432b49caeaa2cce3b376e30b5e18",
+  "FilesAnalyzed": 141,
+  "TestFiles": 48,
+  "TestEntries": 662,
+  "Quarantined": [
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Examples/ExampleGrammarVerificationTests.cs",
+      "Line": 128,
+      "TestId": "Minotaur.Tests.Examples.ExampleGrammarVerificationTests.GrammarConfigExample_ReferencesOnlyGrammarFiles",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 77,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_FunctionDefinition_IdentifiesFunctionPattern",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 92,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_VariableDeclaration_IdentifiesDeclarationPattern",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 107,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_IfStatement_IdentifiesControlFlow",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 122,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_ComplexCode_IdentifiesExpressionRules",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 138,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_ComplexCode_IdentifiesStatementRules",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 158,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_HasProgramRule_AsTopLevel",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 173,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_ProductionRules_HaveAlternatives",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 192,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_ProductionRules_HaveConfidence",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 210,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_ProductionRules_HavePriority",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 228,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_CommentsInCode_IgnoresComments",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 253,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_MultipleFiles_CombinesPatterns",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 254,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_MultipleFiles_CombinesPatterns",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/SyntaxStructureAnalyzerTests.cs",
+      "Line": 292,
+      "TestId": "Minotaur.Tests.GrammarGeneration.SyntaxStructureAnalyzerTests.DiscoverSyntaxPatterns_NestedBlocks_HandlesNesting",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 65,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_SimpleCode_IdentifiesLiterals",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 81,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_SimpleCode_IdentifiesOperators",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 97,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_SimpleCode_IdentifiesKeywords",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 118,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_SimpleCode_IdentifiesIdentifierPattern",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 133,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_SimpleCode_IdentifiesStructuralTokens",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 153,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_SimpleCode_IdentifiesCommentPatterns",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 169,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_SimpleCode_IdentifiesWhitespace",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 189,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_MultipleFiles_CombinesAnalysis",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 190,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_MultipleFiles_CombinesAnalysis",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 228,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_ComplexExpression_IdentifiesAllTokenTypes",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 254,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_TokenPatterns_HaveConfidenceScores",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 272,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_TokenPatterns_HavePriorities",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/GrammarGeneration/TokenPatternAnalyzerTests.cs",
+      "Line": 290,
+      "TestId": "Minotaur.Tests.GrammarGeneration.TokenPatternAnalyzerTests.AnalyzeSourceCode_RepeatedKeyword_HigherConfidence",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthGrammarPipelineTests.cs",
+      "Line": 32,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthGrammarPipelineTests.LabyrinthGrammar_IsDownloadedAndNonEmpty",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthGrammarPipelineTests.cs",
+      "Line": 40,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthGrammarPipelineTests.YamlGrammar_IsDownloadedAndNonEmpty",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 177,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_TryLoadDirectory_ReportsErrorsPerRule_AndLoadsValidRules",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 180,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_TryLoadDirectory_ReportsErrorsPerRule_AndLoadsValidRules",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 187,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_TryLoadDirectory_ReportsErrorsPerRule_AndLoadsValidRules",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 218,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_TryLoadDirectory_DetectsDuplicateRuleIds_AcrossFiles",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 228,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_TryLoadDirectory_DetectsDuplicateRuleIds_AcrossFiles",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 229,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_TryLoadDirectory_DetectsDuplicateRuleIds_AcrossFiles",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 255,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_LoadDirectory_ThrowsWithAllErrors_WhenInvalid",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 258,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_LoadDirectory_ThrowsWithAllErrors_WhenInvalid",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 279,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_LoadDirectory_MergesValidPack",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 282,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_LoadDirectory_MergesValidPack",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 283,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_LoadDirectory_MergesValidPack",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is a non-constant expression, not a constant literal",
+      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthReportingTests.cs",
+      "Line": 290,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_LoadDirectory_MergesValidPack",
+      "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Projects/Grammar/GrammarDetectionManagerTests.cs",
+      "Line": 36,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarDetectionManagerTests.DetectGrammarAsync_CSharpFile_ReturnsCorrectGrammar",
+      "Rule": "dotnet.file.writealltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Projects/Grammar/GrammarDetectionManagerTests.cs",
+      "Line": 75,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarDetectionManagerTests.DetectGrammarsAsync_MultipleFiles_ReturnsResultsForAll",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Projects/Grammar/GrammarDetectionManagerTests.cs",
+      "Line": 88,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarDetectionManagerTests.DetectGrammarsAsync_MultipleFiles_ReturnsResultsForAll",
+      "Rule": "dotnet.file.writealltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Projects/Grammar/GrammarDetectionManagerTests.cs",
+      "Line": 115,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarDetectionManagerTests.GetConfigurationAsync_NoConfigFile_ReturnsNull",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Projects/Grammar/GrammarDetectionManagerTests.cs",
+      "Line": 138,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarDetectionManagerTests.GetConfigurationAsync_WithConfigFile_LoadsConfiguration",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Projects/Grammar/GrammarDetectionManagerTests.cs",
+      "Line": 171,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarDetectionManagerTests.SaveConfigurationAsync_SavesAndLoadsCorrectly",
+      "Rule": "dotnet.directory.createdirectory"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/GrammarGeneration/Analysis/SyntaxStructureAnalyzer.cs",
+      "Line": 64,
+      "TestId": "sut:Minotaur.GrammarGeneration.Analysis.SyntaxStructureAnalyzer.AnalyzeSourceStructure",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/GrammarGeneration/Analysis/TokenPatternAnalyzer.cs",
+      "Line": 70,
+      "TestId": "sut:Minotaur.GrammarGeneration.Analysis.TokenPatternAnalyzer.AnalyzeFile",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/GrammarGeneration/GrammarGenerator.cs",
+      "Line": 192,
+      "TestId": "sut:Minotaur.GrammarGeneration.GrammarGenerator.SaveGrammarAsync",
+      "Rule": "dotnet.file.writealltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/GrammarGeneration/Validation/GrammarValidator.cs",
+      "Line": 153,
+      "TestId": "sut:Minotaur.GrammarGeneration.Validation.GrammarValidator.ValidateCoverage",
+      "Rule": "dotnet.file.readalllinesasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarConfiguration.cs",
+      "Line": 194,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTargetGrammarOverlayTests.Extension_ParsesThroughGrammarExtensionLoader",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarConfiguration.cs",
+      "Line": 194,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTargetGrammarOverlayTests.Overlay_ComposesWithTargetGrammarThroughStepParser",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarConfiguration.cs",
+      "Line": 194,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTargetGrammarOverlayTests.Overlay_IsAdditive_TargetProductionsArePreserved",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarConfiguration.cs",
+      "Line": 194,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarExtensionLoaderTests.LoadFromFileAsync_WithRepoExtensionFiles_ParsesAllSuccessfully",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarConfiguration.cs",
+      "Line": 194,
+      "TestId": "sut:Minotaur.Projects.Grammar.GrammarConfiguration.LoadFromFileAsync",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarConfiguration.cs",
+      "Line": 237,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarDetectionManagerTests.GetConfigurationAsync_WithConfigFile_LoadsConfiguration",
+      "Rule": "dotnet.file.writealltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarConfiguration.cs",
+      "Line": 237,
+      "TestId": "sut:Minotaur.Projects.Grammar.GrammarConfiguration.SaveToFileAsync",
+      "Rule": "dotnet.file.writealltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.CanDetect_ReturnsExpectedResult[0]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.CanDetect_ReturnsExpectedResult[1]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.CanDetect_ReturnsExpectedResult[2]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.CanDetect_ReturnsExpectedResult[3]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_KnownExtensions_ReturnsCorrectGrammar[0]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_KnownExtensions_ReturnsCorrectGrammar[1]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_KnownExtensions_ReturnsCorrectGrammar[2]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_KnownExtensions_ReturnsCorrectGrammar[3]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_KnownExtensions_ReturnsCorrectGrammar[4]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_KnownExtensions_ReturnsCorrectGrammar[5]",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_NoExtension_ReturnsFailure",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_UnknownExtension_ReturnsFailure",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "Minotaur.Tests.Projects.Grammar.Detectors.FileExtensionGrammarDetectorTests.DetectGrammarAsync_WithProjectConfiguration_UsesConfigurationOverDefault",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarDetectionContext.cs",
+      "Line": 110,
+      "TestId": "sut:Minotaur.Projects.Grammar.GrammarDetectionContext.Create",
+      "Rule": "dotnet.file.readalltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarExtensionLoader.cs",
+      "Line": 118,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTargetGrammarOverlayTests.Extension_ParsesThroughGrammarExtensionLoader",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarExtensionLoader.cs",
+      "Line": 118,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTargetGrammarOverlayTests.Overlay_ComposesWithTargetGrammarThroughStepParser",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarExtensionLoader.cs",
+      "Line": 118,
+      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTargetGrammarOverlayTests.Overlay_IsAdditive_TargetProductionsArePreserved",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarExtensionLoader.cs",
+      "Line": 118,
+      "TestId": "Minotaur.Tests.Projects.Grammar.GrammarExtensionLoaderTests.LoadFromFileAsync_WithRepoExtensionFiles_ParsesAllSuccessfully",
+      "Rule": "dotnet.file.readalltextasync"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur/Projects/Grammar/GrammarExtensionLoader.cs",
+      "Line": 118,
+      "TestId": "sut:Minotaur.Projects.Grammar.GrammarExtensionLoader.LoadFromFileAsync",
+      "Rule": "dotnet.file.readalltextasync"
+    }
+  ],
+  "Noise": [
+    {
+      "Description": "test helper (not an entry method): .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 124,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): node.AddChild",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 125,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 125,
+      "TestId": ""
+    },
+    {
+      "Description": "harness API: .CreateCSharpLikeGrammar",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 132,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .SemanticBinder",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 133,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 136,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 137,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 138,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 139,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 141,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 142,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 143,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 148,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 149,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 150,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 152,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 153,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 154,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 161,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: References.Single",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 162,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 163,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 164,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_CSharpLike_SameNamedClassesInDifferentNamespaces_ResolvedPerUsing"
+    },
+    {
+      "Description": "harness API: .CreateJavaLikeGrammar",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 170,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .SemanticBinder",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 171,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 173,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 174,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 175,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 176,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 178,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 179,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 180,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 184,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 185,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 186,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 188,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 189,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 190,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: References.Single",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 197,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 198,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 199,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_JavaLike_SameNamedClassesInDifferentPackages_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .CreatePythonLikeGrammar",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 205,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .SemanticBinder",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 206,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 210,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 211,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 212,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 213,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 215,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 216,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 217,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 221,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 222,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 223,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 225,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 226,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 227,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: References.Single",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 234,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 235,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 236,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_PythonLike_SameNamedClassesInDifferentModules_ResolvedPerImport"
+    },
+    {
+      "Description": "harness API: .SemanticBinder",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 270,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 272,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 273,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 274,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 275,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 276,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 277,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 280,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 281,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 282,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 283,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 284,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 289,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 290,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 291,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 293,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 294,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 295,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 296,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 297,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: References.Single",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 304,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 305,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 306,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 307,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: Symbols.Single",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 307,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_NewGrammarWithAnnotations_RequiresNoEngineChanges"
+    },
+    {
+      "Description": "harness API: .CreateCSharpLikeGrammar",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 313,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: .SemanticBinder",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 314,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 316,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 317,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 318,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 319,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: References.Single",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 326,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 327,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: Assert.IsFalse",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 328,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 329,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: UnresolvedReferences.Count",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 329,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_UnresolvedReference_ReportsUnresolved"
+    },
+    {
+      "Description": "harness API: .CreateCSharpLikeGrammar",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 335,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .SemanticBinder",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 336,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 338,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 339,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 340,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 341,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 345,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .CreateClassDeclaration",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 346,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 347,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: .Text",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 348,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: References.Single",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 355,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 356,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 357,
+      "TestId": "Minotaur.Tests.Analysis.Binding.SemanticBinderTests.Bind_QualifiedReference_ResolvesAcrossContainers"
+    },
+    {
+      "Description": "test helper (not an entry method): .NonTerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 362,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): node.AddChild",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 363,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 363,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): node.AddChild",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 364,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .TerminalNode",
+      "File": "src/Minotaur.Tests/Analysis/Binding/SemanticBinderTests.cs",
+      "Line": 364,
+      "TestId": ""
+    },
+    {
+      "Description": "harness API: .QualityMetrics",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 30,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithRequiredProperties_CreatesInstance"
+    },
+    {
+      "Description": "harness API: Assert.IsNotNull",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 39,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithRequiredProperties_CreatesInstance"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 40,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithRequiredProperties_CreatesInstance"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 41,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithRequiredProperties_CreatesInstance"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 42,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithRequiredProperties_CreatesInstance"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 43,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithRequiredProperties_CreatesInstance"
+    },
+    {
+      "Description": "harness API: .QualityMetrics",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 50,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithConfidence_StoresValue"
+    },
+    {
+      "Description": "harness API: Assert.IsNotNull",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 60,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithConfidence_StoresValue"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 61,
+      "TestId": "Minotaur.Tests.Analysis.QualityMetricsTests.QualityMetrics_WithConfidence_StoresValue"
+    },
+    {
+      "Description": "harness API: .QualityMetrics",
+      "File": "src/Minotaur.Tests/Analysis/QualityMetricsTests.cs",
+      "Line": 68,

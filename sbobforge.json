@@ -1,0 +1,13 @@
+{
+  "packageType": "nuget",
+  "packageName": "DevelApp.Minotaur",
+  "packageVersion": "1.5.21",
+  "namespace": "develapp",
+  "targetOs": "linux",
+  "architectures": [ "amd64" ],
+  "sutGlobs": [ "src/Minotaur/**/*.cs" ],
+  "testGlobs": [ "src/Minotaur.Tests/**/*.cs" ],
+  "pathPolicies": [],
+  "execPathPolicy": {},
+  "allowParseError": []
+}
