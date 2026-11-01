@@ -59,7 +59,6 @@ exclude:
   - Gemfile.lock
   - node_modules
   - vendor
-@@EXCLUDES@@
   - src/
   - examples/
   - extensions/
