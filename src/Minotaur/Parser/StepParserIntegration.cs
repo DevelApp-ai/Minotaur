@@ -49,6 +49,23 @@ public class ParserConfiguration
     public bool IncludeWhitespace { get; set; } = false;
 
     /// <summary>
+    /// Whether C# parsing uses the structure-preserving backend
+    /// (<see cref="StructurePreservingParser"/>): a complete token stream
+    /// including punctuation tokens plus a balanced structure graph with
+    /// parent-child edges, deterministic and never truncating (Minotaur
+    /// issue #136). Default is true; disable to use the legacy
+    /// reflection-based StepParser path.
+    /// </summary>
+    public bool StructurePreserving { get; set; } = true;
+
+    /// <summary>
+    /// Whether the structure-preserving backend attaches punctuation tokens
+    /// (braces, parens, brackets, semicolons, commas) as leaves of the
+    /// structure graph. Default is true.
+    /// </summary>
+    public bool IncludePunctuation { get; set; } = true;
+
+    /// <summary>
     /// The cognitive graph version to use.
     /// Auto: automatically selects based on project size (small projects use V1, large projects use V2).
     /// V1: optimized for small to medium projects.
@@ -113,6 +130,18 @@ public partial class StepParserIntegration : IDisposable
     {
         if (string.IsNullOrEmpty(sourceCode))
             throw new ArgumentException("Source code cannot be null or empty", nameof(sourceCode));
+
+        // Structure-preserving backend for C# (Minotaur issue #136): complete
+        // token stream including punctuation, balanced structure edges,
+        // deterministic output, no truncation. Failures are explicit.
+        if (_config.StructurePreserving && _config.Language.Equals("csharp", StringComparison.OrdinalIgnoreCase))
+        {
+            var structureParser = new StructurePreservingParser(
+                includePunctuation: _config.IncludePunctuation,
+                includeWhitespace: _config.IncludeWhitespace);
+            var structureResult = structureParser.Parse(sourceCode);
+            return structureParser.ToCognitiveGraph(structureResult, sourceCode, _config.Language);
+        }
 
         // Determine which version to use
         var effectiveVersion = DetermineGraphVersion(sourceCode);
