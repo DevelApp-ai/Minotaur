@@ -14,7 +14,12 @@ public class ClassicAspGrammarTests
 
     public ClassicAspGrammarTests()
     {
-        _integration = new StepParserIntegration();
+        // Classic ASP markup is not C# source, so the structure-preserving
+        // C# backend must not be applied here; use the legacy StepParser path.
+        _integration = new StepParserIntegration(new ParserConfiguration
+        {
+            StructurePreserving = false,
+        });
     }
 
     #region Basic ASP Structure Tests
