@@ -68,50 +68,50 @@ public static class StructureGraphBuilder
             switch (token.Kind)
             {
                 case StructureTokenKind.Punctuation when token.Text.Length == 1 && closers.ContainsKey(token.Text[0]):
-                {
-                    var group = new NonTerminalNode(groupNames[token.Text[0]], 0);
-                    group.Metadata["openPosition"] = token.StartPosition;
-                    group.SourcePosition = new SourcePosition(
-                        Line: token.Line,
-                        Column: token.Column,
-                        Offset: token.StartPosition,
-                        Length: token.Length);
-                    stack.Peek().AddChild(group);
-                    stack.Push(group);
-                    break;
-                }
+                    {
+                        var group = new NonTerminalNode(groupNames[token.Text[0]], 0);
+                        group.Metadata["openPosition"] = token.StartPosition;
+                        group.SourcePosition = new SourcePosition(
+                            Line: token.Line,
+                            Column: token.Column,
+                            Offset: token.StartPosition,
+                            Length: token.Length);
+                        stack.Peek().AddChild(group);
+                        stack.Push(group);
+                        break;
+                    }
 
                 case StructureTokenKind.Punctuation when token.Text.Length == 1 &&
                                                           (token.Text[0] == '}' || token.Text[0] == ')' || token.Text[0] == ']'):
-                {
-                    if (stack.Count <= 1)
-                        throw new StructureParseException(
-                            $"Unbalanced '{token.Text}': no matching opening delimiter", token.StartPosition, token.Line, token.Column);
-                    var top = stack.Pop();
-                    if (top.RuleName is "block" && token.Text[0] != '}' ||
-                        top.RuleName is "paren_group" && token.Text[0] != ')' ||
-                        top.RuleName is "bracket_group" && token.Text[0] != ']')
-                        throw new StructureParseException(
-                            $"Mismatched delimiter '{token.Text}' for '{top.RuleName}'", token.StartPosition, token.Line, token.Column);
-                    top.Metadata["closePosition"] = token.StartPosition;
-                    break;
-                }
+                    {
+                        if (stack.Count <= 1)
+                            throw new StructureParseException(
+                                $"Unbalanced '{token.Text}': no matching opening delimiter", token.StartPosition, token.Line, token.Column);
+                        var top = stack.Pop();
+                        if (top.RuleName is "block" && token.Text[0] != '}' ||
+                            top.RuleName is "paren_group" && token.Text[0] != ')' ||
+                            top.RuleName is "bracket_group" && token.Text[0] != ']')
+                            throw new StructureParseException(
+                                $"Mismatched delimiter '{token.Text}' for '{top.RuleName}'", token.StartPosition, token.Line, token.Column);
+                        top.Metadata["closePosition"] = token.StartPosition;
+                        break;
+                    }
 
                 case StructureTokenKind.Whitespace:
                 case StructureTokenKind.LineComment:
                 case StructureTokenKind.BlockComment:
-                {
-                    if (includeWhitespace)
-                        AddLeaf(stack.Peek(), token);
-                    break;
-                }
+                    {
+                        if (includeWhitespace)
+                            AddLeaf(stack.Peek(), token);
+                        break;
+                    }
 
                 case StructureTokenKind.Punctuation:
-                {
-                    if (includePunctuation)
-                        AddLeaf(stack.Peek(), token);
-                    break;
-                }
+                    {
+                        if (includePunctuation)
+                            AddLeaf(stack.Peek(), token);
+                        break;
+                    }
 
                 default:
                     AddLeaf(stack.Peek(), token);
