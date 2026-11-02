@@ -55,4 +55,3 @@ jobs:
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
       SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_REGISTRY_TOKEN }}
-

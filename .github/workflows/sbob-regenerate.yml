@@ -115,4 +115,3 @@ jobs:
             --head "$branch" \
             --title "sbob: regenerate profile for DevelApp.Minotaur $VERSION" \
             --body-file /tmp/pr-body.md
-
