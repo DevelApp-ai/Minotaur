@@ -23,7 +23,7 @@ on:
       sbob-forge-ref:
         description: 'SBOB-Forge ref to build the sbobforge generator from'
         required: false
-        default: 'ae7c3068e9030dc0d38f1832d61fa4d0345838cb'
+        default: '8275a7f22a1a0b500c2f25fc5aaad0ca9d056a05'
         type: string
 
 permissions:
@@ -115,3 +115,4 @@ jobs:
             --head "$branch" \
             --title "sbob: regenerate profile for DevelApp.Minotaur $VERSION" \
             --body-file /tmp/pr-body.md
+

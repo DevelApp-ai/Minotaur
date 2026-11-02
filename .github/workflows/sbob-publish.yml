@@ -1,11 +1,12 @@
 name: sbob-publish
 
-# M6 dogfood lane (SBOB-Forge TDS 10.2/10.3): on every published stable
+# M6 dogfood lane (SBOB-Forge TDS 10.2/10.3/10.5): on every published stable
 # release, run the SBOB-Forge registry publish pipeline for the committed
 # profile:
 #   drift gate (generate --check --frozen + purl binding check)
 #     -> cosign keyless signing (SBoB + provenance, org decision #14)
 #     -> dialect conversion + sbobctl validate/diff
+#     -> public-lane content gate (sbobforge gate, TDS 10.5)
 #     -> registry PR in DevelApp-ai/Software-Bill-of-Behavior
 #
 # The pipeline REFUSES to publish a drifted profile or one not bound to the
@@ -42,7 +43,7 @@ jobs:
 
   sbob-publish:
     needs: [resolve-version]
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@ae7c3068e9030dc0d38f1832d61fa4d0345838cb
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@8275a7f22a1a0b500c2f25fc5aaad0ca9d056a05
     with:
       package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.linux.sbob.yaml
@@ -54,3 +55,4 @@ jobs:
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
       SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_REGISTRY_TOKEN }}
+
