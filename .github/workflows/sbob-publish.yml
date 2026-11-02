@@ -1,0 +1,56 @@
+name: sbob-publish
+
+# M6 dogfood lane (SBOB-Forge TDS 10.2/10.3): on every published stable
+# release, run the SBOB-Forge registry publish pipeline for the committed
+# profile:
+#   drift gate (generate --check --frozen + purl binding check)
+#     -> cosign keyless signing (SBoB + provenance, org decision #14)
+#     -> dialect conversion + sbobctl validate/diff
+#     -> registry PR in DevelApp-ai/Software-Bill-of-Behavior
+#
+# The pipeline REFUSES to publish a drifted profile or one not bound to the
+# released version (org decision #26: the fix is regenerating, never
+# hand-editing). Release flow: bump + regenerate via sbob-regenerate.yml,
+# merge that PR, then cut the release.
+#
+# Prereleases are skipped: beta profiles are not registry material.
+# Requires the SBOB_REGISTRY_TOKEN org secret (contents:write on the
+# Software-Bill-of-Behavior repo) to open the cross-repo registry PR.
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  resolve-version:
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Strip the v prefix from the release tag
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          v="${{ github.event.release.tag_name }}"
+          v="${v#v}"
+          case "$v" in
+            ''|*[!0-9A-Za-z.+-]*) echo "unexpected tag '${{ github.event.release.tag_name }}'"; exit 1 ;;
+          esac
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+  sbob-publish:
+    needs: [resolve-version]
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@ae7c3068e9030dc0d38f1832d61fa4d0345838cb
+    with:
+      package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
+      sbob-file: sbob/develapp-minotaur.linux.sbob.yaml
+      provenance-file: sbob/develapp-minotaur.linux.provenance.jsonl
+      registry-dir: sbobs/nuget
+      registry-name: develapp-minotaur.linux
+    permissions:
+      contents: read
+      id-token: write   # cosign keyless OIDC (org decision #14)
+    secrets:
+      SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_REGISTRY_TOKEN }}
