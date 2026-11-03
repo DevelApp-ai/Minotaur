@@ -208,8 +208,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-            generate . --check --frozen --config sbobforge-choco.json 2>&1 | tee drift.log
+          if ! dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+            generate . --check --frozen --config sbobforge-choco.json 2>&1 | tee drift.log; then
+            # Drift diagnosis (TDS 9: the profile must be byte-identical on
+            # every platform). Regenerate in place and diff each committed
+            # artifact against what THIS platform emits, so the
+            # failure-context comment pins the exact diverging lines instead
+            # of just naming the file. The working tree is throwaway — the
+            # job exits non-zero right after.
+            for f in sbob.yaml provenance.jsonl coverage.json; do
+              cp "sbob/develapp-minotaur.windows.$f" "$RUNNER_TEMP/committed.$f"
+            done
+            dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+              generate . --frozen --config sbobforge-choco.json 2>&1 | tee -a drift.log
+            for f in sbob.yaml provenance.jsonl coverage.json; do
+              echo "=== drift diagnosis on ${RUNNER_OS}: committed vs regenerated — $f ===" | tee -a drift.log
+              echo "--- sizes: committed $(wc -c < "$RUNNER_TEMP/committed.$f") bytes, regenerated $(wc -c < "sbob/develapp-minotaur.windows.$f") bytes" | tee -a drift.log
+              diff "$RUNNER_TEMP/committed.$f" "sbob/develapp-minotaur.windows.$f" | head -80 | tee -a drift.log || true
+            done
+            exit 1
+          fi
           dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
             validate sbob/develapp-minotaur.windows.sbob.yaml 2>&1 | tee -a drift.log
           dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
