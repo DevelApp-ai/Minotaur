@@ -49,7 +49,7 @@ permissions:
 
 env:
   # SBOB-Forge ref the generator is built from — pinned; bump deliberately.
-  SBOB_FORGE_REF: 3bf45fc9f2b00548335a86993b1b529009b847c4
+  SBOB_FORGE_REF: 177f6f337898d6bf6100a3f24b961fbc1f811aa6
   DOTNET_VERSION: '8.0.x'
 
 jobs:

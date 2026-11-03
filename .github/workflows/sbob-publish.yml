@@ -47,7 +47,7 @@ jobs:
 
   sbob-publish:
     needs: [resolve-version]
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@3bf45fc9f2b00548335a86993b1b529009b847c4
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@177f6f337898d6bf6100a3f24b961fbc1f811aa6
     with:
       package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.linux.sbob.yaml
@@ -62,7 +62,7 @@ jobs:
 
   sbob-publish-choco:
     needs: [resolve-version]
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@3bf45fc9f2b00548335a86993b1b529009b847c4
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@177f6f337898d6bf6100a3f24b961fbc1f811aa6
     with:
       package-purl: pkg:choco/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.windows.sbob.yaml

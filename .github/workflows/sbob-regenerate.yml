@@ -27,7 +27,7 @@ on:
       sbob-forge-ref:
         description: 'SBOB-Forge ref to build the sbobforge generator from'
         required: false
-        default: '3bf45fc9f2b00548335a86993b1b529009b847c4'
+        default: '177f6f337898d6bf6100a3f24b961fbc1f811aa6'
         type: string
 
 permissions:

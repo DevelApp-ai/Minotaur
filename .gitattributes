@@ -1,0 +1,12 @@
+# Org decision #26 / TDS 9 determinism: the committed SBoB profiles and their
+# sidecars (sbob/**), the grammar lock, and the sbobforge configs are compared
+# byte-for-byte by the drift gates (generate --check compares the working-tree
+# text with the emitted text; the profiles embed the lock hash). git's
+# autocrlf rewrites line endings on Windows checkouts, which would fail every
+# drift gate on a windows runner before it even starts (found dogfooding the
+# choco lane, PR #152; the SBOB-Forge side pins *.grammar and the catalogs the
+# same way). Byte-identical checkouts on every platform: no conversion, ever.
+sbob/** -text
+sbobforge.lock.json -text
+sbobforge.json -text
+sbobforge-choco.json -text
