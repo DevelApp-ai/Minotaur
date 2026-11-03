@@ -386,5 +386,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release upload "$RELEASE_TAG" dist/*.nupkg --clobber
+          # --repo: this job has no checkout step, so gh has no git-repo
+          # context to resolve GITHUB_REPOSITORY from (the 1.5.27 dispatch
+          # failed here with "fatal: not a git repository").
+          gh release upload "$RELEASE_TAG" dist/*.nupkg --clobber --repo "$GITHUB_REPOSITORY"
           echo "choco nupkg attached to $RELEASE_TAG"
