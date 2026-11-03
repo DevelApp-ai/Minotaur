@@ -1,50 +1,33 @@
 name: diagnose-push-run
 
-# Throwaway probe: pure diagnostics — dump sbob lane run state + failed logs.
+# Probe branch (throwaway): push-triggered lane dispatcher. GITHUB_TOKEN
+# cannot fire the `release` event, but it CAN dispatch workflow_dispatch
+# (GitHub changelog 2022-09-08) — this is how the sbob lanes get re-run for
+# an already-cut release tag without touching main. Each push to this branch
+# re-dispatches both lanes for TAG below.
 
 on:
   push:
-    branches: [ 'probe/push-run-diagnosis' ]
-  workflow_dispatch:
+    branches: [ probe/push-run-diagnosis ]
+  workflow_dispatch: {}
 
 permissions:
-  actions: read
-  contents: write
+  actions: write
+  contents: read
+
+env:
+  TAG: v1.5.27
 
 jobs:
-  diagnose:
+  dispatch-sbob-lanes:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-
-      - name: Dump sbob lane state
+      - name: Dispatch sbob-publish + sbob-choco for the TAG against main
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          set -uo pipefail
-          mkdir -p diag
-          gh run list --repo "$GITHUB_REPOSITORY" --limit 12 > diag/runs.txt 2>&1 || true
-          : > diag/failed-logs.txt
-          for wf_name in sbob-publish sbob-choco; do
-            for id in $(gh run list --repo "$GITHUB_REPOSITORY" --workflow "$wf_name.yml" --limit 3 --json databaseId --jq '.[].databaseId' 2>/dev/null); do
-              concl="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id" --jq .conclusion 2>/dev/null || echo unknown)"
-              echo "== run $id ($wf_name, $concl) ==" >> diag/failed-logs.txt
-              if [ "$concl" = "failure" ]; then
-                gh run view "$id" --repo "$GITHUB_REPOSITORY" --log-failed 2>&1 | tail -120 >> diag/failed-logs.txt || true
-              else
-                gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id/jobs?per_page=100" \
-                  --jq '.jobs[] | "  job: " + .name + " : " + (.conclusion // .status)' >> diag/failed-logs.txt 2>&1 || true
-              fi
-            done
-          done
-
-      - name: Commit the dump
-        shell: bash
-        run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add diag
-          git commit -m "diag: sbob lane state dump" || echo "nothing to commit"
-          git push origin HEAD:probe/push-run-diagnosis
+          gh workflow run sbob-publish.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$TAG"
+          gh workflow run sbob-choco.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$TAG"
+          echo "dispatched both sbob lanes for $TAG against main"
