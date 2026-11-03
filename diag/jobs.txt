@@ -1,0 +1,9 @@
+== jobs for run 41727156676 ==
+== jobs for run 41727055127 ==
+== jobs for run 41725437206 ==
+"Dependency Vulnerability Scan","completed","success"
+"CodeQL Security Analysis (csharp)","completed","success"
+"License Compliance Scan","completed","success"
+== jobs for run 41725437239 ==
+"build","completed","success"
+"deploy","completed","success"
