@@ -245,15 +245,18 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path stage.log | Out-Null
           New-Item -ItemType Directory -Force -Path choco/tools/sbob | Out-Null
           Copy-Item sbob/develapp-minotaur.windows.sbob.yaml choco/tools/sbob/
           Copy-Item sbob/develapp-minotaur.windows.provenance.jsonl choco/tools/sbob/
           Copy-Item sbob/develapp-minotaur.windows.coverage.json choco/tools/sbob/
+          Stop-Transcript | Out-Null
 
       - name: choco pack at the profile-bound version
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path pack.log | Out-Null
           $version = (Get-Content sbobforge-choco.json | ConvertFrom-Json).packageVersion
           $nuspecPath = "$PWD/choco/develapp.minotaur.nuspec"
           $nuspec = Get-Content -Raw $nuspecPath
@@ -263,11 +266,13 @@ jobs:
           choco pack choco/develapp.minotaur.nuspec --output-directory=dist
           if ($LASTEXITCODE -ne 0) { throw "choco pack failed" }
           if (-not (Test-Path "dist/develapp.minotaur.$version.nupkg")) { throw "expected dist/develapp.minotaur.$version.nupkg" }
+          Stop-Transcript | Out-Null
 
       - name: Assert the embed and the purl binding inside the nupkg
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path embed.log | Out-Null
           $version = (Get-Content sbobforge-choco.json | ConvertFrom-Json).packageVersion
           $nupkg = "$PWD/dist/develapp.minotaur.$version.nupkg"
           Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -285,11 +290,13 @@ jobs:
           } finally {
             $zip.Dispose()
           }
+          Stop-Transcript | Out-Null
 
       - name: choco install / uninstall round-trip (shim + sbob data)
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path install.log | Out-Null
           # --ignore-dependencies: the runner already carries the .NET 8 runtime;
           # the dotnet-8.0-runtime dependency is exercised in a real consumer
           # environment, not against the community feed from CI.
@@ -303,6 +310,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "choco uninstall failed" }
           if (Test-Path $installed) { throw "SBoB data survived uninstall" }
           Write-Output "uninstalled clean"
+          Stop-Transcript | Out-Null
 
       - name: Upload the nupkg as a workflow artifact
         uses: actions/upload-artifact@v6
@@ -317,7 +325,7 @@ jobs:
           script: |
             const fs = require('fs');
             const chunks = [];
-            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'drift.log', 'publish.log']) {
+            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'drift.log', 'publish.log', 'stage.log', 'pack.log', 'embed.log', 'install.log']) {
               try {
                 const t = fs.readFileSync(f, 'utf8').trimEnd();
                 if (t.length === 0) continue;
