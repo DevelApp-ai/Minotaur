@@ -91,6 +91,11 @@ jobs:
       sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
     permissions:
       contents: read
+      # The reusable workflow restores the sbobforge substrate from GitHub
+      # Packages with the #8 fallback (PACKAGES_READ_TOKEN || github.token);
+      # without packages: read here the fallback token 403s (NU1301), which
+      # is how all four dispatch runs failed on 2026-11-03.
+      packages: read    # GitHub Packages restore of the sbobforge substrate (org decision #8)
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
       SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
@@ -112,6 +117,11 @@ jobs:
       sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
     permissions:
       contents: read
+      # The reusable workflow restores the sbobforge substrate from GitHub
+      # Packages with the #8 fallback (PACKAGES_READ_TOKEN || github.token);
+      # without packages: read here the fallback token 403s (NU1301), which
+      # is how all four dispatch runs failed on 2026-11-03.
+      packages: read    # GitHub Packages restore of the sbobforge substrate (org decision #8)
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
       SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
