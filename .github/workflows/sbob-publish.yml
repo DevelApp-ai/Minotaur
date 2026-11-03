@@ -22,6 +22,13 @@ name: sbob-publish
 # merge that PR, then cut the release.
 #
 # Prereleases are skipped: beta profiles are not registry material.
+#
+# Chaining: a release published BY CI with GITHUB_TOKEN does not fire the
+# `release` event (GitHub's workflow-recursion guard), so ci-cd-enhanced's
+# release job dispatches this workflow via workflow_dispatch with the tag
+# input — the one event GITHUB_TOKEN CAN trigger (GitHub changelog
+# 2022-09-08). The `release` trigger stays for releases published outside
+# CI; both paths run the same jobs.
 # Requires the SBOB_PRIVATE_REGISTRY_TOKEN org secret (contents:write on
 # DevelApp-ai/DevelApp-Repo-Global, org decision #40) to open the cross-repo
 # registry PR; the sbobctl validate/diff tooling is checked out from the pinned
@@ -30,28 +37,47 @@ name: sbob-publish
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (v-prefixed) to publish SBoBs for (chained from ci-cd-enhanced on stable cuts)'
+        required: true
+        type: string
 
 jobs:
+  # Runs for both the release event and the chained dispatch; the prerelease
+  # guard moved to the publish jobs so a dispatch against a prerelease tag
+  # resolves first and then skips cleanly.
   resolve-version:
-    if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
     steps:
-      - name: Strip the v prefix from the release tag
+      - name: Resolve the released version (release event or chained dispatch)
         id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          v="${{ github.event.release.tag_name }}"
-          v="${v#v}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+            pre="$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json isPrerelease --jq .isPrerelease)"
+          else
+            tag="${{ github.event.release.tag_name }}"
+            pre="${{ github.event.release.prerelease }}"
+          fi
+          v="${tag#v}"
           case "$v" in
-            ''|*[!0-9A-Za-z.+-]*) echo "unexpected tag '${{ github.event.release.tag_name }}'"; exit 1 ;;
+            ''|*[!0-9A-Za-z.+-]*) echo "unexpected tag '$tag'"; exit 1 ;;
           esac
           echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$pre" >> "$GITHUB_OUTPUT"
 
   sbob-publish:
     needs: [resolve-version]
+    if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
     uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@b74466e07ee2ea7caf9945095a4c4402bee910e8
     with:
       package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
@@ -71,6 +97,7 @@ jobs:
 
   sbob-publish-choco:
     needs: [resolve-version]
+    if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
     uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@b74466e07ee2ea7caf9945095a4c4402bee910e8
     with:
       package-purl: pkg:choco/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
