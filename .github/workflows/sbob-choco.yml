@@ -102,6 +102,14 @@ jobs:
         run: |
           set -euo pipefail
           if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Substrate bump hygiene: refresh the grammar lock from the pinned
+            # generator first. `lock --update` is the tool's own instruction for
+            # the exit-5 lock mismatch; the lock diff rides this PR for review
+            # like a dependency bump (org decision #26). push/release below stay
+            # strictly --frozen: a stale lock there fails honestly and is fixed
+            # by re-running the generator, never hand-editing.
+            dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+              lock . --update 2>&1 | tee lock.log
             # Generate now, commit below (org decision #26).
             dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
               generate . --frozen --config sbobforge-choco.json 2>&1 | tee generate.log
@@ -121,14 +129,15 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add sbob/develapp-minotaur.windows.sbob.yaml \
+          git add sbobforge.lock.json \
+                  sbob/develapp-minotaur.windows.sbob.yaml \
                   sbob/develapp-minotaur.windows.provenance.jsonl \
                   sbob/develapp-minotaur.windows.coverage.json
           if git diff --cached --quiet; then
             echo "choco-bound profile already current — nothing to commit"
             exit 0
           fi
-          git commit -m "sbob: generate choco-bound windows profile (sbobforge $SBOB_FORGE_REF, lock frozen)"
+          git commit -m "sbob: refresh grammar lock to the pinned sbobforge substrate + generate choco-bound windows profile (lock frozen)"
           git push origin "HEAD:${{ github.head_ref }}"
 
       - name: Report failure context to PR
@@ -138,7 +147,7 @@ jobs:
           script: |
             const fs = require('fs');
             const chunks = [];
-            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'generate.log']) {
+            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'lock.log', 'generate.log']) {
               try {
                 const t = fs.readFileSync(f, 'utf8').trimEnd();
                 if (t.length === 0) continue;
