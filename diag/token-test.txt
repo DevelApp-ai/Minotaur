@@ -1,0 +1,3 @@
+== SBOB_REGISTRY_TOKEN vs DevelApp-ai/DevelApp-Repo-Global ==
+READ: NO (token cannot see the private registry repo)
+SBOB_PRIVATE_REGISTRY_TOKEN: EMPTY
