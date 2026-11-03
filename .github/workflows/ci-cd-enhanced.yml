@@ -595,6 +595,28 @@ jobs:
         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
+  # Failure-context convention (cf. sbob-choco.yml PR-comment step and
+  # SBOB-Forge ci.yml): push runs to main have no PR to comment on, so a
+  # failed release lane is otherwise invisible - on 2026-11-03 the stable
+  # release lane was silently dead for two days (six merges, no release).
+  # On any failed job in a main push run, open an issue so it surfaces.
+  report-push-failure:
+    runs-on: ubuntu-latest
+    needs: [calculate-version, build-and-test, code-quality, lint-and-format, performance-test, package, prerelease, release]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure')
+    permissions:
+      issues: write
+    steps:
+      - name: Open a failure report issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          failed_jobs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs?per_page=100" --jq '[.jobs[] | select(.conclusion=="failure") | .name] | join(", ")' || echo "unknown")"
+          printf 'The push run for %s failed.\n\nFailed jobs: %s\n\nRun: https://github.com/%s/actions/runs/%s\n' "${{ github.sha }}" "$failed_jobs" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > /tmp/body.md
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "ci: main push run failed (${{ github.sha }})" --body-file /tmp/body.md || echo "issue creation failed (report manually)"
+
   cleanup:
     runs-on: ubuntu-latest
     needs: [build-and-test, package]
