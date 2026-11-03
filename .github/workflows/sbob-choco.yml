@@ -27,6 +27,10 @@ name: sbob-choco
 #
 # Both profiles (nuget: sbobforge.json, choco: sbobforge-choco.json) are
 # re-bound together by the sbob-regenerate workflow at a version cut.
+#
+# On failure, each job posts its captured step logs to the PR (SBOB-Forge
+# ci.yml pattern, org decision #29) so the cause is visible without
+# downloading the run archive.
 
 on:
   pull_request:
@@ -39,8 +43,9 @@ on:
     types: [ published ]
 
 permissions:
-  contents: write   # bootstrap commits the generated profile to the PR branch; release job attaches the nupkg
-  packages: read    # restore DevelApp packages from GitHub Packages (org decision #8)
+  contents: write        # bootstrap commits the generated profile to the PR branch; release job attaches the nupkg
+  packages: read         # restore DevelApp packages from GitHub Packages (org decision #8)
+  pull-requests: write   # failure-context comments
 
 env:
   # SBOB-Forge ref the generator is built from — pinned; bump deliberately.
@@ -73,11 +78,24 @@ jobs:
         working-directory: sbobforge-repo
         shell: bash
         env:
+          # Org decision #8: GitHub Packages reads authenticate with the org
+          # secret, falling back to GITHUB_TOKEN (packages: read).
           NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
         run: |
           set -euo pipefail
-          dotnet restore
-          dotnet build --no-restore -warnaserror
+          # GitHub Packages NU1301s are frequently transient — retry before failing.
+          for attempt in 1 2 3; do
+            if dotnet restore 2>&1 | tee restore.log; then
+              break
+            fi
+            echo "restore attempt $attempt failed — retrying in 15s"
+            sleep 15
+            if [ "$attempt" = "3" ]; then
+              echo "restore failed after 3 attempts (NU1301? check NUGET_AUTH_TOKEN / package visibility)"
+              exit 1
+            fi
+          done
+          dotnet build --no-restore -warnaserror 2>&1 | tee build.log
 
       - name: Generate / drift-check the choco-bound Windows profile
         shell: bash
@@ -86,14 +104,14 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             # Generate now, commit below (org decision #26).
             dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-              generate . --frozen --config sbobforge-choco.json
+              generate . --frozen --config sbobforge-choco.json 2>&1 | tee generate.log
             dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-              validate sbob/develapp-minotaur.windows.sbob.yaml
+              validate sbob/develapp-minotaur.windows.sbob.yaml 2>&1 | tee -a generate.log
           else
             # push/release: the committed profile must be exactly what the
             # generator would emit — drift fails the build (#26).
             dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-              generate . --check --frozen --config sbobforge-choco.json
+              generate . --check --frozen --config sbobforge-choco.json 2>&1 | tee generate.log
           fi
 
       - name: Commit the generated profile to the PR branch
@@ -112,6 +130,28 @@ jobs:
           fi
           git commit -m "sbob: generate choco-bound windows profile (sbobforge $SBOB_FORGE_REF, lock frozen)"
           git push origin "HEAD:${{ github.head_ref }}"
+
+      - name: Report failure context to PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const chunks = [];
+            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'generate.log']) {
+              try {
+                const t = fs.readFileSync(f, 'utf8').trimEnd();
+                if (t.length === 0) continue;
+                chunks.push('### ' + f + '\n```\n' + (t.length > 14000 ? '...[tail]\n' + t.slice(-14000) : t) + '\n```');
+              } catch {}
+            }
+            const body = chunks.join('\n\n') || 'no logs captured';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'bootstrap-profile failure context (run ' + context.runId + '):\n\n' + body
+            });
 
   choco-pack:
     needs: [ bootstrap-profile ]
@@ -141,19 +181,30 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
         run: |
           set -euo pipefail
-          dotnet restore
-          dotnet build --no-restore -warnaserror
+          # GitHub Packages NU1301s are frequently transient — retry before failing.
+          for attempt in 1 2 3; do
+            if dotnet restore 2>&1 | tee restore.log; then
+              break
+            fi
+            echo "restore attempt $attempt failed — retrying in 15s"
+            sleep 15
+            if [ "$attempt" = "3" ]; then
+              echo "restore failed after 3 attempts (NU1301? check NUGET_AUTH_TOKEN / package visibility)"
+              exit 1
+            fi
+          done
+          dotnet build --no-restore -warnaserror 2>&1 | tee build.log
 
       - name: Drift gate + validate + public-lane gate on the choco profile
         shell: bash
         run: |
           set -euo pipefail
           dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-            generate . --check --frozen --config sbobforge-choco.json
+            generate . --check --frozen --config sbobforge-choco.json 2>&1 | tee drift.log
           dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-            validate sbob/develapp-minotaur.windows.sbob.yaml
+            validate sbob/develapp-minotaur.windows.sbob.yaml 2>&1 | tee -a drift.log
           dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-            gate sbob/develapp-minotaur.windows.sbob.yaml
+            gate sbob/develapp-minotaur.windows.sbob.yaml 2>&1 | tee -a drift.log
 
       - name: Publish the win-x64 product closure (full Minotaur + demo CLI)
         shell: bash
@@ -161,7 +212,7 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
         run: |
           set -euo pipefail
-          dotnet publish src/Minotaur.Demo -c Release -r win-x64 --self-contained false -o choco/tools/minotaur
+          dotnet publish src/Minotaur.Demo -c Release -r win-x64 --self-contained false -o choco/tools/minotaur 2>&1 | tee publish.log
 
       - name: Stage the committed SBoB at tools/sbob (data, not behavior)
         shell: pwsh
@@ -231,6 +282,28 @@ jobs:
         with:
           name: choco-nupkg
           path: dist/*.nupkg
+
+      - name: Report failure context to PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const chunks = [];
+            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'drift.log', 'publish.log']) {
+              try {
+                const t = fs.readFileSync(f, 'utf8').trimEnd();
+                if (t.length === 0) continue;
+                chunks.push('### ' + f + '\n```\n' + (t.length > 14000 ? '...[tail]\n' + t.slice(-14000) : t) + '\n```');
+              } catch {}
+            }
+            const body = chunks.join('\n\n') || 'no logs captured (later step failed — check the run: ' + context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + ')';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'choco-pack failure context (run ' + context.runId + '):\n\n' + body
+            });
 
   choco-release:
     if: ${{ github.event_name == 'release' && !github.event.release.prerelease }}
