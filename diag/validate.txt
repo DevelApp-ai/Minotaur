@@ -1,0 +1,29 @@
+== sbobctl validate (Software-Bill-of-Behavior @ 18178345) — enforcement validation ==
+-- [linux] positive: untouched converted profile
+PASS (exit 0)
+    OK: develapp-minotaur.linux (develapp) image pkg:nuget/develapp.minotaur@1.5.27
+      note: execs: section-absent
+      note: egress: section-absent
+      note: ingress: section-absent
+      note: capabilities: section-absent
+      note: rulePolicies: section-absent
+-- [linux] negative 1: spec.imageID line removed
+REJECTED (exit 1)
+    ERR_SCHEMA_INVALID: spec.imageID: expected non-empty string, got undefined
+-- [linux] negative 2: purl version stripped (unversioned binding)
+REJECTED (exit 1)
+    ERR_SCHEMA_INVALID: spec.imageID: "pkg:nuget/develapp.minotaur" is not a version-pinned package purl of a supported ecosystem (nuget, choco, generic, golang, maven, npm, composer, pypi)
+-- [windows] positive: untouched converted profile
+PASS (exit 0)
+    OK: develapp-minotaur.windows (develapp) image pkg:choco/develapp.minotaur@1.5.27
+      note: execs: section-absent
+      note: egress: section-absent
+      note: ingress: section-absent
+      note: capabilities: section-absent
+      note: rulePolicies: section-absent
+-- [windows] negative 1: spec.imageID line removed
+REJECTED (exit 1)
+    ERR_SCHEMA_INVALID: spec.imageID: expected non-empty string, got undefined
+-- [windows] negative 2: purl version stripped (unversioned binding)
+REJECTED (exit 1)
+    ERR_SCHEMA_INVALID: spec.imageID: "pkg:choco/develapp.minotaur" is not a version-pinned package purl of a supported ecosystem (nuget, choco, generic, golang, maven, npm, composer, pypi)
