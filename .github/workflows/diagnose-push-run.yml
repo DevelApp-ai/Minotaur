@@ -1,8 +1,8 @@
 name: diagnose-push-run
 
-# Throwaway probe: lists recent release-event workflow runs (sbob-publish /
-# sbob-choco lanes), their job conclusions, and the failed-step logs, then
-# commits the dump to this branch so it can be read via the API.
+# Throwaway probe: dumps recent run state AND chain-dispatches the sbob
+# registry publish lanes for v1.5.27 (the stable release whose profiles are
+# bound on main). Commits the dump to this branch for reading via API.
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
+  actions: write   # gh workflow run (chain dispatch, GITHUB_TOKEN)
   contents: write
 
 jobs:
@@ -19,33 +19,24 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Dump release-run state
+      - name: Dump run state + dispatch the v1.5.27 publish lanes
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -uo pipefail
           mkdir -p diag
-          echo "== all runs, latest 15 ==" > diag/runs.txt
-          gh run list --repo "$GITHUB_REPOSITORY" --limit 15 >> diag/runs.txt 2>&1 || true
-          echo >> diag/runs.txt
-          echo "== release-event runs, latest 10 ==" >> diag/runs.txt
-          gh run list --repo "$GITHUB_REPOSITORY" --event release --limit 10 >> diag/runs.txt 2>&1 || true
+          echo "== runs BEFORE dispatch ==" > diag/runs.txt
+          gh run list --repo "$GITHUB_REPOSITORY" --limit 25 >> diag/runs.txt 2>&1 || true
 
-          : > diag/jobs.txt
-          for id in $(gh run list --repo "$GITHUB_REPOSITORY" --event release --limit 10 --json databaseId --jq '.[].databaseId' 2>/dev/null); do
-            echo "== jobs for run $id ==" >> diag/jobs.txt
-            gh api "repos/DevelApp-ai/Minotaur/actions/runs/$id/jobs?per_page=100" --jq '.jobs[] | [.name, .status, .conclusion, (.steps[]? | select(.conclusion=="failure") | .name)] | @csv' >> diag/jobs.txt 2>&1 || true
-          done
-
-          : > diag/failed-logs.txt
-          for id in $(gh run list --repo "$GITHUB_REPOSITORY" --event release --limit 10 --json databaseId,conclusion --jq '[.[] | select(.conclusion=="failure")][].databaseId' 2>/dev/null); do
-            echo "== failed logs for run $id ==" >> diag/failed-logs.txt
-            gh run view "$id" --repo "$GITHUB_REPOSITORY" --log-failed >> diag/failed-logs.txt 2>&1 || true
-          done
-          if [ ! -s diag/failed-logs.txt ]; then
-            echo "no failed release-event run found" > diag/failed-logs.txt
-          fi
+          : > diag/dispatch.txt
+          gh workflow run sbob-publish.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag=v1.5.27 >> diag/dispatch.txt 2>&1 \
+            || echo "sbob-publish dispatch FAILED" >> diag/dispatch.txt
+          gh workflow run sbob-choco.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag=v1.5.27 >> diag/dispatch.txt 2>&1 \
+            || echo "sbob-choco dispatch FAILED" >> diag/dispatch.txt
+          echo "dispatched; waiting 30s" >> diag/dispatch.txt
+          sleep 30
+          gh run list --repo "$GITHUB_REPOSITORY" --limit 25 >> diag/dispatch.txt 2>&1 || true
 
       - name: Commit the dump
         shell: bash
@@ -54,5 +45,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add diag
-          git commit -m "diag: release-run state dump" || echo "nothing to commit"
+          git commit -m "diag: run state + v1.5.27 lane dispatch" || echo "nothing to commit"
           git push origin HEAD:probe/push-run-diagnosis
