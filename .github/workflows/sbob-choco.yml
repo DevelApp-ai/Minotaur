@@ -41,6 +41,18 @@ on:
     paths: [ 'sbobforge-choco.json', 'sbob/**', 'choco/**', '.github/workflows/sbob-choco.yml' ]
   release:
     types: [ published ]
+  # Chained dispatch: a release published BY CI with GITHUB_TOKEN does not
+  # fire the `release` event (GitHub's workflow-recursion guard), so
+  # ci-cd-enhanced's release job dispatches this workflow with the tag input;
+  # workflow_dispatch is the one event GITHUB_TOKEN CAN trigger. The caller
+  # only dispatches for stable releases, and the choco-release job's
+  # tag/nupkg assert still refuses any version mismatch.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (v-prefixed) whose choco nupkg to attach (chained from ci-cd-enhanced on stable cuts)'
+        required: true
+        type: string
 
 permissions:
   contents: write        # bootstrap commits the generated profile to the PR branch; release job attaches the nupkg
@@ -344,9 +356,11 @@ jobs:
             });
 
   choco-release:
-    if: ${{ github.event_name == 'release' && !github.event.release.prerelease }}
+    if: ${{ (github.event_name == 'release' && !github.event.release.prerelease) || github.event_name == 'workflow_dispatch' }}
     needs: [ choco-pack ]
     runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
     steps:
       - name: Download the packed nupkg
         uses: actions/download-artifact@v7
@@ -358,7 +372,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="${{ github.event.release.tag_name }}"
+          tag="$RELEASE_TAG"
           tag="${tag#v}"
           if [ ! -f "dist/develapp.minotaur.$tag.nupkg" ]; then
             echo "no develapp.minotaur.$tag.nupkg: the choco profile is not bound to the release version."
@@ -372,5 +386,5 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh release upload "${{ github.event.release.tag_name }}" dist/*.nupkg --clobber
-          echo "choco nupkg attached to ${{ github.event.release.tag_name }}"
+          gh release upload "$RELEASE_TAG" dist/*.nupkg --clobber
+          echo "choco nupkg attached to $RELEASE_TAG"

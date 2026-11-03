@@ -432,6 +432,10 @@ jobs:
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'release' && github.event.action == 'published') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
+    permissions:
+      contents: write    # create the stable release + attach assets
+      packages: write    # publish the nupkg to GitHub Packages
+      actions: write     # dispatch the sbob-publish / sbob-choco chain lanes
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -519,6 +523,26 @@ jobs:
         files: ./packages/*.nupkg
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Chain the sbob-publish + sbob-choco release lanes
+      # Publishing a release with GITHUB_TOKEN does NOT fire the `release`
+      # event (GitHub's workflow-recursion guard) — sbob-publish.yml and the
+      # sbob-choco.yml release lane never triggered on CI-cut releases, which
+      # is how the M6 registry lanes went silently unpublished. workflow_dispatch
+      # is the one event GITHUB_TOKEN CAN trigger (GitHub changelog 2022-09-08),
+      # so dispatch both lanes explicitly.
+      if: |
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        tag="v${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}"
+        gh workflow run sbob-publish.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$tag"
+        gh workflow run sbob-choco.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$tag"
+        echo "dispatched sbob-publish + sbob-choco for $tag"
 
   # Manual job to create v1.0.0 release from main branch
   create-stable-release:
