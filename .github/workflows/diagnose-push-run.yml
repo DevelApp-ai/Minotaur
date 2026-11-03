@@ -1,8 +1,8 @@
 name: diagnose-push-run
 
-# Throwaway probe: lists recent workflow runs on main (the push-event runs),
-# their job conclusions, and the failed-step logs, then commits the dump to
-# this branch so it can be read via the API. No CI impact on main.
+# Throwaway probe: lists recent release-event workflow runs (sbob-publish /
+# sbob-choco lanes), their job conclusions, and the failed-step logs, then
+# commits the dump to this branch so it can be read via the API.
 
 on:
   push:
@@ -19,31 +19,32 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Dump push-run state on main
+      - name: Dump release-run state
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -uo pipefail
           mkdir -p diag
-          echo "== runs on branch main (latest 12) ==" | tee diag/runs.txt
-          gh run list --repo "$GITHUB_REPOSITORY" --branch main --limit 12 >> diag/runs.txt 2>&1 || true
+          echo "== all runs, latest 15 ==" > diag/runs.txt
+          gh run list --repo "$GITHUB_REPOSITORY" --limit 15 >> diag/runs.txt 2>&1 || true
           echo >> diag/runs.txt
-          echo "== runs, all events, latest 12 ==" >> diag/runs.txt
-          gh run list --repo "$GITHUB_REPOSITORY" --limit 12 >> diag/runs.txt 2>&1 || true
+          echo "== release-event runs, latest 10 ==" >> diag/runs.txt
+          gh run list --repo "$GITHUB_REPOSITORY" --event release --limit 10 >> diag/runs.txt 2>&1 || true
 
           : > diag/jobs.txt
-          for id in $(gh run list --repo "$GITHUB_REPOSITORY" --branch main --limit 4 --json databaseId --jq '.[].databaseId' 2>/dev/null); do
+          for id in $(gh run list --repo "$GITHUB_REPOSITORY" --event release --limit 10 --json databaseId --jq '.[].databaseId' 2>/dev/null); do
             echo "== jobs for run $id ==" >> diag/jobs.txt
             gh api "repos/DevelApp-ai/Minotaur/actions/runs/$id/jobs?per_page=100" --jq '.jobs[] | [.name, .status, .conclusion, (.steps[]? | select(.conclusion=="failure") | .name)] | @csv' >> diag/jobs.txt 2>&1 || true
           done
 
-          failed_id=$(gh run list --repo "$GITHUB_REPOSITORY" --branch main --limit 10 --json databaseId,conclusion --jq '[.[] | select(.conclusion=="failure")][0].databaseId' 2>/dev/null || true)
-          if [ -n "${failed_id:-}" ]; then
-            echo "dumping failed logs for run $failed_id"
-            gh run view "$failed_id" --repo "$GITHUB_REPOSITORY" --log-failed > diag/failed-logs.txt 2>&1 || true
-          else
-            echo "no failed run found on branch main" > diag/failed-logs.txt
+          : > diag/failed-logs.txt
+          for id in $(gh run list --repo "$GITHUB_REPOSITORY" --event release --limit 10 --json databaseId,conclusion --jq '[.[] | select(.conclusion=="failure")][].databaseId' 2>/dev/null); do
+            echo "== failed logs for run $id ==" >> diag/failed-logs.txt
+            gh run view "$id" --repo "$GITHUB_REPOSITORY" --log-failed >> diag/failed-logs.txt 2>&1 || true
+          done
+          if [ ! -s diag/failed-logs.txt ]; then
+            echo "no failed release-event run found" > diag/failed-logs.txt
           fi
 
       - name: Commit the dump
@@ -53,5 +54,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add diag
-          git commit -m "diag: push-run state dump" || echo "nothing to commit"
+          git commit -m "diag: release-run state dump" || echo "nothing to commit"
           git push origin HEAD:probe/push-run-diagnosis
