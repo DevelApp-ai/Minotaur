@@ -1,14 +1,14 @@
 == sbob-publish runs ==
+41741291359 failure 2026-11-03T23:42:43Z sbob-publish
 41738927459 failure 2026-11-03T23:24:41Z sbob-publish
 41738573590 failure 2026-11-03T23:22:00Z sbob-publish
 41735530000 failure 2026-11-03T22:59:58Z sbob-publish
 41735424374 failure 2026-11-03T22:59:10Z sbob-publish
 41734100665 failure 2026-11-03T22:49:27Z sbob-publish
-41732990955 failure 2026-11-03T22:41:30Z sbob-publish
 == sbob-choco runs ==
+41741295024  2026-11-03T23:42:44Z sbob-choco
 41738931405 failure 2026-11-03T23:24:43Z sbob-choco
 41738577473 success 2026-11-03T23:22:02Z sbob-choco
 41738449759 success 2026-11-03T23:21:07Z Merge pull request #159 from DevelApp-ai/ci/sbob-publish-token-forward
 41737651043 success 2026-11-03T23:15:06Z ci: forward PACKAGES_READ_TOKEN + re-pin sbob-registry-publish; choco release asset name fix
 41735533430 failure 2026-11-03T23:00:00Z sbob-choco
-41735428588 failure 2026-11-03T22:59:12Z sbob-choco
