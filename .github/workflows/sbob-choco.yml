@@ -389,5 +389,17 @@ jobs:
           # --repo: this job has no checkout step, so gh has no git-repo
           # context to resolve GITHUB_REPOSITORY from (the 1.5.27 dispatch
           # failed here with "fatal: not a git repository").
-          gh release upload "$RELEASE_TAG" dist/*.nupkg --clobber --repo "$GITHUB_REPOSITORY"
-          echo "choco nupkg attached to $RELEASE_TAG"
+          # Release asset names are unique case-INSENSITIVELY: the release job
+          # already attaches the NuGet substrate nupkg
+          # (DevelApp.Minotaur.<v>.nupkg), so the choco artifact
+          # (develapp.minotaur.<v>.nupkg) collides with it and the upload
+          # 422s with "ReleaseAsset.name already exists" (the 2026-11-03
+          # v1.5.27 dispatch failed exactly here). Upload under a distinct
+          # asset name; the nupkg itself is untouched — the nuspec id inside
+          # is develapp.minotaur. To install from a local folder source,
+          # rename the download to develapp.minotaur.<v>.nupkg (or point
+          # choco install at the downloaded file directly).
+          tag="${RELEASE_TAG#v}"
+          cp "dist/develapp.minotaur.$tag.nupkg" "dist/develapp.minotaur.$tag.choco.nupkg"
+          gh release upload "$RELEASE_TAG" "dist/develapp.minotaur.$tag.choco.nupkg" --clobber --repo "$GITHUB_REPOSITORY"
+          echo "choco nupkg attached to $RELEASE_TAG (asset: develapp.minotaur.$tag.choco.nupkg)"
