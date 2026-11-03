@@ -78,7 +78,7 @@ jobs:
   sbob-publish:
     needs: [resolve-version]
     if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@b74466e07ee2ea7caf9945095a4c4402bee910e8
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@0b62e021f16407526392a851fac1356bc3364a5a
     with:
       package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.linux.sbob.yaml
@@ -99,11 +99,18 @@ jobs:
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
       SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
+      # Forward the org secret so the reusable workflow can authenticate the
+      # GitHub Packages substrate restore (org decision #8). In a reusable
+      # workflow the caller's PACKAGES_READ_TOKEN is invisible unless
+      # forwarded, so the restore silently fell back to github.token and
+      # NU1301-403'd (every 2026-11-03 dispatch) — the callee now declares
+      # this optional secret (SBOB-Forge #35).
+      PACKAGES_READ_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
 
   sbob-publish-choco:
     needs: [resolve-version]
     if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@b74466e07ee2ea7caf9945095a4c4402bee910e8
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@0b62e021f16407526392a851fac1356bc3364a5a
     with:
       package-purl: pkg:choco/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.windows.sbob.yaml
@@ -125,3 +132,10 @@ jobs:
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
       SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
+      # Forward the org secret so the reusable workflow can authenticate the
+      # GitHub Packages substrate restore (org decision #8). In a reusable
+      # workflow the caller's PACKAGES_READ_TOKEN is invisible unless
+      # forwarded, so the restore silently fell back to github.token and
+      # NU1301-403'd (every 2026-11-03 dispatch) — the callee now declares
+      # this optional secret (SBOB-Forge #35).
+      PACKAGES_READ_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
