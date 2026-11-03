@@ -1,7 +1,9 @@
 name: diagnose-push-run
 
-# Probe branch (throwaway): report which registry/org secrets are visible
-# to this repo. Prints SET/EMPTY only — never secret values.
+# Probe branch (throwaway): test whether the SBOB_REGISTRY_TOKEN org secret
+# can write to the PRIVATE registry (DevelApp-Repo-Global). Creates and
+# deletes a throwaway ref probe/token-test; prints only YES/NO verdicts,
+# never secret values.
 
 on:
   push:
@@ -17,20 +19,35 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Probe secret presence (SET/EMPTY only)
+      - name: Cross-repo token capability test
         env:
-          S1: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
-          S2: ${{ secrets.SBOB_REGISTRY_TOKEN }}
-          S3: ${{ secrets.PACKAGES_READ_TOKEN }}
+          T1: ${{ secrets.SBOB_REGISTRY_TOKEN }}
+          T2: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p diag
           {
-            if [ -n "$S1" ]; then echo "SBOB_PRIVATE_REGISTRY_TOKEN: SET"; else echo "SBOB_PRIVATE_REGISTRY_TOKEN: EMPTY"; fi
-            if [ -n "$S2" ]; then echo "SBOB_REGISTRY_TOKEN: SET"; else echo "SBOB_REGISTRY_TOKEN: EMPTY"; fi
-            if [ -n "$S3" ]; then echo "PACKAGES_READ_TOKEN: SET"; else echo "PACKAGES_READ_TOKEN: EMPTY"; fi
-          } | tee diag/secrets.txt
+            echo "== SBOB_REGISTRY_TOKEN vs DevelApp-ai/DevelApp-Repo-Global =="
+            if [ -n "$T1" ]; then
+              export GH_TOKEN="$T1"
+              if db="$(gh api repos/DevelApp-ai/DevelApp-Repo-Global --jq .default_branch 2>/dev/null)" && [ -n "$db" ]; then
+                echo "READ: YES (default branch: $db)"
+                sha="$(gh api "repos/DevelApp-ai/DevelApp-Repo-Global/git/ref/heads/$db" --jq .object.sha 2>/dev/null || true)"
+                if [ -n "$sha" ] && gh api -X POST repos/DevelApp-ai/DevelApp-Repo-Global/git/refs -f ref=refs/heads/probe/token-test -f sha="$sha" >/dev/null 2>&1; then
+                  gh api -X DELETE repos/DevelApp-ai/DevelApp-Repo-Global/git/refs/heads/probe/token-test >/dev/null 2>&1 || true
+                  echo "WRITE: YES (throwaway ref created + deleted)"
+                else
+                  echo "WRITE: NO"
+                fi
+              else
+                echo "READ: NO (token cannot see the private registry repo)"
+              fi
+            else
+              echo "T1: EMPTY"
+            fi
+            if [ -n "$T2" ]; then echo "SBOB_PRIVATE_REGISTRY_TOKEN: SET"; else echo "SBOB_PRIVATE_REGISTRY_TOKEN: EMPTY"; fi
+          } | tee diag/token-test.txt
 
       - name: Commit diag
         shell: bash
@@ -38,5 +55,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add diag/
-          git commit -m "diag: secret presence probe" || echo "nothing to commit"
+          git commit -m "diag: cross-repo token capability test" || echo "nothing to commit"
           git push origin HEAD:probe/push-run-diagnosis
