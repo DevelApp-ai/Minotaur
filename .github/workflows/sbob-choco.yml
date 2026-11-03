@@ -1,0 +1,376 @@
+name: sbob-choco
+
+# M6 choco lane (SBOB-Forge TDS 10.3): build, verify, and ship the Chocolatey
+# package for the full Minotaur product, dogfooding the choco channel end to
+# end:
+#
+#   bootstrap-profile — generate the choco-bound Windows profile
+#     (pkg:choco/develapp.minotaur@<v>, target-os windows, config
+#     sbobforge-choco.json) with sbobforge. On a pull request the generated
+#     profile is committed to the PR branch (org decision #26: generated
+#     artifacts are committed and drift-gated); on push/release the same job
+#     runs in --check mode — drift fails the build, the fix is re-running the
+#     generator, never hand-editing.
+#
+#   choco-pack (windows-latest) — publish the win-x64 closure of Minotaur.Demo
+#     (DevelApp.Minotaur with its dependency tree + the demo CLI entry point),
+#     stage the committed profile at tools/sbob/ (the SBoB is DATA, not
+#     behavior: install scripts never act on it), choco pack at the
+#     profile-bound version, assert the embed and the purl binding inside the
+#     nupkg, then a real choco install / uninstall round-trip on the runner:
+#     the sbob copy and the minotaur shim must appear and disappear.
+#
+#   choco-release (stable release published) — attach the nupkg to the release
+#     as an asset. Distribution is GitHub release assets only, mirroring the
+#     NuGet package policy (GitHub Packages only, no public registry publish);
+#     there is intentionally no chocolatey.org publish step.
+#
+# Both profiles (nuget: sbobforge.json, choco: sbobforge-choco.json) are
+# re-bound together by the sbob-regenerate workflow at a version cut.
+#
+# On failure, each job posts its captured step logs to the PR (SBOB-Forge
+# ci.yml pattern, org decision #29) so the cause is visible without
+# downloading the run archive.
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths: [ 'sbobforge-choco.json', 'sbob/**', 'choco/**', '.github/workflows/sbob-choco.yml' ]
+  push:
+    branches: [ main ]
+    paths: [ 'sbobforge-choco.json', 'sbob/**', 'choco/**', '.github/workflows/sbob-choco.yml' ]
+  release:
+    types: [ published ]
+
+permissions:
+  contents: write        # bootstrap commits the generated profile to the PR branch; release job attaches the nupkg
+  packages: read         # restore DevelApp packages from GitHub Packages (org decision #8)
+  pull-requests: write   # failure-context comments
+
+env:
+  # SBOB-Forge ref the generator is built from — pinned; bump deliberately.
+  SBOB_FORGE_REF: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  bootstrap-profile:
+    runs-on: ubuntu-latest
+    steps:
+      # PR head on pull_request so the generated profile can be committed to
+      # the branch; the pushed ref / release tag on the other triggers.
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+
+      - name: Checkout SBOB-Forge (generator)
+        uses: actions/checkout@v5
+        with:
+          repository: DevelApp-ai/SBOB-Forge
+          ref: ${{ env.SBOB_FORGE_REF }}
+          path: sbobforge-repo
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore + build sbobforge
+        working-directory: sbobforge-repo
+        shell: bash
+        env:
+          # Org decision #8: GitHub Packages reads authenticate with the org
+          # secret, falling back to GITHUB_TOKEN (packages: read).
+          NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          # GitHub Packages NU1301s are frequently transient — retry before failing.
+          for attempt in 1 2 3; do
+            if dotnet restore 2>&1 | tee restore.log; then
+              break
+            fi
+            echo "restore attempt $attempt failed — retrying in 15s"
+            sleep 15
+            if [ "$attempt" = "3" ]; then
+              echo "restore failed after 3 attempts (NU1301? check NUGET_AUTH_TOKEN / package visibility)"
+              exit 1
+            fi
+          done
+          dotnet build --no-restore -warnaserror 2>&1 | tee build.log
+
+      - name: Generate / drift-check the choco-bound Windows profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Substrate bump hygiene: refresh the grammar lock from the pinned
+            # generator first. `lock --update` is the tool's own instruction for
+            # the exit-5 lock mismatch; the lock diff rides this PR for review
+            # like a dependency bump (org decision #26). push/release below stay
+            # strictly --frozen: a stale lock there fails honestly and is fixed
+            # by re-running the generator, never hand-editing.
+            dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+              lock . --update 2>&1 | tee lock.log
+            # Generate now, commit below (org decision #26).
+            dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+              generate . --frozen --config sbobforge-choco.json 2>&1 | tee generate.log
+            dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+              validate sbob/develapp-minotaur.windows.sbob.yaml 2>&1 | tee -a generate.log
+          else
+            # push/release: the committed profile must be exactly what the
+            # generator would emit — drift fails the build (#26).
+            dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+              generate . --check --frozen --config sbobforge-choco.json 2>&1 | tee generate.log
+          fi
+
+      - name: Commit the generated profile to the PR branch
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sbobforge.lock.json \
+                  sbob/develapp-minotaur.windows.sbob.yaml \
+                  sbob/develapp-minotaur.windows.provenance.jsonl \
+                  sbob/develapp-minotaur.windows.coverage.json
+          if git diff --cached --quiet; then
+            echo "choco-bound profile already current — nothing to commit"
+            exit 0
+          fi
+          git commit -m "sbob: refresh grammar lock to the pinned sbobforge substrate + generate choco-bound windows profile (lock frozen)"
+          git push origin "HEAD:${{ github.head_ref }}"
+
+      - name: Report failure context to PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const chunks = [];
+            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'lock.log', 'generate.log']) {
+              try {
+                const t = fs.readFileSync(f, 'utf8').trimEnd();
+                if (t.length === 0) continue;
+                chunks.push('### ' + f + '\n```\n' + (t.length > 14000 ? '...[tail]\n' + t.slice(-14000) : t) + '\n```');
+              } catch {}
+            }
+            const body = chunks.join('\n\n') || 'no logs captured';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'bootstrap-profile failure context (run ' + context.runId + '):\n\n' + body
+            });
+
+  choco-pack:
+    needs: [ bootstrap-profile ]
+    runs-on: windows-latest
+    steps:
+      # PR head so the bootstrap job's commit (if any) is included.
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+
+      - name: Checkout SBOB-Forge (generator)
+        uses: actions/checkout@v5
+        with:
+          repository: DevelApp-ai/SBOB-Forge
+          ref: ${{ env.SBOB_FORGE_REF }}
+          path: sbobforge-repo
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore + build sbobforge
+        working-directory: sbobforge-repo
+        shell: bash
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          # GitHub Packages NU1301s are frequently transient — retry before failing.
+          for attempt in 1 2 3; do
+            if dotnet restore 2>&1 | tee restore.log; then
+              break
+            fi
+            echo "restore attempt $attempt failed — retrying in 15s"
+            sleep 15
+            if [ "$attempt" = "3" ]; then
+              echo "restore failed after 3 attempts (NU1301? check NUGET_AUTH_TOKEN / package visibility)"
+              exit 1
+            fi
+          done
+          dotnet build --no-restore -warnaserror 2>&1 | tee build.log
+
+      - name: Drift gate + validate + public-lane gate on the choco profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+            generate . --check --frozen --config sbobforge-choco.json 2>&1 | tee drift.log; then
+            # Drift diagnosis (TDS 9: the profile must be byte-identical on
+            # every platform). Regenerate in place and diff each committed
+            # artifact against what THIS platform emits, so the
+            # failure-context comment pins the exact diverging lines instead
+            # of just naming the file. The working tree is throwaway — the
+            # job exits non-zero right after.
+            for f in sbob.yaml provenance.jsonl coverage.json; do
+              cp "sbob/develapp-minotaur.windows.$f" "$RUNNER_TEMP/committed.$f"
+            done
+            dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+              generate . --frozen --config sbobforge-choco.json 2>&1 | tee -a drift.log
+            for f in sbob.yaml provenance.jsonl coverage.json; do
+              echo "=== drift diagnosis on ${RUNNER_OS}: committed vs regenerated — $f ===" | tee -a drift.log
+              echo "--- sizes: committed $(wc -c < "$RUNNER_TEMP/committed.$f") bytes, regenerated $(wc -c < "sbob/develapp-minotaur.windows.$f") bytes" | tee -a drift.log
+              diff "$RUNNER_TEMP/committed.$f" "sbob/develapp-minotaur.windows.$f" | head -80 | tee -a drift.log || true
+            done
+            exit 1
+          fi
+          dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+            validate sbob/develapp-minotaur.windows.sbob.yaml 2>&1 | tee -a drift.log
+          dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+            gate sbob/develapp-minotaur.windows.sbob.yaml 2>&1 | tee -a drift.log
+
+      - name: Publish the win-x64 product closure (full Minotaur + demo CLI)
+        shell: bash
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          dotnet publish src/Minotaur.Demo -c Release -r win-x64 --self-contained false -o choco/tools/minotaur 2>&1 | tee publish.log
+
+      - name: Stage the committed SBoB at tools/sbob (data, not behavior)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path stage.log | Out-Null
+          New-Item -ItemType Directory -Force -Path choco/tools/sbob | Out-Null
+          Copy-Item sbob/develapp-minotaur.windows.sbob.yaml choco/tools/sbob/
+          Copy-Item sbob/develapp-minotaur.windows.provenance.jsonl choco/tools/sbob/
+          Copy-Item sbob/develapp-minotaur.windows.coverage.json choco/tools/sbob/
+          Stop-Transcript | Out-Null
+
+      - name: choco pack at the profile-bound version
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path pack.log | Out-Null
+          $version = (Get-Content sbobforge-choco.json | ConvertFrom-Json).packageVersion
+          $nuspecPath = "$PWD/choco/develapp.minotaur.nuspec"
+          $nuspec = Get-Content -Raw $nuspecPath
+          $nuspec = $nuspec -replace '<version>[^<]*</version>', "<version>$version</version>"
+          Set-Content -Path $nuspecPath -Value $nuspec -NoNewline
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          choco pack choco/develapp.minotaur.nuspec --output-directory=dist
+          if ($LASTEXITCODE -ne 0) { throw "choco pack failed" }
+          if (-not (Test-Path "dist/develapp.minotaur.$version.nupkg")) { throw "expected dist/develapp.minotaur.$version.nupkg" }
+          Stop-Transcript | Out-Null
+
+      - name: Assert the embed and the purl binding inside the nupkg
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path embed.log | Out-Null
+          $version = (Get-Content sbobforge-choco.json | ConvertFrom-Json).packageVersion
+          $nupkg = "$PWD/dist/develapp.minotaur.$version.nupkg"
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::OpenRead($nupkg)
+          try {
+            $entry = $zip.Entries | Where-Object { $_.FullName -eq 'tools/sbob/develapp-minotaur.windows.sbob.yaml' }
+            if (-not $entry) { throw "nupkg does not embed tools/sbob/develapp-minotaur.windows.sbob.yaml (TDS 10.3 choco lane)" }
+            $reader = New-Object System.IO.StreamReader($entry.Open())
+            $profile = $reader.ReadToEnd()
+            $reader.Close()
+            if (-not $profile.Contains("imageID: pkg:choco/develapp.minotaur@$version")) {
+              throw "embedded profile is not bound to pkg:choco/develapp.minotaur@$version"
+            }
+            Write-Output "nupkg embeds the choco-bound profile (pkg:choco/develapp.minotaur@$version)"
+          } finally {
+            $zip.Dispose()
+          }
+          Stop-Transcript | Out-Null
+
+      - name: choco install / uninstall round-trip (shim + sbob data)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Start-Transcript -Path install.log | Out-Null
+          # --ignore-dependencies: the runner already carries the .NET 8 runtime;
+          # the dotnet-8.0-runtime dependency is exercised in a real consumer
+          # environment, not against the community feed from CI.
+          choco install develapp.minotaur --source="'dist'" -y --no-progress --ignore-dependencies 2>&1 | Tee-Object -FilePath install-choco.log
+          if ($LASTEXITCODE -ne 0) {
+            Get-Content "$env:ChocolateyInstall/logs/chocolatey.log" -Tail 60 -ErrorAction SilentlyContinue | Tee-Object -FilePath install-choco.log -Append
+            throw "choco install failed (exit code $LASTEXITCODE)"
+          }
+          $installed = "$env:ChocolateyInstall/lib/develapp.minotaur/tools/sbob/develapp-minotaur.windows.sbob.yaml"
+          if (-not (Test-Path $installed)) { throw "SBoB data not installed at $installed" }
+          if (-not (Get-Command minotaur -ErrorAction SilentlyContinue)) { throw "minotaur shim not on PATH" }
+          Write-Output "installed: sbob data at lib\develapp.minotaur\tools\sbob\ + minotaur shim on PATH"
+          choco uninstall develapp.minotaur -y --no-progress
+          if ($LASTEXITCODE -ne 0) { throw "choco uninstall failed" }
+          if (Test-Path $installed) { throw "SBoB data survived uninstall" }
+          Write-Output "uninstalled clean"
+          Stop-Transcript | Out-Null
+
+      - name: Upload the nupkg as a workflow artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: choco-nupkg
+          path: dist/*.nupkg
+
+      - name: Report failure context to PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const chunks = [];
+            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'drift.log', 'publish.log', 'stage.log', 'pack.log', 'embed.log', 'install.log', 'install-choco.log']) {
+              try {
+                const t = fs.readFileSync(f, 'utf8').trimEnd();
+                if (t.length === 0) continue;
+                chunks.push('### ' + f + '\n```\n' + (t.length > 14000 ? '...[tail]\n' + t.slice(-14000) : t) + '\n```');
+              } catch {}
+            }
+            const body = chunks.join('\n\n') || 'no logs captured (later step failed — check the run: ' + context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId + ')';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'choco-pack failure context (run ' + context.runId + '):\n\n' + body
+            });
+
+  choco-release:
+    if: ${{ github.event_name == 'release' && !github.event.release.prerelease }}
+    needs: [ choco-pack ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the packed nupkg
+        uses: actions/download-artifact@v7
+        with:
+          name: choco-nupkg
+          path: dist
+
+      - name: Assert the profile version matches the release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ github.event.release.tag_name }}"
+          tag="${tag#v}"
+          if [ ! -f "dist/develapp.minotaur.$tag.nupkg" ]; then
+            echo "no develapp.minotaur.$tag.nupkg: the choco profile is not bound to the release version."
+            echo "run sbob-regenerate with version $tag, merge its PR, then re-cut the release."
+            exit 1
+          fi
+
+      - name: Attach the nupkg to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release upload "${{ github.event.release.tag_name }}" dist/*.nupkg --clobber
+          echo "choco nupkg attached to ${{ github.event.release.tag_name }}"
