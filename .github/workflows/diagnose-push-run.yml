@@ -1,9 +1,11 @@
 name: diagnose-push-run
 
-# Probe branch (throwaway): test whether the SBOB_REGISTRY_TOKEN org secret
-# can write to the PRIVATE registry (DevelApp-Repo-Global). Creates and
-# deletes a throwaway ref probe/token-test; prints only YES/NO verdicts,
-# never secret values.
+# Probe branch (throwaway): sbobctl enforcement validation. Converts the
+# committed Minotaur profiles to the registry dialect with the pinned
+# sbobforge CLI, then runs the PINNED sbobctl (Software-Bill-of-Behavior
+# @ 18178345) validate on: the untouched profiles (positive) and two
+# tampered variants per lane (imageID removed; purl version stripped).
+# Expected: positive PASS, negatives REJECTED non-zero.
 
 on:
   push:
@@ -12,42 +14,105 @@ on:
 
 permissions:
   contents: write
+  packages: read
 
 jobs:
-  probe:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5   # probe branch (for committing diag)
 
-      - name: Cross-repo token capability test
+      - name: Checkout Minotaur main (current committed profiles)
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          path: main-repo
+
+      - name: Checkout SBOB-Forge (generator, CLI pin)
+        uses: actions/checkout@v5
+        with:
+          repository: DevelApp-ai/SBOB-Forge
+          ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
+          path: sbobforge-repo
+
+      - name: Checkout sbobctl (pinned tooling)
+        uses: actions/checkout@v5
+        with:
+          repository: DevelApp-ai/Software-Bill-of-Behavior
+          ref: 181783453d3e9bddc30faba5f0b9ad96a571b2d9
+          path: sbob-repo
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Restore + build sbobforge
+        working-directory: sbobforge-repo
+        shell: bash
         env:
-          T1: ${{ secrets.SBOB_REGISTRY_TOKEN }}
-          T2: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
+          NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          dotnet restore
+          dotnet build --no-restore -warnaserror
+
+      - name: Convert profiles to the registry dialect (TDS 10.4)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reg
+          dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+            convert main-repo/sbob/develapp-minotaur.linux.sbob.yaml reg/develapp-minotaur.linux.yaml
+          dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
+            convert main-repo/sbob/develapp-minotaur.windows.sbob.yaml reg/develapp-minotaur.windows.yaml
+
+      - name: sbobctl enforcement validation (positive + tampered)
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p diag
           {
-            echo "== SBOB_REGISTRY_TOKEN vs DevelApp-ai/DevelApp-Repo-Global =="
-            if [ -n "$T1" ]; then
-              export GH_TOKEN="$T1"
-              if db="$(gh api repos/DevelApp-ai/DevelApp-Repo-Global --jq .default_branch 2>/dev/null)" && [ -n "$db" ]; then
-                echo "READ: YES (default branch: $db)"
-                sha="$(gh api "repos/DevelApp-ai/DevelApp-Repo-Global/git/ref/heads/$db" --jq .object.sha 2>/dev/null || true)"
-                if [ -n "$sha" ] && gh api -X POST repos/DevelApp-ai/DevelApp-Repo-Global/git/refs -f ref=refs/heads/probe/token-test -f sha="$sha" >/dev/null 2>&1; then
-                  gh api -X DELETE repos/DevelApp-ai/DevelApp-Repo-Global/git/refs/heads/probe/token-test >/dev/null 2>&1 || true
-                  echo "WRITE: YES (throwaway ref created + deleted)"
-                else
-                  echo "WRITE: NO"
-                fi
+            echo "== sbobctl validate (Software-Bill-of-Behavior @ 18178345) — enforcement validation =="
+            for lane in linux windows; do
+              f="reg/develapp-minotaur.$lane.yaml"
+
+              echo "-- [$lane] positive: untouched converted profile"
+              if node sbob-repo/src/cli.ts validate --sbob "$f" > /tmp/pos.txt 2>&1; then
+                echo "PASS (exit 0)"
+                sed 's/^/    /' /tmp/pos.txt
               else
-                echo "READ: NO (token cannot see the private registry repo)"
+                rc=$?
+                echo "FAIL (exit $rc) — UNEXPECTED: the publish pipeline gates on this"
+                sed 's/^/    /' /tmp/pos.txt
               fi
-            else
-              echo "T1: EMPTY"
-            fi
-            if [ -n "$T2" ]; then echo "SBOB_PRIVATE_REGISTRY_TOKEN: SET"; else echo "SBOB_PRIVATE_REGISTRY_TOKEN: EMPTY"; fi
-          } | tee diag/token-test.txt
+
+              echo "-- [$lane] negative 1: spec.imageID line removed"
+              sed '/^[[:space:]]*imageID:/d' "$f" > reg/t1.yaml
+              if node sbob-repo/src/cli.ts validate --sbob reg/t1.yaml > /tmp/neg1.txt 2>&1; then
+                echo "NOT REJECTED — ENFORCEMENT HOLE"
+              else
+                rc=$?
+                echo "REJECTED (exit $rc)"
+                sed 's/^/    /' /tmp/neg1.txt
+              fi
+
+              echo "-- [$lane] negative 2: purl version stripped (unversioned binding)"
+              sed -E 's|(imageID: pkg:([a-z]+)/([^@]+))@[A-Za-z0-9._+-]+|\1|' "$f" > reg/t2.yaml
+              if grep -q "imageID:.*@[^[:space:]]*" reg/t2.yaml; then
+                echo "TAMPER DID NOT APPLY — sed did not strip the version (check dialect)"
+              elif node sbob-repo/src/cli.ts validate --sbob reg/t2.yaml > /tmp/neg2.txt 2>&1; then
+                echo "NOT REJECTED — ENFORCEMENT HOLE (unversioned purl accepted)"
+              else
+                rc=$?
+                echo "REJECTED (exit $rc)"
+                sed 's/^/    /' /tmp/neg2.txt
+              fi
+            done
+          } | tee diag/validate.txt
 
       - name: Commit diag
         shell: bash
@@ -55,5 +120,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add diag/
-          git commit -m "diag: cross-repo token capability test" || echo "nothing to commit"
+          git commit -m "diag: sbobctl enforcement validation" || echo "nothing to commit"
           git push origin HEAD:probe/push-run-diagnosis
