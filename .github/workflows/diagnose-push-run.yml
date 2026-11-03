@@ -1,10 +1,9 @@
 name: diagnose-push-run
 
-# Probe branch (throwaway): push-triggered lane dispatcher. GITHUB_TOKEN
-# cannot fire the `release` event, but it CAN dispatch workflow_dispatch
-# (GitHub changelog 2022-09-08) — this is how the sbob lanes get re-run for
-# an already-cut release tag without touching main. Each push to this branch
-# re-dispatches both lanes for TAG below.
+# Probe branch (throwaway): dump the recent sbob lane run states and the
+# failed-run logs to diag/ so the failure point is visible without the run
+# archive (github_app has no log tool; this is the established probe
+# technique).
 
 on:
   push:
@@ -12,22 +11,41 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  actions: write
-  contents: read
-
-env:
-  TAG: v1.5.27
+  actions: read
+  contents: write
 
 jobs:
-  dispatch-sbob-lanes:
+  dump:
     runs-on: ubuntu-latest
     steps:
-      - name: Dispatch sbob-publish + sbob-choco for the TAG against main
+      - uses: actions/checkout@v5
+
+      - name: Dump recent sbob lane run states + failed logs
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run sbob-publish.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$TAG"
-          gh workflow run sbob-choco.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$TAG"
-          echo "dispatched both sbob lanes for $TAG against main"
+          mkdir -p diag
+          {
+            echo "== sbob-publish runs =="
+            gh run list --workflow sbob-publish.yml --limit 6 --json databaseId,status,conclusion,createdAt,displayTitle | jq -r '.[] | "\(.databaseId) \(.conclusion // .status) \(.createdAt) \(.displayTitle)"'
+            echo "== sbob-choco runs =="
+            gh run list --workflow sbob-choco.yml --limit 6 --json databaseId,status,conclusion,createdAt,displayTitle | jq -r '.[] | "\(.databaseId) \(.conclusion // .status) \(.createdAt) \(.displayTitle)"'
+          } > diag/runs.txt
+          : > diag/failed-logs.txt
+          for wf in sbob-publish sbob-choco; do
+            for id in $(gh run list --workflow "$wf.yml" --limit 6 --json databaseId,conclusion --jq '.[] | select(.conclusion=="failure") | .databaseId'); do
+              echo "== run $id ($wf, failure) ==" >> diag/failed-logs.txt
+              gh run view "$id" --log-failed 2>/dev/null | tail -120 >> diag/failed-logs.txt || echo "(no failed logs)" >> diag/failed-logs.txt
+            done
+          done
+
+      - name: Commit diag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add diag/
+          git commit -m "diag: dump sbob lane run states + failed logs" || echo "nothing to commit"
+          git push origin HEAD:probe/push-run-diagnosis
