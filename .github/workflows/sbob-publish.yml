@@ -1,13 +1,17 @@
 name: sbob-publish
 
 # M6 dogfood lane (SBOB-Forge TDS 10.2/10.3/10.5): on every published stable
-# release, run the SBOB-Forge registry publish pipeline for the committed
-# profile:
-#   drift gate (generate --check --frozen + purl binding check)
+# release, run the SBOB-Forge registry publish pipeline for each committed
+# profile — the nuget-bound linux profile (sbobforge.json) and the choco-bound
+# windows profile (sbobforge-choco.json, the choco lane):
+#   drift gate (generate --check --frozen --config <profile config> + purl
+#     binding check)
 #     -> cosign keyless signing (SBoB + provenance, org decision #14)
 #     -> dialect conversion + sbobctl validate/diff
 #     -> public-lane content gate (sbobforge gate, TDS 10.5)
 #     -> registry PR in DevelApp-ai/Software-Bill-of-Behavior
+#        (nuget lane: sbobs/nuget/develapp-minotaur.linux.yaml;
+#         choco lane: sbobs/choco/develapp-minotaur.windows.yaml)
 #
 # The pipeline REFUSES to publish a drifted profile or one not bound to the
 # released version (org decision #26: the fix is regenerating, never
@@ -43,13 +47,29 @@ jobs:
 
   sbob-publish:
     needs: [resolve-version]
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@8275a7f22a1a0b500c2f25fc5aaad0ca9d056a05
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@58beae61547e8fea98137132fb3cc12320c35025
     with:
       package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.linux.sbob.yaml
       provenance-file: sbob/develapp-minotaur.linux.provenance.jsonl
       registry-dir: sbobs/nuget
       registry-name: develapp-minotaur.linux
+    permissions:
+      contents: read
+      id-token: write   # cosign keyless OIDC (org decision #14)
+    secrets:
+      SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_REGISTRY_TOKEN }}
+
+  sbob-publish-choco:
+    needs: [resolve-version]
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@58beae61547e8fea98137132fb3cc12320c35025
+    with:
+      package-purl: pkg:choco/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
+      sbob-file: sbob/develapp-minotaur.windows.sbob.yaml
+      provenance-file: sbob/develapp-minotaur.windows.provenance.jsonl
+      registry-dir: sbobs/choco
+      registry-name: develapp-minotaur.windows
+      sbob-config: sbobforge-choco.json
     permissions:
       contents: read
       id-token: write   # cosign keyless OIDC (org decision #14)

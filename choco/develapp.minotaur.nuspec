@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>develapp.minotaur</id>
+    <!-- Placeholder version: sbob-choco.yml rewrites this element from
+         sbobforge-choco.json packageVersion at pack time, so the nupkg is
+         always bound to the committed SBoB profile's version. -->
+    <version>1.5.21</version>
+    <title>Minotaur</title>
+    <authors>DevelApp</authors>
+    <owners>DevelApp</owners>
+    <summary>Minotaur CLI shipping an embedded Software Bill of Behavior</summary>
+    <description>The full Minotaur product: the DevelApp.Minotaur library plus the Minotaur.Demo console entry point (shimmed as `minotaur`), published for win-x64 against the .NET 8 runtime. The package embeds Minotaur's Software Bill of Behavior under tools/sbob/ (develapp-minotaur.windows.*), so the behavior contract travels with the binary it describes.</description>
+    <projectUrl>https://github.com/DevelApp-ai/Minotaur</projectUrl>
+    <packageSourceUrl>https://github.com/DevelApp-ai/Minotaur/tree/main/choco</packageSourceUrl>
+    <bugTrackerUrl>https://github.com/DevelApp-ai/Minotaur/issues</bugTrackerUrl>
+    <licenseUrl>https://github.com/DevelApp-ai/Minotaur/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>minotaur develapp sbob</tags>
+    <dependencies>
+      <dependency id="dotnet-8.0-runtime" version="[8.0, 9.0)" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools/**" target="tools" />
+  </files>
+</package>
