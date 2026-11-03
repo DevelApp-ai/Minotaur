@@ -1,27 +1,18 @@
-== runs on branch main (latest 12) ==
-completed	failure	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	.github/workflows/ci-cd-enhanced.yml	main	push	41727156676	0s	2026-11-03T22:02:11Z
-completed	failure	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	.github/workflows/ci-cd-enhanced.yml	main	push	41727055127	0s	2026-11-03T22:01:31Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	Security and Dependency Scan	main	push	41725437206	3m12s	2026-11-03T21:50:41Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41725437239	41s	2026-11-03T21:50:41Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	Code Quality Checks	main	push	41725437181	2m2s	2026-11-03T21:50:41Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	CodeQL Advanced	main	push	41725437307	2m56s	2026-11-03T21:50:41Z
-completed	failure	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	.github/workflows/ci-cd-enhanced.yml	main	push	41725434522	0s	2026-11-03T21:50:40Z
-completed	success	Merge pull request #153 from DevelApp-ai/sbob/regenerate-1.5.27	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41724342550	1m24s	2026-11-03T21:43:19Z
-completed	success	Merge pull request #153 from DevelApp-ai/sbob/regenerate-1.5.27	Security and Dependency Scan	main	push	41724342545	2m18s	2026-11-03T21:43:19Z
-completed	success	Merge pull request #153 from DevelApp-ai/sbob/regenerate-1.5.27	Code Quality Checks	main	push	41724342516	1m41s	2026-11-03T21:43:19Z
-completed	success	Merge pull request #153 from DevelApp-ai/sbob/regenerate-1.5.27	CodeQL Advanced	main	push	41724342547	3m36s	2026-11-03T21:43:19Z
-completed	success	Merge pull request #153 from DevelApp-ai/sbob/regenerate-1.5.27	sbob-choco	main	push	41724342332	3m36s	2026-11-03T21:43:19Z
+== all runs, latest 15 ==
+in_progress		diag: switch probe to release-event runs	diagnose-push-run	probe/push-run-diagnosis	push	41731423352	6s	2026-11-03T22:30:43Z
+completed	failure	diag: switch probe to release-event runs	CI/CD Pipeline	probe/push-run-diagnosis	push	41731420893	0s	2026-11-03T22:30:42Z
+completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	CodeQL Advanced	main	push	41729874314	2m24s	2026-11-03T22:20:05Z
+completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41729874231	41s	2026-11-03T22:20:05Z
+completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	CI/CD Pipeline	main	push	41729874154	3m45s	2026-11-03T22:20:05Z
+completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	Code Quality Checks	main	push	41729874150	2m18s	2026-11-03T22:20:05Z
+completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	Security and Dependency Scan	main	push	41729874147	2m40s	2026-11-03T22:20:05Z
+completed	success	ci: self-report main push-run failures as issues	Security and Dependency Scan	ci/push-failure-self-report	pull_request	41729185205	3m33s	2026-11-03T22:15:26Z
+completed	success	ci: self-report main push-run failures as issues	CI/CD Pipeline	ci/push-failure-self-report	pull_request	41729185075	3m42s	2026-11-03T22:15:26Z
+completed	success	ci: self-report main push-run failures as issues	CodeQL Advanced	ci/push-failure-self-report	pull_request	41729184967	3m8s	2026-11-03T22:15:26Z
+completed	success	ci: self-report main push-run failures as issues	Code Quality Checks	ci/push-failure-self-report	pull_request	41729184940	1m34s	2026-11-03T22:15:26Z
+completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	Code Quality Checks	main	push	41728493853	1m31s	2026-11-03T22:10:50Z
+completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	Security and Dependency Scan	main	push	41728493795	2m36s	2026-11-03T22:10:50Z
+completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41728493783	38s	2026-11-03T22:10:50Z
+completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	CI/CD Pipeline	main	push	41728493778	3m29s	2026-11-03T22:10:50Z
 
-== runs, all events, latest 12 ==
-in_progress		probe: diagnose the missing push-run releases (throwaway branch)	diagnose-push-run	probe/push-run-diagnosis	push	41727170745	8s	2026-11-03T22:02:17Z
-completed	failure	probe: diagnose the missing push-run releases (throwaway branch)	.github/workflows/ci-cd-enhanced.yml	probe/push-run-diagnosis	push	41727168394	0s	2026-11-03T22:02:16Z
-completed	failure	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	.github/workflows/ci-cd-enhanced.yml	main	push	41727156676	0s	2026-11-03T22:02:11Z
-completed	failure	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	.github/workflows/ci-cd-enhanced.yml	main	push	41727055127	0s	2026-11-03T22:01:31Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	CodeQL Advanced	main	push	41725437307	2m56s	2026-11-03T21:50:41Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41725437239	41s	2026-11-03T21:50:41Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	Security and Dependency Scan	main	push	41725437206	3m12s	2026-11-03T21:50:41Z
-completed	success	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	Code Quality Checks	main	push	41725437181	2m2s	2026-11-03T21:50:41Z
-completed	failure	Merge pull request #154 from DevelApp-ai/ci/gitversion6-main-release	.github/workflows/ci-cd-enhanced.yml	main	push	41725434522	0s	2026-11-03T21:50:40Z
-completed	success	ci: cut stable releases on main again (GitVersion 6.x fix)	CodeQL Advanced	ci/gitversion6-main-release	pull_request	41724817760	3m2s	2026-11-03T21:46:31Z
-completed	success	ci: cut stable releases on main again (GitVersion 6.x fix)	Security and Dependency Scan	ci/gitversion6-main-release	pull_request	41724817690	2m45s	2026-11-03T21:46:31Z
-completed	success	ci: cut stable releases on main again (GitVersion 6.x fix)	Code Quality Checks	ci/gitversion6-main-release	pull_request	41724817683	1m37s	2026-11-03T21:46:31Z
+== release-event runs, latest 10 ==
