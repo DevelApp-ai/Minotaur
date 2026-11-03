@@ -1,18 +1,18 @@
 == all runs, latest 15 ==
-in_progress		diag: switch probe to release-event runs	diagnose-push-run	probe/push-run-diagnosis	push	41731423352	6s	2026-11-03T22:30:43Z
+in_progress		diag: retrigger release-run state dump	diagnose-push-run	probe/push-run-diagnosis	push	41732597322	7s	2026-11-03T22:38:46Z
+completed	failure	diag: retrigger release-run state dump	CI/CD Pipeline	probe/push-run-diagnosis	push	41732595244	0s	2026-11-03T22:38:45Z
+in_progress		Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	CI/CD Pipeline	main	push	41732381069	1m39s	2026-11-03T22:37:14Z
+in_progress		Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	CodeQL Advanced	main	push	41732381032	1m39s	2026-11-03T22:37:14Z
+in_progress		Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	sbob-choco	main	push	41732381013	1m39s	2026-11-03T22:37:14Z
+in_progress		Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	Security and Dependency Scan	main	push	41732381012	1m39s	2026-11-03T22:37:14Z
+completed	success	Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41732380985	45s	2026-11-03T22:37:14Z
+in_progress		Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	Code Quality Checks	main	push	41732380961	1m39s	2026-11-03T22:37:14Z
+completed	success	ci: chain sbob-publish/sbob-choco from the release job via workflow_dispatch	sbob-choco	ci/chain-sbob-release-lanes	pull_request	41731824200	2m52s	2026-11-03T22:33:26Z
+completed	success	ci: chain sbob-publish/sbob-choco from the release job via workflow_dispatch	Security and Dependency Scan	ci/chain-sbob-release-lanes	pull_request	41731824089	3m18s	2026-11-03T22:33:26Z
+completed	success	ci: chain sbob-publish/sbob-choco from the release job via workflow_dispatch	CodeQL Advanced	ci/chain-sbob-release-lanes	pull_request	41731824032	2m27s	2026-11-03T22:33:26Z
+completed	success	ci: chain sbob-publish/sbob-choco from the release job via workflow_dispatch	CI/CD Pipeline	ci/chain-sbob-release-lanes	pull_request	41731823997	3m35s	2026-11-03T22:33:26Z
+completed	success	ci: chain sbob-publish/sbob-choco from the release job via workflow_dispatch	Code Quality Checks	ci/chain-sbob-release-lanes	pull_request	41731823977	1m39s	2026-11-03T22:33:26Z
+completed	success	diag: switch probe to release-event runs	diagnose-push-run	probe/push-run-diagnosis	push	41731423352	12s	2026-11-03T22:30:43Z
 completed	failure	diag: switch probe to release-event runs	CI/CD Pipeline	probe/push-run-diagnosis	push	41731420893	0s	2026-11-03T22:30:42Z
-completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	CodeQL Advanced	main	push	41729874314	2m24s	2026-11-03T22:20:05Z
-completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41729874231	41s	2026-11-03T22:20:05Z
-completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	CI/CD Pipeline	main	push	41729874154	3m45s	2026-11-03T22:20:05Z
-completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	Code Quality Checks	main	push	41729874150	2m18s	2026-11-03T22:20:05Z
-completed	success	Merge pull request #156 from DevelApp-ai/ci/push-failure-self-report	Security and Dependency Scan	main	push	41729874147	2m40s	2026-11-03T22:20:05Z
-completed	success	ci: self-report main push-run failures as issues	Security and Dependency Scan	ci/push-failure-self-report	pull_request	41729185205	3m33s	2026-11-03T22:15:26Z
-completed	success	ci: self-report main push-run failures as issues	CI/CD Pipeline	ci/push-failure-self-report	pull_request	41729185075	3m42s	2026-11-03T22:15:26Z
-completed	success	ci: self-report main push-run failures as issues	CodeQL Advanced	ci/push-failure-self-report	pull_request	41729184967	3m8s	2026-11-03T22:15:26Z
-completed	success	ci: self-report main push-run failures as issues	Code Quality Checks	ci/push-failure-self-report	pull_request	41729184940	1m34s	2026-11-03T22:15:26Z
-completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	Code Quality Checks	main	push	41728493853	1m31s	2026-11-03T22:10:50Z
-completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	Security and Dependency Scan	main	push	41728493795	2m36s	2026-11-03T22:10:50Z
-completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41728493783	38s	2026-11-03T22:10:50Z
-completed	success	Merge pull request #155 from DevelApp-ai/ci/gitversion6-main-release-…	CI/CD Pipeline	main	push	41728493778	3m29s	2026-11-03T22:10:50Z
 
 == release-event runs, latest 10 ==
