@@ -300,8 +300,11 @@ jobs:
           # --ignore-dependencies: the runner already carries the .NET 8 runtime;
           # the dotnet-8.0-runtime dependency is exercised in a real consumer
           # environment, not against the community feed from CI.
-          choco install develapp.minotaur --source="'dist'" -y --no-progress --ignore-dependencies
-          if ($LASTEXITCODE -ne 0) { throw "choco install failed" }
+          choco install develapp.minotaur --source="'dist'" -y --no-progress --ignore-dependencies 2>&1 | Tee-Object -FilePath install-choco.log
+          if ($LASTEXITCODE -ne 0) {
+            Get-Content "$env:ChocolateyInstall/logs/chocolatey.log" -Tail 60 -ErrorAction SilentlyContinue | Tee-Object -FilePath install-choco.log -Append
+            throw "choco install failed (exit code $LASTEXITCODE)"
+          }
           $installed = "$env:ChocolateyInstall/lib/develapp.minotaur/tools/sbob/develapp-minotaur.windows.sbob.yaml"
           if (-not (Test-Path $installed)) { throw "SBoB data not installed at $installed" }
           if (-not (Get-Command minotaur -ErrorAction SilentlyContinue)) { throw "minotaur shim not on PATH" }
@@ -325,7 +328,7 @@ jobs:
           script: |
             const fs = require('fs');
             const chunks = [];
-            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'drift.log', 'publish.log', 'stage.log', 'pack.log', 'embed.log', 'install.log']) {
+            for (const f of ['sbobforge-repo/restore.log', 'sbobforge-repo/build.log', 'drift.log', 'publish.log', 'stage.log', 'pack.log', 'embed.log', 'install.log', 'install-choco.log']) {
               try {
                 const t = fs.readFileSync(f, 'utf8').trimEnd();
                 if (t.length === 0) continue;
