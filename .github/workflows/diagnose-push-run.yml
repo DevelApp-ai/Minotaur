@@ -1,11 +1,9 @@
 name: diagnose-push-run
 
-# Probe branch (throwaway): sbobctl enforcement validation. Converts the
-# committed Minotaur profiles to the registry dialect with the pinned
-# sbobforge CLI, then runs the PINNED sbobctl (Software-Bill-of-Behavior
-# @ 18178345) validate on: the untouched profiles (positive) and two
-# tampered variants per lane (imageID removed; purl version stripped).
-# Expected: positive PASS, negatives REJECTED non-zero.
+# Probe branch (throwaway): dump the recent sbob lane run states and the
+# failed-run logs to diag/ so the failure point is visible without the run
+# archive (github_app has no log tool; this is the established probe
+# technique).
 
 on:
   push:
@@ -13,106 +11,35 @@ on:
   workflow_dispatch: {}
 
 permissions:
+  actions: read
   contents: write
-  packages: read
 
 jobs:
-  validate:
+  dump:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5   # probe branch (for committing diag)
+      - uses: actions/checkout@v5
 
-      - name: Checkout Minotaur main (current committed profiles)
-        uses: actions/checkout@v5
-        with:
-          ref: main
-          path: main-repo
-
-      - name: Checkout SBOB-Forge (generator, CLI pin)
-        uses: actions/checkout@v5
-        with:
-          repository: DevelApp-ai/SBOB-Forge
-          ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
-          path: sbobforge-repo
-
-      - name: Checkout sbobctl (pinned tooling)
-        uses: actions/checkout@v5
-        with:
-          repository: DevelApp-ai/Software-Bill-of-Behavior
-          ref: 181783453d3e9bddc30faba5f0b9ad96a571b2d9
-          path: sbob-repo
-
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 8.0.x
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-
-      - name: Restore + build sbobforge
-        working-directory: sbobforge-repo
-        shell: bash
+      - name: Dump recent sbob lane run states + failed logs
         env:
-          NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
-        run: |
-          set -euo pipefail
-          dotnet restore
-          dotnet build --no-restore -warnaserror
-
-      - name: Convert profiles to the registry dialect (TDS 10.4)
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p reg
-          dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-            convert main-repo/sbob/develapp-minotaur.linux.sbob.yaml reg/develapp-minotaur.linux.yaml
-          dotnet run --no-build --project sbobforge-repo/src/SBOBForge.Cli -- \
-            convert main-repo/sbob/develapp-minotaur.windows.sbob.yaml reg/develapp-minotaur.windows.yaml
-
-      - name: sbobctl enforcement validation (positive + tampered)
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p diag
           {
-            echo "== sbobctl validate (Software-Bill-of-Behavior @ 18178345) — enforcement validation =="
-            for lane in linux windows; do
-              f="reg/develapp-minotaur.$lane.yaml"
-
-              echo "-- [$lane] positive: untouched converted profile"
-              if node sbob-repo/src/cli.ts validate --sbob "$f" > /tmp/pos.txt 2>&1; then
-                echo "PASS (exit 0)"
-                sed 's/^/    /' /tmp/pos.txt
-              else
-                rc=$?
-                echo "FAIL (exit $rc) — UNEXPECTED: the publish pipeline gates on this"
-                sed 's/^/    /' /tmp/pos.txt
-              fi
-
-              echo "-- [$lane] negative 1: spec.imageID line removed"
-              sed '/^[[:space:]]*imageID:/d' "$f" > reg/t1.yaml
-              if node sbob-repo/src/cli.ts validate --sbob reg/t1.yaml > /tmp/neg1.txt 2>&1; then
-                echo "NOT REJECTED — ENFORCEMENT HOLE"
-              else
-                rc=$?
-                echo "REJECTED (exit $rc)"
-                sed 's/^/    /' /tmp/neg1.txt
-              fi
-
-              echo "-- [$lane] negative 2: purl version stripped (unversioned binding)"
-              sed -E 's|(imageID: pkg:([a-z]+)/([^@]+))@[A-Za-z0-9._+-]+|\1|' "$f" > reg/t2.yaml
-              if grep -q "imageID:.*@[^[:space:]]*" reg/t2.yaml; then
-                echo "TAMPER DID NOT APPLY — sed did not strip the version (check dialect)"
-              elif node sbob-repo/src/cli.ts validate --sbob reg/t2.yaml > /tmp/neg2.txt 2>&1; then
-                echo "NOT REJECTED — ENFORCEMENT HOLE (unversioned purl accepted)"
-              else
-                rc=$?
-                echo "REJECTED (exit $rc)"
-                sed 's/^/    /' /tmp/neg2.txt
-              fi
+            echo "== sbob-publish runs =="
+            gh run list --workflow sbob-publish.yml --limit 6 --json databaseId,status,conclusion,createdAt,displayTitle | jq -r '.[] | "\(.databaseId) \(.conclusion // .status) \(.createdAt) \(.displayTitle)"'
+            echo "== sbob-choco runs =="
+            gh run list --workflow sbob-choco.yml --limit 6 --json databaseId,status,conclusion,createdAt,displayTitle | jq -r '.[] | "\(.databaseId) \(.conclusion // .status) \(.createdAt) \(.displayTitle)"'
+          } > diag/runs.txt
+          : > diag/failed-logs.txt
+          for wf in sbob-publish sbob-choco; do
+            for id in $(gh run list --workflow "$wf.yml" --limit 6 --json databaseId,conclusion --jq '.[] | select(.conclusion=="failure") | .databaseId'); do
+              echo "== run $id ($wf, failure) ==" >> diag/failed-logs.txt
+              gh run view "$id" --log-failed 2>/dev/null | tail -120 >> diag/failed-logs.txt || echo "(no failed logs)" >> diag/failed-logs.txt
             done
-          } | tee diag/validate.txt
+          done
 
       - name: Commit diag
         shell: bash
@@ -120,5 +47,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add diag/
-          git commit -m "diag: sbobctl enforcement validation" || echo "nothing to commit"
+          git commit -m "diag: dump sbob lane run states + failed logs" || echo "nothing to commit"
           git push origin HEAD:probe/push-run-diagnosis
