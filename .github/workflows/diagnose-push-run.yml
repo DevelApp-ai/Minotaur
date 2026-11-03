@@ -1,9 +1,7 @@
 name: diagnose-push-run
 
-# Probe branch (throwaway): dump the recent sbob lane run states and the
-# failed-run logs to diag/ so the failure point is visible without the run
-# archive (github_app has no log tool; this is the established probe
-# technique).
+# Probe branch (throwaway): report which registry/org secrets are visible
+# to this repo. Prints SET/EMPTY only — never secret values.
 
 on:
   push:
@@ -11,35 +9,28 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  actions: read
   contents: write
 
 jobs:
-  dump:
+  probe:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
 
-      - name: Dump recent sbob lane run states + failed logs
+      - name: Probe secret presence (SET/EMPTY only)
         env:
-          GH_TOKEN: ${{ github.token }}
+          S1: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
+          S2: ${{ secrets.SBOB_REGISTRY_TOKEN }}
+          S3: ${{ secrets.PACKAGES_READ_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p diag
           {
-            echo "== sbob-publish runs =="
-            gh run list --workflow sbob-publish.yml --limit 6 --json databaseId,status,conclusion,createdAt,displayTitle | jq -r '.[] | "\(.databaseId) \(.conclusion // .status) \(.createdAt) \(.displayTitle)"'
-            echo "== sbob-choco runs =="
-            gh run list --workflow sbob-choco.yml --limit 6 --json databaseId,status,conclusion,createdAt,displayTitle | jq -r '.[] | "\(.databaseId) \(.conclusion // .status) \(.createdAt) \(.displayTitle)"'
-          } > diag/runs.txt
-          : > diag/failed-logs.txt
-          for wf in sbob-publish sbob-choco; do
-            for id in $(gh run list --workflow "$wf.yml" --limit 6 --json databaseId,conclusion --jq '.[] | select(.conclusion=="failure") | .databaseId'); do
-              echo "== run $id ($wf, failure) ==" >> diag/failed-logs.txt
-              gh run view "$id" --log-failed 2>/dev/null | tail -120 >> diag/failed-logs.txt || echo "(no failed logs)" >> diag/failed-logs.txt
-            done
-          done
+            if [ -n "$S1" ]; then echo "SBOB_PRIVATE_REGISTRY_TOKEN: SET"; else echo "SBOB_PRIVATE_REGISTRY_TOKEN: EMPTY"; fi
+            if [ -n "$S2" ]; then echo "SBOB_REGISTRY_TOKEN: SET"; else echo "SBOB_REGISTRY_TOKEN: EMPTY"; fi
+            if [ -n "$S3" ]; then echo "PACKAGES_READ_TOKEN: SET"; else echo "PACKAGES_READ_TOKEN: EMPTY"; fi
+          } | tee diag/secrets.txt
 
       - name: Commit diag
         shell: bash
@@ -47,5 +38,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add diag/
-          git commit -m "diag: dump sbob lane run states + failed logs" || echo "nothing to commit"
+          git commit -m "diag: secret presence probe" || echo "nothing to commit"
           git push origin HEAD:probe/push-run-diagnosis
