@@ -62,6 +62,7 @@ jobs:
       # Private/internal lane (org decision #40): PR target + token.
       registry-repo: DevelApp-ai/DevelApp-Repo-Global
       lane: private
+      sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
     permissions:
       contents: read
       id-token: write   # cosign keyless OIDC (org decision #14)
@@ -81,6 +82,7 @@ jobs:
       # Private/internal lane (org decision #40): PR target + token.
       registry-repo: DevelApp-ai/DevelApp-Repo-Global
       lane: private
+      sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
     permissions:
       contents: read
       id-token: write   # cosign keyless OIDC (org decision #14)
