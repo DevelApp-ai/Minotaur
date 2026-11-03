@@ -1,20 +1,12 @@
-in_progress		diag: switch probe to sbob lane failed-log dumping (no more dispatches)	diagnose-push-run	probe/push-run-diagnosis	push	41734235321	7s	2026-11-03T22:50:24Z
-completed	failure	diag: switch probe to sbob lane failed-log dumping (no more dispatches)	CI/CD Pipeline	probe/push-run-diagnosis	push	41734232786	0s	2026-11-03T22:50:23Z
-in_progress		sbob-choco	sbob-choco	main	workflow_dispatch	41734104639	1m3s	2026-11-03T22:49:28Z
-completed	failure	sbob-publish	sbob-publish	main	workflow_dispatch	41734100665	32s	2026-11-03T22:49:27Z
-completed	success	diag: poll 1.5.27 lane state	diagnose-push-run	probe/push-run-diagnosis	push	41734083243	44s	2026-11-03T22:49:19Z
-completed	failure	diag: poll 1.5.27 lane state	CI/CD Pipeline	probe/push-run-diagnosis	push	41734080332	0s	2026-11-03T22:49:18Z
-completed	failure	sbob-choco	sbob-choco	main	workflow_dispatch	41732994877	2m58s	2026-11-03T22:41:32Z
-completed	failure	sbob-publish	sbob-publish	main	workflow_dispatch	41732990955	45s	2026-11-03T22:41:30Z
-completed	success	diag: dispatch the v1.5.27 sbob publish lanes from the probe	diagnose-push-run	probe/push-run-diagnosis	push	41732968495	48s	2026-11-03T22:41:21Z
-completed	failure	diag: dispatch the v1.5.27 sbob publish lanes from the probe	CI/CD Pipeline	probe/push-run-diagnosis	push	41732966285	0s	2026-11-03T22:41:20Z
-completed	failure	sbob-choco	sbob-choco	main	workflow_dispatch	41732916059	3m11s	2026-11-03T22:41:00Z
-completed	failure	sbob-publish	sbob-publish	main	workflow_dispatch	41732912137	45s	2026-11-03T22:40:58Z
-completed	success	diag: poll run state again	diagnose-push-run	probe/push-run-diagnosis	push	41732806907	13s	2026-11-03T22:40:14Z
-completed	failure	diag: poll run state again	CI/CD Pipeline	probe/push-run-diagnosis	push	41732803195	0s	2026-11-03T22:40:13Z
-completed	success	diag: retrigger release-run state dump	diagnose-push-run	probe/push-run-diagnosis	push	41732597322	13s	2026-11-03T22:38:46Z
-completed	failure	diag: retrigger release-run state dump	CI/CD Pipeline	probe/push-run-diagnosis	push	41732595244	0s	2026-11-03T22:38:45Z
-completed	success	Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	CI/CD Pipeline	main	push	41732381069	3m49s	2026-11-03T22:37:14Z
-completed	success	Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	CodeQL Advanced	main	push	41732381032	2m50s	2026-11-03T22:37:14Z
-completed	success	Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	sbob-choco	main	push	41732381013	5m15s	2026-11-03T22:37:14Z
-completed	success	Merge pull request #157 from DevelApp-ai/ci/chain-sbob-release-lanes	Security and Dependency Scan	main	push	41732381012	3m23s	2026-11-03T22:37:14Z
+in_progress		diag: pure diagnostics dump of sbob lane state	diagnose-push-run	probe/push-run-diagnosis	push	41736407242	7s	2026-11-03T23:06:06Z
+completed	failure	diag: pure diagnostics dump of sbob lane state	CI/CD Pipeline	probe/push-run-diagnosis	push	41736404868	0s	2026-11-03T23:06:05Z
+completed	failure	sbob-choco	sbob-choco	main	workflow_dispatch	41735533430	4m18s	2026-11-03T23:00:00Z
+completed	failure	sbob-publish	sbob-publish	main	workflow_dispatch	41735530000	33s	2026-11-03T22:59:58Z
+completed	success	diag: dispatch v1.5.27 lanes after the token-scope + gh-repo-context …	diagnose-push-run	probe/push-run-diagnosis	push	41735497317	51s	2026-11-03T22:59:44Z
+completed	failure	diag: dispatch v1.5.27 lanes after the token-scope + gh-repo-context …	CI/CD Pipeline	probe/push-run-diagnosis	push	41735495059	0s	2026-11-03T22:59:43Z
+completed	failure	sbob-choco	sbob-choco	main	workflow_dispatch	41735428588	2m50s	2026-11-03T22:59:12Z
+completed	failure	sbob-publish	sbob-publish	main	workflow_dispatch	41735424374	50s	2026-11-03T22:59:10Z
+completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41734981499	35s	2026-11-03T22:55:50Z
+completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	sbob-choco	main	push	41734981488	3m15s	2026-11-03T22:55:50Z
+completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	Security and Dependency Scan	main	push	41734981449	2m11s	2026-11-03T22:55:50Z
+completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	CI/CD Pipeline	main	push	41734981417	3m26s	2026-11-03T22:55:50Z
