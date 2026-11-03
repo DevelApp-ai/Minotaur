@@ -80,6 +80,19 @@ jobs:
           fi
         fi
         
+        # GitVersion 6.x (5.x -> 6.x migration in #147/#149) ignores the v5
+        # "mode:" keys in GitVersion.yml, so main computes like Continuous-
+        # Deployment: SemVer carries a commit-count pre-release ("1.5.26-6")
+        # and PreReleaseTag is non-empty. That made the stable-release job's
+        # "prerelease == ''" gate skip every push to main (no releases since
+        # v1.5.25, 2026-11-01). Stable cuts on main use the clean MajorMinorPatch
+        # (still exactly one patch increment per merge into main, as with 5.x).
+        if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" && "${{ steps.gitversion.outputs.PreReleaseLabel }}" == "" ]]; then
+          VERSION="${{ steps.gitversion.outputs.MajorMinorPatch }}"
+          PRERELEASE=""
+          FULL_VERSION="${VERSION}"
+        fi
+
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
         echo "prerelease=${PRERELEASE}" >> $GITHUB_OUTPUT
         echo "full-version=${FULL_VERSION}" >> $GITHUB_OUTPUT
@@ -413,7 +426,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [calculate-version, build-and-test, package]
     if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.calculate-version.outputs.prerelease == '') ||
+      # prerelease-gate dropped: GitVersion 6.x always emits a commit-count
+      # PreReleaseTag on main (see calculate-version); the ref check alone
+      # scopes stable releases to pushes on main.
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'release' && github.event.action == 'published') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
     steps:
