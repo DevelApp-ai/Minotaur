@@ -1,12 +1,14 @@
-in_progress		diag: pure diagnostics dump of sbob lane state	diagnose-push-run	probe/push-run-diagnosis	push	41736407242	7s	2026-11-03T23:06:06Z
-completed	failure	diag: pure diagnostics dump of sbob lane state	CI/CD Pipeline	probe/push-run-diagnosis	push	41736404868	0s	2026-11-03T23:06:05Z
-completed	failure	sbob-choco	sbob-choco	main	workflow_dispatch	41735533430	4m18s	2026-11-03T23:00:00Z
-completed	failure	sbob-publish	sbob-publish	main	workflow_dispatch	41735530000	33s	2026-11-03T22:59:58Z
-completed	success	diag: dispatch v1.5.27 lanes after the token-scope + gh-repo-context …	diagnose-push-run	probe/push-run-diagnosis	push	41735497317	51s	2026-11-03T22:59:44Z
-completed	failure	diag: dispatch v1.5.27 lanes after the token-scope + gh-repo-context …	CI/CD Pipeline	probe/push-run-diagnosis	push	41735495059	0s	2026-11-03T22:59:43Z
-completed	failure	sbob-choco	sbob-choco	main	workflow_dispatch	41735428588	2m50s	2026-11-03T22:59:12Z
-completed	failure	sbob-publish	sbob-publish	main	workflow_dispatch	41735424374	50s	2026-11-03T22:59:10Z
-completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	Deploy Jekyll with GitHub Pages dependencies preinstalled	main	push	41734981499	35s	2026-11-03T22:55:50Z
-completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	sbob-choco	main	push	41734981488	3m15s	2026-11-03T22:55:50Z
-completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	Security and Dependency Scan	main	push	41734981449	2m11s	2026-11-03T22:55:50Z
-completed	success	Merge pull request #158 from DevelApp-ai/ci/sbob-publish-token-scope-fix	CI/CD Pipeline	main	push	41734981417	3m26s	2026-11-03T22:55:50Z
+== sbob-publish runs ==
+41738927459 failure 2026-11-03T23:24:41Z sbob-publish
+41738573590 failure 2026-11-03T23:22:00Z sbob-publish
+41735530000 failure 2026-11-03T22:59:58Z sbob-publish
+41735424374 failure 2026-11-03T22:59:10Z sbob-publish
+41734100665 failure 2026-11-03T22:49:27Z sbob-publish
+41732990955 failure 2026-11-03T22:41:30Z sbob-publish
+== sbob-choco runs ==
+41738931405 failure 2026-11-03T23:24:43Z sbob-choco
+41738577473 success 2026-11-03T23:22:02Z sbob-choco
+41738449759 success 2026-11-03T23:21:07Z Merge pull request #159 from DevelApp-ai/ci/sbob-publish-token-forward
+41737651043 success 2026-11-03T23:15:06Z ci: forward PACKAGES_READ_TOKEN + re-pin sbob-registry-publish; choco release asset name fix
+41735533430 failure 2026-11-03T23:00:00Z sbob-choco
+41735428588 failure 2026-11-03T22:59:12Z sbob-choco
