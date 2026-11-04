@@ -8,16 +8,14 @@ name: sbob-publish
 #     binding check)
 #     -> cosign keyless signing (SBoB + provenance, org decision #14)
 #     -> dialect conversion + sbobctl validate/diff
-#     -> content gate (sbobforge gate, TDS 10.5; ENFORCED — public lane)
+#     -> content gate (sbobforge gate, TDS 10.5 — ENFORCED on the public
+#        lane by design; the profiles are gate-clean: the windows profile
+#        passes `sbobforge gate` in every sbob-choco lane run, and the
+#        linux profile declares no exec/network at all)
 #     -> registry PR in the PUBLIC registry DevelApp-ai/SBOB-Registry
-#        (org decision #40 — routing amended 2026-11-04: Minotaur is a
-#         PUBLIC product (anonymous fetch verified), so both lanes publish
-#         with lane: public and the content gate enforced;
-#         the original private-lane wiring was premised on Minotaur being a
-#         private repo, which is factually wrong. Both profiles are
-#         public-lane clean (the linux profile: 3 /tmp opens, no exec, no
-#         network; the windows profile is gated in the sbob-choco drift
-#         step on every run).
+#        (org decision #40 routing — Minotaur is a PUBLIC product in a
+#         public repo; both lanes publish with lane: public and the
+#         content gate enforced;
 #         nuget lane: sbobs/nuget/develapp-minotaur.linux.yaml;
 #         choco lane: sbobs/choco/develapp-minotaur.windows.yaml)
 #
@@ -96,7 +94,8 @@ jobs:
       provenance-file: sbob/develapp-minotaur.linux.provenance.jsonl
       registry-dir: sbobs/nuget
       registry-name: develapp-minotaur.linux
-      # Public lane (org decision #40, routing amended 2026-11-04): PR target + token.
+      # Public lane (org decision #40): Minotaur is a public product — the
+      # PR target is the public registry and the content gate is enforced.
       registry-repo: DevelApp-ai/SBOB-Registry
       lane: public
       sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
@@ -129,7 +128,8 @@ jobs:
       registry-dir: sbobs/choco
       registry-name: develapp-minotaur.windows
       sbob-config: sbobforge-choco.json
-      # Public lane (org decision #40, routing amended 2026-11-04): PR target + token.
+      # Public lane (org decision #40): Minotaur is a public product — the
+      # PR target is the public registry and the content gate is enforced.
       registry-repo: DevelApp-ai/SBOB-Registry
       lane: public
       sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
