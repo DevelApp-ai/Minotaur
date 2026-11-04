@@ -14,8 +14,13 @@ name: sbob-regenerate
 # lock frozen), merge the PR, then tag the release. sbob-publish.yml then
 # drift-gates the merged profiles and publishes them to the registry.
 #
-# Manual dispatch only: the version is a release decision, not an event
-# to react to.
+# Two entry paths, same job:
+#   - workflow_dispatch with the version input (human lane).
+#   - push of sbob-regenerate-request.json to trigger/sbob-regenerate
+#     (agent lane — a version cut requested without workflow_dispatch
+#     access). The version stays a release decision expressed as an
+#     explicit request artifact; the request file is removed from the PR
+#     so main never carries it.
 
 on:
   workflow_dispatch:
@@ -29,6 +34,9 @@ on:
         required: false
         default: '5a5c9984b070dc88decc8a7454920be31ce2ac5f'
         type: string
+  push:
+    branches: [ trigger/sbob-regenerate ]
+    paths: [ sbob-regenerate-request.json ]
 
 permissions:
   contents: write
@@ -40,11 +48,28 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Resolve the requested version + generator ref
+        id: request
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "push" ]; then
+            v="$(jq -r '.version' sbob-regenerate-request.json)"
+            f="$(jq -r '."sbob-forge-ref" // "5a5c9984b070dc88decc8a7454920be31ce2ac5f"' sbob-regenerate-request.json)"
+          else
+            v="${{ inputs.version }}"
+            f="${{ inputs.sbob-forge-ref }}"
+          fi
+          case "$v" in
+            ''|*[!0-9A-Za-z.+-]*) echo "invalid version '$v' in the version-cut request"; exit 1 ;; esac
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "forge-ref=$f" >> "$GITHUB_OUTPUT"
+
       - name: Checkout SBOB-Forge (generator)
         uses: actions/checkout@v5
         with:
           repository: DevelApp-ai/SBOB-Forge
-          ref: ${{ inputs.sbob-forge-ref }}
+          ref: ${{ steps.request.outputs.forge-ref }}
           path: sbobforge-repo
 
       - uses: actions/setup-dotnet@v5
@@ -69,9 +94,9 @@ jobs:
           set -euo pipefail
           for cfg in sbobforge.json sbobforge-choco.json; do
             tmp="$(mktemp)"
-            jq --arg v "${{ inputs.version }}" '.packageVersion = $v' "$cfg" > "$tmp"
+            jq --arg v "${{ steps.request.outputs.version }}" '.packageVersion = $v' "$cfg" > "$tmp"
             mv "$tmp" "$cfg"
-            grep -q "\"packageVersion\": \"${{ inputs.version }}\"" "$cfg"
+            grep -q "\"packageVersion\": \"${{ steps.request.outputs.version }}\"" "$cfg"
           done
 
       - name: Regenerate both profiles (lock frozen) + self-validate
@@ -88,8 +113,8 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
-          FORGE_REF: ${{ inputs.sbob-forge-ref }}
+          VERSION: ${{ steps.request.outputs.version }}
+          FORGE_REF: ${{ steps.request.outputs.forge-ref }}
         run: |
           set -euo pipefail
           branch="sbob/regenerate-$VERSION"
@@ -97,6 +122,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"
           git add sbobforge.json sbobforge-choco.json sbob/
+          # The request file is the trigger artifact, not registry material —
+          # main must not carry it (and the push-trigger lane must not
+          # re-fire on future edits to it).
+          if [ -f sbob-regenerate-request.json ]; then
+            git rm -q sbob-regenerate-request.json
+          fi
           if git diff --cached --quiet; then
             echo "profiles already current for $VERSION — nothing to regenerate"
             exit 0
