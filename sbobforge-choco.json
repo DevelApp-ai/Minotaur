@@ -1,7 +1,7 @@
 {
   "packageType": "choco",
   "packageName": "develapp.minotaur",
-  "packageVersion": "1.5.35",
+  "packageVersion": "1.5.36",
   "namespace": "develapp",
   "targetOs": "windows",
   "architectures": [
