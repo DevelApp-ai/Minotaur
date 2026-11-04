@@ -8,10 +8,10 @@ metadata:
     develapp.io/binding: package-purl
     develapp.io/generator: sbobforge@0.1.0
     develapp.io/grammar-lock-sha256: 8e5651bf16ecf80ab37c143263072547922c294ad593ca17fe68cdef116ffe57
-    develapp.io/behavior-hash: f093d664cd4b25a8307b83705e80a84e56e937ced7205e2a0c601140d3113764
+    develapp.io/behavior-hash: 21b9aecd755bb4877db3db9bac04892b147047cc11f8701475379d4cc6f8af9d
 spec:
   architectures: [amd64]
-  imageID: pkg:nuget/develapp.minotaur@1.5.37
+  imageID: pkg:nuget/develapp.minotaur@1.5.39
   opens:
     - path: /tmp/sample1.sscript
       flags: [O_WRONLY, O_CREAT, O_TRUNC]
