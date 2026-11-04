@@ -8,11 +8,16 @@ name: sbob-publish
 #     binding check)
 #     -> cosign keyless signing (SBoB + provenance, org decision #14)
 #     -> dialect conversion + sbobctl validate/diff
-#     -> content gate (sbobforge gate, TDS 10.5; skipped on the private
-#        lane by design)
-#     -> registry PR in the PRIVATE registry DevelApp-ai/DevelApp-Repo-Global
-#        (org decision #40 — Minotaur is an internal, GH-Packages-only product;
-#         both lanes publish with lane: private;
+#     -> content gate (sbobforge gate, TDS 10.5; ENFORCED — public lane)
+#     -> registry PR in the PUBLIC registry DevelApp-ai/SBOB-Registry
+#        (org decision #40 — routing amended 2026-11-04: Minotaur is a
+#         PUBLIC product (anonymous fetch verified), so both lanes publish
+#         with lane: public and the content gate enforced;
+#         the original private-lane wiring was premised on Minotaur being a
+#         private repo, which is factually wrong. Both profiles are
+#         public-lane clean (the linux profile: 3 /tmp opens, no exec, no
+#         network; the windows profile is gated in the sbob-choco drift
+#         step on every run).
 #         nuget lane: sbobs/nuget/develapp-minotaur.linux.yaml;
 #         choco lane: sbobs/choco/develapp-minotaur.windows.yaml)
 #
@@ -29,8 +34,8 @@ name: sbob-publish
 # input — the one event GITHUB_TOKEN CAN trigger (GitHub changelog
 # 2022-09-08). The `release` trigger stays for releases published outside
 # CI; both paths run the same jobs.
-# Requires the SBOB_PRIVATE_REGISTRY_TOKEN org secret (contents:write on
-# DevelApp-ai/DevelApp-Repo-Global, org decision #40) to open the cross-repo
+# Requires the SBOB_REGISTRY_TOKEN org secret (contents:write on
+# DevelApp-ai/SBOB-Registry, org decision #40) to open the cross-repo
 # registry PR; the sbobctl validate/diff tooling is checked out from the pinned
 # Software-Bill-of-Behavior ref inside the reusable workflow.
 #
@@ -91,9 +96,9 @@ jobs:
       provenance-file: sbob/develapp-minotaur.linux.provenance.jsonl
       registry-dir: sbobs/nuget
       registry-name: develapp-minotaur.linux
-      # Private/internal lane (org decision #40): PR target + token.
-      registry-repo: DevelApp-ai/DevelApp-Repo-Global
-      lane: private
+      # Public lane (org decision #40, routing amended 2026-11-04): PR target + token.
+      registry-repo: DevelApp-ai/SBOB-Registry
+      lane: public
       sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
     permissions:
       contents: read
@@ -104,7 +109,7 @@ jobs:
       packages: read    # GitHub Packages restore of the sbobforge substrate (org decision #8)
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
-      SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
+      SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_REGISTRY_TOKEN }}
       # Forward the org secret so the reusable workflow can authenticate the
       # GitHub Packages substrate restore (org decision #8). In a reusable
       # workflow the caller's PACKAGES_READ_TOKEN is invisible unless
@@ -124,9 +129,9 @@ jobs:
       registry-dir: sbobs/choco
       registry-name: develapp-minotaur.windows
       sbob-config: sbobforge-choco.json
-      # Private/internal lane (org decision #40): PR target + token.
-      registry-repo: DevelApp-ai/DevelApp-Repo-Global
-      lane: private
+      # Public lane (org decision #40, routing amended 2026-11-04): PR target + token.
+      registry-repo: DevelApp-ai/SBOB-Registry
+      lane: public
       sbob-forge-ref: 5a5c9984b070dc88decc8a7454920be31ce2ac5f
     permissions:
       contents: read
@@ -137,7 +142,7 @@ jobs:
       packages: read    # GitHub Packages restore of the sbobforge substrate (org decision #8)
       id-token: write   # cosign keyless OIDC (org decision #14)
     secrets:
-      SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_PRIVATE_REGISTRY_TOKEN }}
+      SBOB_REGISTRY_TOKEN: ${{ secrets.SBOB_REGISTRY_TOKEN }}
       # Forward the org secret so the reusable workflow can authenticate the
       # GitHub Packages substrate restore (org decision #8). In a reusable
       # workflow the caller's PACKAGES_READ_TOKEN is invisible unless
