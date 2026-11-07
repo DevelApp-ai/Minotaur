@@ -1,7 +1,7 @@
 {
   "packageType": "nuget",
   "packageName": "DevelApp.Minotaur",
-  "packageVersion": "1.5.42",
+  "packageVersion": "1.5.43",
   "namespace": "develapp",
   "targetOs": "linux",
   "architectures": [
