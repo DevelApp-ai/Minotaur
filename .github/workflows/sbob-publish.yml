@@ -33,7 +33,8 @@ name: sbob-publish
 # `release` event (GitHub's workflow-recursion guard), so ci-cd-enhanced's
 # release job dispatches this workflow via workflow_dispatch with the tag
 # input — the one event GITHUB_TOKEN CAN trigger (GitHub changelog
-# 2022-09-08). The `release` trigger stays for releases published outside
+# 2022-09-08). The `release` trigger stays for r
+eleases published outside
 # CI; both paths run the same jobs.
 # Requires the SBOB_REGISTRY_TOKEN org secret (contents:write on
 # DevelApp-ai/SBOB-Registry, org decision #40) to open the cross-repo
@@ -82,7 +83,8 @@ jobs:
           fi
           v="${tag#v}"
           case "$v" in
-            ''|*[!0-9A-Za-z.+-]*) echo "unexpected tag '$tag'"; exit 1 ;;
+            ''|*[!0-9A-Za-z.+-]*) echo "unexpected tag '$tag'"
+; exit 1 ;;
           esac
           echo "version=$v" >> "$GITHUB_OUTPUT"
           echo "prerelease=$pre" >> "$GITHUB_OUTPUT"
@@ -90,7 +92,7 @@ jobs:
   sbob-publish:
     needs: [resolve-version]
     if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@f004b54a876618fa8684d27d9ff6302f298419c2
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@f686793ce333e323adb4b1432c43ab862e596685
     with:
       package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.linux.sbob.yaml
@@ -120,10 +122,11 @@ jobs:
       # this optional secret (SBOB-Forge #35).
       PACKAGES_READ_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
 
-  sbob-publish-choco:
+  sbob-publish-ch
+oco:
     needs: [resolve-version]
     if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
-    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@f004b54a876618fa8684d27d9ff6302f298419c2
+    uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@f686793ce333e323adb4b1432c43ab862e596685
     with:
       package-purl: pkg:choco/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
       sbob-file: sbob/develapp-minotaur.windows.sbob.yaml
@@ -154,7 +157,8 @@ jobs:
       # this optional secret (SBOB-Forge #35).
       PACKAGES_READ_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
   # Observability (cf. ci-cd-enhanced.yml report-push-failure): these lanes
-  # run on workflow_dispatch / release events with no PR to comment on — the
+  # run on workflow_dispatch / relea
+se events with no PR to comment on — the
   # 2026-11-03 dispatch failures were only discovered because the registry
   # PRs never appeared. On any failed lane, open an issue naming the failed
   # jobs and steps, with a link to the run.
