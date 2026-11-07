@@ -8,10 +8,10 @@ metadata:
     develapp.io/binding: package-purl
     develapp.io/generator: sbobforge@0.1.0
     develapp.io/grammar-lock-sha256: 8e5651bf16ecf80ab37c143263072547922c294ad593ca17fe68cdef116ffe57
-    develapp.io/behavior-hash: 8fcc19a13cc524488593faa875e35ec43b6bdf92400482ac1f690f0b6a9f6fda
+    develapp.io/behavior-hash: 40bbdf96c84a538fd922fe59349f638af72258d77dcd864a47f2142c1e7cb760
 spec:
   architectures: [amd64]
-  imageID: pkg:choco/develapp.minotaur@1.5.41
+  imageID: pkg:choco/develapp.minotaur@1.5.42
   opens:
     - path: /tmp/sample1.sscript
       flags: [O_WRONLY, O_CREAT, O_TRUNC]
