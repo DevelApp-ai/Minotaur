@@ -536,6 +536,7 @@ jobs:
       contents: write    # create the stable release + attach assets
       packages: write    # publish the nupkg to GitHub Packages
       actions: write     # dispatch the sbob-publish / sbob-choco chain lanes
+      id-token: write   # mint the GitHub OIDC token for NuGet.org trusted publishing
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -606,9 +607,12 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Publishing target is GitHub Packages ONLY (#72): DevelApp consumers (e.g. Golem)
-    # authenticate to https://nuget.pkg.github.com/DevelApp-ai/index.json.
-    # There is intentionally no NuGet.org publish step.
+    # Publishing targets (cf. #72): GitHub Packages remains the primary feed
+    # for DevelApp consumers (Golem authenticates to
+    # https://nuget.pkg.github.com/DevelApp-ai/index.json). NuGet.org is
+    # ADDITIONAL for stable releases per the 2026-11-12 trusted-publishing
+    # onboarding (order per #73: GitHub Packages -> Release -> NuGet.org last,
+    # loud failures; prereleases are never pushed to NuGet.org).
 
     - name: Create GitHub Release Assets
       uses: softprops/action-gh-release@v3
@@ -643,6 +647,32 @@ jobs:
         gh workflow run sbob-publish.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$tag"
         gh workflow run sbob-choco.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$tag"
         echo "dispatched sbob-publish + sbob-choco for $tag"
+
+    - name: NuGet.org login (OIDC -> temp API key)
+      # Trusted publishing (org standard; there is no long-lived NUGET_API_KEY
+      # secret): this job's GitHub OIDC token is exchanged for a ~1-hour
+      # nuget.org API key, validated against the trusted publishing policy
+      # registered on nuget.org for this repository + workflow:
+      #   Repository Owner: DevelApp-ai
+      #   Repository:      Minotaur
+      #   Workflow File:   ci-cd-enhanced.yml
+      #   Environment:    (none - this job uses no environment)
+      # NUGET_USER = the nuget.org profile name of the owning account (NOT an
+      # email address). The login runs close to the push (the temp key is
+      # short-lived). Fails loudly if the policy is not (yet) registered.
+      if: ${{ !github.event.release.prerelease }}
+      id: nuget-login
+      uses: NuGet/login@v1
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
+    - name: Publish to NuGet.org (stable releases only)
+      # #73 order: GitHub Packages -> Release assets -> NuGet.org LAST, so a
+      # NuGet.org failure can never block the org feed or the release; it is a
+      # visible red job and report-push-failure opens an issue. Prereleases
+      # (release events with prerelease=true) never reach NuGet.org.
+      if: ${{ !github.event.release.prerelease }}
+      run: dotnet nuget push ./packages/*.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   # Manual job to create v1.0.0 release from main branch
   create-stable-release:
