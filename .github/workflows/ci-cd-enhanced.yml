@@ -1,5 +1,15 @@
 name: CI/CD Pipeline
 
+# Publishing is signed with Certum cloud code signing (org decisions
+# DevelApp-ai/DevelApp-Repo-Global#38 + #73, incl. the SHA-256 amendment,
+# 2026-11-12): on non-PR runs the sign job (windows-latest) signs the packed
+# .nupkg via 'dotnet nuget sign --certificate-fingerprint <SHA-256
+# fingerprint> --timestamper http://time.certum.pl' and gates on
+# 'dotnet nuget verify' BEFORE anything is published; the prerelease and
+# release lanes then consume only verified packages. PR-triggered builds
+# skip signing so no TOTP window is spent on PR builds (the PR package
+# lane stays unsigned by design, org-wide convention).
+
 on:
   push:
     branches: [ main, develop, 'copilot/**' ]
@@ -61,7 +71,7 @@ jobs:
         PRERELEASE="${{ steps.gitversion.outputs.PreReleaseTag }}"
         # Use SemVer (without build metadata) for package version to ensure NuGet.org compatibility
         # FullSemVer includes build metadata like +37 which causes issues on NuGet.org
-        FULL_VERSION="${VERSION}"
+        FULL_VERSION="$VERSION"
         
         # Check if this is a pull request and adjust version accordingly
         if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -90,12 +100,12 @@ jobs:
         if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" && "${{ steps.gitversion.outputs.PreReleaseLabel }}" == "" ]]; then
           VERSION="${{ steps.gitversion.outputs.MajorMinorPatch }}"
           PRERELEASE=""
-          FULL_VERSION="${VERSION}"
+          FULL_VERSION="$VERSION"
         fi
 
-        echo "version=${VERSION}" >> $GITHUB_OUTPUT
-        echo "prerelease=${PRERELEASE}" >> $GITHUB_OUTPUT
-        echo "full-version=${FULL_VERSION}" >> $GITHUB_OUTPUT
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "prerelease=$PRERELEASE" >> $GITHUB_OUTPUT
+        echo "full-version=$FULL_VERSION" >> $GITHUB_OUTPUT
 
     - name: Display Version
       run: |
@@ -353,6 +363,90 @@ jobs:
         name: nuget-packages
         path: ./packages/*.nupkg
 
+  sign:
+    name: Sign NuGet package (Certum cloud)
+    runs-on: windows-latest
+    needs: [calculate-version, package]
+    # Non-PR runs only (org decisions #38 + #73): branch pushes (main stable,
+    # develop/feature prereleases), release events and manual dispatches are
+    # signed; PR-triggered builds skip signing so no TOTP window is spent on
+    # PR builds (the PR package lane stays unsigned by design).
+    if: github.event_name != 'pull_request'
+    steps:
+    - name: Download packages
+      uses: actions/download-artifact@v6
+      with:
+        name: nuget-packages
+        path: packages/
+
+    - name: Validate signing inputs
+      # Fail fast BEFORE the SimplySign login consumes a TOTP window
+      # (values are never echoed).
+      shell: pwsh
+      env:
+        CERTUM_SIMPLYSIGN_USERID: ${{ secrets.CERTUM_SIMPLYSIGN_USERID }}
+        CERTUM_SIMPLYSIGN_OTP_URI: ${{ secrets.CERTUM_SIMPLYSIGN_OTP_URI }}
+        CERTUM_THUMBPRINT: ${{ secrets.CODE_SIGNING_CERT_THUMBPRINT }}
+        CERTUM_FINGERPRINT_SHA256: ${{ secrets.CODE_SIGNING_CERT_FINGERPRINT_SHA256 }}
+      run: |
+        foreach ($name in @('CERTUM_SIMPLYSIGN_USERID','CERTUM_SIMPLYSIGN_OTP_URI','CERTUM_THUMBPRINT','CERTUM_FINGERPRINT_SHA256')) {
+          if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
+            throw "Missing signing input: $name (org secrets setup, decision #38)"
+          }
+        }
+        $tp = $env:CERTUM_THUMBPRINT -replace '\s',''
+        if ($tp -notmatch '^[0-9A-Fa-f]{40}$') { throw 'Certificate thumbprint must be exactly 40 hex characters (CODE_SIGNING_CERT_THUMBPRINT org secret).' }
+        $fp = $env:CERTUM_FINGERPRINT_SHA256 -replace '\s',''
+        if ($fp -notmatch '^[0-9A-Fa-f]{64}$') { throw 'Certificate fingerprint must be exactly 64 hex characters (CODE_SIGNING_CERT_FINGERPRINT_SHA256 org secret, decision #73 amendment).' }
+        $uri = $null
+        if (-not [Uri]::TryCreate($env:CERTUM_SIMPLYSIGN_OTP_URI, [UriKind]::Absolute, [ref]$uri) -or
+            $uri.Scheme -ne 'otpauth' -or $uri.Host -ne 'totp' -or
+            $uri.Query -notmatch '[?&]secret=[A-Za-z2-7]+=*(&|$)') {
+          throw 'CERTUM_SIMPLYSIGN_OTP_URI must be the full otpauth://totp provisioning URI (org secrets setup, decision #38).'
+        }
+
+    - name: Connect to Certum SimplySign
+      # Pinned by full commit SHA; proven by the LocalTaskhandler signing
+      # test (run 43089090840, 2026-11-11). Never sees
+      # CERTUM_SIMPLYSIGN_PASSWORD - that secret stays dormant.
+      uses: dismine/windows-app-signing-setup-action@89ae3b032d4bc7a5b98d1a42a34e61ecb6faad64
+      with:
+        certum-username: ${{ secrets.CERTUM_SIMPLYSIGN_USERID }}
+        certum-otp-uri: ${{ secrets.CERTUM_SIMPLYSIGN_OTP_URI }}
+        certum-key-id: ${{ secrets.CODE_SIGNING_CERT_THUMBPRINT }}
+        capture-diagnostics: 'false'
+
+    - name: Sign NuGet package
+      # SHA-256 fingerprint interface (decision #73 amendment, 2026-11-12):
+      # works identically on .NET 9 and .NET 10 SDKs; no SDK pin needed.
+      shell: pwsh
+      env:
+        CERTUM_FINGERPRINT_SHA256: ${{ secrets.CODE_SIGNING_CERT_FINGERPRINT_SHA256 }}
+      run: |
+        $fp = ($env:CERTUM_FINGERPRINT_SHA256 -replace '\s','').ToUpperInvariant()
+        $packages = @(Get-ChildItem packages/*.nupkg)
+        if (-not $packages.Count) { throw 'No packages found to sign.' }
+        foreach ($p in $packages) {
+          dotnet nuget sign $p.FullName --certificate-fingerprint $fp --timestamper http://time.certum.pl
+          if ($LASTEXITCODE -ne 0) { throw "Signing failed (exit $LASTEXITCODE): $($p.Name)" }
+        }
+
+    - name: Verify signatures (gate)
+      # Any invalid signature fails the job and blocks the publishing lanes.
+      shell: pwsh
+      run: |
+        foreach ($p in @(Get-ChildItem packages/*.nupkg)) {
+          dotnet nuget verify $p.FullName
+          if ($LASTEXITCODE -ne 0) { throw "Signature verification failed (exit $LASTEXITCODE): $($p.Name)" }
+        }
+
+    - name: Upload signed packages
+      uses: actions/upload-artifact@v6
+      with:
+        name: nuget-packages-signed
+        path: packages/*.nupkg
+        if-no-files-found: error
+
   publish-pr-package:
     runs-on: ubuntu-latest
     needs: [calculate-version, build-and-test, package]
@@ -378,8 +472,11 @@ jobs:
 
   prerelease:
     runs-on: ubuntu-latest
-    needs: [calculate-version, build-and-test, package]
+    needs: [calculate-version, build-and-test, package, sign]
+    # Sign gate (org decisions #38 + #73): only verified packages reach the
+    # prerelease lane (branch pushes always sign; see the sign job).
     if: |
+      needs.sign.result == 'success' &&
       github.event_name == 'push' && 
       (contains(github.ref, 'refs/heads/develop') || 
        contains(github.ref, 'refs/heads/copilot/') ||
@@ -388,10 +485,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
 
-    - name: Download packages
+    - name: Download signed packages
       uses: actions/download-artifact@v7
       with:
-        name: nuget-packages
+        name: nuget-packages-signed
         path: ./packages
 
     - name: Create Pre-release
@@ -424,14 +521,17 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: [calculate-version, build-and-test, package]
+    needs: [calculate-version, build-and-test, package, sign]
     # prerelease-gate dropped: GitVersion 6.x always emits a commit-count
     # PreReleaseTag on main (see calculate-version); the ref check alone
     # scopes stable releases to pushes on main.
+    # Sign gate (org decisions #38 + #73): only verified packages reach the
+    # stable lane; a sign failure blocks the release.
     if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'release' && github.event.action == 'published') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
+      needs.sign.result == 'success' &&
+      ((github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+       (github.event_name == 'release' && github.event.action == 'published') ||
+       (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true'))
     permissions:
       contents: write    # create the stable release + attach assets
       packages: write    # publish the nupkg to GitHub Packages
@@ -445,10 +545,10 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Download packages
+    - name: Download signed packages
       uses: actions/download-artifact@v7
       with:
-        name: nuget-packages
+        name: nuget-packages-signed
         path: ./packages
 
     - name: Create GitHub Release (for main branch pushes and manual dispatch)
@@ -464,30 +564,30 @@ jobs:
         body: |
           # Minotaur v${{ needs.calculate-version.outputs.version }} - Stable Release
 
-          ## 🎉 What's New
+          ## What's New
 
           This is a stable release of Minotaur, a powerful cognitive graph editing and parsing framework.
 
-          ### ✅ Core Features
+          ### Core Features
           - **StepParser Integration**: Complete parsing pipeline with step-by-step debugging capabilities
           - **Graph Editor**: Full cognitive graph editing with comprehensive undo/redo support  
           - **Plugin System**: Extensible unparsing system supporting C#, JavaScript, and Python
           - **Enhanced Location Tracking**: Precise APIs for syntax tree navigation and manipulation
           - **Context-Aware Editing**: Advanced context-aware editing capabilities for intelligent code generation
 
-          ### ✅ Developer Experience  
+          ### Developer Experience  
           - **Comprehensive Testing**: 56+ unit tests covering all functionality with 100% pass rate
           - **CI/CD Pipeline**: Fully automated builds, testing, quality checks, and releases
           - **Rich Documentation**: Complete API documentation with examples and integration guides
           - **High Performance**: Optimized parsing algorithms and efficient graph operations
 
-          ### 📦 Installation
+          ### Installation
 
           ```bash
           dotnet add package DevelApp.Minotaur --version ${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
           ```
 
-          ### 🔧 Requirements
+          ### Requirements
           - .NET 8.0 or later
           - Compatible with Windows, macOS, and Linux
 
@@ -525,7 +625,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Chain the sbob-publish + sbob-choco release lanes
-      # Publishing a release with GITHUB_TOKEN does NOT fire the `release`
+      # Publishing a release with GITHUB_TOKEN does NOT fire the 'release'
       # event (GitHub's workflow-recursion guard) — sbob-publish.yml and the
       # sbob-choco.yml release lane never triggered on CI-cut releases, which
       # is how the M6 registry lanes went silently unpublished. workflow_dispatch
@@ -574,30 +674,30 @@ jobs:
         body: |
           # Minotaur v1.0.0 - First Stable Release
 
-          ## 🎉 What's New
+          ## What's New
 
           This is the first stable release of Minotaur, a powerful cognitive graph editing and parsing framework.
 
-          ### ✅ Core Features
+          ### Core Features
           - **StepParser Integration**: Complete parsing pipeline with step-by-step debugging capabilities
           - **Graph Editor**: Full cognitive graph editing with comprehensive undo/redo support  
           - **Plugin System**: Extensible unparsing system supporting C#, JavaScript, and Python
           - **Enhanced Location Tracking**: Precise APIs for syntax tree navigation and manipulation
           - **Context-Aware Editing**: Advanced context-aware editing capabilities for intelligent code generation
 
-          ### ✅ Developer Experience  
+          ### Developer Experience
           - **Comprehensive Testing**: 157 unit tests covering all functionality with 100% pass rate
           - **CI/CD Pipeline**: Fully automated builds, testing, quality checks, and releases
           - **Rich Documentation**: Complete API documentation with examples and integration guides
           - **High Performance**: Optimized parsing algorithms and efficient graph operations
 
-          ### 📦 Installation
+          ### Installation
 
           ```bash
           dotnet add package DevelApp.Minotaur --version 1.0.0
           ```
 
-          ### 🔧 Requirements
+          ### Requirements
           - .NET 8.0 or later
           - Compatible with Windows, macOS, and Linux
 
@@ -618,7 +718,6 @@ jobs:
       env:
         NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
   # Failure-context convention (cf. sbob-choco.yml PR-comment step and
   # SBOB-Forge ci.yml): push runs to main have no PR to comment on, so a
   # failed release lane is otherwise invisible - on 2026-11-03 the stable
@@ -626,7 +725,7 @@ jobs:
   # On any failed job in a main push run, open an issue so it surfaces.
   report-push-failure:
     runs-on: ubuntu-latest
-    needs: [calculate-version, build-and-test, code-quality, lint-and-format, performance-test, package, prerelease, release]
+    needs: [calculate-version, build-and-test, code-quality, lint-and-format, performance-test, package, sign, prerelease, release]
     if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(needs.*.result, 'failure')
     permissions:
       issues: write
