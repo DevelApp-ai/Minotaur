@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.14" />
+    <PackageReference Include="DevelApp.CognitiveGraph" Version="1.1.20" />
   </ItemGroup>
 
   <ItemGroup>

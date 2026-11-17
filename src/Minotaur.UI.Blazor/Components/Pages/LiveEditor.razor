@@ -1,0 +1,261 @@
+@page "/live-editor"
+@using Minotaur.Parser.LiveEditing
+@using DevelApp.StepLexer
+@using DevelApp.StepParser
+
+<PageTitle>Live Editor</PageTitle>
+
+<div class="live-editor">
+    @if (!string.IsNullOrEmpty(warning))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @warning
+            <button type="button" class="btn-close" @onclick="DismissWarning"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Left Panel: Live Source Editor -->
+        <div class="col-md-7">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-code-square"></i> Live Source Editor
+                    </h5>
+                    <div class="btn-group" role="group" aria-label="Editing mode">
+                        <button class="btn btn-sm @(session.Mode == LiveEditingMode.Incremental ? "btn-primary" : "btn-outline-primary")"
+                                @onclick="() => SetMode(LiveEditingMode.Incremental)">
+                            Incremental
+                        </button>
+                        <button class="btn btn-sm @(session.Mode == LiveEditingMode.FullReparse ? "btn-primary" : "btn-outline-primary")"
+                                @onclick="() => SetMode(LiveEditingMode.FullReparse)">
+                            Full re-parse
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <textarea value="@sourceText" @oninput="OnSourceInput"
+                              class="form-control live-editor-source"
+                              placeholder="Type C#-like code here; tokens update on every keystroke..."
+                              rows="24" spellcheck="false"></textarea>
+                </div>
+                <div class="card-footer text-muted small">
+                    ASCII input only; non-ASCII text is rejected and the editor reverts.
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Live Statistics -->
+        <div class="col-md-5">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-speedometer2"></i> Live Statistics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Tokens:</strong> @session.TokenCount.ToString("N0")</li>
+                        <li><strong>Edits applied:</strong> @session.EditCount.ToString("N0") (version @session.Version)</li>
+                        <li><strong>Last edit latency:</strong> @FormatMicros(lastLatencyMicroseconds)</li>
+                        <li><strong>Last token reuse ratio:</strong> @session.LastReuseRatio.ToString("P1")</li>
+                        <li><strong>p50 / p95 / p99 latency:</strong>
+                            @FormatMicros(latencySummary.P50Microseconds) /
+                            @FormatMicros(latencySummary.P95Microseconds) /
+                            @FormatMicros(latencySummary.P99Microseconds)
+                        </li>
+                        <li><strong>Mean / min / max:</strong>
+                            @FormatMicros(latencySummary.MeanMicroseconds) /
+                            @FormatMicros(latencySummary.MinMicroseconds) /
+                            @FormatMicros(latencySummary.MaxMicroseconds)
+                        </li>
+                        <li><strong>Samples:</strong> @latencySummary.Count.ToString("N0")</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-check"></i> Token Stream (first @TokenPreviewCount)
+                    </h5>
+                </div>
+                <div class="card-body p-0 token-preview">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th>Pos</th>
+                                <th>Len</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (index, token) in TokenPreview)
+                            {
+                                <tr>
+                                    <td>@index</td>
+                                    <td><span class="badge bg-secondary">@token.Type</span></td>
+                                    <td class="token-value">@PreviewText(token.Value)</td>
+                                    <td>@token.StartPosition</td>
+                                    <td>@token.Length</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-filetype-js"></i> Grammar (GrammarForge)
+                    </h5>
+                    <button class="btn btn-primary btn-sm" @onclick="ApplyGrammar">
+                        <i class="bi bi-arrow-repeat"></i> Apply Grammar
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <textarea @bind="grammarText" @bind:event="oninput"
+                              class="form-control live-editor-grammar"
+                              rows="10" spellcheck="false"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.live-editor {
+    padding: 1rem;
+}
+
+.live-editor-source,
+.live-editor-grammar {
+    border: none;
+    resize: none;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.token-preview {
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.token-value {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.live-editor .list-unstyled li {
+    margin-bottom: 0.25rem;
+}
+</style>
+
+@code {
+    private const int TokenPreviewCount = 40;
+
+    private LiveEditorSession session = null!;
+    private string warning = string.Empty;
+    private double? lastLatencyMicroseconds;
+    private LatencySummary latencySummary;
+
+    private string sourceText = @"# A small C#-like sample: type below and watch tokens update incrementally.
+public class Greeter
+{
+    private const string Prefix = ""Hello, "";
+    private int[] counts = { 1, 2 };
+
+    public string Greet(string name)
+    {
+        var message = Prefix + name;
+        counts[0] += 1; # trailing comment
+        return message;
+    }
+}
+";
+
+    private string grammarText = LiveEditorGrammars.CSharpLike;
+
+    protected override void OnInitialized()
+    {
+        session = new LiveEditorSession(grammarText);
+        session.Open(sourceText);
+        latencySummary = LatencySummary.From(session.Latency);
+    }
+
+    private IEnumerable<(int Index, StepToken Token)> TokenPreview =>
+        session.Session.Tokens
+            .Take(TokenPreviewCount)
+            .Select((token, index) => (Index: index, Token: token));
+
+    private void OnSourceInput(ChangeEventArgs e)
+    {
+        var newText = e.Value?.ToString() ?? string.Empty;
+
+        try
+        {
+            var latency = session.OnTextChange(newText);
+            if (latency is not null)
+            {
+                sourceText = session.Text;
+                lastLatencyMicroseconds = latency.Value.TotalMicroseconds;
+                latencySummary = LatencySummary.From(session.Latency);
+            }
+        }
+        catch (NotSupportedException)
+        {
+            // Non-ASCII input: reject the edit and revert the textarea by
+            // leaving sourceText unchanged; the next render restores it.
+            warning = "Only ASCII text is supported by the incremental session; the edit was rejected.";
+        }
+    }
+
+    private void SetMode(LiveEditingMode mode)
+    {
+        session.Mode = mode;
+    }
+
+    private void ApplyGrammar()
+    {
+        try
+        {
+            var candidate = new LiveEditorSession(grammarText);
+            candidate.Open(sourceText);
+            session = candidate;
+            lastLatencyMicroseconds = null;
+            latencySummary = LatencySummary.From(session.Latency);
+            warning = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            warning = $"The grammar could not be loaded: {ex.Message}";
+        }
+    }
+
+    private void DismissWarning()
+    {
+        warning = string.Empty;
+    }
+
+    private string PreviewText(string value) => value.Length <= 40 ? value : value[..37] + "...";
+
+    private string FormatMicros(double? microseconds)
+    {
+        if (microseconds is null)
+        {
+            return "-";
+        }
+
+        return microseconds.Value >= 1000
+            ? $"{microseconds.Value / 1000:F2} ms"
+            : $"{microseconds.Value:F1} us";
+    }
+}

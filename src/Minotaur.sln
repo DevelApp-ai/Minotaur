@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -11,6 +11,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Tests", "Minotaur.Tests\Minotaur.Tests.csproj", "{EC2949FF-CFF7-430F-B27E-427A08EF94D2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Demo", "Minotaur.Demo\Minotaur.Demo.csproj", "{4863017D-411F-4F41-8BAC-03EA17DF696A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.LiveEditing", "Minotaur.Benchmarks.LiveEditing\Minotaur.Benchmarks.LiveEditing.csproj", "{CF279947-5D5F-48DF-992B-820570F9D9DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,5 +43,9 @@ Global
 		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF279947-5D5F-48DF-992B-820570F9D9DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF279947-5D5F-48DF-992B-820570F9D9DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF279947-5D5F-48DF-992B-820570F9D9DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF279947-5D5F-48DF-992B-820570F9D9DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
