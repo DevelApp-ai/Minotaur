@@ -159,7 +159,7 @@ public class LatencyRecorderTests
         var recorder = new LatencyRecorder();
         for (var i = 1; i <= 10; i++)
         {
-            recorder.AddMicroseconds(i * 10);
+            recorder.AddMicroseconds(i * 10.0);
         }
 
         var summary = LatencySummary.From(recorder);

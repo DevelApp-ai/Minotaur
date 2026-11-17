@@ -191,10 +191,12 @@ ScenarioResult RunScenario(LiveEditingMode mode, List<string> versions)
     {
         if (i == WarmupEdits + 1)
         {
-            // Measured window starts after JIT warm-up.
-            GC.Collect();
+            // Measured window starts after JIT warm-up. The explicit collects
+            // are deliberate benchmarking practice (stable allocation-delta
+            // baseline), so suppress the CodeQL quality alerts on them.
+            GC.Collect(); // lgtm[cs/call-to-gc-collect]
             GC.WaitForPendingFinalizers();
-            GC.Collect();
+            GC.Collect(); // lgtm[cs/call-to-gc-collect]
             allocatedBefore = GC.GetTotalAllocatedBytes(precise: true);
             cpuBeforeMs = process.TotalProcessorTime.TotalMilliseconds;
         }
