@@ -65,8 +65,8 @@ public sealed class LabyrinthTargetGrammarOverlayTests
         // spot-check a few languages across the alphabet
         Assert.Contains("programming-languages/c17", dirs);
         Assert.Contains("programming-languages/csharp10", dirs);
-        Assert.Contains("programming-languages/kotlin", dirs);
-        Assert.Contains("programming-languages/swift", dirs);
+        Assert.Contains("programming-languages/kotlin001", dirs);
+        Assert.Contains("programming-languages/swift001", dirs);
         Assert.Contains("programming-languages/xml", dirs);
     }
 

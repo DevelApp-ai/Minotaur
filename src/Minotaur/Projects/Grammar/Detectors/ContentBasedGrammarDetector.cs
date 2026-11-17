@@ -56,14 +56,14 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         {
             Name = "typescript-interface",
             Pattern = @"^\s*(?:export\s+)?interface\s+\w+",
-            Mapping = new GrammarMapping { Grammar = "TypeScript.grammar", Version = "4.9", Confidence = 0.95 },
+            Mapping = new GrammarMapping { Grammar = "TypeScript001.grammar", Version = "4.9", Confidence = 0.95 },
             Priority = 10
         },
         new ContentDetectionRule
         {
             Name = "typescript-type",
             Pattern = @"^\s*(?:export\s+)?type\s+\w+\s*=",
-            Mapping = new GrammarMapping { Grammar = "TypeScript.grammar", Version = "4.9", Confidence = 0.9 },
+            Mapping = new GrammarMapping { Grammar = "TypeScript001.grammar", Version = "4.9", Confidence = 0.9 },
             Priority = 9
         },
         new ContentDetectionRule
@@ -77,7 +77,7 @@ public partial class ContentBasedGrammarDetector : IGrammarDetector
         {
             Name = "commonjs-require",
             Pattern = @"^\s*(?:const|var|let)\s+.*\s*=\s*require\s*\(",
-            Mapping = new GrammarMapping { Grammar = "JavaScript.grammar", Confidence = 0.7 },
+            Mapping = new GrammarMapping { Grammar = "JavaScript001.grammar", Confidence = 0.7 },
             Priority = 6
         },
 

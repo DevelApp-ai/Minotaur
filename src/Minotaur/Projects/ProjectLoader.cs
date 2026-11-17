@@ -40,8 +40,8 @@ public class ProjectLoader : IProjectLoader
     private static readonly Dictionary<string, string> FileExtensionToGrammar = new()
     {
         { ".cs", "CSharp10.grammar" },
-        { ".vb", "VisualBasic.grammar" },
-        { ".fs", "FSharp.grammar" },
+        { ".vb", "VisualBasic001.grammar" },
+        { ".fs", "FSharp001.grammar" },
         { ".razor", "HTMLEmbedded.grammar" },
         { ".cshtml", "HTMLEmbedded.grammar" },
         { ".xaml", "XAML.grammar" },
@@ -49,7 +49,7 @@ public class ProjectLoader : IProjectLoader
         { ".xml", "XML.grammar" },
         { ".config", "XML.grammar" },
         { ".js", "JavaScriptES2022.grammar" },
-        { ".ts", "TypeScript.grammar" },
+        { ".ts", "TypeScript001.grammar" },
         { ".py", "Python311.grammar" },
         { ".java", "Java17.grammar" },
         { ".cpp", "Cpp20.grammar" },
