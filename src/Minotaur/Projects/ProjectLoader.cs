@@ -83,7 +83,7 @@ public class ProjectLoader : IProjectLoader
         var dependencies = new List<ProjectDependency>();
 
         // Parse solution file using DotNetProject grammar (placeholder - actual implementation would use StepParser)
-        // var solutionGraph = await _stepParser.ParseTextAsync(solutionContent, "DotNetProject.grammar");
+        // var solutionGraph = await _stepParser.ParseTextAsync(solutionContent, "DotNetProject001.grammar");
         var solutionGraph = new object(); // Placeholder
 
         // Extract project references from solution
@@ -124,7 +124,7 @@ public class ProjectLoader : IProjectLoader
         var configFiles = new List<ConfigurationFile>();
 
         // Parse project file (placeholder - actual implementation would use StepParser)
-        // var projectGraph = await _stepParser.ParseTextAsync(projectContent, "DotNetProject.grammar");
+        // var projectGraph = await _stepParser.ParseTextAsync(projectContent, "DotNetProject001.grammar");
         var projectGraph = new object(); // Placeholder
 
         // Extract file references from project

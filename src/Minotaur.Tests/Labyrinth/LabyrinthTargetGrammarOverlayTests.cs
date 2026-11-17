@@ -57,11 +57,11 @@ public sealed class LabyrinthTargetGrammarOverlayTests
         var dirs = Minotaur.Labyrinth.LabyrinthTargetGrammars.All.Select(t => t.Directory).ToList();
         Assert.Equal(36, dirs.Count);
         Assert.All(dirs, d => Assert.StartsWith("programming-languages/", d));
-        Assert.DoesNotContain(dirs, d => d.EndsWith("extensionfile"));
-        Assert.DoesNotContain(dirs, d => d.EndsWith("folderproject"));
-        Assert.DoesNotContain(dirs, d => d.EndsWith("grammarfile"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("extensionfile001"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("folderproject001"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("grammarfile001"));
         Assert.DoesNotContain(dirs, d => d.EndsWith("sample"));
-        Assert.DoesNotContain(dirs, d => d.EndsWith("dotnetproject"));
+        Assert.DoesNotContain(dirs, d => d.EndsWith("dotnetproject001"));
         // spot-check a few languages across the alphabet
         Assert.Contains("programming-languages/c17", dirs);
         Assert.Contains("programming-languages/csharp10", dirs);
