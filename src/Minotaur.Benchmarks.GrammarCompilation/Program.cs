@@ -50,6 +50,10 @@ using Minotaur.GrammarGeneration;
 // Grammar source: MINOTAUR_GRAMMARS_DIR points at a local checkout of the
 // pinned Minotaur-Grammars ref; without it the harness downloads from
 // raw.githubusercontent.com at the pinned ref (recorded in the results).
+//
+// Timings are recorded, never asserted: re-running the harness regenerates
+// docs/measurements/issue-126 (results.json + RESULTS.md) on the current
+// machine; the committed artifacts document the recorded run.
 // ---------------------------------------------------------------------------
 
 const string GrammarsRepo = "DevelApp-ai/Minotaur-Grammars";
