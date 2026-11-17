@@ -109,9 +109,10 @@ public class GrammarGenerator
     {
         var sb = new StringBuilder();
 
-        // Header
+        // Header (TokenSplitter omitted: the header is dead - neither the
+        // StepParser engine nor Minotaur's parser consumes it, and all
+        // grammar files had it removed from Minotaur-Grammars)
         sb.AppendLine($"Grammar: {grammar.Name}");
-        sb.AppendLine("TokenSplitter: Space");
         sb.AppendLine("FormatType: EBNF");
         sb.AppendLine();
 
