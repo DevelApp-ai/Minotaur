@@ -64,7 +64,7 @@
       <LabyrinthTargetGrammar Include="programming-languages/kotlin" MainFile="Kotlin.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/lua" MainFile="Lua.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/perl" MainFile="Perl.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/php" MainFile="PHP.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/php85" MainFile="PHP85.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/pl1" MainFile="PL1.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/python311" MainFile="Python311.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/r" MainFile="RLang.grammar" />

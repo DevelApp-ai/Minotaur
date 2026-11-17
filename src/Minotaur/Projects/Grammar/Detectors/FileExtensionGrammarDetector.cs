@@ -58,7 +58,7 @@ public class FileExtensionGrammarDetector : IGrammarDetector
         { ".scss", new GrammarMapping { Grammar = "CSS.grammar", Confidence = 0.7 } },
         { ".sass", new GrammarMapping { Grammar = "CSS.grammar", Confidence = 0.7 } },
         { ".less", new GrammarMapping { Grammar = "CSS.grammar", Confidence = 0.7 } },
-        { ".sql", new GrammarMapping { Grammar = "SQL.grammar", Confidence = 0.8 } }
+        { ".sql", new GrammarMapping { Grammar = "SQL2023.grammar", Confidence = 0.8 } }
     };
 
     private static readonly object _extensionMappingsLock = new();

@@ -60,7 +60,7 @@ public static class LabyrinthTargetGrammars
         new() { Directory = "programming-languages/kotlin", MainFile = "Kotlin.grammar" },
         new() { Directory = "programming-languages/lua", MainFile = "Lua.grammar" },
         new() { Directory = "programming-languages/perl", MainFile = "Perl.grammar" },
-        new() { Directory = "programming-languages/php", MainFile = "PHP.grammar" },
+        new() { Directory = "programming-languages/php85", MainFile = "PHP85.grammar" },
         new() { Directory = "programming-languages/pl1", MainFile = "PL1.grammar" },
         new() { Directory = "programming-languages/python311", MainFile = "Python311.grammar" },
         new() { Directory = "programming-languages/r", MainFile = "RLang.grammar" },
