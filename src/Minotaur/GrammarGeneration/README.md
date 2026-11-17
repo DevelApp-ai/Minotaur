@@ -131,7 +131,6 @@ The system generates grammar files that comply with the Grammar File Creation Gu
 
 ```
 Grammar: MyLanguage
-TokenSplitter: Space
 FormatType: EBNF
 
 /*

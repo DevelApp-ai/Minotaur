@@ -16,7 +16,6 @@ public sealed class LabyrinthDynamicLinqConditionTests
 
     private const string TestGrammar = """
         Grammar: TestLang
-        TokenSplitter: Space
         FormatType: EBNF
 
         <WS> ::= /[ \t\r\n]+/ => { skip(); }

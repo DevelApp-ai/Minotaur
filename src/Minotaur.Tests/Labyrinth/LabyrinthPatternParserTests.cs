@@ -21,7 +21,6 @@ public sealed class LabyrinthPatternParserTests
     /// </summary>
     private const string TestGrammar = """
         Grammar: TestLang
-        TokenSplitter: Space
         FormatType: EBNF
         <WS> ::= /[ \t\r\n]+/ => { skip(); }
         <IDENTIFIER> ::= /[a-zA-Z][a-zA-Z0-9]*/
