@@ -1,9 +1,9 @@
 {
   "SbobIrVersion": 1,
-  "BehaviorHash": "3c9f5101e7da24ed6d16d4ef923775306ac60b159b77845d19d0968ad13180ef",
-  "FilesAnalyzed": 153,
-  "TestFiles": 50,
-  "TestEntries": 702,
+  "BehaviorHash": "669f7124c42c814fd80f9ed8d724076416bd12607b28ab9533f2c24fa851f174",
+  "FilesAnalyzed": 155,
+  "TestFiles": 51,
+  "TestEntries": 716,
   "Quarantined": [
     {
       "Primitive": "Open",
@@ -5754,6 +5754,216 @@
       "TestId": "Minotaur.Tests.GrammarGeneration.GrammarModelsTests.GrammarGenerationProgress_Properties_CanBeSet"
     },
     {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 41,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Classifies_RegexAndLiteralRules_AsTokenRules"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 42,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Classifies_RegexAndLiteralRules_AsTokenRules"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 43,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Classifies_RegexAndLiteralRules_AsTokenRules"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 56,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SameNamedRules_CollapseToOneDistinctTokenType"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 57,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SameNamedRules_CollapseToOneDistinctTokenType"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 70,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Classifies_RuleReferencesAndKeywords_AsProductionRules"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 71,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Classifies_RuleReferencesAndKeywords_AsProductionRules"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 90,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SplitsMixedGrammar_IntoTokenAndProductionCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 91,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SplitsMixedGrammar_IntoTokenAndProductionCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 92,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SplitsMixedGrammar_IntoTokenAndProductionCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 93,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SplitsMixedGrammar_IntoTokenAndProductionCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 94,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SplitsMixedGrammar_IntoTokenAndProductionCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 111,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Skips_BlockCommentsAndHashComments"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 112,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Skips_BlockCommentsAndHashComments"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 125,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_RegexPatternWithHexEscapedSlash_IsNotTreatedAsCommentOrFragment"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 126,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_RegexPatternWithHexEscapedSlash_IsNotTreatedAsCommentOrFragment"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 142,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Strips_TrailingRuleTerminators"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 143,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Strips_TrailingRuleTerminators"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 144,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_Strips_TrailingRuleTerminators"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 152,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_EmptyGrammar_ReturnsZeroCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 153,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_EmptyGrammar_ReturnsZeroCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 154,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_EmptyGrammar_ReturnsZeroCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 155,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_EmptyGrammar_ReturnsZeroCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 156,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_EmptyGrammar_ReturnsZeroCounts"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 166,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_KeywordsHeader_IgnoresEmptyEntries"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 178,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SingleQuotedLiteral_IsTokenRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 179,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_SingleQuotedLiteral_IsTokenRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 194,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_QuotedPairWrappingRuleReferences_IsProductionRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 195,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_QuotedPairWrappingRuleReferences_IsProductionRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 208,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_RegexAlternation_IsProductionRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 209,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_RegexAlternation_IsProductionRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 221,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_LiteralAlternation_IsProductionRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 222,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_LiteralAlternation_IsProductionRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 235,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_QuotedLiteralWithSpacesAndBrackets_IsTokenRule"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/GrammarGeneration/GrammarProfileTests.cs",
+      "Line": 236,
+      "TestId": "Minotaur.Tests.GrammarGeneration.GrammarProfileTests.Analyze_QuotedLiteralWithSpacesAndBrackets_IsTokenRule"
+    },
+    {
       "Description": "harness API: .CreateValidGrammar",
       "File": "src/Minotaur.Tests/GrammarGeneration/GrammarValidatorTests.cs",
       "Line": 40,
@@ -8880,12 +9090,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.SourceCondition_FiltersSourceIdentification"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
-      "Line": 211,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.SourceCondition_FiltersSourceIdentification"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
       "Line": 211,
@@ -8985,12 +9189,6 @@
       "Description": "harness API: graph.Connect",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
       "Line": 238,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.SinkCondition_FiltersSinkConfirmation"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
-      "Line": 240,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.SinkCondition_FiltersSinkConfirmation"
     },
     {
@@ -9114,12 +9312,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.SanitizerCondition_SanitizesOnlyWhenConditionHolds"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
-      "Line": 274,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.SanitizerCondition_SanitizesOnlyWhenConditionHolds"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
       "Line": 274,
@@ -9216,12 +9408,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.PropagatorCondition_GatesTaintTransfer"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
-      "Line": 308,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.PropagatorCondition_GatesTaintTransfer"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
       "Line": 308,
@@ -9315,12 +9501,6 @@
       "Description": "harness API: graph.Connect",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
       "Line": 337,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.PropagatorCondition_False_NoTransferNoFinding"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthDynamicLinqConditionTests.cs",
-      "Line": 339,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthDynamicLinqConditionTests.PropagatorCondition_False_NoTransferNoFinding"
     },
     {
@@ -12822,12 +13002,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.DirectSourceToSink_ProducesFinding_WithFullPath"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 100,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.DirectSourceToSink_ProducesFinding_WithFullPath"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 100,
@@ -12948,12 +13122,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.PropagationThroughIntermediateNodes_ReachesSink"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 128,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.PropagationThroughIntermediateNodes_ReachesSink"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 128,
@@ -13005,12 +13173,6 @@
       "Description": "harness API: .LabyrinthDataFlowGraph",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 142,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.NoSourceMatch_NoFindings"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 144,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.NoSourceMatch_NoFindings"
     },
     {
@@ -13077,12 +13239,6 @@
       "Description": "harness API: .LabyrinthDataFlowGraph",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 165,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.Sanitizer_PrunesTraversal_NoFinding"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 169,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.Sanitizer_PrunesTraversal_NoFinding"
     },
     {
@@ -13167,12 +13323,6 @@
       "Description": "harness API: graph.Connect",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 200,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.Propagator_TransfersTaintToTarget"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 202,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.Propagator_TransfersTaintToTarget"
     },
     {
@@ -13266,12 +13416,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.SinkUnification_DifferentNode_NoFinding"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 233,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.SinkUnification_DifferentNode_NoFinding"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 233,
@@ -13353,12 +13497,6 @@
       "Description": "harness API: .LabyrinthDataFlowGraph",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 256,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.CycleInDataFlow_TerminatesAndReachesSink"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 262,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.CycleInDataFlow_TerminatesAndReachesSink"
     },
     {
@@ -13458,12 +13596,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.DiamondFlow_ShortestPathReportedOnce"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 288,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.DiamondFlow_ShortestPathReportedOnce"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 288,
@@ -13536,12 +13668,6 @@
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.InterproceduralEdges_FlowAcrossFunctionBoundary"
     },
     {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 317,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.InterproceduralEdges_FlowAcrossFunctionBoundary"
-    },
-    {
       "Description": "harness API: .LabyrinthTaintEngine",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 317,
@@ -13605,12 +13731,6 @@
       "Description": "harness API: Assert.Throws",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 340,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.Cancellation_ThrowsOperationCanceled"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 341,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.Cancellation_ThrowsOperationCanceled"
     },
     {
@@ -13729,12 +13849,6 @@
     },
     {
       "Description": "harness API: Task.Run",
-      "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
-      "Line": 384,
-      "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.LargeGraph_TerminatesPromptly_WithBoundedAllocations"
-    },
-    {
-      "Description": "harness API: LabyrinthTaintEngine.Analyze",
       "File": "src/Minotaur.Tests/Labyrinth/LabyrinthTaintEngineTests.cs",
       "Line": 384,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthTaintEngineTests.LargeGraph_TerminatesPromptly_WithBoundedAllocations"
