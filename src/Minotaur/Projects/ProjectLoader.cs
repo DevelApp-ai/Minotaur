@@ -40,8 +40,8 @@ public class ProjectLoader : IProjectLoader
     private static readonly Dictionary<string, string> FileExtensionToGrammar = new()
     {
         { ".cs", "CSharp10.grammar" },
-        { ".vb", "VisualBasic001.grammar" },
-        { ".fs", "FSharp001.grammar" },
+        { ".vb", "VisualBasic.grammar" },
+        { ".fs", "FSharp.grammar" },
         { ".razor", "HTMLEmbedded.grammar" },
         { ".cshtml", "HTMLEmbedded.grammar" },
         { ".xaml", "XAML.grammar" },
@@ -49,7 +49,7 @@ public class ProjectLoader : IProjectLoader
         { ".xml", "XML.grammar" },
         { ".config", "XML.grammar" },
         { ".js", "JavaScriptES2022.grammar" },
-        { ".ts", "TypeScript001.grammar" },
+        { ".ts", "TypeScript.grammar" },
         { ".py", "Python311.grammar" },
         { ".java", "Java17.grammar" },
         { ".cpp", "Cpp20.grammar" },
@@ -83,7 +83,7 @@ public class ProjectLoader : IProjectLoader
         var dependencies = new List<ProjectDependency>();
 
         // Parse solution file using DotNetProject grammar (placeholder - actual implementation would use StepParser)
-        // var solutionGraph = await _stepParser.ParseTextAsync(solutionContent, "DotNetProject.grammar");
+        // var solutionGraph = await _stepParser.ParseTextAsync(solutionContent, "DotNetProject001.grammar");
         var solutionGraph = new object(); // Placeholder
 
         // Extract project references from solution
@@ -124,7 +124,7 @@ public class ProjectLoader : IProjectLoader
         var configFiles = new List<ConfigurationFile>();
 
         // Parse project file (placeholder - actual implementation would use StepParser)
-        // var projectGraph = await _stepParser.ParseTextAsync(projectContent, "DotNetProject.grammar");
+        // var projectGraph = await _stepParser.ParseTextAsync(projectContent, "DotNetProject001.grammar");
         var projectGraph = new object(); // Placeholder
 
         // Extract file references from project

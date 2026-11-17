@@ -42,38 +42,38 @@
     -->
     <ItemGroup>
       <LabyrinthTargetGrammar Include="programming-languages/c17" MainFile="C17.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/classicasp001" MainFile="ClassicASP001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/clojure001" MainFile="Clojure001.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/classicasp" MainFile="ClassicASP.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/clojure" MainFile="Clojure.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/cobol2023" MainFile="COBOL2023.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/cpp20" MainFile="Cpp20.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/csharp10" MainFile="CSharp10.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/css" MainFile="CSS.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/dart001" MainFile="Dart001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/elixir001" MainFile="Elixir001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/erlang001" MainFile="Erlang001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/fsharp001" MainFile="FSharp001.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/dart" MainFile="Dart.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/elixir" MainFile="Elixir.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/erlang" MainFile="Erlang.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/fsharp" MainFile="FSharp.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/go119" MainFile="Go119.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/haskell001" MainFile="Haskell001.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/haskell" MainFile="Haskell.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/htmlembedded" MainFile="HTMLEmbedded.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/java8" MainFile="Java8.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/java17" MainFile="Java17.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/javascript001" MainFile="JavaScript001.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/javascript" MainFile="JavaScript.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/javascriptes2022" MainFile="JavaScriptES2022.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/json" MainFile="JSON.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/jsonschema" MainFile="JSONSchema.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/kotlin001" MainFile="Kotlin001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/lua001" MainFile="Lua001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/perl001" MainFile="Perl001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/php001" MainFile="PHP001.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/kotlin" MainFile="Kotlin.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/lua" MainFile="Lua.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/perl" MainFile="Perl.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/php" MainFile="PHP.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/pl1" MainFile="PL1.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/python311" MainFile="Python311.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/r001" MainFile="RLang001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/ruby001" MainFile="Ruby001.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/r" MainFile="RLang.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/ruby" MainFile="Ruby.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/rust2021" MainFile="Rust2021.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/scala001" MainFile="Scala001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/swift001" MainFile="Swift001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/typescript001" MainFile="TypeScript001.grammar" />
-      <LabyrinthTargetGrammar Include="programming-languages/visualbasic001" MainFile="VisualBasic001.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/scala" MainFile="Scala.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/swift" MainFile="Swift.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/typescript" MainFile="TypeScript.grammar" />
+      <LabyrinthTargetGrammar Include="programming-languages/visualbasic" MainFile="VisualBasic.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/webassembly20" MainFile="WebAssembly20.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/xaml" MainFile="XAML.grammar" />
       <LabyrinthTargetGrammar Include="programming-languages/xml" MainFile="XML.grammar" />
