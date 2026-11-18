@@ -65,6 +65,11 @@ var report = new JsonObject
         ["os"] = RuntimeInformation.OSDescription,
         ["processArchitecture"] = RuntimeInformation.ProcessArchitecture.ToString(),
         ["processorCount"] = Environment.ProcessorCount,
+        ["engine"] = new JsonObject
+        {
+            ["develapp.steplexer"] = EngineAssemblyVersion("DevelApp.StepLexer"),
+            ["develapp.stepparser"] = EngineAssemblyVersion("DevelApp.StepParser"),
+        },
     },
     ["scenarios"] = new JsonArray(),
 };
@@ -155,7 +160,7 @@ foreach (var key in orderedKeys)
 }
 
 File.WriteAllText(Path.Combine(outputDir, "results.json"), report.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
-File.WriteAllText(Path.Combine(outputDir, "RESULTS.md"), BuildResultsMarkdown(markdownRows));
+File.WriteAllText(Path.Combine(outputDir, "RESULTS.md"), BuildResultsMarkdown(markdownRows, report));
 File.Delete(checkpointPath);
 Console.WriteLine();
 Console.WriteLine($"Wrote {Path.Combine(outputDir, "results.json")} and RESULTS.md");
@@ -407,7 +412,7 @@ static string ApplyNextEdit(string text, int editKind, Random rng, int editIndex
     }
 }
 
-static string BuildResultsMarkdown(List<string> rows)
+static string BuildResultsMarkdown(List<string> rows, JsonObject report)
 {
     var sb = new StringBuilder();
     sb.AppendLine("# Live editing latency measurements (Minotaur issue #196)");
@@ -418,6 +423,10 @@ static string BuildResultsMarkdown(List<string> rows)
     sb.AppendLine("measured edits per scenario. Identical edit streams are applied to both modes.");
     sb.AppendLine();
     sb.AppendLine("Raw per-edit microsecond samples: `results.json`.");
+    sb.AppendLine();
+    sb.AppendLine("Engine: DevelApp.StepLexer `" + report["environment"]!["engine"]!["develapp.steplexer"]!.GetValue<string>()
+        + "` / DevelApp.StepParser `" + report["environment"]!["engine"]!["develapp.stepparser"]!.GetValue<string>()
+        + "` (the C#-process target the session provides).");
     sb.AppendLine();
     sb.AppendLine("| Corpus (lines) | Edit type | Inc p50 | Inc p95 | Inc p99 | Full p50 | Full p95 | Full p99 | p50 speedup | Mean reuse | Inc alloc (MB) | Full alloc (MB) | Inc CPU (ms) | Full CPU (ms) |");
     sb.AppendLine("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
@@ -438,6 +447,22 @@ static string BuildResultsMarkdown(List<string> rows)
     sb.AppendLine("  `TextEditCalculator` enforces the ASCII assumption.");
     sb.AppendLine();
     return sb.ToString();
+}
+
+
+static string EngineAssemblyVersion(string assemblyName)
+{
+    try
+    {
+        var loaded = AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName, StringComparison.OrdinalIgnoreCase))
+            ?? System.Reflection.Assembly.Load(assemblyName);
+        return loaded.GetName().Version?.ToString() ?? "0.0.0";
+    }
+    catch
+    {
+        return "unrecorded";
+    }
 }
 
 // ------------------------- record -------------------------
