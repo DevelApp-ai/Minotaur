@@ -1,10 +1,18 @@
 {
   "SbobIrVersion": 1,
-  "BehaviorHash": "1d410e9a8afd92b53d15e9a4327a4d469ee71915023ca9c9ae5d23f0cb847a45",
-  "FilesAnalyzed": 155,
-  "TestFiles": 51,
-  "TestEntries": 716,
+  "BehaviorHash": "475eb5953fa62839db939d29e12daf0f310a26897a4a9b7603994e03572bb745",
+  "FilesAnalyzed": 157,
+  "TestFiles": 53,
+  "TestEntries": 732,
   "Quarantined": [
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 197,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte",
+      "Rule": "dotnet.file.readalltext"
+    },
     {
       "Primitive": "Open",
       "Reason": "open path is an identifier, not a constant literal",
@@ -332,6 +340,14 @@
       "Line": 290,
       "TestId": "Minotaur.Tests.Labyrinth.LabyrinthReportingTests.RulePack_LoadDirectory_MergesValidPack",
       "Rule": "dotnet.file.writealltext"
+    },
+    {
+      "Primitive": "Open",
+      "Reason": "open path is an identifier, not a constant literal",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 63,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits",
+      "Rule": "dotnet.file.readalltextasync"
     },
     {
       "Primitive": "Open",
@@ -1971,6 +1987,624 @@
       "Description": "test helper (not an entry method): .TestCase",
       "File": "src/Minotaur.Tests/Analysis/Symbolic/SymbolicAnalysisEngineTests.cs",
       "Line": 297,
+      "TestId": ""
+    },
+    {
+      "Description": "harness API: .AssertMinotaurAccepts",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 47,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurConfigGrammar_ParsesCorpusDocuments_WithFullConsumption"
+    },
+    {
+      "Description": "harness API: .AssertMinotaurAccepts",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 53,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurQueryGrammar_ParsesCorpusDocuments_WithFullConsumption"
+    },
+    {
+      "Description": "harness API: .AssertMinotaurAccepts",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 59,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurTemplateGrammar_ParsesCorpusDocuments_WithFullConsumption"
+    },
+    {
+      "Description": "harness API: Assert.IsFalse",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 69,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurConfigGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: .ParseMinotaurValid",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 69,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurConfigGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: Assert.IsFalse",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 72,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurConfigGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: .ParseMinotaurValid",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 72,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurConfigGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: Assert.IsFalse",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 82,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurQueryGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: .ParseMinotaurValid",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 82,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurQueryGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: Assert.IsFalse",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 90,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurTemplateGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: .ParseMinotaurValid",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 90,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.MinotaurTemplateGrammar_RejectsGarbage"
+    },
+    {
+      "Description": "harness API: .HandWrittenConfigParser",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 102,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenConfigParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Corpus.Document",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 105,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenConfigParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 106,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenConfigParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: .HandWrittenQueryParser",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 113,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenQueryParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 116,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenQueryParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Corpus.Document",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 116,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenQueryParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: .HandWrittenTemplateParser",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 124,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenTemplateParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 127,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenTemplateParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Corpus.Document",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 127,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.HandWrittenTemplateParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 141,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrConfigParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: .CountAntlrErrorsConfig",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 141,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrConfigParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Corpus.Document",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 141,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrConfigParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 151,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrQueryParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: .CountAntlrErrorsQuery",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 151,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrQueryParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Corpus.Document",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 151,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrQueryParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 161,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrTemplateParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: .CountAntlrErrorsTemplate",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 161,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrTemplateParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Corpus.Document",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 161,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrTemplateParser_AcceptsCorpusDocuments"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 170,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrQueryParser_RejectsMalformedStatement"
+    },
+    {
+      "Description": "harness API: .CountAntlrErrorsQuery",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 170,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrQueryParser_RejectsMalformedStatement"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 175,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrQueryParser_RejectsMalformedStatement"
+    },
+    {
+      "Description": "harness API: .CountAntlrErrorsQuery",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 175,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.AntlrQueryParser_RejectsMalformedStatement"
+    },
+    {
+      "Description": "harness API: Path.Join",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 187,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: .FindRepoRoot",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 187,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 188,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: Directory.Exists",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 188,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: Path.Join",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 195,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 196,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: File.Exists",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 196,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: Corpus.Render",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 198,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: .ParseDsl",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 198,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: .ParseSize",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 198,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 199,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_CommittedFiles_MatchGeneratorByteForByte"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 209,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: .Lines",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 209,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 210,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: .Lines",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 210,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 211,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: .Lines",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 211,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 216,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: .Lines",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 216,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 217,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: .Lines",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 217,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: Assert.AreEqual",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 218,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "harness API: .Lines",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 218,
+      "TestId": "Minotaur.Tests.Benchmarks.ParserRuntimeBenchmarkTests.Corpus_MeetsLineCountTargets"
+    },
+    {
+      "Description": "test helper (not an entry method): Assert.IsTrue",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 230,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .ParseMinotaurValid",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 230,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Corpus.Document",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 230,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .RealTimeParserSession",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 244,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): session.Initialize",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 245,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): session.Parse",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 246,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .LastOrDefault",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 247,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): document.TrimEnd",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 249,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .ConfigDslLexer",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 259,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .AntlrInputStream",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 259,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): lexer.RemoveErrorListeners",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 260,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .CountingErrorListener",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 261,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): lexer.AddErrorListener",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 262,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .ConfigDslParser",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 263,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .CommonTokenStream",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 263,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): parser.RemoveErrorListeners",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 264,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): parser.config_file",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 265,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .QueryDslLexer",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 271,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .AntlrInputStream",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 271,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): lexer.RemoveErrorListeners",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 272,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .CountingErrorListener",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 273,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): lexer.AddErrorListener",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 274,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .QueryDslParser",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 275,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .CommonTokenStream",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 275,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): parser.RemoveErrorListeners",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 276,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): parser.query",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 277,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .TemplateDslLexer",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 283,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .AntlrInputStream",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 283,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): lexer.RemoveErrorListeners",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 284,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .CountingErrorListener",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 285,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): lexer.AddErrorListener",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 286,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .TemplateDslParser",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 287,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .CommonTokenStream",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 287,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): parser.RemoveErrorListeners",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 288,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): parser.template",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 289,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Corpus.CountLines",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 294,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Corpus.Render",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 294,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .nameof",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 301,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .ArgumentOutOfRangeException",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 301,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .nameof",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 309,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .ArgumentOutOfRangeException",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 309,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .DirectoryInfo",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 314,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Directory.Exists",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 317,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Path.Join",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 317,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Directory.Exists",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 318,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Path.Join",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 318,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): .InvalidOperationException",
+      "File": "src/Minotaur.Tests/Benchmarks/ParserRuntimeBenchmarkTests.cs",
+      "Line": 326,
       "TestId": ""
     },
     {
@@ -14439,6 +15073,276 @@
       "Description": "test helper (not an entry method): .CreatePerformanceMetrics",
       "File": "src/Minotaur.Tests/Learning/LearningTypesTests.cs",
       "Line": 177,
+      "TestId": ""
+    },
+    {
+      "Description": "harness API: Environment.GetEnvironmentVariable",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 34,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: string.IsNullOrWhiteSpace",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 35,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Path.GetFullPath",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 41,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: OrderBy.ToArray",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 42,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Where.OrderBy",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 42,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: GetFiles.Where",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 42,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Directory.GetFiles",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 42,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: p.Replace",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 44,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.NotEmpty",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 47,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: .JsonSerializerOptions",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 50,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: .FlexibleDependenciesConverter",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 51,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: .GrammarPackageExporter",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 53,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Path.GetDirectoryName",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 57,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Path.GetRelativePath",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 58,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: JsonSerializer.Deserialize",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 62,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.NotNull",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 64,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.False",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 65,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: string.IsNullOrWhiteSpace",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 65,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.False",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 66,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: string.IsNullOrWhiteSpace",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 66,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.False",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 67,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: string.IsNullOrWhiteSpace",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 67,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.False",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 68,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: string.IsNullOrWhiteSpace",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 68,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.False",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 69,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: string.IsNullOrWhiteSpace",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 69,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.True",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 72,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: File.Exists",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 72,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Path.Combine",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 72,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: exporter.ExportGrammarPackageAsync",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 76,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.True",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 77,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: .ReadAllAsync",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 80,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: .ReadTarEntryNames",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 81,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "harness API: Assert.True",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 93,
+      "TestId": "Minotaur.Tests.Marketplace.MarketplacePackageSmokeTests.EveryRepoGrammar_PackagesWithoutManualEdits"
+    },
+    {
+      "Description": "test helper (not an entry method): .MemoryStream",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 98,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): stream.CopyToAsync",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 99,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): ms.ToArray",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 100,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Array.Copy",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 111,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): header.All",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 112,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Array.IndexOf",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 117,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): names.Add",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 123,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): ASCII.GetString",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 123,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): GetString.TrimEnd",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 124,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): ASCII.GetString",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 124,
+      "TestId": ""
+    },
+    {
+      "Description": "test helper (not an entry method): Convert.ToInt64",
+      "File": "src/Minotaur.Tests/Marketplace/MarketplacePackageSmokeTests.cs",
+      "Line": 125,
       "TestId": ""
     },
     {
