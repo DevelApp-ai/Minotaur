@@ -72,6 +72,7 @@ namespace Minotaur.Core.Services.Marketplace
                 using (var archive = new TarArchive(packageStream, TarArchive.TarArchiveMode.Create))
                 {
                     await AddDirectoryToTarAsync(archive, packageDir, "", cancellationToken);
+                    await archive.WriteEndOfArchiveAsync(cancellationToken);
                 }
 
                 packageStream.Position = 0;
@@ -287,14 +288,63 @@ namespace Minotaur.Core.Services.Marketplace
 
             public async Task WriteEntryAsync(TarEntry entry, bool closeEntry, CancellationToken cancellationToken)
             {
-                // Placeholder - actual implementation would write tar entries
-                using var fileStream = File.OpenRead(entry.FilePath);
-                await fileStream.CopyToAsync(_stream, cancellationToken);
+                // Minimal ustar header (512 bytes): name[100], mode[8],
+                // uid[8], gid[8], size[12] octal, mtime[12], chksum[8],
+                // typeflag[1] '0', magic[6] "ustar\0".
+                var header = new byte[512];
+                var nameBytes = Encoding.ASCII.GetBytes(entry.Name);
+                Array.Copy(nameBytes, 0, header, 0, Math.Min(nameBytes.Length, 100));
+                var info = new FileInfo(entry.FilePath);
+                WriteOctal(header, 100, 8, 0x1A4); // mode 0644
+                WriteOctal(header, 108, 8, 0);     // uid
+                WriteOctal(header, 116, 8, 0);     // gid
+                WriteOctal(header, 124, 12, info.Length);
+                WriteOctal(header, 136, 12, 0);    // mtime (deterministic: 0)
+                header[156] = (byte)'0';           // typeflag: regular file
+                var magic = Encoding.ASCII.GetBytes("ustar\0");
+                Array.Copy(magic, 0, header, 257, 6);
+                // checksum: sum of header bytes with chksum field as spaces
+                Array.Fill(header, (byte)' ', 148, 8);
+                var checksum = 0;
+                foreach (var b in header)
+                {
+                    checksum += b;
+                }
+
+                WriteOctal(header, 148, 8, checksum);
+                await _stream.WriteAsync(header, 0, header.Length, cancellationToken);
+                using (var fileStream = File.OpenRead(entry.FilePath))
+                {
+                    await fileStream.CopyToAsync(_stream, cancellationToken);
+                }
+
+                var padding = (int)((512 - (info.Length % 512)) % 512);
+                if (padding > 0)
+                {
+                    await _stream.WriteAsync(new byte[padding], 0, padding, cancellationToken);
+                }
+            }
+
+            /// <summary>
+            /// Write the two zero blocks that terminate a tar archive.
+            /// </summary>
+            public async Task WriteEndOfArchiveAsync(CancellationToken cancellationToken)
+            {
+                await _stream.WriteAsync(new byte[1024], 0, 1024, cancellationToken);
+            }
+
+            private static void WriteOctal(byte[] header, int offset, int length, long value)
+            {
+                var octal = Convert.ToString(value, 8).PadLeft(length - 1, '0') + "\0";
+                Array.Copy(Encoding.ASCII.GetBytes(octal), 0, header, offset, length);
             }
 
             public void Dispose()
             {
-                _stream?.Dispose();
+                // Do NOT dispose the underlying stream: the caller owns it and
+                // receives it as the exported package. Disposing it here closed
+                // the returned stream ("Cannot access a closed Stream", found
+                // by the Minotaur-Grammars #26 package smoke test).
             }
         }
 
