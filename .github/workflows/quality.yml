@@ -11,7 +11,11 @@ on:
     branches: [ main, develop ]
 
 env:
-  NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Org decision #8: GitHub Packages reads authenticate with the org
+  # secret, falling back to GITHUB_TOKEN (packages: read). Plain GITHUB_TOKEN
+  # 403s persistently on windows runners (NU1301, see #216); the sbob lanes
+  # (sbob-choco.yml) already use this form.
+  NUGET_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
 
 jobs:
   code-metrics:
