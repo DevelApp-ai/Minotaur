@@ -76,16 +76,22 @@ public static class Corpus
         {
             case CaseDsl.Config:
                 {
+                    // Line breaks are appended as a literal '\n' (never
+                    // AppendLine/Environment.NewLine): the rendered corpus is
+                    // byte-compared against the committed corpus files by the
+                    // benchmark tests, so the output must be identical on
+                    // every platform (Windows CRLF would break the equality,
+                    // see docs/corpus pins in .gitattributes).
                     var sb = new StringBuilder(160);
-                    sb.Append("[server_").Append(index).AppendLine("]");
-                    sb.Append("port_").Append(index).Append(" = ").Append(8000 + index % 4096).AppendLine();
-                    sb.Append("host_").Append(index).Append(" = worker_").Append(index % 97).AppendLine();
-                    sb.Append("note_").Append(index).Append(" = \"edge node ").Append(index % 512).Append(" of 10.5\"").AppendLine();
+                    sb.Append("[server_").Append(index).Append("]").Append('\n');
+                    sb.Append("port_").Append(index).Append(" = ").Append(8000 + index % 4096).Append('\n');
+                    sb.Append("host_").Append(index).Append(" = worker_").Append(index % 97).Append('\n');
+                    sb.Append("note_").Append(index).Append(" = \"edge node ").Append(index % 512).Append(" of 10.5\"").Append('\n');
                     sb.Append("tags_").Append(index).Append(" = [").Append(index % 8192).Append(", ")
                       .Append((index % 997) + 0.5).Append(", \"tag_").Append(index % 256).Append("\", enabled_")
-                      .Append(index % 128).Append(']').AppendLine();
-                    sb.Append("weight_").Append(index).Append(" = ").Append(index % 9).AppendLine();
-                    sb.Append("tier_").Append(index).Append(" = tier_").Append(index % 5).AppendLine();
+                      .Append(index % 128).Append(']').Append('\n');
+                    sb.Append("weight_").Append(index).Append(" = ").Append(index % 9).Append('\n');
+                    sb.Append("tier_").Append(index).Append(" = tier_").Append(index % 5).Append('\n');
                     return sb.ToString();
                 }
 
