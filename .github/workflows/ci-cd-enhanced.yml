@@ -204,6 +204,46 @@ jobs:
         name: coverage-report
         path: CoverageReport/
 
+  grammar-package-smoke:
+    # Minotaur-Grammars #26: package-only round-trip smoke - every grammar in
+    # an unmodified Minotaur-Grammars@main checkout must export through
+    # GrammarPackageExporter with zero manual edits (publish/consume still
+    # needs the private marketplace and is out of scope here).
+    name: Grammar package smoke (Minotaur-Grammars checkout)
+    runs-on: ubuntu-latest
+    needs: [calculate-version]
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout Minotaur
+      uses: actions/checkout@v5
+
+    - name: Checkout Minotaur-Grammars
+      uses: actions/checkout@v5
+      with:
+        repository: DevelApp-ai/Minotaur-Grammars
+        path: grammars
+        ref: main
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore and build test project
+      run: |
+        dotnet restore src/Minotaur.Tests/Minotaur.Tests.csproj
+        dotnet build src/Minotaur.Tests/Minotaur.Tests.csproj --configuration Release --no-restore
+
+    - name: Package every repo grammar (no publish)
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
+      run: |
+        dotnet test src/Minotaur.Tests/Minotaur.Tests.csproj \
+          --configuration Release --no-build --no-restore \
+          --filter "FullyQualifiedName~MarketplacePackageSmoke"
+
   code-quality:
     name: Code Quality Analysis
     runs-on: ubuntu-latest
