@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -75,11 +76,11 @@ namespace Minotaur.Tests.Marketplace
                     using var package = await exporter.ExportGrammarPackageAsync(info);
                     Assert.True(package.Length > 0, $"{relative}: empty package");
 
-                    // The tar stream stores entry names in clear text.
+                    // The package is a tar: entry names live in the 512-byte headers.
                     var bytes = await ReadAllAsync(package);
-                    var text = Encoding.ASCII.GetString(bytes);
-                    Assert.Contains("minotaur-metadata.json", text);
-                    Assert.Contains("grammar.grammar", text);
+                    var entryNames = ReadTarEntryNames(bytes);
+                    Assert.Contains("minotaur-metadata.json", entryNames);
+                    Assert.Contains("grammar.grammar", entryNames);
                 }
                 catch (Exception ex)
                 {
@@ -97,6 +98,35 @@ namespace Minotaur.Tests.Marketplace
             using var ms = new MemoryStream();
             await stream.CopyToAsync(ms);
             return ms.ToArray();
+        }
+
+        /// <summary>Parse ustar entry names from a tar byte block stream.</summary>
+        private static List<string> ReadTarEntryNames(byte[] tar)
+        {
+            var names = new List<string>();
+            var pos = 0;
+            while (pos + 512 <= tar.Length)
+            {
+                var header = new byte[512];
+                Array.Copy(tar, pos, header, 0, 512);
+                if (header.All(b => b == 0))
+                {
+                    break; // end-of-archive block
+                }
+
+                var nameLen = Array.IndexOf(header, (byte)0);
+                if (nameLen < 0)
+                {
+                    nameLen = 100;
+                }
+
+                names.Add(Encoding.ASCII.GetString(header, 0, nameLen));
+                var sizeText = Encoding.ASCII.GetString(header, 124, 12).TrimEnd('\0', ' ');
+                var size = sizeText.Length == 0 ? 0 : Convert.ToInt64(sizeText, 8);
+                pos += 512 + (int)(((size + 511) / 512) * 512);
+            }
+
+            return names;
         }
     }
 }
