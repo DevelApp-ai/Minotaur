@@ -75,19 +75,19 @@ public static class Corpus
         switch (dsl)
         {
             case CaseDsl.Config:
-            {
-                var sb = new StringBuilder(160);
-                sb.Append("[server_").Append(index).AppendLine("]");
-                sb.Append("port_").Append(index).Append(" = ").Append(8000 + index % 4096).AppendLine();
-                sb.Append("host_").Append(index).Append(" = worker_").Append(index % 97).AppendLine();
-                sb.Append("note_").Append(index).Append(" = \"edge node ").Append(index % 512).Append(" of 10.5\"").AppendLine();
-                sb.Append("tags_").Append(index).Append(" = [").Append(index % 8192).Append(", ")
-                  .Append((index % 997) + 0.5).Append(", \"tag_").Append(index % 256).Append("\", enabled_")
-                  .Append(index % 128).Append(']').AppendLine();
-                sb.Append("weight_").Append(index).Append(" = ").Append(index % 9).AppendLine();
-                sb.Append("tier_").Append(index).Append(" = tier_").Append(index % 5).AppendLine();
-                return sb.ToString();
-            }
+                {
+                    var sb = new StringBuilder(160);
+                    sb.Append("[server_").Append(index).AppendLine("]");
+                    sb.Append("port_").Append(index).Append(" = ").Append(8000 + index % 4096).AppendLine();
+                    sb.Append("host_").Append(index).Append(" = worker_").Append(index % 97).AppendLine();
+                    sb.Append("note_").Append(index).Append(" = \"edge node ").Append(index % 512).Append(" of 10.5\"").AppendLine();
+                    sb.Append("tags_").Append(index).Append(" = [").Append(index % 8192).Append(", ")
+                      .Append((index % 997) + 0.5).Append(", \"tag_").Append(index % 256).Append("\", enabled_")
+                      .Append(index % 128).Append(']').AppendLine();
+                    sb.Append("weight_").Append(index).Append(" = ").Append(index % 9).AppendLine();
+                    sb.Append("tier_").Append(index).Append(" = tier_").Append(index % 5).AppendLine();
+                    return sb.ToString();
+                }
 
             case CaseDsl.Query:
                 return "select metric_" + index % 50 + " from sales_data_" + index % 20 +

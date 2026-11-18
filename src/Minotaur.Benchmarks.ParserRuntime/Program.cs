@@ -697,9 +697,9 @@ static JsonObject? FindCell(JsonObject report, string dsl, string size, string e
 
 namespace Minotaur.Benchmarks.ParserRuntime
 {
-using Antlr4.Runtime;
+    using Antlr4.Runtime;
 
-internal interface IRuntimeEngine
+    internal interface IRuntimeEngine
     {
         string Name { get; }
 
@@ -798,43 +798,43 @@ internal interface IRuntimeEngine
             switch (this.dsl)
             {
                 case CaseDsl.Config:
-                {
-                    var lexer = new ConfigDslLexer(input);
-                    lexer.RemoveErrorListeners();
-                    var lexerErrors = new CountingErrorListener();
-                    lexer.AddErrorListener(lexerErrors);
-                    var parser = new ConfigDslParser(new CommonTokenStream(lexer));
-                    parser.RemoveErrorListeners();
-                    parser.config_file();
-                    errors = lexerErrors.Count + parser.NumberOfSyntaxErrors;
-                    break;
-                }
+                    {
+                        var lexer = new ConfigDslLexer(input);
+                        lexer.RemoveErrorListeners();
+                        var lexerErrors = new CountingErrorListener();
+                        lexer.AddErrorListener(lexerErrors);
+                        var parser = new ConfigDslParser(new CommonTokenStream(lexer));
+                        parser.RemoveErrorListeners();
+                        parser.config_file();
+                        errors = lexerErrors.Count + parser.NumberOfSyntaxErrors;
+                        break;
+                    }
 
                 case CaseDsl.Query:
-                {
-                    var lexer = new QueryDslLexer(input);
-                    lexer.RemoveErrorListeners();
-                    var lexerErrors = new CountingErrorListener();
-                    lexer.AddErrorListener(lexerErrors);
-                    var parser = new QueryDslParser(new CommonTokenStream(lexer));
-                    parser.RemoveErrorListeners();
-                    parser.query();
-                    errors = lexerErrors.Count + parser.NumberOfSyntaxErrors;
-                    break;
-                }
+                    {
+                        var lexer = new QueryDslLexer(input);
+                        lexer.RemoveErrorListeners();
+                        var lexerErrors = new CountingErrorListener();
+                        lexer.AddErrorListener(lexerErrors);
+                        var parser = new QueryDslParser(new CommonTokenStream(lexer));
+                        parser.RemoveErrorListeners();
+                        parser.query();
+                        errors = lexerErrors.Count + parser.NumberOfSyntaxErrors;
+                        break;
+                    }
 
                 case CaseDsl.Template:
-                {
-                    var lexer = new TemplateDslLexer(input);
-                    lexer.RemoveErrorListeners();
-                    var lexerErrors = new CountingErrorListener();
-                    lexer.AddErrorListener(lexerErrors);
-                    var parser = new TemplateDslParser(new CommonTokenStream(lexer));
-                    parser.RemoveErrorListeners();
-                    parser.template();
-                    errors = lexerErrors.Count + parser.NumberOfSyntaxErrors;
-                    break;
-                }
+                    {
+                        var lexer = new TemplateDslLexer(input);
+                        lexer.RemoveErrorListeners();
+                        var lexerErrors = new CountingErrorListener();
+                        lexer.AddErrorListener(lexerErrors);
+                        var parser = new TemplateDslParser(new CommonTokenStream(lexer));
+                        parser.RemoveErrorListeners();
+                        parser.template();
+                        errors = lexerErrors.Count + parser.NumberOfSyntaxErrors;
+                        break;
+                    }
 
                 default:
                     return false;

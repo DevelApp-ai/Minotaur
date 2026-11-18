@@ -6,6 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- Generated ANTLR code (Antlr/generated/*) carries [CLSCompliant] attributes
+         that trigger CS3021 because this assembly is not marked CLS-compliant;
+         the lint lane builds with TreatWarningsAsErrors. -->
+    <NoWarn>$(NoWarn);CS3021</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
