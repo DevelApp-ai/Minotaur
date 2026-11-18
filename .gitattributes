@@ -10,3 +10,10 @@ sbob/** -text
 sbobforge.lock.json -text
 sbobforge.json -text
 sbobforge-choco.json -text
+
+# The committed benchmark corpora are compared byte-for-byte against the
+# deterministic corpus generator in the benchmark tests (and the measurements
+# record the corpus SHA-256), so Windows autocrlf rewrites would break the
+# byte-equality tests on windows runners, same class of problem as the sbob
+# pins above. No conversion for the corpus files, ever.
+docs/corpus/** -text
