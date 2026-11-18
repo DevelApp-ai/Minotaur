@@ -46,7 +46,7 @@ namespace Minotaur.Core.Services.Marketplace
                         reader.Read();
                         result[key] = reader.TokenType == JsonTokenType.String
                             ? reader.GetString()!
-                            : reader.GetRawText();
+                            : "*";
                     }
                     return result;
                 default:
