@@ -484,6 +484,11 @@ static JsonObject BuildReport(JsonArray corpusInfo, List<JsonObject> coldRows, L
             ["runtime"] = RuntimeInformation.FrameworkDescription,
             ["architecture"] = RuntimeInformation.ProcessArchitecture.ToString(),
             ["processorCount"] = Environment.ProcessorCount,
+            ["engine"] = new JsonObject
+            {
+                ["develapp.steplexer"] = EngineAssemblyVersion("DevelApp.StepLexer"),
+                ["develapp.stepparser"] = EngineAssemblyVersion("DevelApp.StepParser"),
+            },
         },
         ["protocol"] = new JsonObject
         {
@@ -576,6 +581,9 @@ static string BuildResultsMarkdown(JsonObject report)
     sb.AppendLine("- Runtime: " + report["machine"]!["runtime"]!.GetValue<string>()
         + " (" + report["machine"]!["architecture"]!.GetValue<string>()
         + ", " + report["machine"]!["processorCount"]!.GetValue<int>() + " CPUs)");
+    sb.AppendLine("- Engine: DevelApp.StepLexer `" + report["machine"]!["engine"]!["develapp.steplexer"]!.GetValue<string>()
+        + "` / DevelApp.StepParser `" + report["machine"]!["engine"]!["develapp.stepparser"]!.GetValue<string>()
+        + "` (the C#-process target measured here)");
     sb.AppendLine("- Minotaur commit: `" + report["minotaurCommit"]!.GetValue<string>() + "`");
     sb.AppendLine("- Corpora: seed " + report["corpus"]!["seed"]!.GetValue<int>()
         + "; small + medium committed under `docs/corpus/issue-127`, large generated");
@@ -689,6 +697,21 @@ static JsonObject? FindCell(JsonObject report, string dsl, string size, string e
     }
 
     return null;
+}
+
+static string EngineAssemblyVersion(string assemblyName)
+{
+    try
+    {
+        var loaded = AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName, StringComparison.OrdinalIgnoreCase))
+            ?? System.Reflection.Assembly.Load(assemblyName);
+        return loaded.GetName().Version?.ToString() ?? "0.0.0";
+    }
+    catch
+    {
+        return "unrecorded";
+    }
 }
 
 // ---------------------------------------------------------------------------

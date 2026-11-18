@@ -20,7 +20,8 @@ the full pass.
 Machine: Debian GNU/Linux 13 (trixie)
 
 - Runtime: .NET 8.0.34 (X64, 1 CPUs)
-- Minotaur commit: `18e0c8eb` (measurement working tree base)
+- Engine: DevelApp.StepLexer `1.83.0.0` / DevelApp.StepParser `1.83.0.0` (the C#-process target measured here)
+- Minotaur commit: `4057af288c2fe9bf32b7e4d213d209d2528ea88f`
 - Corpora: seed 127; small + medium committed under `docs/corpus/issue-127`, large generated
   at runtime (SHA-256 in `results.json`)
 
@@ -28,33 +29,33 @@ Machine: Debian GNU/Linux 13 (trixie)
 
 | Engine | Small p50/p95 (µs) | Medium p50/p95 (µs) | Large p50/p95 (µs) | Throughput small/medium/large (MB/s) | Allocated/doc small/medium/large (bytes) | Full-parse rate |
 |--------|--------------------|--------------------|-------------------|-------------------------------------|-----------------------------------------|-----------------|
-| minotaur | 2167.4 / 3026.1 | 2359.6 / 2830.1 | 2535.1 / 3043.2 | 0.1 / 0.1 / 0.1 | 1241274 / 1256927 / 1248210 | 100.0 % |
-| hand-written | 1.9 / 6.2 | 1.9 / 6.1 | 1.9 / 6.0 | 52.8 / 86.6 / 68.2 | 2560 / 2630 / 2697 | 100.0 % |
-| antlr | 43.3 / 92.3 | 42.7 / 78.0 | 40.9 / 62.9 | 3.6 / 3.9 / 4.2 | 8777 / 8745 / 8760 | 100.0 % |
+| minotaur | 2959.8 / 3694.0 | 3412.3 / 3932.4 | 3393.6 / 3865.4 | 0.0 / 0.1 / 0.1 | 1258813 / 1259980 / 1245327 | 100.0 % |
+| hand-written | 2.6 / 7.5 | 3.6 / 9.8 | 2.6 / 7.6 | 37.4 / 43.6 / 53.2 | 2560 / 2630 / 2697 | 100.0 % |
+| antlr | 53.5 / 76.5 | 54.4 / 84.3 | 55.5 / 87.7 | 3.0 / 3.1 / 3.1 | 8777 / 8745 / 8760 | 100.0 % |
 
 ## query DSL
 
 | Engine | Small p50/p95 (µs) | Medium p50/p95 (µs) | Large p50/p95 (µs) | Throughput small/medium/large (MB/s) | Allocated/doc small/medium/large (bytes) | Full-parse rate |
 |--------|--------------------|--------------------|-------------------|-------------------------------------|-----------------------------------------|-----------------|
-| minotaur | 456.4 / 592.7 | 461.4 / 632.9 | 469.7 / 631.8 | 0.2 / 0.1 / 0.3 | 336431 / 336430 / 336879 | 100.0 % |
-| hand-written | 1.0 / 4.2 | 1.1 / 4.5 | 1.1 / 4.2 | 56.5 / 46.4 / 65.0 | 747 / 743 / 743 | 100.0 % |
-| antlr | 17.9 / 35.2 | 17.2 / 21.5 | 17.7 / 21.0 | 4.4 / 4.8 / 5.2 | 4485 / 4480 / 4479 | 100.0 % |
+| minotaur | 622.7 / 769.6 | 627.7 / 802.1 | 624.6 / 846.5 | 0.1 / 0.1 / 0.2 | 336541 / 336541 / 336952 | 100.0 % |
+| hand-written | 1.4 / 5.0 | 1.3 / 4.8 | 1.4 / 5.1 | 45.5 / 41.2 / 50.3 | 747 / 743 / 743 | 100.0 % |
+| antlr | 22.4 / 39.8 | 22.4 / 27.6 | 22.4 / 27.6 | 3.4 / 3.6 / 3.5 | 4485 / 4480 / 4479 | 100.0 % |
 
 ## template DSL
 
 | Engine | Small p50/p95 (µs) | Medium p50/p95 (µs) | Large p50/p95 (µs) | Throughput small/medium/large (MB/s) | Allocated/doc small/medium/large (bytes) | Full-parse rate |
 |--------|--------------------|--------------------|-------------------|-------------------------------------|-----------------------------------------|-----------------|
-| minotaur | 259.4 / 382.3 | 260.2 / 384.9 | 262.8 / 343.0 | 0.5 / 0.5 / 0.6 | 225681 / 225702 / 226304 | 100.0 % |
-| hand-written | 0.6 / 0.7 | 0.5 / 0.8 | 0.6 / 0.9 | 246.1 / 148.0 / 263.6 | 8 / 1 / 0 | 100.0 % |
-| antlr | 19.6 / 24.9 | 19.3 / 32.9 | 19.6 / 29.6 | 7.2 / 7.2 / 7.9 | 4912 / 4916 / 4918 | 100.0 % |
+| minotaur | 349.1 / 472.0 | 353.5 / 469.7 | 362.9 / 462.4 | 0.4 / 0.3 / 0.5 | 225791 / 225888 / 226128 | 100.0 % |
+| hand-written | 0.7 / 0.9 | 0.8 / 1.0 | 0.7 / 1.1 | 181.7 / 113.8 / 222.8 | 8 / 1 / 0 | 100.0 % |
+| antlr | 24.8 / 47.3 | 25.9 / 44.2 | 25.1 / 33.5 | 5.3 / 5.4 / 5.0 | 4912 / 4916 / 4918 | 100.0 % |
 
 ## Cold start (fresh process, includes JIT)
 
 | DSL | Minotaur construction | Session footprint | Minotaur first parse | Hand-written first parse | ANTLR first parse |
 |-----|-----------------------|-------------------|----------------------|--------------------------|------------------|
-| config | 30.6 ms | 113.5 KB | 37.6 ms | 0.62 ms | 31.4 ms |
-| query | 35.0 ms | 111.0 KB | 36.6 ms | 0.99 ms | 22.6 ms |
-| template | 33.5 ms | 108.9 KB | 36.5 ms | 0.27 ms | 24.9 ms |
+| config | 34.0 ms | 113.5 KB | 45.2 ms | 0.75 ms | 36.4 ms |
+| query | 38.1 ms | 111.0 KB | 44.4 ms | 1.15 ms | 27.9 ms |
+| template | 34.6 ms | 108.9 KB | 82.0 ms | 0.33 ms | 28.9 ms |
 
 ## Findings
 
@@ -71,7 +72,7 @@ honest:
    measurement therefore constructs a fresh session per document and
    includes session construction in the per-document cost; this is the
    engine's supported model, not a benchmark artifact.
-2. **Bounded-document operating mode.** The shipped engine explores a
+1. **Bounded-document operating mode.** The shipped engine explores a
    bounded GLR path budget per document, so the benchmark feeds every
    engine a stream of bounded, fixed-shape documents (the live-editing
    usage the engine is shipped for: one document per editor buffer). The
