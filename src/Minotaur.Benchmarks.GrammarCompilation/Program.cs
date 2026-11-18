@@ -159,6 +159,11 @@ var report = new JsonObject
         ["runtime"] = RuntimeInformation.FrameworkDescription,
         ["architecture"] = RuntimeInformation.ProcessArchitecture.ToString(),
         ["processorCount"] = Environment.ProcessorCount,
+        ["engine"] = new JsonObject
+        {
+            ["develapp.steplexer"] = EngineAssemblyVersion("DevelApp.StepLexer"),
+            ["develapp.stepparser"] = EngineAssemblyVersion("DevelApp.StepParser"),
+        },
     },
     ["rows"] = new JsonArray(rows.Select(r => (JsonNode)r!.DeepClone()).ToArray()),
 };
@@ -293,6 +298,8 @@ static string BuildResultsMarkdown(JsonObject report)
     sb.AppendLine("- Runtime: " + report["machine"]!["runtime"]!.GetValue<string>()
         + " (" + report["machine"]!["architecture"]!.GetValue<string>()
         + ", " + report["machine"]!["processorCount"]!.GetValue<int>() + " CPUs)");
+    sb.AppendLine("- Engine: DevelApp.StepLexer `" + report["machine"]!["engine"]!["develapp.steplexer"]!.GetValue<string>()
+        + "` / DevelApp.StepParser `" + report["machine"]!["engine"]!["develapp.stepparser"]!.GetValue<string>() + "`");
     sb.AppendLine("- Grammars: " + report["grammarsRepo"]!.GetValue<string>()
         + " @ `" + report["grammarsRef"]!.GetValue<string>()[..12] + "`");
     sb.AppendLine("- Minotaur commit: `" + report["minotaurCommit"]!.GetValue<string>() + "`");
@@ -323,4 +330,19 @@ static string BuildResultsMarkdown(JsonObject report)
     sb.AppendLine("Full per-class detail (rule split, keyword counts, all warm samples, smoke");
     sb.AppendLine("parse results) is in `results.json` next to this file.");
     return sb.ToString();
+}
+
+static string EngineAssemblyVersion(string assemblyName)
+{
+    try
+    {
+        var loaded = AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName, StringComparison.OrdinalIgnoreCase))
+            ?? System.Reflection.Assembly.Load(assemblyName);
+        return loaded.GetName().Version?.ToString() ?? "0.0.0";
+    }
+    catch
+    {
+        return "unrecorded";
+    }
 }

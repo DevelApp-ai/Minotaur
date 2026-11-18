@@ -7,20 +7,22 @@ measured edits per scenario. Identical edit streams are applied to both modes.
 
 Raw per-edit microsecond samples: `results.json`.
 
+Engine: DevelApp.StepLexer `1.83.0.0` / DevelApp.StepParser `1.83.0.0` (the C#-process target the session provides).
+
 | Corpus (lines) | Edit type | Inc p50 | Inc p95 | Inc p99 | Full p50 | Full p95 | Full p99 | p50 speedup | Mean reuse | Inc alloc (MB) | Full alloc (MB) | Inc CPU (ms) | Full CPU (ms) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 150 | single-char-insert | 3.79 ms | 52.44 ms | 59.07 ms | 5.22 ms | 54.93 ms | 59.62 ms | 1.4x | 0.990 | 122.12 | 212.87 | 270 | 390 |
-| 150 | word-completion | 2.69 ms | 49.71 ms | 54.99 ms | 4.96 ms | 54.46 ms | 56.38 ms | 1.8x | 0.994 | 108.58 | 207.87 | 200 | 400 |
-| 150 | line-insertion | 5.62 ms | 12.21 ms | 12.60 ms | 12.01 ms | 15.13 ms | 16.37 ms | 2.1x | 0.997 | 182.07 | 347.59 | 420 | 860 |
-| 150 | block-paste | 10.13 ms | 28.73 ms | 40.22 ms | 25.72 ms | 35.71 ms | 79.42 ms | 2.5x | 0.998 | 367.94 | 778.72 | 880 | 1940 |
-| 800 | single-char-insert | 15.32 ms | 26.52 ms | 38.66 ms | 22.19 ms | 49.01 ms | 62.73 ms | 1.4x | 0.999 | 565.12 | 1085.47 | 1080 | 1650 |
-| 800 | word-completion | 4.54 ms | 7.89 ms | 9.46 ms | 7.33 ms | 18.86 ms | 19.72 ms | 1.6x | 0.992 | 619.77 | 1079.63 | 340 | 690 |
-| 800 | line-insertion | 4.18 ms | 8.32 ms | 17.58 ms | 8.40 ms | 19.00 ms | 19.89 ms | 2.0x | 0.998 | 584.68 | 1216.30 | 330 | 700 |
-| 800 | block-paste | 6.07 ms | 18.12 ms | 21.54 ms | 12.12 ms | 28.74 ms | 42.96 ms | 2.0x | 0.999 | 866.89 | 1644.59 | 570 | 1170 |
-| 3500 | single-char-insert | 23.54 ms | 52.69 ms | 66.95 ms | 52.88 ms | 70.47 ms | 72.40 ms | 2.2x | 1.000 | 2439.67 | 4702.90 | 1960 | 3850 |
-| 3500 | word-completion | 29.30 ms | 53.57 ms | 72.98 ms | 54.08 ms | 71.36 ms | 82.93 ms | 1.8x | 1.000 | 2563.21 | 4698.57 | 2080 | 3890 |
-| 3500 | line-insertion | 15.53 ms | 59.75 ms | 66.11 ms | 54.73 ms | 73.14 ms | 75.02 ms | 3.5x | 1.000 | 2292.84 | 4835.02 | 1780 | 3990 |
-| 3500 | block-paste | 28.04 ms | 59.48 ms | 68.67 ms | 58.26 ms | 77.21 ms | 79.04 ms | 2.1x | 1.000 | 2981.82 | 5259.33 | 2320 | 4320 |
+| 150 | single-char-insert | 191.3 us | 247.2 us | 471.2 us | 5.34 ms | 9.64 ms | 13.84 ms | 27.9x | 0.949 | 8.21 | 212.88 | 10 | 430 |
+| 150 | word-completion | 135.7 us | 186.1 us | 207.6 us | 5.01 ms | 5.49 ms | 7.40 ms | 36.9x | 0.945 | 7.78 | 207.87 | 10 | 380 |
+| 150 | line-insertion | 221.0 us | 302.0 us | 2.61 ms | 8.24 ms | 10.62 ms | 14.72 ms | 37.3x | 0.971 | 13.91 | 347.60 | 20 | 630 |
+| 150 | block-paste | 517.4 us | 700.3 us | 746.9 us | 18.37 ms | 38.07 ms | 39.96 ms | 35.5x | 0.978 | 33.19 | 778.73 | 40 | 1530 |
+| 800 | single-char-insert | 424.7 us | 685.4 us | 946.7 us | 37.05 ms | 55.90 ms | 76.96 ms | 87.2x | 0.988 | 30.81 | 1085.46 | 30 | 2810 |
+| 800 | word-completion | 492.9 us | 637.0 us | 761.9 us | 18.26 ms | 32.87 ms | 65.76 ms | 37.0x | 0.978 | 32.16 | 1079.64 | 40 | 1710 |
+| 800 | line-insertion | 449.1 us | 694.3 us | 795.3 us | 17.10 ms | 54.75 ms | 59.47 ms | 38.1x | 0.985 | 35.21 | 1216.32 | 30 | 1350 |
+| 800 | block-paste | 376.3 us | 703.3 us | 738.5 us | 12.37 ms | 28.80 ms | 33.55 ms | 32.9x | 0.988 | 57.68 | 1644.59 | 40 | 1080 |
+| 3500 | single-char-insert | 1.03 ms | 1.69 ms | 7.99 ms | 52.91 ms | 73.60 ms | 86.21 ms | 51.5x | 0.997 | 126.56 | 4702.91 | 100 | 3920 |
+| 3500 | word-completion | 1.02 ms | 3.08 ms | 4.89 ms | 52.42 ms | 69.67 ms | 86.10 ms | 51.1x | 0.997 | 130.53 | 4698.58 | 110 | 3900 |
+| 3500 | line-insertion | 990.6 us | 1.93 ms | 8.60 ms | 59.12 ms | 80.84 ms | 90.32 ms | 59.7x | 0.997 | 125.63 | 4835.03 | 100 | 4330 |
+| 3500 | block-paste | 1.38 ms | 4.28 ms | 8.02 ms | 61.63 ms | 92.58 ms | 106.98 ms | 44.7x | 0.997 | 161.56 | 5259.34 | 140 | 4720 |
 
 Notes:
 
