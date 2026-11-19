@@ -62,12 +62,21 @@ const string GrammarsRef = "85360f6ff73304ef0d063fc33af9d03845f3d1c3";
 // issue Minotaur-Grammars#192) were added after the pinned ref above, so the
 // #131 mode resolves them from main (or MINOTAUR_GRAMMARS_DIR when set).
 const string SyntheticRef = "main";
+
+// Grammars renamed on Minotaur-Grammars main after the pinned #126 ref
+// (e.g. unversioned sql -> sql2023 in #218). The harness tries the pinned-ref
+// path first and falls back to the current path, so both the recorded #126
+// run and a main checkout work.
+static readonly Dictionary<string, string> MovedGrammars = new()
+{
+    ["data-query/sql/SQL.grammar"] = "data-query/sql2023/SQL2023.grammar",
+};
 const int MeasuredConstructs = 10;
 
 var grammarClasses = new (string ClassName, int MinRules, int MaxRules, string RepoPath)[]
 {
     ("Small DSL", 15, 25, "data-config/kdl/KDL.grammar"),
-    ("Medium DSL", 50, 80, "data-query/sql2023/SQL2023.grammar"),
+    ("Medium DSL", 50, 80, "data-query/sql/SQL.grammar"),
     ("Large DSL", 150, 200, "programming-languages/c17/C17.grammar"),
     ("Complex DSL", 300, int.MaxValue, "programming-languages/csharp10/CSharp10.grammar"),
 };
@@ -325,17 +334,40 @@ static double Median(double[] sortedValues)
 
 static string LoadGrammar(string repoPath, string grammarsRef)
 {
+    var candidates = MovedGrammars.TryGetValue(repoPath, out var moved)
+        ? new[] { repoPath, moved }
+        : new[] { repoPath };
+
     var localDir = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR");
     if (!string.IsNullOrEmpty(localDir))
     {
-        var localPath = Path.Combine(localDir, repoPath.Replace('/', Path.DirectorySeparatorChar));
-        return File.ReadAllText(localPath);
+        foreach (var candidate in candidates)
+        {
+            var localPath = Path.Combine(localDir, candidate.Replace('/', Path.DirectorySeparatorChar));
+            if (File.Exists(localPath))
+            {
+                return File.ReadAllText(localPath);
+            }
+        }
+        throw new FileNotFoundException(
+            $"grammar not found in MINOTAUR_GRAMMARS_DIR: tried {string.Join(", ", candidates)}");
     }
 
     using var http = new HttpClient();
-    var url = $"https://raw.githubusercontent.com/DevelApp-ai/Minotaur-Grammars/{grammarsRef}/{repoPath}";
-    var content = http.GetStringAsync(url).GetAwaiter().GetResult();
-    return content;
+    Exception? lastError = null;
+    foreach (var candidate in candidates)
+    {
+        var url = $"https://raw.githubusercontent.com/DevelApp-ai/Minotaur-Grammars/{grammarsRef}/{candidate}";
+        try
+        {
+            return http.GetStringAsync(url).GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            lastError = ex;
+        }
+    }
+    throw lastError ?? new InvalidOperationException($"grammar fetch failed: {repoPath}");
 }
 
 static string BuildResultsMarkdown(JsonObject report, string title)
