@@ -58,6 +58,11 @@ using Minotaur.GrammarGeneration;
 
 const string GrammarsRepo = "DevelApp-ai/Minotaur-Grammars";
 const string GrammarsRef = "85360f6ff73304ef0d063fc33af9d03845f3d1c3";
+// The synthetic rule-count bins (Minotaur-Grammars benchmarks/synthetic,
+// issue Minotaur-Grammars#192) were added after the pinned ref above, so the
+// #131 mode resolves them from main (or MINOTAUR_GRAMMARS_DIR when set).
+const string SyntheticRef = "main";
+
 const int MeasuredConstructs = 10;
 
 var grammarClasses = new (string ClassName, int MinRules, int MaxRules, string RepoPath)[]
@@ -68,123 +73,176 @@ var grammarClasses = new (string ClassName, int MinRules, int MaxRules, string R
     ("Complex DSL", 300, int.MaxValue, "programming-languages/csharp10/CSharp10.grammar"),
 };
 
+// Issue #131: compile-time by rule-count bin, using the committed synthetic
+// grammars (deterministic, gen_synthetic.py) instead of one real grammar per
+// class. Bins map to the article's <50 / 50-200 / 200+ classes.
+var syntheticClasses = new (string ClassName, int MinRules, int MaxRules, string RepoPath)[]
+{
+    ("Bin 20 rules", 0, 50, "benchmarks/synthetic/rules-020/rules-020.grammar"),
+    ("Bin 60 rules", 50, 200, "benchmarks/synthetic/rules-060/rules-060.grammar"),
+    ("Bin 180 rules", 50, 200, "benchmarks/synthetic/rules-180/rules-180.grammar"),
+    ("Bin 320 rules", 200, int.MaxValue, "benchmarks/synthetic/rules-320/rules-320.grammar"),
+};
+
 // Child mode: measure one grammar in this fresh process and print one JSON line.
 if (args.Length == 2 && args[0] == "--measure-one" && int.TryParse(args[1], out var classIndex)
     && classIndex >= 0 && classIndex < grammarClasses.Length)
 {
-    Console.WriteLine(MeasureOne(grammarClasses[classIndex]));
+    Console.WriteLine(MeasureOne(grammarClasses[classIndex], GrammarsRef));
     return 0;
 }
 
-// Parent mode: spawn one fresh child per grammar class and aggregate.
+if (args.Length == 2 && args[0] == "--measure-one-synthetic" && int.TryParse(args[1], out var synthIndex)
+    && synthIndex >= 0 && synthIndex < syntheticClasses.Length)
+{
+    Console.WriteLine(MeasureOne(syntheticClasses[synthIndex], SyntheticRef));
+    return 0;
+}
+
+// Parent modes: spawn one fresh child per grammar class and aggregate.
+if (args.Length >= 2 && args[0] == "--synthetic")
+{
+    // Issue #131: compile-time by rule-count bin over the committed synthetic
+    // grammars (benchmarks/synthetic/rules-*). Resolved from main because the
+    // synthetic corpus postdates the pinned #126 ref.
+    return RunAggregation(
+        args[1],
+        "DevelApp-ai/Minotaur#131",
+        syntheticClasses,
+        SyntheticRef,
+        "--measure-one-synthetic",
+        "Issue #131 — Grammar compilation time by rule-count bin (synthetic corpus)");
+}
+
 var outputDir = args.Length > 0
     ? args[0]
     : Path.Combine("docs", "measurements", "issue-126");
-Directory.CreateDirectory(outputDir);
+return RunAggregation(
+    outputDir,
+    "DevelApp-ai/Minotaur#126",
+    grammarClasses,
+    GrammarsRef,
+    "--measure-one",
+    "Issue #126 — Grammar compilation performance by grammar size");
 
-Console.WriteLine("Minotaur issue #126 grammar-compilation harness");
-Console.WriteLine($"  runtime: {RuntimeInformation.FrameworkDescription} ({RuntimeInformation.ProcessArchitecture})");
-Console.WriteLine($"  os:      {RuntimeInformation.OSDescription}");
-Console.WriteLine($"  cpus:    {Environment.ProcessorCount}");
-Console.WriteLine($"  grammars: {GrammarsRepo} @ {GrammarsRef[..12]}");
-Console.WriteLine();
-
-var rows = new List<JsonObject>();
-var entryAssembly = System.Reflection.Assembly.GetEntryAssembly()!
-    .Location;
-
-// Under `dotnet run` the current process is the apphost (it already knows
-// its entry assembly); when launched via the dotnet driver directly, the
-// entry assembly must be passed explicitly.
-var processPath = Environment.ProcessPath!;
-var isDotnetDriver = string.Equals(
-    Path.GetFileName(processPath),
-    "dotnet",
-    StringComparison.OrdinalIgnoreCase);
-
-foreach (var (index, grammarClass) in grammarClasses.Select((g, i) => (i, g)))
+// ---------------------------------------------------------------------------
+// Parent-mode aggregation: one fresh child process per grammar class (cold
+// numbers include JIT), then results.json + RESULTS.md in outputDir.
+static int RunAggregation(
+    string outputDir,
+    string issueTag,
+    (string ClassName, int MinRules, int MaxRules, string RepoPath)[] classes,
+    string grammarsRef,
+    string childArg,
+    string title)
 {
-    Console.WriteLine($"measuring {grammarClass.ClassName}: {grammarClass.RepoPath} ...");
+    Directory.CreateDirectory(outputDir);
 
-    var startInfo = new ProcessStartInfo
+    Console.WriteLine("Minotaur grammar-compilation harness (" + issueTag + ")");
+    Console.WriteLine($"  runtime: {RuntimeInformation.FrameworkDescription} ({RuntimeInformation.ProcessArchitecture})");
+    Console.WriteLine($"  os:      {RuntimeInformation.OSDescription}");
+    Console.WriteLine($"  cpus:    {Environment.ProcessorCount}");
+    var shortRef = grammarsRef.Length >= 12 ? grammarsRef[..12] : grammarsRef;
+    Console.WriteLine($"  grammars: {GrammarsRepo} @ {shortRef}");
+    Console.WriteLine();
+
+    var rows = new List<JsonObject>();
+    var entryAssembly = System.Reflection.Assembly.GetEntryAssembly()!
+        .Location;
+
+    // Under `dotnet run` the current process is the apphost (it already knows
+    // its entry assembly); when launched via the dotnet driver directly, the
+    // entry assembly must be passed explicitly.
+    var processPath = Environment.ProcessPath!;
+    var isDotnetDriver = string.Equals(
+        Path.GetFileName(processPath),
+        "dotnet",
+        StringComparison.OrdinalIgnoreCase);
+
+    foreach (var (index, grammarClass) in classes.Select((g, i) => (i, g)))
     {
-        FileName = processPath,
-        Arguments = isDotnetDriver
-            ? $"\"{entryAssembly}\" --measure-one {index}"
-            : $"--measure-one {index}",
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-        UseShellExecute = false,
-    };
+        Console.WriteLine($"measuring {grammarClass.ClassName}: {grammarClass.RepoPath} ...");
 
-    using var child = Process.Start(startInfo)!;
-    var stdout = child.StandardOutput.ReadToEnd();
-    var stderr = child.StandardError.ReadToEnd();
-    child.WaitForExit();
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = processPath,
+            Arguments = isDotnetDriver
+                ? $"\"{entryAssembly}\" {childArg} {index}"
+                : $"{childArg} {index}",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
 
-    if (child.ExitCode != 0)
-    {
-        Console.WriteLine($"  child FAILED (exit {child.ExitCode}): {stderr.Trim()}");
-        continue;
+        using var child = Process.Start(startInfo)!;
+        var stdout = child.StandardOutput.ReadToEnd();
+        var stderr = child.StandardError.ReadToEnd();
+        child.WaitForExit();
+
+        if (child.ExitCode != 0)
+        {
+            Console.WriteLine($"  child FAILED (exit {child.ExitCode}): {stderr.Trim()}");
+            continue;
+        }
+
+        var line = stdout.Split('\n').Select(l => l.Trim()).LastOrDefault(l => l.StartsWith("{")) ?? "";
+        var row = JsonNode.Parse(line)!.AsObject();
+        rows.Add(row);
+
+        var warmMs = row["warmMedianMs"]!.GetValue<double>();
+        var coldMs = row["coldMs"]!.GetValue<double>();
+        var rules = row["totalRules"]!.GetValue<int>();
+        Console.WriteLine($"  rules {rules}, cold {coldMs:F1} ms, warm median {warmMs:F1} ms, " +
+            $"parser footprint {row["retainedKb"]!.GetValue<double>():F1} KB");
     }
 
-    var line = stdout.Split('\n').Select(l => l.Trim()).LastOrDefault(l => l.StartsWith("{")) ?? "";
-    var row = JsonNode.Parse(line)!.AsObject();
-    rows.Add(row);
+    var commitSha = Environment.GetEnvironmentVariable("MINOTAUR_COMMIT") ?? "unrecorded";
+    var grammarSource = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR") is { Length: > 0 } dir
+        ? $"local checkout of {GrammarsRepo} @ {grammarsRef}"
+        : $"raw.githubusercontent.com {GrammarsRepo} @ {grammarsRef}";
 
-    var warmMs = row["warmMedianMs"]!.GetValue<double>();
-    var coldMs = row["coldMs"]!.GetValue<double>();
-    var rules = row["totalRules"]!.GetValue<int>();
-    Console.WriteLine($"  rules {rules}, cold {coldMs:F1} ms, warm median {warmMs:F1} ms, " +
-        $"parser footprint {row["retainedKb"]!.GetValue<double>():F1} KB");
-}
-
-var commitSha = Environment.GetEnvironmentVariable("MINOTAUR_COMMIT") ?? "unrecorded";
-var grammarSource = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR") is { Length: > 0 } dir
-    ? $"local checkout of {GrammarsRepo} @ {GrammarsRef}"
-    : $"raw.githubusercontent.com {GrammarsRepo} @ {GrammarsRef}";
-
-var report = new JsonObject
-{
-    ["issue"] = "DevelApp-ai/Minotaur#126",
-    ["harness"] = "Minotaur.Benchmarks.GrammarCompilation",
-    ["measuredConstructs"] = MeasuredConstructs,
-    ["minotaurCommit"] = commitSha,
-    ["grammarsRepo"] = GrammarsRepo,
-    ["grammarsRef"] = GrammarsRef,
-    ["grammarSource"] = grammarSource,
-    ["machine"] = new JsonObject
+    var report = new JsonObject
     {
-        ["os"] = RuntimeInformation.OSDescription,
-        ["runtime"] = RuntimeInformation.FrameworkDescription,
-        ["architecture"] = RuntimeInformation.ProcessArchitecture.ToString(),
-        ["processorCount"] = Environment.ProcessorCount,
-        ["engine"] = new JsonObject
+        ["issue"] = issueTag,
+        ["harness"] = "Minotaur.Benchmarks.GrammarCompilation",
+        ["measuredConstructs"] = MeasuredConstructs,
+        ["minotaurCommit"] = commitSha,
+        ["grammarsRepo"] = GrammarsRepo,
+        ["grammarsRef"] = grammarsRef,
+        ["grammarSource"] = grammarSource,
+        ["machine"] = new JsonObject
         {
-            ["develapp.steplexer"] = EngineAssemblyVersion("DevelApp.StepLexer"),
-            ["develapp.stepparser"] = EngineAssemblyVersion("DevelApp.StepParser"),
+            ["os"] = RuntimeInformation.OSDescription,
+            ["runtime"] = RuntimeInformation.FrameworkDescription,
+            ["architecture"] = RuntimeInformation.ProcessArchitecture.ToString(),
+            ["processorCount"] = Environment.ProcessorCount,
+            ["engine"] = new JsonObject
+            {
+                ["develapp.steplexer"] = EngineAssemblyVersion("DevelApp.StepLexer"),
+                ["develapp.stepparser"] = EngineAssemblyVersion("DevelApp.StepParser"),
+            },
         },
-    },
-    ["rows"] = new JsonArray(rows.Select(r => (JsonNode)r!.DeepClone()).ToArray()),
-};
+        ["rows"] = new JsonArray(rows.Select(r => (JsonNode)r!.DeepClone()).ToArray()),
+    };
 
-File.WriteAllText(
-    Path.Combine(outputDir, "results.json"),
-    report.ToString());
+    File.WriteAllText(
+        Path.Combine(outputDir, "results.json"),
+        report.ToString());
 
-File.WriteAllText(
-    Path.Combine(outputDir, "RESULTS.md"),
-    BuildResultsMarkdown(report));
+    File.WriteAllText(
+        Path.Combine(outputDir, "RESULTS.md"),
+        BuildResultsMarkdown(report, title));
 
-Console.WriteLine();
-Console.WriteLine($"wrote {Path.Combine(outputDir, "results.json")} and RESULTS.md");
-return 0;
+    Console.WriteLine();
+    Console.WriteLine($"wrote {Path.Combine(outputDir, "results.json")} and RESULTS.md");
+    return 0;
+}
 
 // ---------------------------------------------------------------------------
 
-static string MeasureOne((string ClassName, int MinRules, int MaxRules, string RepoPath) grammarClass)
+static string MeasureOne((string ClassName, int MinRules, int MaxRules, string RepoPath) grammarClass, string grammarsRef)
 {
-    var content = LoadGrammar(grammarClass.RepoPath);
+    var content = LoadGrammar(grammarClass.RepoPath, grammarsRef);
     var grammarBytes = System.Text.Encoding.UTF8.GetByteCount(content);
     var profile = GrammarProfile.Analyze(content);
 
@@ -266,25 +324,51 @@ static double Median(double[] sortedValues)
         : (sortedValues[mid - 1] + sortedValues[mid]) / 2.0;
 }
 
-static string LoadGrammar(string repoPath)
+static string LoadGrammar(string repoPath, string grammarsRef)
 {
+    // Grammars renamed on Minotaur-Grammars main after the pinned #126 ref
+    // (unversioned sql -> sql2023 in #218): try the pinned-ref path first,
+    // then the current path, so both the recorded run and a main checkout work.
+    var candidates = repoPath == "data-query/sql/SQL.grammar"
+        ? new[] { repoPath, "data-query/sql2023/SQL2023.grammar" }
+        : new[] { repoPath };
+
     var localDir = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR");
     if (!string.IsNullOrEmpty(localDir))
     {
-        var localPath = Path.Combine(localDir, repoPath.Replace('/', Path.DirectorySeparatorChar));
-        return File.ReadAllText(localPath);
+        foreach (var candidate in candidates)
+        {
+            var localPath = Path.Combine(localDir, candidate.Replace('/', Path.DirectorySeparatorChar));
+            if (File.Exists(localPath))
+            {
+                return File.ReadAllText(localPath);
+            }
+        }
+        throw new FileNotFoundException(
+            $"grammar not found in MINOTAUR_GRAMMARS_DIR: tried {string.Join(", ", candidates)}");
     }
 
     using var http = new HttpClient();
-    var url = $"https://raw.githubusercontent.com/DevelApp-ai/Minotaur-Grammars/{GrammarsRef}/{repoPath}";
-    var content = http.GetStringAsync(url).GetAwaiter().GetResult();
-    return content;
+    Exception? lastError = null;
+    foreach (var candidate in candidates)
+    {
+        var url = $"https://raw.githubusercontent.com/DevelApp-ai/Minotaur-Grammars/{grammarsRef}/{candidate}";
+        try
+        {
+            return http.GetStringAsync(url).GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            lastError = ex;
+        }
+    }
+    throw lastError ?? new InvalidOperationException($"grammar fetch failed: {repoPath}");
 }
 
-static string BuildResultsMarkdown(JsonObject report)
+static string BuildResultsMarkdown(JsonObject report, string title)
 {
     var sb = new System.Text.StringBuilder();
-    sb.AppendLine("# Issue #126 — Grammar compilation performance by grammar size");
+    sb.AppendLine("# " + title);
     sb.AppendLine();
     sb.AppendLine("Measured by `Minotaur.Benchmarks.GrammarCompilation`: compiling a");
     sb.AppendLine("GrammarForge grammar into the engine's shipped `RealTimeParserSession`");
@@ -301,7 +385,7 @@ static string BuildResultsMarkdown(JsonObject report)
     sb.AppendLine("- Engine: DevelApp.StepLexer `" + report["machine"]!["engine"]!["develapp.steplexer"]!.GetValue<string>()
         + "` / DevelApp.StepParser `" + report["machine"]!["engine"]!["develapp.stepparser"]!.GetValue<string>() + "`");
     sb.AppendLine("- Grammars: " + report["grammarsRepo"]!.GetValue<string>()
-        + " @ `" + report["grammarsRef"]!.GetValue<string>()[..12] + "`");
+        + " @ `" + (report["grammarsRef"]!.GetValue<string>() is { Length: >= 12 } r ? r[..12] : report["grammarsRef"]!.GetValue<string>()) + "`");
     sb.AppendLine("- Minotaur commit: `" + report["minotaurCommit"]!.GetValue<string>() + "`");
     sb.AppendLine("- Harness: measured " + report["measuredConstructs"]!.GetValue<int>()
         + " warm constructs per class");
@@ -322,10 +406,9 @@ static string BuildResultsMarkdown(JsonObject report)
     }
 
     sb.AppendLine();
-    sb.AppendLine("All four rows use real grammars from the pinned Minotaur-Grammars corpus;");
-    sb.AppendLine("no synthetic grammar was needed. The measured compilation times are in the");
-    sb.AppendLine("milliseconds range, several orders of magnitude below the article's projected");
-    sb.AppendLine("targets; the article table must be updated to these measured values.");
+    sb.AppendLine("Measured compilation times are recorded, never asserted: re-running the");
+    sb.AppendLine("harness regenerates these artifacts on the current machine. Compare against");
+    sb.AppendLine("the article's projected tables and replace the projections with these values.");
     sb.AppendLine();
     sb.AppendLine("Full per-class detail (rule split, keyword counts, all warm samples, smoke");
     sb.AppendLine("parse results) is in `results.json` next to this file.");

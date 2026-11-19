@@ -244,6 +244,76 @@ jobs:
           --configuration Release --no-build --no-restore \
           --filter "FullyQualifiedName~MarketplacePackageSmoke"
 
+  article-measurements:
+    # Article-lane measurements (research-article-builder backlog): grammar
+    # compilation by size (Minotaur#126 real grammars, Minotaur#131 synthetic
+    # rule-count bins from Minotaur-Grammars benchmarks/synthetic) and
+    # project-load curves (Minotaur#134). Results are uploaded as artifacts
+    # and transcribed into docs/measurements/; this job never gates merges.
+    name: Article-lane measurements (benchmarks)
+    runs-on: ubuntu-latest
+    needs: [calculate-version]
+    permissions:
+      contents: read
+    timeout-minutes: 60
+    steps:
+    - name: Checkout Minotaur
+      uses: actions/checkout@v5
+
+    - name: Checkout Minotaur-Grammars
+      uses: actions/checkout@v5
+      with:
+        repository: DevelApp-ai/Minotaur-Grammars
+        path: grammars
+        ref: main
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Build benchmark harnesses
+      run: |
+        dotnet restore src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj
+        dotnet restore src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj
+        dotnet build src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj --configuration Release --no-restore
+        dotnet build src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj --configuration Release --no-restore
+
+    - name: Grammar compilation by size (issue #126, real grammars)
+      env:
+        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.GrammarCompilation
+        --configuration Release --no-build --
+        ${{ github.workspace }}/measurement-artifacts/issue-126
+
+    - name: Grammar compilation by rule-count bin (issue #131, synthetic corpus)
+      env:
+        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.GrammarCompilation
+        --configuration Release --no-build --
+        --synthetic ${{ github.workspace }}/measurement-artifacts/issue-131
+
+    - name: Project-load curves (issue #134)
+      env:
+        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.ProjectLoad
+        --configuration Release --no-build --
+        ${{ github.workspace }}/measurement-artifacts/issue-134
+
+    - name: Upload article measurement artifacts
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: article-measurements
+        path: ${{ github.workspace }}/measurement-artifacts
+        if-no-files-found: warn
+
   code-quality:
     name: Code Quality Analysis
     runs-on: ubuntu-latest

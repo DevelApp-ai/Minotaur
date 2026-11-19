@@ -1,0 +1,94 @@
+{
+  "issue": "DevelApp-ai/Minotaur#134",
+  "harness": "Minotaur.Benchmarks.ProjectLoad",
+  "minotaurCommit": "1cff9be6c9cad54607e19e3860435a9d3e9e7ca7",
+  "grammarsDir": "/home/runner/work/Minotaur/Minotaur/grammars",
+  "machine": {
+    "os": "Ubuntu 26.04.1 LTS",
+    "runtime": ".NET 8.0.34",
+    "architecture": "X64",
+    "processorCount": 4
+  },
+  "method": {
+    "discover": "Directory.GetFiles recursive (same call ProjectLoader makes)",
+    "classify": "per-file GrammarDetectionManager.DetectGrammarAsync replayed by the harness (loader exposes no phase timings)",
+    "total": "ProjectLoader.LoadFolderAsync end to end; per-file symbol extraction is stubbed in the shipped loader, so total = discover \u002B classify \u002B assemble",
+    "memory": "GC.GetTotalMemory delta after full collection, GC.GetAllocatedBytesForCurrentThread delta, process WorkingSet64 delta",
+    "reps": "3 for \u003C=1K files, 1 above; median reported"
+  },
+  "rows": [
+    {
+      "scaleFiles": 100,
+      "discoveredFiles": 100,
+      "loadedFiles": 100,
+      "reps": 3,
+      "discoverMs": 0.78,
+      "classifyMs": 36.81,
+      "totalMedianMs": 12.37,
+      "totalAllMs": [
+        19.46,
+        12.37,
+        11.77
+      ],
+      "classified": 68,
+      "unclassified": 32,
+      "fileTypeMix": {
+        "SourceCode": 50,
+        "Documentation": 16,
+        "Configuration": 34
+      },
+      "symbolsExtracted": 0,
+      "heapDeltaBytes": 0,
+      "allocBytes": 11559112,
+      "workingSetDeltaBytes": 0
+    },
+    {
+      "scaleFiles": 1000,
+      "discoveredFiles": 1000,
+      "loadedFiles": 1000,
+      "reps": 3,
+      "discoverMs": 0.57,
+      "classifyMs": 159.81,
+      "totalMedianMs": 168.36,
+      "totalAllMs": [
+        150.94,
+        169.97,
+        168.36
+      ],
+      "classified": 668,
+      "unclassified": 332,
+      "fileTypeMix": {
+        "SourceCode": 500,
+        "Configuration": 334,
+        "Documentation": 166
+      },
+      "symbolsExtracted": 0,
+      "heapDeltaBytes": 0,
+      "allocBytes": 116207136,
+      "workingSetDeltaBytes": 0
+    },
+    {
+      "scaleFiles": 10000,
+      "discoveredFiles": 10000,
+      "loadedFiles": 10000,
+      "reps": 1,
+      "discoverMs": 5.65,
+      "classifyMs": 833.2,
+      "totalMedianMs": 721.03,
+      "totalAllMs": [
+        721.03
+      ],
+      "classified": 6668,
+      "unclassified": 3332,
+      "fileTypeMix": {
+        "SourceCode": 5000,
+        "Configuration": 3334,
+        "Documentation": 1666
+      },
+      "symbolsExtracted": 0,
+      "heapDeltaBytes": 3554696,
+      "allocBytes": 1163308856,
+      "workingSetDeltaBytes": 4784128
+    }
+  ]
+}
