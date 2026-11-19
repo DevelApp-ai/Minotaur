@@ -110,7 +110,7 @@ if (args.Length >= 2 && args[0] == "--synthetic")
         syntheticClasses,
         SyntheticRef,
         "--measure-one-synthetic",
-        "Issue #131 " + em + " Grammar compilation time by rule-count bin (synthetic corpus)");
+        "Issue #131 — Grammar compilation time by rule-count bin (synthetic corpus)");
 }
 
 var outputDir = args.Length > 0
@@ -122,7 +122,7 @@ return RunAggregation(
     grammarClasses,
     GrammarsRef,
     "--measure-one",
-    "Issue #126 " + em + " Grammar compilation performance by grammar size");
+    "Issue #126 — Grammar compilation performance by grammar size");
 
 // ---------------------------------------------------------------------------
 // Parent-mode aggregation: one fresh child process per grammar class (cold
@@ -135,63 +135,63 @@ static int RunAggregation(
     string childArg,
     string title)
 {
-Directory.CreateDirectory(outputDir);
+    Directory.CreateDirectory(outputDir);
 
-Console.WriteLine("Minotaur issue #126 grammar-compilation harness");
-Console.WriteLine($"  runtime: {RuntimeInformation.FrameworkDescription} ({RuntimeInformation.ProcessArchitecture})");
-Console.WriteLine($"  os:      {RuntimeInformation.OSDescription}");
-Console.WriteLine($"  cpus:    {Environment.ProcessorCount}");
-Console.WriteLine($"  grammars: {GrammarsRepo} @ {grammarsRef[..12]}");
-Console.WriteLine();
+    Console.WriteLine("Minotaur grammar-compilation harness (" + issueTag + ")");
+    Console.WriteLine($"  runtime: {RuntimeInformation.FrameworkDescription} ({RuntimeInformation.ProcessArchitecture})");
+    Console.WriteLine($"  os:      {RuntimeInformation.OSDescription}");
+    Console.WriteLine($"  cpus:    {Environment.ProcessorCount}");
+    Console.WriteLine($"  grammars: {GrammarsRepo} @ {grammarsRef[..12]}");
+    Console.WriteLine();
 
-var rows = new List<JsonObject>();
-var entryAssembly = System.Reflection.Assembly.GetEntryAssembly()!
-    .Location;
+    var rows = new List<JsonObject>();
+    var entryAssembly = System.Reflection.Assembly.GetEntryAssembly()!
+        .Location;
 
-// Under `dotnet run` the current process is the apphost (it already knows
-// its entry assembly); when launched via the dotnet driver directly, the
-// entry assembly must be passed explicitly.
-var processPath = Environment.ProcessPath!;
-var isDotnetDriver = string.Equals(
-    Path.GetFileName(processPath),
-    "dotnet",
-    StringComparison.OrdinalIgnoreCase);
+    // Under `dotnet run` the current process is the apphost (it already knows
+    // its entry assembly); when launched via the dotnet driver directly, the
+    // entry assembly must be passed explicitly.
+    var processPath = Environment.ProcessPath!;
+    var isDotnetDriver = string.Equals(
+        Path.GetFileName(processPath),
+        "dotnet",
+        StringComparison.OrdinalIgnoreCase);
 
-foreach (var (index, grammarClass) in classes.Select((g, i) => (i, g)))
-{
-    Console.WriteLine($"measuring {grammarClass.ClassName}: {grammarClass.RepoPath} ...");
-
-    var startInfo = new ProcessStartInfo
+    foreach (var (index, grammarClass) in classes.Select((g, i) => (i, g)))
     {
-        FileName = processPath,
-        Arguments = isDotnetDriver
-            ? $"\"{entryAssembly}\" {childArg} {index}"
-            : $"{childArg} {index}",
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-        UseShellExecute = false,
-    };
+        Console.WriteLine($"measuring {grammarClass.ClassName}: {grammarClass.RepoPath} ...");
 
-    using var child = Process.Start(startInfo)!;
-    var stdout = child.StandardOutput.ReadToEnd();
-    var stderr = child.StandardError.ReadToEnd();
-    child.WaitForExit();
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = processPath,
+            Arguments = isDotnetDriver
+                ? $"\"{entryAssembly}\" {childArg} {index}"
+                : $"{childArg} {index}",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
 
-    if (child.ExitCode != 0)
-    {
-        Console.WriteLine($"  child FAILED (exit {child.ExitCode}): {stderr.Trim()}");
-        continue;
-    }
+        using var child = Process.Start(startInfo)!;
+        var stdout = child.StandardOutput.ReadToEnd();
+        var stderr = child.StandardError.ReadToEnd();
+        child.WaitForExit();
 
-    var line = stdout.Split('\n').Select(l => l.Trim()).LastOrDefault(l => l.StartsWith("{")) ?? "";
-    var row = JsonNode.Parse(line)!.AsObject();
-    rows.Add(row);
+        if (child.ExitCode != 0)
+        {
+            Console.WriteLine($"  child FAILED (exit {child.ExitCode}): {stderr.Trim()}");
+            continue;
+        }
 
-    var warmMs = row["warmMedianMs"]!.GetValue<double>();
-    var coldMs = row["coldMs"]!.GetValue<double>();
-    var rules = row["totalRules"]!.GetValue<int>();
-    Console.WriteLine($"  rules {rules}, cold {coldMs:F1} ms, warm median {warmMs:F1} ms, " +
-        $"parser footprint {row["retainedKb"]!.GetValue<double>():F1} KB");
+        var line = stdout.Split('\n').Select(l => l.Trim()).LastOrDefault(l => l.StartsWith("{")) ?? "";
+        var row = JsonNode.Parse(line)!.AsObject();
+        rows.Add(row);
+
+        var warmMs = row["warmMedianMs"]!.GetValue<double>();
+        var coldMs = row["coldMs"]!.GetValue<double>();
+        var rules = row["totalRules"]!.GetValue<int>();
+        Console.WriteLine($"  rules {rules}, cold {coldMs:F1} ms, warm median {warmMs:F1} ms, " +
+            $"parser footprint {row["retainedKb"]!.GetValue<double>():F1} KB");
 }
 
 var commitSha = Environment.GetEnvironmentVariable("MINOTAUR_COMMIT") ?? "unrecorded";
