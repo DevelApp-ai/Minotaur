@@ -28,6 +28,12 @@ name: sbob-choco
 # Both profiles (nuget: sbobforge.json, choco: sbobforge-choco.json) are
 # re-bound together by the sbob-regenerate workflow at a version cut.
 #
+# #213 pre-flight: on a dispatch/release for a tag whose version does not
+# match the committed sbobforge-choco.json packageVersion (the expected state
+# after any non-regen merge), bootstrap-profile detects it up front and the
+# pack/release jobs SKIP green with a notice instead of building 4 minutes
+# and failing the version assert — red then means a real problem.
+#
 # On failure, each job posts its captured step logs to the PR (SBOB-Forge
 # ci.yml pattern, org decision #29) so the cause is visible without
 # downloading the run archive.
@@ -67,6 +73,8 @@ env:
 jobs:
   bootstrap-profile:
     runs-on: ubuntu-latest
+    outputs:
+      stale: ${{ steps.binding.outputs.stale }}
     steps:
       # PR head on pull_request so the generated profile can be committed to
       # the branch; the pushed ref / release tag on the other triggers.
@@ -75,18 +83,41 @@ jobs:
         with:
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
 
+      # #213 pre-flight (dispatch/release only): if the committed profile
+      # binding does not match the tag this lane was dispatched for, mark the
+      # run stale so the heavy jobs below skip green.
+      - name: Pre-flight profile-binding check (#213)
+        id: binding
+        if: github.event_name != 'pull_request' && github.event_name != 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ inputs.tag || github.event.release.tag_name }}"
+          v="${tag#v}"
+          binding="$(jq -r .packageVersion sbobforge-choco.json)"
+          if [ "$binding" != "$v" ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::sbob-choco SKIPPED for v$v: committed choco profile binds $binding. Drift is expected after a non-regen merge (org decision #26); run sbob-regenerate for the next cut and merge its PR."
+          else
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+            echo "choco profile in sync: binds $v — proceeding."
+          fi
+
       - name: Checkout SBOB-Forge (generator)
+        if: steps.binding.outputs.stale != 'true'
         uses: actions/checkout@v5
         with:
           repository: DevelApp-ai/SBOB-Forge
           ref: ${{ env.SBOB_FORGE_REF }}
           path: sbobforge-repo
 
-      - uses: actions/setup-dotnet@v5
+      - if: steps.binding.outputs.stale != 'true'
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore + build sbobforge
+        if: steps.binding.outputs.stale != 'true'
         working-directory: sbobforge-repo
         shell: bash
         env:
@@ -110,6 +141,7 @@ jobs:
           dotnet build --no-restore -warnaserror 2>&1 | tee build.log
 
       - name: Generate / drift-check the choco-bound Windows profile
+        if: steps.binding.outputs.stale != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -176,6 +208,7 @@ jobs:
 
   choco-pack:
     needs: [ bootstrap-profile ]
+    if: needs.bootstrap-profile.outputs.stale != 'true'
     runs-on: windows-latest
     steps:
       # PR head so the bootstrap job's commit (if any) is included.
@@ -356,7 +389,7 @@ jobs:
             });
 
   choco-release:
-    if: ${{ (github.event_name == 'release' && !github.event.release.prerelease) || github.event_name == 'workflow_dispatch' }}
+    if: ${{ needs.bootstrap-profile.outputs.stale != 'true' && ((github.event_name == 'release' && !github.event.release.prerelease) || github.event_name == 'workflow_dispatch') }}
     needs: [ choco-pack ]
     runs-on: ubuntu-latest
     env:
