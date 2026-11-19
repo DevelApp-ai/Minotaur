@@ -58,6 +58,10 @@ using Minotaur.GrammarGeneration;
 
 const string GrammarsRepo = "DevelApp-ai/Minotaur-Grammars";
 const string GrammarsRef = "85360f6ff73304ef0d063fc33af9d03845f3d1c3";
+// The synthetic rule-count bins (Minotaur-Grammars benchmarks/synthetic,
+// issue Minotaur-Grammars#192) were added after the pinned ref above, so the
+// #131 mode resolves them from main (or MINOTAUR_GRAMMARS_DIR when set).
+const string SyntheticRef = "main";
 const int MeasuredConstructs = 10;
 
 var grammarClasses = new (string ClassName, int MinRules, int MaxRules, string RepoPath)[]
@@ -68,25 +72,76 @@ var grammarClasses = new (string ClassName, int MinRules, int MaxRules, string R
     ("Complex DSL", 300, int.MaxValue, "programming-languages/csharp10/CSharp10.grammar"),
 };
 
+// Issue #131: compile-time by rule-count bin, using the committed synthetic
+// grammars (deterministic, gen_synthetic.py) instead of one real grammar per
+// class. Bins map to the article's <50 / 50-200 / 200+ classes.
+var syntheticClasses = new (string ClassName, int MinRules, int MaxRules, string RepoPath)[]
+{
+    ("Bin 20 rules", 0, 50, "benchmarks/synthetic/rules-020/rules-020.grammar"),
+    ("Bin 60 rules", 50, 200, "benchmarks/synthetic/rules-060/rules-060.grammar"),
+    ("Bin 180 rules", 50, 200, "benchmarks/synthetic/rules-180/rules-180.grammar"),
+    ("Bin 320 rules", 200, int.MaxValue, "benchmarks/synthetic/rules-320/rules-320.grammar"),
+};
+
 // Child mode: measure one grammar in this fresh process and print one JSON line.
 if (args.Length == 2 && args[0] == "--measure-one" && int.TryParse(args[1], out var classIndex)
     && classIndex >= 0 && classIndex < grammarClasses.Length)
 {
-    Console.WriteLine(MeasureOne(grammarClasses[classIndex]));
+    Console.WriteLine(MeasureOne(grammarClasses[classIndex], GrammarsRef));
     return 0;
 }
 
-// Parent mode: spawn one fresh child per grammar class and aggregate.
+if (args.Length == 2 && args[0] == "--measure-one-synthetic" && int.TryParse(args[1], out var synthIndex)
+    && synthIndex >= 0 && synthIndex < syntheticClasses.Length)
+{
+    Console.WriteLine(MeasureOne(syntheticClasses[synthIndex], SyntheticRef));
+    return 0;
+}
+
+// Parent modes: spawn one fresh child per grammar class and aggregate.
+if (args.Length >= 2 && args[0] == "--synthetic")
+{
+    // Issue #131: compile-time by rule-count bin over the committed synthetic
+    // grammars (benchmarks/synthetic/rules-*). Resolved from main because the
+    // synthetic corpus postdates the pinned #126 ref.
+    return RunAggregation(
+        args[1],
+        "DevelApp-ai/Minotaur#131",
+        syntheticClasses,
+        SyntheticRef,
+        "--measure-one-synthetic",
+        "Issue #131 " + em + " Grammar compilation time by rule-count bin (synthetic corpus)");
+}
+
 var outputDir = args.Length > 0
     ? args[0]
     : Path.Combine("docs", "measurements", "issue-126");
+return RunAggregation(
+    outputDir,
+    "DevelApp-ai/Minotaur#126",
+    grammarClasses,
+    GrammarsRef,
+    "--measure-one",
+    "Issue #126 " + em + " Grammar compilation performance by grammar size");
+
+// ---------------------------------------------------------------------------
+// Parent-mode aggregation: one fresh child process per grammar class (cold
+// numbers include JIT), then results.json + RESULTS.md in outputDir.
+static int RunAggregation(
+    string outputDir,
+    string issueTag,
+    (string ClassName, int MinRules, int MaxRules, string RepoPath)[] classes,
+    string grammarsRef,
+    string childArg,
+    string title)
+{
 Directory.CreateDirectory(outputDir);
 
 Console.WriteLine("Minotaur issue #126 grammar-compilation harness");
 Console.WriteLine($"  runtime: {RuntimeInformation.FrameworkDescription} ({RuntimeInformation.ProcessArchitecture})");
 Console.WriteLine($"  os:      {RuntimeInformation.OSDescription}");
 Console.WriteLine($"  cpus:    {Environment.ProcessorCount}");
-Console.WriteLine($"  grammars: {GrammarsRepo} @ {GrammarsRef[..12]}");
+Console.WriteLine($"  grammars: {GrammarsRepo} @ {grammarsRef[..12]}");
 Console.WriteLine();
 
 var rows = new List<JsonObject>();
@@ -102,7 +157,7 @@ var isDotnetDriver = string.Equals(
     "dotnet",
     StringComparison.OrdinalIgnoreCase);
 
-foreach (var (index, grammarClass) in grammarClasses.Select((g, i) => (i, g)))
+foreach (var (index, grammarClass) in classes.Select((g, i) => (i, g)))
 {
     Console.WriteLine($"measuring {grammarClass.ClassName}: {grammarClass.RepoPath} ...");
 
@@ -110,8 +165,8 @@ foreach (var (index, grammarClass) in grammarClasses.Select((g, i) => (i, g)))
     {
         FileName = processPath,
         Arguments = isDotnetDriver
-            ? $"\"{entryAssembly}\" --measure-one {index}"
-            : $"--measure-one {index}",
+            ? $"\"{entryAssembly}\" {childArg} {index}"
+            : $"{childArg} {index}",
         RedirectStandardOutput = true,
         RedirectStandardError = true,
         UseShellExecute = false,
@@ -141,17 +196,17 @@ foreach (var (index, grammarClass) in grammarClasses.Select((g, i) => (i, g)))
 
 var commitSha = Environment.GetEnvironmentVariable("MINOTAUR_COMMIT") ?? "unrecorded";
 var grammarSource = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR") is { Length: > 0 } dir
-    ? $"local checkout of {GrammarsRepo} @ {GrammarsRef}"
-    : $"raw.githubusercontent.com {GrammarsRepo} @ {GrammarsRef}";
+    ? $"local checkout of {GrammarsRepo} @ {grammarsRef}"
+    : $"raw.githubusercontent.com {GrammarsRepo} @ {grammarsRef}";
 
 var report = new JsonObject
 {
-    ["issue"] = "DevelApp-ai/Minotaur#126",
+    ["issue"] = issueTag,
     ["harness"] = "Minotaur.Benchmarks.GrammarCompilation",
     ["measuredConstructs"] = MeasuredConstructs,
     ["minotaurCommit"] = commitSha,
     ["grammarsRepo"] = GrammarsRepo,
-    ["grammarsRef"] = GrammarsRef,
+    ["grammarsRef"] = grammarsRef,
     ["grammarSource"] = grammarSource,
     ["machine"] = new JsonObject
     {
@@ -174,17 +229,18 @@ File.WriteAllText(
 
 File.WriteAllText(
     Path.Combine(outputDir, "RESULTS.md"),
-    BuildResultsMarkdown(report));
+    BuildResultsMarkdown(report, title));
 
 Console.WriteLine();
 Console.WriteLine($"wrote {Path.Combine(outputDir, "results.json")} and RESULTS.md");
 return 0;
+}
 
 // ---------------------------------------------------------------------------
 
-static string MeasureOne((string ClassName, int MinRules, int MaxRules, string RepoPath) grammarClass)
+static string MeasureOne((string ClassName, int MinRules, int MaxRules, string RepoPath) grammarClass, string grammarsRef)
 {
-    var content = LoadGrammar(grammarClass.RepoPath);
+    var content = LoadGrammar(grammarClass.RepoPath, grammarsRef);
     var grammarBytes = System.Text.Encoding.UTF8.GetByteCount(content);
     var profile = GrammarProfile.Analyze(content);
 
@@ -266,7 +322,7 @@ static double Median(double[] sortedValues)
         : (sortedValues[mid - 1] + sortedValues[mid]) / 2.0;
 }
 
-static string LoadGrammar(string repoPath)
+static string LoadGrammar(string repoPath, string grammarsRef)
 {
     var localDir = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR");
     if (!string.IsNullOrEmpty(localDir))
@@ -276,15 +332,15 @@ static string LoadGrammar(string repoPath)
     }
 
     using var http = new HttpClient();
-    var url = $"https://raw.githubusercontent.com/DevelApp-ai/Minotaur-Grammars/{GrammarsRef}/{repoPath}";
+    var url = $"https://raw.githubusercontent.com/DevelApp-ai/Minotaur-Grammars/{grammarsRef}/{repoPath}";
     var content = http.GetStringAsync(url).GetAwaiter().GetResult();
     return content;
 }
 
-static string BuildResultsMarkdown(JsonObject report)
+static string BuildResultsMarkdown(JsonObject report, string title)
 {
     var sb = new System.Text.StringBuilder();
-    sb.AppendLine("# Issue #126 — Grammar compilation performance by grammar size");
+    sb.AppendLine("# " + title);
     sb.AppendLine();
     sb.AppendLine("Measured by `Minotaur.Benchmarks.GrammarCompilation`: compiling a");
     sb.AppendLine("GrammarForge grammar into the engine's shipped `RealTimeParserSession`");
@@ -322,10 +378,9 @@ static string BuildResultsMarkdown(JsonObject report)
     }
 
     sb.AppendLine();
-    sb.AppendLine("All four rows use real grammars from the pinned Minotaur-Grammars corpus;");
-    sb.AppendLine("no synthetic grammar was needed. The measured compilation times are in the");
-    sb.AppendLine("milliseconds range, several orders of magnitude below the article's projected");
-    sb.AppendLine("targets; the article table must be updated to these measured values.");
+    sb.AppendLine("Measured compilation times are recorded, never asserted: re-running the");
+    sb.AppendLine("harness regenerates these artifacts on the current machine. Compare against");
+    sb.AppendLine("the article's projected tables and replace the projections with these values.");
     sb.AppendLine();
     sb.AppendLine("Full per-class detail (rule split, keyword counts, all warm samples, smoke");
     sb.AppendLine("parse results) is in `results.json` next to this file.");
