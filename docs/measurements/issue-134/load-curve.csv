@@ -1,0 +1,4 @@
+scale_files,discovered_files,loaded_files,discover_ms,classify_ms,total_median_ms,classified,unclassified,heap_delta_mb,working_set_delta_mb,alloc_mb
+100,100,100,0.78,36.81,12.37,68,32,0.00,0.00,11.02
+1000,1000,1000,0.57,159.81,168.36,668,332,0.00,0.00,110.82
+10000,10000,10000,5.65,833.20,721.03,6668,3332,3.39,4.56,1109.42
