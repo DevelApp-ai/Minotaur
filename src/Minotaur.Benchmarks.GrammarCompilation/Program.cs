@@ -67,7 +67,7 @@ const int MeasuredConstructs = 10;
 var grammarClasses = new (string ClassName, int MinRules, int MaxRules, string RepoPath)[]
 {
     ("Small DSL", 15, 25, "data-config/kdl/KDL.grammar"),
-    ("Medium DSL", 50, 80, "data-query/sql/SQL.grammar"),
+    ("Medium DSL", 50, 80, "data-query/sql2023/SQL2023.grammar"),
     ("Large DSL", 150, 200, "programming-languages/c17/C17.grammar"),
     ("Complex DSL", 300, int.MaxValue, "programming-languages/csharp10/CSharp10.grammar"),
 };
@@ -141,7 +141,8 @@ static int RunAggregation(
     Console.WriteLine($"  runtime: {RuntimeInformation.FrameworkDescription} ({RuntimeInformation.ProcessArchitecture})");
     Console.WriteLine($"  os:      {RuntimeInformation.OSDescription}");
     Console.WriteLine($"  cpus:    {Environment.ProcessorCount}");
-    Console.WriteLine($"  grammars: {GrammarsRepo} @ {grammarsRef[..12]}");
+    var shortRef = grammarsRef.Length >= 12 ? grammarsRef[..12] : grammarsRef;
+    Console.WriteLine($"  grammars: {GrammarsRepo} @ {shortRef}");
     Console.WriteLine();
 
     var rows = new List<JsonObject>();
@@ -357,7 +358,7 @@ static string BuildResultsMarkdown(JsonObject report, string title)
     sb.AppendLine("- Engine: DevelApp.StepLexer `" + report["machine"]!["engine"]!["develapp.steplexer"]!.GetValue<string>()
         + "` / DevelApp.StepParser `" + report["machine"]!["engine"]!["develapp.stepparser"]!.GetValue<string>() + "`");
     sb.AppendLine("- Grammars: " + report["grammarsRepo"]!.GetValue<string>()
-        + " @ `" + report["grammarsRef"]!.GetValue<string>()[..12] + "`");
+        + " @ `" + (report["grammarsRef"]!.GetValue<string>() is { Length: >= 12 } r ? r[..12] : report["grammarsRef"]!.GetValue<string>()) + "`");
     sb.AppendLine("- Minotaur commit: `" + report["minotaurCommit"]!.GetValue<string>() + "`");
     sb.AppendLine("- Harness: measured " + report["measuredConstructs"]!.GetValue<int>()
         + " warm constructs per class");
