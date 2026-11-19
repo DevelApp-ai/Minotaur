@@ -27,6 +27,14 @@ name: sbob-publish
 # hand-editing). Release flow: bump + regenerate via sbob-regenerate.yml,
 # merge that PR, then cut the release.
 #
+# #213 pre-flight: every non-regen merge to main cuts the next patch while the
+# committed profile bindings stay behind, so the drift gate would fail the
+# dispatch BY DESIGN. Before dispatching anything, resolve-version compares
+# the committed packageVersion bindings against the version being published;
+# on mismatch the publish jobs SKIP with a stand-alone notice job that
+# refreshes ONE standing "profiles stale" tracker (issue #213) instead of a
+# red run + a per-release failure issue. Red then means a real problem.
+#
 # Prereleases are skipped: beta profiles are not registry material.
 #
 # Chaining: a release published BY CI with GITHUB_TOKEN does not fire the
@@ -62,9 +70,13 @@ jobs:
   # resolves first and then skips cleanly.
   resolve-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read    # #213 pre-flight reads the committed sbob configs
     outputs:
       version: ${{ steps.version.outputs.version }}
       prerelease: ${{ steps.version.outputs.prerelease }}
+      bindings: ${{ steps.binding.outputs.bindings }}
+      in-sync: ${{ steps.binding.outputs.in_sync }}
     steps:
       - name: Resolve the released version (release event or chained dispatch)
         id: version
@@ -87,9 +99,32 @@ jobs:
           echo "version=$v" >> "$GITHUB_OUTPUT"
           echo "prerelease=$pre" >> "$GITHUB_OUTPUT"
 
+      - name: Checkout committed sbob configs
+        uses: actions/checkout@v5
+
+      # #213: compare the committed profile bindings with the version this
+      # dispatch publishes BEFORE running any expensive lane; stale bindings
+      # skip (not fail) the publish jobs.
+      - name: Pre-flight profile-binding check (#213)
+        id: binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          v="${{ steps.version.outputs.version }}"
+          nuget="$(jq -r .packageVersion sbobforge.json)"
+          choco="$(jq -r .packageVersion sbobforge-choco.json)"
+          echo "bindings=nuget=$nuget,choco=$choco" >> "$GITHUB_OUTPUT"
+          if [ "$nuget" = "$v" ] && [ "$choco" = "$v" ]; then
+            echo "in_sync=true" >> "$GITHUB_OUTPUT"
+            echo "profiles in sync: both configs bind $v — publishing."
+          else
+            echo "in_sync=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::sbob lanes SKIPPED for v$v: committed profiles bind nuget=$nuget, choco=$choco. This drift is expected after a non-regen merge (org decision #26); run sbob-regenerate for the next cut and merge its PR, then re-cut or wait for the next dispatch."
+          fi
+
   sbob-publish:
     needs: [resolve-version]
-    if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
+    if: ${{ needs.resolve-version.outputs.prerelease != 'true' && needs.resolve-version.outputs.in-sync == 'true' }}
     uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@e933f6da8ddad9a0ac39c0c60b7074af11fe2192
     with:
       package-purl: pkg:nuget/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
@@ -122,7 +157,7 @@ jobs:
 
   sbob-publish-choco:
     needs: [resolve-version]
-    if: ${{ needs.resolve-version.outputs.prerelease != 'true' }}
+    if: ${{ needs.resolve-version.outputs.prerelease != 'true' && needs.resolve-version.outputs.in-sync == 'true' }}
     uses: DevelApp-ai/SBOB-Forge/.github/workflows/sbob-registry-publish.yml@e933f6da8ddad9a0ac39c0c60b7074af11fe2192
     with:
       package-purl: pkg:choco/develapp.minotaur@${{ needs.resolve-version.outputs.version }}
@@ -153,6 +188,69 @@ jobs:
       # NU1301-403'd (every 2026-11-03 dispatch) — the callee now declares
       # this optional secret (SBOB-Forge #35).
       PACKAGES_READ_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
+  # #213: when the pre-flight finds stale bindings, this job runs instead of
+  # the publish lanes. It leaves the run GREEN with an explicit skip record:
+  # a step summary + one standing "profiles stale" tracker (refreshed, not
+  # duplicated), replacing the per-release failure issues that the drift gate
+  # used to auto-file for an expected, by-design condition.
+  stale-skip-notice:
+    runs-on: ubuntu-latest
+    needs: [resolve-version]
+    if: ${{ !cancelled() && needs.resolve-version.outputs.prerelease != 'true' && needs.resolve-version.outputs.in-sync == 'false' }}
+    permissions:
+      issues: write
+    steps:
+      - name: Record the skip (summary, notice, standing tracker)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          v="${{ needs.resolve-version.outputs.version }}"
+          bindings="${{ needs.resolve-version.outputs.bindings }}"
+          {
+            echo "### sbob lanes skipped — profiles stale for v$v"
+            echo
+            echo "Committed bindings ($bindings) do not match the published version v$v."
+            echo "This is the expected state after a non-regen merge cut the release"
+            echo "(org decision #26: generated artifacts are committed and drift-gated;"
+            echo "the fix is regenerating, never hand-editing)."
+            echo
+            echo "Action: dispatch sbob-regenerate for the next cut, merge its PR before"
+            echo "the next src-touching merge, and the following dispatch publishes green."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::sbob lanes skipped for v$v (profiles stale: $bindings) — regenerate to re-bind; see the standing tracker."
+          title="sbob: profiles stale for the current cut (standing tracker)"
+          body="Skipped publishing for tag **v$v** (committed bindings: $bindings; run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). Drift is expected after a non-regen merge — run sbob-regenerate for the next cut and merge its PR; the green publish closes this tracker automatically."
+          num="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "in:title \"$title\"" --json number --jq '.[0].number' || true)"
+          if [ -n "${num:-}" ]; then
+            gh issue comment "$num" --repo "$GITHUB_REPOSITORY" --body "Skipped again for **v$v** (run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). Still waiting on a regen merge." || echo "tracker comment failed (non-blocking)"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body" || echo "tracker creation failed (non-blocking)"
+          fi
+
+  # #213 counterpart: when the lanes publish green, close the standing
+  # tracker so the signal is fresh (a re-opened tracker means a NEW skip).
+  stale-tracker-clear:
+    runs-on: ubuntu-latest
+    needs: [resolve-version, sbob-publish, sbob-publish-choco]
+    if: ${{ !cancelled() && needs.resolve-version.outputs.in-sync == 'true' && !contains(needs.*.result, 'failure') }}
+    permissions:
+      issues: write
+    steps:
+      - name: Close the standing stale-profiles tracker if open
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          v="${{ needs.resolve-version.outputs.version }}"
+          title="sbob: profiles stale for the current cut (standing tracker)"
+          num="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "in:title \"$title\"" --json number --jq '.[0].number' || true)"
+          if [ -n "${num:-}" ]; then
+            gh issue close "$num" --repo "$GITHUB_REPOSITORY" --comment "Profiles re-bound and published green for **v$v** (run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). Closing the standing tracker." || echo "tracker close failed (non-blocking)"
+          fi
+
   # Observability (cf. ci-cd-enhanced.yml report-push-failure): these lanes
   # run on workflow_dispatch / release events with no PR to comment on — the
   # 2026-11-03 dispatch failures were only discovered because the registry
