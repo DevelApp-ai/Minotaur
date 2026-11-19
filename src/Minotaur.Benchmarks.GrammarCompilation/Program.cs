@@ -63,14 +63,6 @@ const string GrammarsRef = "85360f6ff73304ef0d063fc33af9d03845f3d1c3";
 // #131 mode resolves them from main (or MINOTAUR_GRAMMARS_DIR when set).
 const string SyntheticRef = "main";
 
-// Grammars renamed on Minotaur-Grammars main after the pinned #126 ref
-// (e.g. unversioned sql -> sql2023 in #218). The harness tries the pinned-ref
-// path first and falls back to the current path, so both the recorded #126
-// run and a main checkout work.
-static readonly Dictionary<string, string> MovedGrammars = new()
-{
-    ["data-query/sql/SQL.grammar"] = "data-query/sql2023/SQL2023.grammar",
-};
 const int MeasuredConstructs = 10;
 
 var grammarClasses = new (string ClassName, int MinRules, int MaxRules, string RepoPath)[]
@@ -334,8 +326,11 @@ static double Median(double[] sortedValues)
 
 static string LoadGrammar(string repoPath, string grammarsRef)
 {
-    var candidates = MovedGrammars.TryGetValue(repoPath, out var moved)
-        ? new[] { repoPath, moved }
+    // Grammars renamed on Minotaur-Grammars main after the pinned #126 ref
+    // (unversioned sql -> sql2023 in #218): try the pinned-ref path first,
+    // then the current path, so both the recorded run and a main checkout work.
+    var candidates = repoPath == "data-query/sql/SQL.grammar"
+        ? new[] { repoPath, "data-query/sql2023/SQL2023.grammar" }
         : new[] { repoPath };
 
     var localDir = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR");
