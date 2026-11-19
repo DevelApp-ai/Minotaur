@@ -39,7 +39,10 @@ namespace Minotaur.Parser.LiveEditing
     /// <item><b>Multi-character alternatives before the single-character
     /// class.</b> Longest alternatives are listed first in the one operator
     /// rule so <c>==</c> wins over <c>=</c>; the remaining single-character
-    /// operators are one character class.</item>
+    /// operators are one character class. <see cref="LiveEditorSession"/>
+    /// runs the engine session in greedy longest-match mode (issue #142), so
+    /// this invariant is belt-and-braces there; the raw engine session's
+    /// exploratory default still requires it.</item>
     /// <item><b>Every character of the edited text must match some
     /// rule.</b> When the lexer reaches input that no rule matches, every
     /// active path dies and the session silently stops lexing at that
