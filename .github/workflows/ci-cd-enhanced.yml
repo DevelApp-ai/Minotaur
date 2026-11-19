@@ -255,6 +255,7 @@ jobs:
     needs: [calculate-version]
     permissions:
       contents: read
+      pull-requests: write
     timeout-minutes: 60
     steps:
     - name: Checkout Minotaur
@@ -301,10 +302,46 @@ jobs:
       env:
         MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
         MINOTAUR_COMMIT: ${{ github.sha }}
+        PROJECTLOAD_INCLUDE_50K: 1
       run: >
         dotnet run --project src/Minotaur.Benchmarks.ProjectLoad
         --configuration Release --no-build --
         ${{ github.workspace }}/measurement-artifacts/issue-134
+
+    - name: Post measurements to the PR (article-lane visibility)
+      if: github.event_name == 'pull_request'
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        {
+          echo "## Article-lane measurements — run #${{ github.run_number }} @ \`${{ github.sha }}\`"
+          echo
+          echo "Fresh run of the article-measurement harnesses on this head commit"
+          echo "(ubuntu-latest, \`.NET ${{ env.DOTNET_VERSION }}\`). On non-PR runs the"
+          echo "full data is only in the \`article-measurements\` artifact."
+          echo
+          echo "### Minotaur #134 — project-load curves (incl. 50K scale)"
+          echo
+          cat measurement-artifacts/issue-134/RESULTS.md
+          echo
+          echo "<details><summary>results.json (#134)</summary>"
+          echo
+          echo '```json'
+          cat measurement-artifacts/issue-134/results.json
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "<details><summary>load-curve.csv (#134)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-134/load-curve.csv
+          echo '```'
+          echo
+          echo "</details>"
+        } > measurement-artifacts/pr-comment-body.md
+        gh pr comment "$PR_NUMBER" --body-file measurement-artifacts/pr-comment-body.md
 
     - name: Upload article measurement artifacts
       if: always()

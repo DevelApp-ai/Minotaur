@@ -7,14 +7,15 @@ loaded through `ProjectLoader.LoadFolderAsync`.
 Machine: Ubuntu 26.04.1 LTS
 
 - Runtime: .NET 8.0.34 (X64, 4 CPUs)
-- Minotaur commit: `1cff9be6c9cad54607e19e3860435a9d3e9e7ca7`
+- Minotaur commit: `539585d31104f362698fd1be9e197b001b1e9008`
 - Grammars dir: `/home/runner/work/Minotaur/Minotaur/grammars`
 
 | Files | Discover (ms) | Classify (ms) | Total load median (ms) | Unclassified | Heap delta (MB) | WS delta (MB) |
 |------:|--------------:|--------------:|-----------------------:|-------------:|----------------:|--------------:|
-| 100 | 1 | 37 | 12 | 32/100 | 0.0 | 0.0 |
-| 1000 | 1 | 160 | 168 | 332/1000 | 0.0 | 0.0 |
-| 10000 | 6 | 833 | 721 | 3332/10000 | 3.4 | 4.6 |
+| 100 | 1 | 76 | 27 | 32/100 | 0.0 | 0.0 |
+| 1000 | 1 | 360 | 379 | 332/1000 | 0.0 | 0.3 |
+| 10000 | 8 | 1499 | 1492 | 3332/10000 | 3.4 | 4.5 |
+| 50000 | 34 | 6934 | 6974 | 16666/50000 | 15.1 | 15.3 |
 
 Notes:
 - `discover` is `Directory.GetFiles` recursive (the call the loader makes);

@@ -1,7 +1,7 @@
 {
   "issue": "DevelApp-ai/Minotaur#134",
   "harness": "Minotaur.Benchmarks.ProjectLoad",
-  "minotaurCommit": "1cff9be6c9cad54607e19e3860435a9d3e9e7ca7",
+  "minotaurCommit": "539585d31104f362698fd1be9e197b001b1e9008",
   "grammarsDir": "/home/runner/work/Minotaur/Minotaur/grammars",
   "machine": {
     "os": "Ubuntu 26.04.1 LTS",
@@ -12,9 +12,9 @@
   "method": {
     "discover": "Directory.GetFiles recursive (same call ProjectLoader makes)",
     "classify": "per-file GrammarDetectionManager.DetectGrammarAsync replayed by the harness (loader exposes no phase timings)",
-    "total": "ProjectLoader.LoadFolderAsync end to end; per-file symbol extraction is stubbed in the shipped loader, so total = discover \u002B classify \u002B assemble",
+    "total": "ProjectLoader.LoadFolderAsync end to end; per-file symbol extraction is stubbed in the shipped loader, so total = discover + classify + assemble",
     "memory": "GC.GetTotalMemory delta after full collection, GC.GetAllocatedBytesForCurrentThread delta, process WorkingSet64 delta",
-    "reps": "3 for \u003C=1K files, 1 above; median reported"
+    "reps": "3 for <=1K files, 1 above; median reported"
   },
   "rows": [
     {
@@ -22,13 +22,13 @@
       "discoveredFiles": 100,
       "loadedFiles": 100,
       "reps": 3,
-      "discoverMs": 0.78,
-      "classifyMs": 36.81,
-      "totalMedianMs": 12.37,
+      "discoverMs": 1.27,
+      "classifyMs": 76.26,
+      "totalMedianMs": 26.57,
       "totalAllMs": [
-        19.46,
-        12.37,
-        11.77
+        39.33,
+        26.57,
+        25.88
       ],
       "classified": 68,
       "unclassified": 32,
@@ -47,13 +47,13 @@
       "discoveredFiles": 1000,
       "loadedFiles": 1000,
       "reps": 3,
-      "discoverMs": 0.57,
-      "classifyMs": 159.81,
-      "totalMedianMs": 168.36,
+      "discoverMs": 0.77,
+      "classifyMs": 360.31,
+      "totalMedianMs": 379.05,
       "totalAllMs": [
-        150.94,
-        169.97,
-        168.36
+        379.05,
+        384.8,
+        376.52
       ],
       "classified": 668,
       "unclassified": 332,
@@ -65,18 +65,18 @@
       "symbolsExtracted": 0,
       "heapDeltaBytes": 0,
       "allocBytes": 116207136,
-      "workingSetDeltaBytes": 0
+      "workingSetDeltaBytes": 319488
     },
     {
       "scaleFiles": 10000,
       "discoveredFiles": 10000,
       "loadedFiles": 10000,
       "reps": 1,
-      "discoverMs": 5.65,
-      "classifyMs": 833.2,
-      "totalMedianMs": 721.03,
+      "discoverMs": 7.55,
+      "classifyMs": 1499.07,
+      "totalMedianMs": 1491.86,
       "totalAllMs": [
-        721.03
+        1491.86
       ],
       "classified": 6668,
       "unclassified": 3332,
@@ -87,8 +87,31 @@
       },
       "symbolsExtracted": 0,
       "heapDeltaBytes": 3554696,
-      "allocBytes": 1163308856,
-      "workingSetDeltaBytes": 4784128
+      "allocBytes": 1163227592,
+      "workingSetDeltaBytes": 4734976
+    },
+    {
+      "scaleFiles": 50000,
+      "discoveredFiles": 50000,
+      "loadedFiles": 50000,
+      "reps": 1,
+      "discoverMs": 34.35,
+      "classifyMs": 6934.09,
+      "totalMedianMs": 6974.23,
+      "totalAllMs": [
+        6974.23
+      ],
+      "classified": 33334,
+      "unclassified": 16666,
+      "fileTypeMix": {
+        "SourceCode": 25000,
+        "Configuration": 16667,
+        "Documentation": 8333
+      },
+      "symbolsExtracted": 0,
+      "heapDeltaBytes": 15823864,
+      "allocBytes": 5816860968,
+      "workingSetDeltaBytes": 16039936
     }
   ]
 }

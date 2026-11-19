@@ -21,8 +21,11 @@ per scale:
 
 Outputs: `results.json` + `load-curve.csv` + `RESULTS.md`. The
 `article-measurements` job in `.github/workflows/ci-cd-enhanced.yml` runs it
-on every PR/push (grammars checkout at `MINOTAUR_GRAMMARS_DIR`) and uploads the
-`article-measurements` artifact.
+on every PR/push at all four scales (100 / 1K / 10K / 50K; it sets
+`PROJECTLOAD_INCLUDE_50K=1`), with the Minotaur-Grammars checkout at
+`MINOTAUR_GRAMMARS_DIR`. It uploads the `article-measurements` artifact and,
+on pull-request runs, posts the current RESULTS.md + raw JSON/CSV as a PR
+comment so the fresh numbers are visible without artifact-download access.
 
 ## Findings the harness already documents
 
