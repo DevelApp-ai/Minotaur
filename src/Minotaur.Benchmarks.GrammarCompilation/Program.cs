@@ -192,48 +192,48 @@ static int RunAggregation(
         var rules = row["totalRules"]!.GetValue<int>();
         Console.WriteLine($"  rules {rules}, cold {coldMs:F1} ms, warm median {warmMs:F1} ms, " +
             $"parser footprint {row["retainedKb"]!.GetValue<double>():F1} KB");
-}
+    }
 
-var commitSha = Environment.GetEnvironmentVariable("MINOTAUR_COMMIT") ?? "unrecorded";
-var grammarSource = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR") is { Length: > 0 } dir
-    ? $"local checkout of {GrammarsRepo} @ {grammarsRef}"
-    : $"raw.githubusercontent.com {GrammarsRepo} @ {grammarsRef}";
+    var commitSha = Environment.GetEnvironmentVariable("MINOTAUR_COMMIT") ?? "unrecorded";
+    var grammarSource = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR") is { Length: > 0 } dir
+        ? $"local checkout of {GrammarsRepo} @ {grammarsRef}"
+        : $"raw.githubusercontent.com {GrammarsRepo} @ {grammarsRef}";
 
-var report = new JsonObject
-{
-    ["issue"] = issueTag,
-    ["harness"] = "Minotaur.Benchmarks.GrammarCompilation",
-    ["measuredConstructs"] = MeasuredConstructs,
-    ["minotaurCommit"] = commitSha,
-    ["grammarsRepo"] = GrammarsRepo,
-    ["grammarsRef"] = grammarsRef,
-    ["grammarSource"] = grammarSource,
-    ["machine"] = new JsonObject
+    var report = new JsonObject
     {
-        ["os"] = RuntimeInformation.OSDescription,
-        ["runtime"] = RuntimeInformation.FrameworkDescription,
-        ["architecture"] = RuntimeInformation.ProcessArchitecture.ToString(),
-        ["processorCount"] = Environment.ProcessorCount,
-        ["engine"] = new JsonObject
+        ["issue"] = issueTag,
+        ["harness"] = "Minotaur.Benchmarks.GrammarCompilation",
+        ["measuredConstructs"] = MeasuredConstructs,
+        ["minotaurCommit"] = commitSha,
+        ["grammarsRepo"] = GrammarsRepo,
+        ["grammarsRef"] = grammarsRef,
+        ["grammarSource"] = grammarSource,
+        ["machine"] = new JsonObject
         {
-            ["develapp.steplexer"] = EngineAssemblyVersion("DevelApp.StepLexer"),
-            ["develapp.stepparser"] = EngineAssemblyVersion("DevelApp.StepParser"),
+            ["os"] = RuntimeInformation.OSDescription,
+            ["runtime"] = RuntimeInformation.FrameworkDescription,
+            ["architecture"] = RuntimeInformation.ProcessArchitecture.ToString(),
+            ["processorCount"] = Environment.ProcessorCount,
+            ["engine"] = new JsonObject
+            {
+                ["develapp.steplexer"] = EngineAssemblyVersion("DevelApp.StepLexer"),
+                ["develapp.stepparser"] = EngineAssemblyVersion("DevelApp.StepParser"),
+            },
         },
-    },
-    ["rows"] = new JsonArray(rows.Select(r => (JsonNode)r!.DeepClone()).ToArray()),
-};
+        ["rows"] = new JsonArray(rows.Select(r => (JsonNode)r!.DeepClone()).ToArray()),
+    };
 
-File.WriteAllText(
-    Path.Combine(outputDir, "results.json"),
-    report.ToString());
+    File.WriteAllText(
+        Path.Combine(outputDir, "results.json"),
+        report.ToString());
 
-File.WriteAllText(
-    Path.Combine(outputDir, "RESULTS.md"),
-    BuildResultsMarkdown(report, title));
+    File.WriteAllText(
+        Path.Combine(outputDir, "RESULTS.md"),
+        BuildResultsMarkdown(report, title));
 
-Console.WriteLine();
-Console.WriteLine($"wrote {Path.Combine(outputDir, "results.json")} and RESULTS.md");
-return 0;
+    Console.WriteLine();
+    Console.WriteLine($"wrote {Path.Combine(outputDir, "results.json")} and RESULTS.md");
+    return 0;
 }
 
 // ---------------------------------------------------------------------------
