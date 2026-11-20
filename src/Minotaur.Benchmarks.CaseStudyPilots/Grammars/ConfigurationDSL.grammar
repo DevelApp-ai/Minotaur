@@ -1,0 +1,44 @@
+/*
+ * This file is part of Minotaur.
+ *
+ * Minotaur is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Minotaur is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Configuration DSL grammar for the issue #128 case-study pilot.
+//
+// Grammar discipline (engine findings, DevelApp.StepParser 1.91.0):
+//  - every line is ONE anchored absorb token (header, include, key=value line,
+//    closing brace); unanchored [/[^ ]/-style] classes that allow skippable
+//    whitespace inside a token rule stall the lexer (LX1002) or flood the
+//    10-path GLR budget with zombie forks
+//  - comments newlines and inter-token whitespace are { skip } and never
+//    cross a newline
+//  - the top level merges BINARY (block_seq ::= block_seq block_seq | block)
+//    so multi-block documents fold in log depth instead of flooding
+//    near-duplicate right-recursive paths.
+
+Grammar: ConfigPilotDsl
+
+<ws> ::= /[\x20\t]+/ => { skip }
+<nl> ::= /\r?\n/ => { skip }
+<comment> ::= /#[^\n]*/ => { skip }
+<header> ::= /environment[\x20\t]+(dev|staging|prod)[\x20\t]*\{/
+<include_line> ::= /include[\x20\t]+"[^"\n]*"/
+<set_line> ::= /[A-Za-z_][A-Za-z0-9_.\-]*=[^\n]*/
+<rbrace> ::= /\}/
+<block> ::= <header> <line_seq> <rbrace>
+<line_seq> ::= <line_seq> <line_seq> | <line>
+<line> ::= <set_line> | <include_line>
+<top> ::= <block> | <include_line>
+<block_seq> ::= <block_seq> <block_seq> | <top>

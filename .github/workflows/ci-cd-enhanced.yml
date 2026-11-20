@@ -248,9 +248,11 @@ jobs:
     # Article-lane measurements (research-article-builder backlog): grammar
     # compilation by size (Minotaur#126 real grammars, Minotaur#131 synthetic
     # rule-count bins from Minotaur-Grammars benchmarks/synthetic),
-    # project-load curves (Minotaur#134), and extension-classification
+    # project-load curves (Minotaur#134), extension-classification
     # accuracy on real polyglot repositories vs the Linguist extension map
-    # (Minotaur#133). Results are uploaded as artifacts
+    # (Minotaur#133), and the grammar-vs-hand case-study pilots for the
+    # configuration DSL (Minotaur#128) and FIX 4.4 + nginx/syslog/logfmt
+    # (Minotaur#132). Results are uploaded as artifacts
     # and transcribed into docs/measurements/; this job never gates merges.
     name: Article-lane measurements (benchmarks)
     runs-on: ubuntu-latest
@@ -280,9 +282,11 @@ jobs:
         dotnet restore src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj
         dotnet restore src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj
         dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj
+        dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj
         dotnet build src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj --configuration Release --no-restore
+        dotnet build src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj --configuration Release --no-restore
 
     - name: Grammar compilation by size (issue #126, real grammars)
       env:
@@ -321,6 +325,30 @@ jobs:
         --configuration Release --no-build --
         ${{ github.workspace }}/measurement-artifacts/issue-133
 
+    - name: Case-study pilot, configuration DSL (issue #128)
+      env:
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.CaseStudyPilots
+        --configuration Release --no-build --
+        dsl ${{ github.workspace }}/measurement-artifacts
+
+    - name: Case-study pilot, FIX 4.4 (issue #132, part 1/2)
+      env:
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.CaseStudyPilots
+        --configuration Release --no-build --
+        fix ${{ github.workspace }}/measurement-artifacts
+
+    - name: Case-study pilot, nginx/syslog/logfmt (issue #132, part 2/2)
+      env:
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.CaseStudyPilots
+        --configuration Release --no-build --
+        logs ${{ github.workspace }}/measurement-artifacts
+
     - name: Post measurements to the PR (article-lane visibility)
       if: github.event_name == 'pull_request'
       env:
@@ -350,6 +378,44 @@ jobs:
           echo
           echo '```csv'
           cat measurement-artifacts/issue-134/load-curve.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "### Minotaur #128 — case-study pilot: configuration DSL, grammar vs hand-written parser"
+          echo
+          cat measurement-artifacts/issue-128/RESULTS.md
+          echo
+          echo "<details><summary>battery.csv (#128)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-128/battery.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "### Minotaur #132 — case-study pilots: FIX 4.4 and nginx/syslog/logfmt, grammar vs hand-written parsers"
+          echo
+          echo "#### FIX 4.4"
+          echo
+          cat measurement-artifacts/issue-132/fix-RESULTS.md
+          echo
+          echo "<details><summary>fix-battery.csv (#132)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-132/fix-battery.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "#### nginx-combined, syslog RFC 3164, logfmt"
+          echo
+          cat measurement-artifacts/issue-132/log-RESULTS.md
+          echo
+          echo "<details><summary>log-battery.csv (#132)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-132/log-battery.csv
           echo '```'
           echo
           echo "</details>"

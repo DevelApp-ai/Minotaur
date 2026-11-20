@@ -1,0 +1,112 @@
+{
+  "commit": "e8016927",
+  "corpus": {
+    "documents": 1000,
+    "bytes": 470757,
+    "largestDocBytes": 919,
+    "seed": 1337
+  },
+  "battery": {
+    "cases": 17,
+    "pass": true
+  },
+  "minotaur": {
+    "meanUsPerDoc": 7118.9,
+    "p95UsPerDoc": 12056.6,
+    "docsPerSecond": 140,
+    "parseFailures": 0,
+    "modelMismatches": 0
+  },
+  "hand": {
+    "meanUsPerDoc": 20.6,
+    "p95UsPerDoc": 32.9,
+    "docsPerSecond": 48174
+  },
+  "slowdownFactor": 345,
+  "timeline": [
+    {
+      "id": "T0",
+      "utc": "2026-11-20T18:10:15Z",
+      "system": "both",
+      "what": "pilot start: DSL spec written, both sides implemented from zero (single implementer)"
+    },
+    {
+      "id": "core-green",
+      "utc": "2026-11-20T18:23:16Z",
+      "system": "both",
+      "what": "grammar and hand parser pass the full DSL battery"
+    },
+    {
+      "id": "M1-grammar",
+      "utc": "2026-11-20T18:23:19Z",
+      "system": "grammar",
+      "what": "maintenance edit M1: add include support to the grammar (token \u002B production)"
+    },
+    {
+      "id": "M1-hand",
+      "utc": "2026-11-20T18:23:29Z",
+      "system": "hand",
+      "what": "maintenance edit M1 mirrored: include branch in the hand parser \u002B rebuild"
+    },
+    {
+      "id": "recreation-start",
+      "utc": "2026-11-20T18:30:00Z",
+      "system": "both",
+      "what": "sandbox environment reset wiped the workspace; re-creating harness files from the session record"
+    },
+    {
+      "id": "recreation-done",
+      "utc": "2026-11-20T18:46:30Z",
+      "system": "both",
+      "what": "harness restored, solution builds again"
+    },
+    {
+      "id": "grammar-hardening",
+      "utc": "2026-11-20T19:12:34Z",
+      "system": "grammar",
+      "what": "grammar redesign guided by recorded engine findings: non-overlapping greedy set_line token \u002B binary top-level merge for multi-block docs, colon-anchored whole-tail syslog token to avoid the LX1002 lexer stall / GLR candidate explosion, and define-before-use rule order in the logfmt grammar"
+    },
+    {
+      "id": "fix-green",
+      "utc": "2026-11-20T18:50:00Z",
+      "system": "both",
+      "what": "FIX grammar \u002B hand parser pass the FIX battery"
+    },
+    {
+      "id": "logs-green",
+      "utc": "2026-11-20T19:14:11Z",
+      "system": "both",
+      "what": "all three log grammars \u002B hand parsers pass their batteries"
+    },
+    {
+      "id": "M2-hand",
+      "utc": "2026-11-20T19:14:11Z",
+      "system": "hand",
+      "what": "maintenance edit M2: add error column \u002B source line to hand parser errors and re-verify battery"
+    },
+    {
+      "id": "recreation2-start",
+      "utc": "2026-11-20T19:30:00Z",
+      "system": "both",
+      "what": "a second sandbox environment reset wiped the workspace after the session-2 recording; re-creating harness files from the recorded state"
+    },
+    {
+      "id": "recreation2-done",
+      "utc": "2026-11-20T19:52:00Z",
+      "system": "both",
+      "what": "harness re-created, solution builds and the DSL \u002B FIX batteries are green again"
+    },
+    {
+      "id": "nginx-hardening",
+      "utc": "2026-11-20T20:04:38Z",
+      "system": "grammar",
+      "what": "engine finding during re-verification: when two token types can both match at one position (a generic quoted vs request over the same span, or status vs bytes over a digit run) the resolved-token stream collapses to the first token while Success=true, and whole-file GLR paths compound exponentially. The nginx grammar was redesigned so every position admits exactly one token: status, bytes and the quoted referer\u002Bagent tail are absorbed into one digit-anchored stb token (walker splits the fields); the logs batteries and whole-file mode are green again"
+    },
+    {
+      "id": "finish",
+      "utc": "2026-11-20T20:12:00Z",
+      "system": "both",
+      "what": "measurements complete"
+    }
+  ]
+}

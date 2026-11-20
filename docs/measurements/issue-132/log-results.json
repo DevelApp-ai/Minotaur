@@ -1,0 +1,50 @@
+{
+  "commit": "e8016927",
+  "formats": [
+    {
+      "format": "nginx-combined",
+      "lines": 5000,
+      "bytes": 687506,
+      "minotaurPerLineMeanUs": 417.92,
+      "minotaurThroughputLinesPerS": 2363,
+      "minotaurFileMs": 25.2,
+      "minotaurFileLines": 30,
+      "minotaurFileParsed": true,
+      "handPerLineMeanUs": 2.45,
+      "handThroughputLinesPerS": 389997,
+      "slowdownFactor": 165.1,
+      "recordsEqual": true,
+      "recordCount": 30
+    },
+    {
+      "format": "syslog-3164",
+      "lines": 5000,
+      "bytes": 311923,
+      "minotaurPerLineMeanUs": 201.91,
+      "minotaurThroughputLinesPerS": 4896,
+      "minotaurFileMs": 21.7,
+      "minotaurFileLines": 30,
+      "minotaurFileParsed": true,
+      "handPerLineMeanUs": 1.18,
+      "handThroughputLinesPerS": 789752,
+      "slowdownFactor": 161.3,
+      "recordsEqual": true,
+      "recordCount": 30
+    },
+    {
+      "format": "logfmt",
+      "lines": 5000,
+      "bytes": 616606,
+      "minotaurPerLineMeanUs": 3118.26,
+      "minotaurThroughputLinesPerS": 320,
+      "minotaurFileMs": 50.6,
+      "minotaurFileLines": 30,
+      "minotaurFileParsed": true,
+      "handPerLineMeanUs": 1.54,
+      "handThroughputLinesPerS": 611785,
+      "slowdownFactor": 1910.3,
+      "recordsEqual": true,
+      "recordCount": 30
+    }
+  ]
+}
