@@ -17,6 +17,7 @@
 
 using System;
 using System.Diagnostics;
+using DevelApp.StepLexer;
 using DevelApp.StepParser;
 
 namespace Minotaur.Parser.LiveEditing
@@ -68,6 +69,20 @@ namespace Minotaur.Parser.LiveEditing
         public LiveEditorSession(string grammarContent, string fileName = "live-editor.txt")
         {
             Session = new RealTimeParserSession(grammarContent, fileName);
+
+            // Greedy longest-match lexing (engine issue #142): the session's
+            // default exploratory mode forks a lexer path per matching rule
+            // and unions the tokens of all active paths, so any overlapping
+            // rule pair (keyword vs. identifier is the classic one) makes the
+            // token stream grow multiplicatively per position. The engine's
+            // issue-101 measurement harness runs greedy for exactly this
+            // reason, and a live editor wants the same deterministic,
+            // exactly-one-token-per-position behavior on every ApplyEdit
+            // re-lex. For the non-overlapping live-editor grammars the
+            // emitted tokens are identical to exploratory; with overlapping
+            // grammars only greedy stays linear.
+            Session.LexingMode = LexingMode.GreedyLongestMatch;
+
             Latency = new LatencyRecorder();
         }
 
