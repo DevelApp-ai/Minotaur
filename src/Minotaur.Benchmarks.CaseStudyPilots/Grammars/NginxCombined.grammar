@@ -1,0 +1,41 @@
+/*
+ * This file is part of Minotaur.
+ *
+ * Minotaur is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Minotaur is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// nginx combined log-format grammar for the issue #132 case-study pilot.
+// Engine discipline: at every byte position at most one token type may
+// match (two viable candidates at one position, e.g. a generic <quoted>
+// vs <request> over the same span, or <status> vs <bytes> over a digit
+// run, collapse the resolved-token stream to the first token even when
+// Success=true, and compound GLR paths exponentially in whole-file
+// parses). So status, bytes and the quoted "referer" "user-agent" tail
+// are absorbed into ONE anchored <stb> token (digit-anchored; the walker
+// splits the four fields and rejects unbalanced quoting), mirroring the
+// syslog colon-anchored absorb token below. Single spaces between fields
+// are { skip } and never cross a newline; the line sequence merges
+// binary for whole-file parses.
+
+Grammar: NginxCombinedPilot
+
+<ws> ::= /[\x20]+/ => { skip }
+<ip> ::= /[0-9]{1,3}(\.[0-9]{1,3}){3}/
+<dash> ::= /-/
+<time> ::= /\[[^\]\n]+\]/
+<request> ::= /"[A-Z]+ [^\x20"\n]+ HTTP\x2F[0-9.]+"/
+<stb> ::= /[0-9]{3}\x20[0-9]{4,}[\x20][^\n]*/
+<eol> ::= /\r?\n/
+<line> ::= <ip> <dash> <dash> <time> <request> <stb> <eol> | <ip> <dash> <dash> <time> <request> <stb>
+<line_seq> ::= <line_seq> <line_seq> | <line>

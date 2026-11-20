@@ -1,0 +1,29 @@
+{
+  "commit": "e8016927",
+  "corpus": {
+    "messages": 100000,
+    "bytes": 7144648,
+    "seed": 421337,
+    "mix": {
+      "heartbeat": "15%",
+      "newOrderSingle": "35%",
+      "executionReport": "35%",
+      "marketDataSnapshot": "10%",
+      "logon": "5%"
+    }
+  },
+  "minotaur": {
+    "p50Us": 489.5,
+    "p95Us": 1865.2,
+    "p99Us": 2706.2,
+    "messagesPerSecond": 1662
+  },
+  "hand": {
+    "p50Us": 0.5,
+    "p95Us": 0.9,
+    "p99Us": 1.1,
+    "messagesPerSecond": 1608547
+  },
+  "slowdownFactor": 967.8,
+  "invalidVerdicts": 0
+}

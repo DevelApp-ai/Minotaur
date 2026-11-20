@@ -1,0 +1,36 @@
+/*
+ * This file is part of Minotaur.
+ *
+ * Minotaur is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Minotaur is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// logfmt grammar for the issue #132 case-study pilot.
+//
+// Pairs are single tokens (key=value absorbed to the next space/newline;
+// values with interior whitespace are quoted and the corpus keeps quoted
+// values space-free so one token covers the pair). THE define-before-use
+// rule of the engine is load-bearing here: with <pair> defined after
+// <pair_seq> even two-line documents failed to resolve. The pair sequence
+// merges binary and the per-line sequence merges binary as well; the GLR
+// path budget nevertheless caps whole-file logfmt parses around 40 lines
+// (an engine finding recorded in the results comment).
+
+Grammar: LogfmtPilot
+
+<ws> ::= /[\x20\t]+/ => { skip }
+<eol> ::= /\r?\n/
+<pair> ::= /[A-Za-z_][A-Za-z0-9_.\-]*=[^\x20\t\n]*/
+<line> ::= <pair_seq> <eol> | <pair_seq>
+<pair_seq> ::= <pair_seq> <pair_seq> | <pair>
+<line_seq> ::= <line_seq> <line_seq> | <line>

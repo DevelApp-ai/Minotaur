@@ -1,0 +1,31 @@
+/*
+ * This file is part of Minotaur.
+ *
+ * Minotaur is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Minotaur is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Minotaur. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// FIX 4.4 grammar for the issue #132 case-study pilot.
+//
+// One SOH-delimited field per token (tag=value absorbs everything up to and
+// including the SOH; anchored by the leading digits and the literal '='):
+// values in the corpus never contain \x01 or \n. The field sequence merges
+// binary, so long messages fold in log depth. Message-level semantics
+// (8=FIX.4.4 first, 9=<body length> second, 10=<checksum> last, checksum =
+// sum of the message bytes preceding "10=" mod 256, zero-padded) are checked
+// identically over the resolved tokens and in the hand scanner.
+
+Grammar: Fix44Pilot
+
+<field> ::= /[0-9]+=[^\x01\n]+\x01/
+<field_seq> ::= <field_seq> <field_seq> | <field>
