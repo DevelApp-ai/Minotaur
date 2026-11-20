@@ -48,7 +48,8 @@ public static class LogRecords
         return true;
     }
 
-    public static bool Equal(LogRecord left, LogRecord right) => Equal(left.Fields, right.Fields);
+    public static bool Equal(LogRecord? left, LogRecord? right) =>
+        (left is null && right is null) || (left is not null && right is not null && Equal(left.Fields, right.Fields));
 
     public static bool ListsEqual(LogRecord[] left, LogRecord[] right)
     {
