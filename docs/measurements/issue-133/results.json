@@ -1,0 +1,837 @@
+{
+  "run": {
+    "harvestedAt": "2026-11-20 15:38:10Z",
+    "commit": "adbf0fa9b1c483512e1742f4a5b850517e2ba7a9",
+    "corpus": [
+      {
+        "repo": "redis",
+        "tarball": "https://codeload.github.com/redis/redis/tar.gz/refs/tags/8.0.2",
+        "files": 1681
+      },
+      {
+        "repo": "curl",
+        "tarball": "https://codeload.github.com/curl/curl/tar.gz/refs/tags/curl-8_23_0",
+        "files": 4581
+      },
+      {
+        "repo": "git",
+        "tarball": "https://codeload.github.com/git/git/tar.gz/refs/tags/v2.56.1",
+        "files": 4858
+      },
+      {
+        "repo": "bootstrap",
+        "tarball": "https://codeload.github.com/twbs/bootstrap/tar.gz/refs/tags/v5.3.9",
+        "files": 796
+      }
+    ],
+    "linguistData": "https://raw.githubusercontent.com/github-linguist/linguist/v9.7.0/lib/linguist/languages.yml",
+    "labelledFiles": 8136,
+    "excludedFiles": 3404,
+    "excluded": {
+      "tool-config:.codespellrc": 1,
+      "vcs-config:.gitattributes": 21,
+      "vcs-config:.gitignore": 71,
+      "extensionless": 2747,
+      "build-template:.in": 48,
+      "no-single-label:.cfg": 1,
+      "tool-config:.clang-format": 2,
+      "build-template:.guess": 1,
+      "test-fixture:.sub": 1,
+      "build-template:.filters": 6,
+      "binary:.png": 116,
+      "binary:.gif": 1,
+      "binary:.ico": 3,
+      "no-single-label:.conf": 8,
+      "binary:.rdb": 8,
+      "no-single-label:.acl": 3,
+      "test-fixture:.aof": 1,
+      "no-single-label:.tpl": 1,
+      "no-single-label:.service": 2,
+      "tool-config:.editorconfig": 4,
+      "no-single-label:.words": 2,
+      "tool-config:.curl": 1,
+      "no-single-label:.mailmap": 2,
+      "no-single-label:.idx": 1,
+      "no-single-label:.checksrc": 5,
+      "build-template:.example": 1,
+      "no-single-label:.soname": 1,
+      "no-single-label:.rc": 2,
+      "no-single-label:.msg": 1,
+      "no-single-label:.sdl": 1,
+      "no-single-label:.opt": 1,
+      "test-fixture:.patch": 19,
+      "no-single-label:.cnf": 2,
+      "no-single-label:.prm": 8,
+      "no-single-label:.key": 2,
+      "test-fixture:tests/data/data1705-stdout.1": 1,
+      "tool-config:.b4-config": 1,
+      "no-single-label:.b4-cover-template": 1,
+      "no-single-label:.gitmodules": 1,
+      "no-single-label:.dev": 1,
+      "no-single-label:.uname": 1,
+      "no-single-label:.netrc": 1,
+      "binary:.gpg": 2,
+      "lockfile:.lock": 2,
+      "no-single-label:.wrap": 5,
+      "test-fixture:.expect": 111,
+      "test-fixture:.test": 96,
+      "binary:.p12": 1,
+      "binary:.pdf": 1,
+      "test-fixture:.export": 2,
+      "test-fixture:.side": 18,
+      "test-fixture:.diff": 18,
+      "binary:.tar": 3,
+      "binary:.zip": 3,
+      "no-single-label:.mbox": 3,
+      "no-single-label:.mboxrd": 1,
+      "binary:.midx": 1,
+      "test-fixture:.dump": 12,
+      "build-template:.sample": 14,
+      "no-single-label:.res": 1,
+      "tool-config:.browserslistrc": 1,
+      "tool-config:.eslintignore": 1,
+      "tool-config:.nvmrc": 1,
+      "tool-config:.prettierignore": 1,
+      "tool-config:.stylelintignore": 1,
+      "binary:.jpg": 3
+    },
+    "unlabelledExtensions": {
+      ".pc": 1,
+      ".def": 2,
+      ".sup": 1,
+      ".git-blame-ignore-revs": 1,
+      ".OS400": 1,
+      ".default": 1,
+      ".c_first": 1,
+      ".supp": 2,
+      ".tsan-suppressions": 1,
+      ".adoco": 2,
+      ".command-option-gpg": 1,
+      ".git-config-gpg": 1,
+      ".README": 1,
+      ".help": 2,
+      ".subjectprefix_DIFFERENT_PREFIX": 1,
+      ".diff-tree_--cc_--patch-with-stat_--summary_main": 1,
+      ".diff-tree_--cc_--patch-with-stat_--summary_side": 1,
+      ".diff-tree_--cc_--patch-with-stat_main": 1,
+      ".diff-tree_--cc_--shortstat_main": 1,
+      ".diff-tree_--cc_--stat_--summary_main": 1,
+      ".diff-tree_--cc_--stat_--summary_side": 1,
+      ".diff-tree_--cc_--stat_main": 1,
+      ".diff-tree_--cc_--summary_REVERSE": 1,
+      ".diff-tree_--cc_main": 1,
+      ".diff-tree_--format=%N_note": 1,
+      ".diff-tree_--patch-with-raw_initial": 1,
+      ".diff-tree_--patch-with-stat_initial": 1,
+      ".diff-tree_--pretty=oneline_--patch-with-raw_initial": 1,
+      ".diff-tree_--pretty=oneline_--patch-with-stat_initial": 1,
+      ".diff-tree_--pretty=oneline_--root_--patch-with-raw_initial": 1,
+      ".diff-tree_--pretty=oneline_--root_--patch-with-stat_initial": 1,
+      ".diff-tree_--pretty=oneline_--root_-p_initial": 1,
+      ".diff-tree_--pretty=oneline_--root_initial": 1,
+      ".diff-tree_--pretty=oneline_-p_initial": 1,
+      ".diff-tree_--pretty=oneline_initial": 1,
+      ".diff-tree_--pretty_--notes_note": 1,
+      ".diff-tree_--pretty_--patch-with-raw_initial": 1,
+      ".diff-tree_--pretty_--patch-with-stat_initial": 1,
+      ".diff-tree_--pretty_--patch-with-stat_side": 1,
+      ".diff-tree_--pretty_--root_--patch-with-raw_initial": 1,
+      ".diff-tree_--pretty_--root_--patch-with-stat_initial": 1,
+      ".diff-tree_--pretty_--root_--stat_--compact-summary_initial": 1,
+      ".diff-tree_--pretty_--root_--stat_--summary_initial": 1,
+      ".diff-tree_--pretty_--root_--stat_initial": 1,
+      ".diff-tree_--pretty_--root_--summary_-r_initial": 1,
+      ".diff-tree_--pretty_--root_--summary_initial": 1,
+      ".diff-tree_--pretty_--root_-p_initial": 1,
+      ".diff-tree_--pretty_--root_initial": 1,
+      ".diff-tree_--pretty_--stat_--summary_initial": 1,
+      ".diff-tree_--pretty_--stat_initial": 1,
+      ".diff-tree_--pretty_--summary_initial": 1,
+      ".diff-tree_--pretty_-R_--root_--stat_--compact-summary_initial": 1,
+      ".diff-tree_--pretty_-p_initial": 1,
+      ".diff-tree_--pretty_-p_side": 1,
+      ".diff-tree_--pretty_initial": 1,
+      ".diff-tree_--pretty_note": 1,
+      ".diff-tree_--pretty_side": 1,
+      ".diff-tree_--root_--abbrev_initial": 1,
+      ".diff-tree_--root_--patch-with-raw_initial": 1,
+      ".diff-tree_--root_--patch-with-stat_initial": 1,
+      ".diff-tree_--root_-p_--abbrev=10_initial": 1,
+      ".diff-tree_--root_-p_--full-index_--abbrev=10_initial": 1,
+      ".diff-tree_--root_-p_--full-index_initial": 1,
+      ".diff-tree_--root_-p_initial": 1,
+      ".diff-tree_--root_-r_--abbrev=4_initial": 1,
+      ".diff-tree_--root_-r_--abbrev_initial": 1,
+      ".diff-tree_--root_-r_initial": 1,
+      ".diff-tree_--root_initial": 1,
+      ".diff-tree_--stat_--compact-summary_initial_mode": 1,
+      ".diff-tree_--stat_initial_mode": 1,
+      ".diff-tree_--summary_initial_mode": 1,
+      ".diff-tree_-R_--stat_--compact-summary_initial_mode": 1,
+      ".diff-tree_-c_--abbrev_main": 1,
+      ".diff-tree_-c_--stat_--summary_main": 1,
+      ".diff-tree_-c_--stat_--summary_side": 1,
+      ".diff-tree_-c_--stat_main": 1,
+      ".diff-tree_-c_main": 1,
+      ".diff-tree_-m_main": 1,
+      ".diff-tree_-p_-m_main": 1,
+      ".diff-tree_-p_initial": 1,
+      ".diff-tree_-p_main": 1,
+      ".diff-tree_-r_--abbrev=4_initial": 1,
+      ".diff-tree_-r_--abbrev_initial": 1,
+      ".diff-tree_-r_initial": 1,
+      ".diff-tree_initial": 1,
+      ".diff-tree_initial_mode": 1,
+      ".diff-tree_main": 1,
+      ".diff_--cached": 1,
+      ".diff_--cached_--_file0": 1,
+      ".diff_--dirstat-by-file_initial_rearrange": 1,
+      ".diff_--dirstat_--cc_main~1_main": 1,
+      ".diff_--dirstat_initial_rearrange": 1,
+      ".diff_--dirstat_main~1_main~2": 1,
+      ".diff_--line-prefix=abc_main_main^_side": 1,
+      ".diff_--line-prefix_--cached_--_file0": 1,
+      ".diff_--name-status_dir2_dir": 1,
+      ".diff_--no-index_--name-status_--_dir2_dir": 1,
+      ".diff_--no-index_--name-status_dir2_dir": 1,
+      ".diff_--no-index_--raw_--abbrev=4_dir2_dir": 1,
+      ".diff_--no-index_--raw_--no-abbrev_dir2_dir": 1,
+      ".diff_--no-index_--raw_dir2_dir": 1,
+      ".diff_--no-index_dir_dir3": 1,
+      ".diff_--raw_--abbrev=4_initial": 1,
+      ".diff_--raw_--no-abbrev_initial": 1,
+      ".diff_--raw_initial": 1,
+      ".diff_main_main^_side": 1,
+      ".main": 9,
+      ".main^": 4,
+      ".main^^": 1,
+      ".log_--cc_-m_-p_main": 1,
+      ".log_--decorate=full_--all": 1,
+      ".log_--decorate=full_--clear-decorations_--all": 1,
+      ".log_--decorate=full_--decorate-all_--all": 1,
+      ".log_--decorate_--all": 1,
+      ".log_--decorate_--clear-decorations_--all": 1,
+      ".log_--decorate_--decorate-all_--all": 1,
+      ".log_--diff-merges=first-parent_main": 1,
+      ".log_--diff-merges=off_-p_--first-parent_main": 1,
+      ".log_--first-parent_--diff-merges=off_-p_main": 1,
+      ".log_--no-diff-merges_-p_--first-parent_main": 1,
+      ".log_--patch-with-stat_--summary_main_--_dir_": 1,
+      ".log_--patch-with-stat_main": 1,
+      ".log_--patch-with-stat_main_--_dir_": 1,
+      ".log_--root_--cc_--patch-with-stat_--summary_main": 1,
+      ".log_--root_--patch-with-stat_--summary_main": 1,
+      ".log_--root_--patch-with-stat_main": 1,
+      ".log_--root_-c_--patch-with-stat_--summary_main": 1,
+      ".log_--root_-p_main": 1,
+      ".log_--root_main": 1,
+      ".log_-GF_-p_--pickaxe-all_main": 1,
+      ".log_-GF_-p_main": 1,
+      ".log_-GF_main": 1,
+      ".log_-IA_-IB_-I1_-I2_-p_main": 1,
+      ".log_-SF_-p_main": 1,
+      ".log_-SF_main": 1,
+      ".log_-SF_main_--max-count=0": 1,
+      ".log_-SF_main_--max-count=1": 1,
+      ".log_-SF_main_--max-count=2": 1,
+      ".log_-S_F_main": 1,
+      ".log_-c_-m_-p_main": 1,
+      ".log_-m_--raw_main": 1,
+      ".log_-m_--stat_main": 1,
+      ".log_-m_-p_--first-parent_main": 1,
+      ".log_-m_-p_main": 1,
+      ".log_-p_--diff-merges=first-parent_main": 1,
+      ".log_-p_--first-parent_main": 1,
+      ".log_-p_main": 1,
+      ".log_main": 1,
+      ".noellipses-diff-tree_--root_--abbrev_initial": 1,
+      ".noellipses-diff-tree_--root_-r_--abbrev=4_initial": 1,
+      ".noellipses-diff-tree_--root_-r_--abbrev_initial": 1,
+      ".noellipses-diff-tree_-c_--abbrev_main": 1,
+      ".noellipses-diff_--no-index_--raw_--abbrev=4_dir2_dir": 1,
+      ".noellipses-diff_--no-index_--raw_dir2_dir": 1,
+      ".noellipses-diff_--raw_--abbrev=4_initial": 1,
+      ".noellipses-diff_--raw_initial": 1,
+      ".noellipses-show_--patch-with-raw_side": 1,
+      ".noellipses-whatchanged_--root_main": 1,
+      ".noellipses-whatchanged_-SF_main": 1,
+      ".noellipses-whatchanged_main": 1,
+      ".rev-list_--children_HEAD": 1,
+      ".rev-list_--parents_HEAD": 1,
+      ".show_--first-parent_main": 1,
+      ".show_--patch-with-raw_side": 1,
+      ".show_--patch-with-stat_--summary_side": 1,
+      ".show_--patch-with-stat_side": 1,
+      ".show_--root_initial": 1,
+      ".show_--stat_--summary_side": 1,
+      ".show_--stat_side": 1,
+      ".show_-c_main": 1,
+      ".show_-m_main": 1,
+      ".show_initial": 1,
+      ".show_main": 1,
+      ".show_side": 1,
+      ".whatchanged_--patch-with-stat_--summary_main_--_dir_": 1,
+      ".whatchanged_--patch-with-stat_main": 1,
+      ".whatchanged_--patch-with-stat_main_--_dir_": 1,
+      ".whatchanged_--root_--cc_--patch-with-stat_--summary_main": 1,
+      ".whatchanged_--root_--patch-with-stat_--summary_main": 1,
+      ".whatchanged_--root_--patch-with-stat_main": 1,
+      ".whatchanged_--root_-c_--patch-with-stat_--summary_main": 1,
+      ".whatchanged_--root_-p_main": 1,
+      ".whatchanged_--root_main": 1,
+      ".whatchanged_-SF_-p_main": 1,
+      ".whatchanged_-SF_main": 1,
+      ".whatchanged_-p_main": 1,
+      ".whatchanged_main": 1,
+      ".NUL": 1,
+      ".0-1": 1,
+      ".0-2": 1,
+      ".0-3": 1,
+      ".1-0": 1,
+      ".1-2": 1,
+      ".1-3": 1,
+      ".2-0": 1,
+      ".2-1": 1,
+      ".2-3": 1,
+      ".3-0": 1,
+      ".3-1": 1,
+      ".3-2": 1,
+      ".beginning-of-file": 2,
+      ".end-of-file": 2,
+      ".move-support-f": 2,
+      ".multiple": 2,
+      ".multiple-overlapping": 2,
+      ".multiple-superset": 2,
+      ".no-assertion-error": 2,
+      ".parallel-change-f-to-main": 2,
+      ".simple-f": 2,
+      ".simple-f-to-main": 2,
+      ".simple-main": 2,
+      ".simple-main-to-end": 2,
+      ".two-ranges": 2,
+      ".vanishes-early": 2,
+      ".orig": 1,
+      ".br-branches-default": 2,
+      ".br-branches-default-merge": 2,
+      ".br-branches-default-merge_branches-default": 2,
+      ".br-branches-default-octopus": 2,
+      ".br-branches-default-octopus_branches-default": 2,
+      ".br-branches-default_branches-default": 2,
+      ".br-branches-one": 2,
+      ".br-branches-one-merge": 2,
+      ".br-branches-one-merge_branches-one": 2,
+      ".br-branches-one-octopus": 2,
+      ".br-branches-one-octopus_branches-one": 2,
+      ".br-branches-one_branches-one": 2,
+      ".br-config-explicit": 2,
+      ".br-config-explicit-merge": 2,
+      ".br-config-explicit-merge_config-explicit": 2,
+      ".br-config-explicit-octopus": 2,
+      ".br-config-explicit-octopus_config-explicit": 2,
+      ".br-config-explicit_config-explicit": 2,
+      ".br-config-glob": 2,
+      ".br-config-glob-merge": 2,
+      ".br-config-glob-merge_config-glob": 2,
+      ".br-config-glob-octopus": 2,
+      ".br-config-glob-octopus_config-glob": 2,
+      ".br-config-glob_config-glob": 2,
+      ".br-remote-explicit": 2,
+      ".br-remote-explicit-merge": 2,
+      ".br-remote-explicit-merge_remote-explicit": 2,
+      ".br-remote-explicit-octopus": 2,
+      ".br-remote-explicit-octopus_remote-explicit": 2,
+      ".br-remote-explicit_remote-explicit": 2,
+      ".br-remote-glob": 2,
+      ".br-remote-glob-merge": 2,
+      ".br-remote-glob-merge_remote-glob": 2,
+      ".br-remote-glob-octopus": 2,
+      ".br-remote-glob-octopus_remote-glob": 2,
+      ".br-remote-glob_remote-glob": 2,
+      ".br-unconfig": 2,
+      ".git": 8,
+      ".git_one": 4,
+      ".git_one_tag_tag-one_tag_tag-three-file": 4,
+      ".git_one_two": 4,
+      ".git_tag_tag-one-tree_tag_tag-three-file": 4,
+      ".git_tag_tag-one_tag_tag-three": 4,
+      ".br-unconfig_branches-default": 2,
+      ".br-unconfig_branches-one": 2,
+      ".br-unconfig_config-explicit": 2,
+      ".br-unconfig_config-glob": 2,
+      ".br-unconfig_remote-explicit": 2,
+      ".br-unconfig_remote-glob": 2,
+      ".main_branches-default": 2,
+      ".main_branches-one": 2,
+      ".main_config-explicit": 2,
+      ".main_config-glob": 2,
+      ".main_remote-explicit": 2,
+      ".main_remote-glob": 2,
+      ".txt,v": 6
+    },
+    "categories": [
+      "standard",
+      "ambiguous",
+      "generated",
+      "container"
+    ],
+    "systems": [
+      "minotaur-composite",
+      "minotaur-extension",
+      "linguist-extension"
+    ]
+  },
+  "accuracy": [
+    {
+      "system": "minotaur-composite",
+      "category": "all",
+      "n": 8136,
+      "correct": 3298,
+      "wrong": 1550,
+      "unclassified": 3288,
+      "coverage": 0.5959,
+      "top1Accuracy": 0.4054,
+      "answeredAccuracy": 0.6803,
+      "setHitAccuracy": 0.4054
+    },
+    {
+      "system": "minotaur-composite",
+      "category": "standard",
+      "n": 5932,
+      "correct": 2478,
+      "wrong": 673,
+      "unclassified": 2781,
+      "coverage": 0.5312,
+      "top1Accuracy": 0.4177,
+      "answeredAccuracy": 0.7864,
+      "setHitAccuracy": 0.4177
+    },
+    {
+      "system": "minotaur-composite",
+      "category": "ambiguous",
+      "n": 923,
+      "correct": 745,
+      "wrong": 166,
+      "unclassified": 12,
+      "coverage": 0.987,
+      "top1Accuracy": 0.8072,
+      "answeredAccuracy": 0.8178,
+      "setHitAccuracy": 0.8072
+    },
+    {
+      "system": "minotaur-composite",
+      "category": "generated",
+      "n": 59,
+      "correct": 56,
+      "wrong": 3,
+      "unclassified": 0,
+      "coverage": 1,
+      "top1Accuracy": 0.9492,
+      "answeredAccuracy": 0.9492,
+      "setHitAccuracy": 0.9492
+    },
+    {
+      "system": "minotaur-composite",
+      "category": "container",
+      "n": 1222,
+      "correct": 19,
+      "wrong": 708,
+      "unclassified": 495,
+      "coverage": 0.5949,
+      "top1Accuracy": 0.0155,
+      "answeredAccuracy": 0.0261,
+      "setHitAccuracy": 0.0155
+    },
+    {
+      "system": "minotaur-extension",
+      "category": "all",
+      "n": 8136,
+      "correct": 3529,
+      "wrong": 122,
+      "unclassified": 4485,
+      "coverage": 0.4487,
+      "top1Accuracy": 0.4338,
+      "answeredAccuracy": 0.9666,
+      "setHitAccuracy": 0.4338
+    },
+    {
+      "system": "minotaur-extension",
+      "category": "standard",
+      "n": 5932,
+      "correct": 2588,
+      "wrong": 122,
+      "unclassified": 3222,
+      "coverage": 0.4568,
+      "top1Accuracy": 0.4363,
+      "answeredAccuracy": 0.955,
+      "setHitAccuracy": 0.4363
+    },
+    {
+      "system": "minotaur-extension",
+      "category": "ambiguous",
+      "n": 923,
+      "correct": 911,
+      "wrong": 0,
+      "unclassified": 12,
+      "coverage": 0.987,
+      "top1Accuracy": 0.987,
+      "answeredAccuracy": 1,
+      "setHitAccuracy": 0.987
+    },
+    {
+      "system": "minotaur-extension",
+      "category": "generated",
+      "n": 59,
+      "correct": 11,
+      "wrong": 0,
+      "unclassified": 48,
+      "coverage": 0.1864,
+      "top1Accuracy": 0.1864,
+      "answeredAccuracy": 1,
+      "setHitAccuracy": 0.1864
+    },
+    {
+      "system": "minotaur-extension",
+      "category": "container",
+      "n": 1222,
+      "correct": 19,
+      "wrong": 0,
+      "unclassified": 1203,
+      "coverage": 0.0155,
+      "top1Accuracy": 0.0155,
+      "answeredAccuracy": 1,
+      "setHitAccuracy": 0.0155
+    },
+    {
+      "system": "linguist-extension",
+      "category": "all",
+      "n": 8136,
+      "correct": 6802,
+      "wrong": 1222,
+      "unclassified": 112,
+      "coverage": 0.9862,
+      "top1Accuracy": 0.836,
+      "answeredAccuracy": 0.8477,
+      "setHitAccuracy": 0.9839
+    },
+    {
+      "system": "linguist-extension",
+      "category": "standard",
+      "n": 5932,
+      "correct": 5663,
+      "wrong": 205,
+      "unclassified": 64,
+      "coverage": 0.9892,
+      "top1Accuracy": 0.9547,
+      "answeredAccuracy": 0.9651,
+      "setHitAccuracy": 0.988
+    },
+    {
+      "system": "linguist-extension",
+      "category": "ambiguous",
+      "n": 923,
+      "correct": 911,
+      "wrong": 12,
+      "unclassified": 0,
+      "coverage": 1,
+      "top1Accuracy": 0.987,
+      "answeredAccuracy": 0.987,
+      "setHitAccuracy": 0.987
+    },
+    {
+      "system": "linguist-extension",
+      "category": "generated",
+      "n": 59,
+      "correct": 11,
+      "wrong": 0,
+      "unclassified": 48,
+      "coverage": 0.1864,
+      "top1Accuracy": 0.1864,
+      "answeredAccuracy": 1,
+      "setHitAccuracy": 0.1864
+    },
+    {
+      "system": "linguist-extension",
+      "category": "container",
+      "n": 1222,
+      "correct": 217,
+      "wrong": 1005,
+      "unclassified": 0,
+      "coverage": 1,
+      "top1Accuracy": 0.1776,
+      "answeredAccuracy": 0.1776,
+      "setHitAccuracy": 1
+    }
+  ],
+  "errorTaxonomy": {
+    "minotaur-extension-unclassifiedByExtension": [
+      {
+        "key": ".sh",
+        "count": 1403
+      },
+      {
+        "key": ".md",
+        "count": 986
+      },
+      {
+        "key": ".adoc",
+        "count": 953
+      },
+      {
+        "key": ".tcl",
+        "count": 255
+      },
+      {
+        "key": ".mdx",
+        "count": 110
+      },
+      {
+        "key": ".astro",
+        "count": 106
+      },
+      {
+        "key": ".yml",
+        "count": 89
+      },
+      {
+        "key": ".pl",
+        "count": 80
+      },
+      {
+        "key": ".txt",
+        "count": 70
+      },
+      {
+        "key": ".po",
+        "count": 59
+      },
+      {
+        "key": ".map",
+        "count": 48
+      },
+      {
+        "key": ".build",
+        "count": 38
+      },
+      {
+        "key": ".pm",
+        "count": 35
+      },
+      {
+        "key": ".cmake",
+        "count": 30
+      },
+      {
+        "key": ".perl",
+        "count": 27
+      }
+    ],
+    "minotaur-extension-wrongPairs": [
+      {
+        "key": "SCSS -\u003E CSS",
+        "count": 122
+      }
+    ],
+    "minotaur-composite-unclassifiedByExtension": [
+      {
+        "key": ".sh",
+        "count": 1382
+      },
+      {
+        "key": ".adoc",
+        "count": 941
+      },
+      {
+        "key": ".md",
+        "count": 458
+      },
+      {
+        "key": ".yml",
+        "count": 88
+      },
+      {
+        "key": ".txt",
+        "count": 70
+      },
+      {
+        "key": ".po",
+        "count": 59
+      },
+      {
+        "key": ".build",
+        "count": 38
+      },
+      {
+        "key": ".cmake",
+        "count": 29
+      },
+      {
+        "key": ".mdx",
+        "count": 27
+      },
+      {
+        "key": ".am",
+        "count": 22
+      },
+      {
+        "key": ".cocci",
+        "count": 20
+      },
+      {
+        "key": ".lua",
+        "count": 20
+      },
+      {
+        "key": ".com",
+        "count": 19
+      },
+      {
+        "key": ".m4",
+        "count": 19
+      },
+      {
+        "key": ".inc",
+        "count": 12
+      }
+    ],
+    "minotaur-composite-wrongPairs": [
+      {
+        "key": "Markdown -\u003E C\u002B\u002B",
+        "count": 513
+      },
+      {
+        "key": "Tcl -\u003E CSS",
+        "count": 218
+      },
+      {
+        "key": "SCSS -\u003E CSS",
+        "count": 122
+      },
+      {
+        "key": "C -\u003E C\u002B\u002B",
+        "count": 121
+      },
+      {
+        "key": "Perl -\u003E Rust",
+        "count": 96
+      },
+      {
+        "key": "JavaScript -\u003E Python",
+        "count": 55
+      },
+      {
+        "key": "MDX -\u003E HTML",
+        "count": 49
+      },
+      {
+        "key": "Python -\u003E C#",
+        "count": 40
+      },
+      {
+        "key": "Perl -\u003E Go",
+        "count": 38
+      },
+      {
+        "key": "Astro -\u003E Python",
+        "count": 34
+      },
+      {
+        "key": "MDX -\u003E CSS",
+        "count": 33
+      },
+      {
+        "key": "Astro -\u003E TypeScript",
+        "count": 27
+      },
+      {
+        "key": "C -\u003E CSS",
+        "count": 27
+      },
+      {
+        "key": "Tcl -\u003E C#",
+        "count": 19
+      },
+      {
+        "key": "Astro -\u003E CSS",
+        "count": 18
+      }
+    ],
+    "minotaur-composite-set-vs-extension": [
+      {
+        "key": "composite=wrong extension=unclassified",
+        "count": 1139
+      },
+      {
+        "key": "composite=wrong extension=correct",
+        "count": 289
+      },
+      {
+        "key": "composite=correct extension=unclassified",
+        "count": 58
+      }
+    ],
+    "linguist-extension-unclassifiedByExtension": [
+      {
+        "key": ".map",
+        "count": 48
+      },
+      {
+        "key": ".build",
+        "count": 38
+      },
+      {
+        "key": ".am",
+        "count": 22
+      },
+      {
+        "key": ".ac",
+        "count": 3
+      },
+      {
+        "key": ".manifest",
+        "count": 1
+      }
+    ],
+    "linguist-extension-wrongPairs": [
+      {
+        "key": "Markdown -\u003E GCC Machine Description",
+        "count": 986
+      },
+      {
+        "key": "YAML -\u003E MiniYAML",
+        "count": 93
+      },
+      {
+        "key": "Text -\u003E Adblock Filter List",
+        "count": 70
+      },
+      {
+        "key": "M4Sugar -\u003E M4",
+        "count": 24
+      },
+      {
+        "key": "HTML -\u003E Ecmarkup",
+        "count": 19
+      },
+      {
+        "key": "Makefile -\u003E Assembly",
+        "count": 12
+      },
+      {
+        "key": "Rust -\u003E RenderScript",
+        "count": 11
+      },
+      {
+        "key": "XML -\u003E Microsoft Visual Studio Solution",
+        "count": 5
+      },
+      {
+        "key": "Shell -\u003E Tcsh",
+        "count": 1
+      },
+      {
+        "key": "Text -\u003E Roff",
+        "count": 1
+      }
+    ]
+  }
+}

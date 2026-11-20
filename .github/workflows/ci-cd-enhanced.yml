@@ -247,8 +247,10 @@ jobs:
   article-measurements:
     # Article-lane measurements (research-article-builder backlog): grammar
     # compilation by size (Minotaur#126 real grammars, Minotaur#131 synthetic
-    # rule-count bins from Minotaur-Grammars benchmarks/synthetic) and
-    # project-load curves (Minotaur#134). Results are uploaded as artifacts
+    # rule-count bins from Minotaur-Grammars benchmarks/synthetic),
+    # project-load curves (Minotaur#134), and extension-classification
+    # accuracy on real polyglot repositories vs the Linguist extension map
+    # (Minotaur#133). Results are uploaded as artifacts
     # and transcribed into docs/measurements/; this job never gates merges.
     name: Article-lane measurements (benchmarks)
     runs-on: ubuntu-latest
@@ -277,8 +279,10 @@ jobs:
       run: |
         dotnet restore src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj
         dotnet restore src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj
+        dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj
         dotnet build src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj --configuration Release --no-restore
+        dotnet build src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj --configuration Release --no-restore
 
     - name: Grammar compilation by size (issue #126, real grammars)
       env:
@@ -307,6 +311,15 @@ jobs:
         dotnet run --project src/Minotaur.Benchmarks.ProjectLoad
         --configuration Release --no-build --
         ${{ github.workspace }}/measurement-artifacts/issue-134
+
+    - name: Classification accuracy on real polyglot repos (issue #133)
+      env:
+        MINOTAUR_COMMIT: ${{ github.sha }}
+        CLASSACC_CACHE_DIR: ${{ runner.temp }}/classacc-corpus
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.ClassificationAccuracy
+        --configuration Release --no-build --
+        ${{ github.workspace }}/measurement-artifacts/issue-133
 
     - name: Post measurements to the PR (article-lane visibility)
       if: github.event_name == 'pull_request'
@@ -337,6 +350,22 @@ jobs:
           echo
           echo '```csv'
           cat measurement-artifacts/issue-134/load-curve.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "### Minotaur #133 — extension-classification accuracy (real polyglot corpus)"
+          echo
+          echo "<details><summary>RESULTS.md (#133)</summary>"
+          echo
+          cat measurement-artifacts/issue-133/RESULTS.md
+          echo
+          echo "</details>"
+          echo
+          echo "<details><summary>accuracy.csv (#133)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-133/accuracy.csv
           echo '```'
           echo
           echo "</details>"

@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.ParserR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.ProjectLoad", "Minotaur.Benchmarks.ProjectLoad\Minotaur.Benchmarks.ProjectLoad.csproj", "{6FEC2B62-9635-406D-9A7A-841456ACA28D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.ClassificationAccuracy", "Minotaur.Benchmarks.ClassificationAccuracy\Minotaur.Benchmarks.ClassificationAccuracy.csproj", "{C673B574-1A6D-4EAB-8E97-93B044CD89F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,5 +67,9 @@ Global
 		{6FEC2B62-9635-406D-9A7A-841456ACA28D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FEC2B62-9635-406D-9A7A-841456ACA28D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FEC2B62-9635-406D-9A7A-841456ACA28D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C673B574-1A6D-4EAB-8E97-93B044CD89F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C673B574-1A6D-4EAB-8E97-93B044CD89F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C673B574-1A6D-4EAB-8E97-93B044CD89F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C673B574-1A6D-4EAB-8E97-93B044CD89F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

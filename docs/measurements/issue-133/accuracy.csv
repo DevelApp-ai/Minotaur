@@ -1,0 +1,16 @@
+system,category,n,correct,wrong,unclassified,set_hit,coverage,top1_accuracy,answered_accuracy
+minotaur-composite,all,8136,3298,1550,3288,3298,0.5959,0.4054,0.6803
+minotaur-composite,standard,5932,2478,673,2781,2478,0.5312,0.4177,0.7864
+minotaur-composite,ambiguous,923,745,166,12,745,0.987,0.8072,0.8178
+minotaur-composite,generated,59,56,3,0,56,1,0.9492,0.9492
+minotaur-composite,container,1222,19,708,495,19,0.5949,0.0155,0.0261
+minotaur-extension,all,8136,3529,122,4485,3529,0.4487,0.4338,0.9666
+minotaur-extension,standard,5932,2588,122,3222,2588,0.4568,0.4363,0.955
+minotaur-extension,ambiguous,923,911,0,12,911,0.987,0.987,1
+minotaur-extension,generated,59,11,0,48,11,0.1864,0.1864,1
+minotaur-extension,container,1222,19,0,1203,19,0.0155,0.0155,1
+linguist-extension,all,8136,6802,1222,112,8005,0.9862,0.836,0.8477
+linguist-extension,standard,5932,5663,205,64,5861,0.9892,0.9547,0.9651
+linguist-extension,ambiguous,923,911,12,0,911,1,0.987,0.987
+linguist-extension,generated,59,11,0,48,11,0.1864,0.1864,1
+linguist-extension,container,1222,217,1005,0,1222,1,0.1776,0.1776
