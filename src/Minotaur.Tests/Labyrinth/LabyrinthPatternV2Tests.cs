@@ -86,21 +86,28 @@ public sealed class LabyrinthPatternV2Tests
     public void Diagnostic_TokenDump()
     {
         var lines = new List<string>();
-        foreach (var pattern in new[] { "$X.DoWork(...)", "GetIndex(...)", "$X?.DoWork()", "$A ?? $B" })
+        foreach (var pattern in new[] { "$X.DoWork(...)", "$X?.DoWork()", "$A ?? $B" })
         {
             var ast = Parse(pattern);
-            lines.Add("P#" + pattern + "# => " + string.Join(" | ", ast.Nodes.Select(n =>
-                n.Kind + ":" + n.TokenType + ":[" + (n.MetavariableName ?? n.Value) + "]")));
+            // Compact dump: KindLetter:TokenType@start+len:<value>, wrapped to
+            // keep each line short enough to survive the 240-char annotation cap.
+            var parts = ast.Nodes.Select(n =>
+                (n.Kind == LabyrinthPatternNodeKind.Metavariable ? "M" :
+                 n.Kind == LabyrinthPatternNodeKind.Ellipsis ? "E" : "L") +
+                ":" + n.TokenType + "@" + n.StartPosition + "+" + n.Length + ":" + n.Value).ToList();
+            for (var k = 0; k < parts.Count; k += 7)
+            {
+                lines.Add("P#" + pattern + "#(" + k + ") " + string.Join(" | ", parts.Skip(k).Take(7)));
+            }
         }
 
-        foreach (var snippet in new[] { "w.DoWork()", "z?.DoWork()", "items.FirstOrDefault()" })
+        foreach (var snippet in new[] { "z?.DoWork();", "var s = x ?? f;" })
         {
             try
             {
-                ScanHost.BuildGraph(snippet + ";", "diag.cs", TestGrammar, "TestLang", out var nodes);
+                ScanHost.BuildGraph(snippet, "diag.cs", TestGrammar, "TestLang", out var nodes);
                 lines.Add("S#" + snippet + "# => " + string.Join(" ; ", nodes.Select(n =>
-                    n.NodeType + ":[" + (n.Name ?? "-") + "]/a" + n.Arguments.Count +
-                    (n.Receiver is null ? string.Empty : "/r[" + n.Receiver.Name + "]"))));
+                    n.NodeType + ":[" + (n.Name ?? "-") + "]/a" + n.Arguments.Count)));
             }
             catch (Exception ex)
             {
