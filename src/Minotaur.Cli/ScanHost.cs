@@ -12,11 +12,14 @@ namespace Minotaur.Cli;
 public sealed class SourceMatchNode : ILabyrinthMatchNode, ILabyrinthFindingLocation
 {
     public SourceMatchNode(string nodeType, string? name, IReadOnlyList<ILabyrinthMatchNode> arguments,
-        string filePath, int position, string source)
+        string filePath, int position, string source,
+        ILabyrinthMatchNode? receiver = null, bool isNullConditional = false)
     {
         NodeType = nodeType;
         Name = name;
         Arguments = arguments;
+        Receiver = receiver;
+        IsNullConditional = isNullConditional;
         FilePath = filePath;
         Position = position;
         var (line, col) = LineCol(source, position);
@@ -27,6 +30,8 @@ public sealed class SourceMatchNode : ILabyrinthMatchNode, ILabyrinthFindingLoca
     public string NodeType { get; }
     public string? Name { get; }
     public IReadOnlyList<ILabyrinthMatchNode> Arguments { get; }
+    public ILabyrinthMatchNode? Receiver { get; }
+    public bool IsNullConditional { get; }
     public string FilePath { get; }
     public int StartLine { get; }
     public int StartColumn { get; }
@@ -107,6 +112,22 @@ public static class ScanHost
     /// (a simple ordered-flow approximation; interprocedural edges are not
     /// built yet). Identifier nodes are interned per name so metavariable
     /// unification (reference equality) works across occurrences.
+    /// <para>
+    /// Materialization conventions (pattern v2, issue #247):
+    /// <list type="bullet">
+    /// <item><c>x.DoWork()</c> ⇒ <c>FunctionCall</c> Name=<c>DoWork</c> with
+    /// <c>Receiver</c> = the interned <c>x</c> identifier node.</item>
+    /// <item><c>x?.DoWork()</c> ⇒ same, with <c>IsNullConditional</c> = true
+    /// (the pattern-side plain <c>$X.DoWork()</c> deliberately does not match
+    /// safe derefs).</item>
+    /// <item><c>a[i]</c> ⇒ <c>IndexAccess</c> with <c>Receiver</c> = the array
+    /// expression node and the index expressions as arguments.</item>
+    /// <item><c>x / y</c>, <c>x % y</c>, <c>x as T</c>, <c>x ?? y</c> ⇒
+    /// <c>FunctionCall</c> Name=<c>op:divide</c>/<c>op:modulo</c>/<c>op:as</c>/
+    /// <c>op:coalesce</c> with the two operands as arguments, folded
+    /// left-associatively.</item>
+    /// </list>
+    /// </para>
     /// </summary>
     public static LabyrinthDataFlowGraph BuildGraph(
         string source, string filePath, string grammarContent, string grammarName, out List<ILabyrinthMatchNode> nodes)
@@ -192,6 +213,98 @@ public static class ScanHost
         return type.Contains("IDENT") || type == "NAME";
     }
 
+    /// <summary>
+    /// Identifier-like token: matches the target grammar's identifier kind (whose
+    /// token rule name varies across grammars) or, by value, any bare word —
+    /// so grammar keywords such as <c>string</c> or <c>value</c> lex as usable
+    /// identifiers. Pure punctuation/operator values never look like words.
+    /// </summary>
+    private static bool IsIdentLike(StepToken token) =>
+        IsIdent(token) || (token.Value.Length > 0
+            && (char.IsLetter(token.Value[0]) || token.Value[0] == '_')
+            && token.Value.All(c => char.IsLetterOrDigit(c) || c == '_'));
+
+    /// <summary>
+    /// Recognizes the v2 binary operators at token position <paramref name="i"/>
+    /// (value-based, so every target grammar lexes the same): <c>/</c>,
+    /// <c>%</c>, <c>as</c>, and <c>??</c> (as one token or as two <c>?</c>).
+    /// </summary>
+    private static bool BinaryOperatorAt(List<StepToken> tokens, int i, out string opName, out int width)
+    {
+        opName = string.Empty;
+        width = 0;
+        var value = tokens[i].Value;
+        if (value == "/")
+        {
+            opName = "op:divide";
+            width = 1;
+        }
+        else if (value == "%")
+        {
+            opName = "op:modulo";
+            width = 1;
+        }
+        else if (value == "as")
+        {
+            opName = "op:as";
+            width = 1;
+        }
+        else if (value == "??")
+        {
+            opName = "op:coalesce";
+            width = 1;
+        }
+        else if (value == "?" && i + 1 < tokens.Count && tokens[i + 1].Value == "?")
+        {
+            opName = "op:coalesce";
+            width = 2;
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Folds v2 binary operators onto a materialized primary: for each
+    /// operator token, parses the right-hand operand and wraps the pair in an
+    /// op: node (<c>op:divide</c>, <c>op:modulo</c>, <c>op:as</c>,
+    /// <c>op:coalesce</c>), left-associatively.
+    /// </summary>
+    private static ILabyrinthMatchNode WithBinaryOperatorTail(
+        ILabyrinthMatchNode lhs, List<StepToken> tokens, ref int i, string source, string filePath,
+        Dictionary<string, SourceMatchNode> intern, List<SourceMatchNode> all, HashSet<string> stops, int position)
+    {
+        while (i < tokens.Count && !stops.Contains(tokens[i].Value) && BinaryOperatorAt(tokens, i, out var opName, out var width))
+        {
+            i += width;
+
+            // The operand parse must stop on further operator tokens: the
+            // while loop here folds them left-associatively. Letting the
+            // operand's own recursion fold them instead would produce a
+            // right-leaning tree the pattern compiler does not match.
+            var operandStops = new HashSet<string>(stops, StringComparer.Ordinal)
+            {
+                ";", ",", ")", "]", "/", "%", "as", "?", "??"
+            };
+            var rhsList = ParseExpr(tokens, ref i, source, filePath, intern, all, operandStops);
+            var rhs = rhsList.Count switch
+            {
+                0 => throw new InvalidOperationException(
+                    $"Binary operator '{opName}' without a right-hand operand at position {i - width}."),
+                1 => rhsList[0],
+                _ => new SourceMatchNode("Expression", null, rhsList, filePath, position, source)
+            };
+            var op = new SourceMatchNode("FunctionCall", opName, new ILabyrinthMatchNode[] { lhs, rhs }, filePath, position, source);
+            all.Add(op);
+            lhs = op;
+        }
+
+        return lhs;
+    }
+
     private static SourceMatchNode Intern(
         IReadOnlyList<string> parts, string source, string filePath,
         Dictionary<string, SourceMatchNode> intern, List<SourceMatchNode> all, int position)
@@ -255,20 +368,43 @@ public static class ScanHost
 
             var parts = new List<string> { token.Value };
             var startPos = token.StartPosition;
+            var nullConditional = false;
             i++;
-            while (i + 1 < tokens.Count && tokens[i].Value == "." && IsIdent(tokens[i + 1]))
+
+            // Member chain, including null-conditional links (?. / . ) — the
+            // marker distinguishes safe derefs (v2).
+            while (i < tokens.Count)
             {
-                parts.Add(tokens[i + 1].Value);
-                i += 2;
+                if (tokens[i].Value == "." && i + 1 < tokens.Count && IsIdentLike(tokens[i + 1]))
+                {
+                    parts.Add(tokens[i + 1].Value);
+                    i += 2;
+                }
+                else if (tokens[i].Value == "?." && i + 1 < tokens.Count && IsIdentLike(tokens[i + 1]))
+                {
+                    nullConditional = true;
+                    parts.Add(tokens[i + 1].Value);
+                    i += 2;
+                }
+                else if (tokens[i].Value == "?" && i + 2 < tokens.Count
+                    && tokens[i + 1].Value == "." && IsIdentLike(tokens[i + 2]))
+                {
+                    nullConditional = true;
+                    parts.Add(tokens[i + 2].Value);
+                    i += 3;
+                }
+                else
+                {
+                    break;
+                }
             }
 
-            if (i < tokens.Count && (tokens[i].Value == "(" || tokens[i].Value == "["))
+            if (i < tokens.Count && tokens[i].Value == "(")
             {
-                var close = tokens[i].Value == "(" ? ")" : "]";
                 i++;
                 var callArgs = new List<ILabyrinthMatchNode>();
-                var argStops = new HashSet<string>(StringComparer.Ordinal) { ",", close };
-                while (i < tokens.Count && tokens[i].Value != close)
+                var argStops = new HashSet<string>(StringComparer.Ordinal) { ",", ")" };
+                while (i < tokens.Count && tokens[i].Value != ")")
                 {
                     if (tokens[i].Value == ",")
                     {
@@ -293,15 +429,76 @@ public static class ScanHost
                     i++;
                 }
 
-                var call = new SourceMatchNode("FunctionCall", string.Join(".", parts), callArgs, filePath, startPos, source);
+                // v2: split receiver from method name; bare calls keep the
+                // receiver-free FunctionCall of v1.
+                SourceMatchNode? receiver = null;
+                string callName;
+                if (parts.Count > 1)
+                {
+                    var receiverParts = parts.Take(parts.Count - 1).ToList();
+                    callName = parts[^1];
+                    receiver = Intern(receiverParts, source, filePath, intern, all, startPos);
+                }
+                else
+                {
+                    callName = parts[0];
+                }
+
+                var call = new SourceMatchNode("FunctionCall", callName, callArgs, filePath, startPos, source, receiver, nullConditional);
                 all.Add(call);
-                result.Add(call);
+                result.Add(WithBinaryOperatorTail(call, tokens, ref i, source, filePath, intern, all, stops, startPos));
+            }
+            else if (i < tokens.Count && IsIndexOpen(tokens, i))
+            {
+                var conditionalIndex = tokens[i].Value != "[";
+                if (tokens[i].Value == "?" )
+                {
+                    i += 2; // the "? [" pair
+                }
+                else
+                {
+                    i++; // "[" or "?["
+                }
+
+                var indexArgs = new List<ILabyrinthMatchNode>();
+                var argStops = new HashSet<string>(StringComparer.Ordinal) { ",", "]" };
+                while (i < tokens.Count && tokens[i].Value != "]")
+                {
+                    if (tokens[i].Value == ",")
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    var before = i;
+                    var arg = ParseExpr(tokens, ref i, source, filePath, intern, all, argStops);
+                    if (i == before)
+                    {
+                        i++;
+                    }
+
+                    indexArgs.Add(arg.Count == 1
+                        ? arg[0]
+                        : new SourceMatchNode("Expression", null, arg, filePath, startPos, source));
+                }
+
+                if (i < tokens.Count)
+                {
+                    i++;
+                }
+
+                // v2: indexing materializes as IndexAccess with the indexed
+                // expression exposed as the Receiver (taint binds to it).
+                var receiver = Intern(parts, source, filePath, intern, all, startPos);
+                var index = new SourceMatchNode("IndexAccess", null, indexArgs, filePath, startPos, source, receiver, conditionalIndex);
+                all.Add(index);
+                result.Add(WithBinaryOperatorTail(index, tokens, ref i, source, filePath, intern, all, stops, startPos));
             }
             else if (i < tokens.Count && tokens[i].Value == "=")
             {
                 i++;
                 var lhs = MakeLhs(parts, source, filePath, intern, all, startPos);
-                var rhsStops = new HashSet<string>(StringComparer.Ordinal) { ";", ")", "," };
+                var rhsStops = new HashSet<string>(StringComparer.Ordinal) { ";", ")", ",", "]" };
                 var rhs = ParseExpr(tokens, ref i, source, filePath, intern, all, rhsStops);
                 var rhsNode = rhs.Count == 1
                     ? rhs[0]
@@ -312,10 +509,22 @@ public static class ScanHost
             }
             else
             {
-                result.Add(Intern(parts, source, filePath, intern, all, startPos));
+                var identifier = Intern(parts, source, filePath, intern, all, startPos);
+                result.Add(WithBinaryOperatorTail(identifier, tokens, ref i, source, filePath, intern, all, stops, startPos));
             }
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// True when the token position opens an indexing bracket: <c>[</c>,
+    /// a single-token null-conditional <c>?[</c>, or the <c>? [</c> pair.
+    /// </summary>
+    private static bool IsIndexOpen(List<StepToken> tokens, int i)
+    {
+        var value = tokens[i].Value;
+        return value == "[" || value == "?["
+            || (value == "?" && i + 1 < tokens.Count && tokens[i + 1].Value == "[");
     }
 }
