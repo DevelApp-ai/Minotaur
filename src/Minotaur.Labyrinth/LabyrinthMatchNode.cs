@@ -27,6 +27,16 @@ public interface ILabyrinthMatchNode
 
     /// <summary>The child nodes in positional order (arguments, assignment sides).</summary>
     IReadOnlyList<ILabyrinthMatchNode> Arguments { get; }
+
+    /// <summary>
+    /// The receiver (explicit left-hand operand) of a dotted call or an index
+    /// expression, or <c>null</c> when the node has no receiver materialized
+    /// (pattern v2, issue #247). For <c>x.DoWork(...)</c> the Name stays the
+    /// full dotted string <c>x.DoWork</c> (v1 behaviour) while the receiver
+    /// carries the materialized <c>x</c> node so patterns like
+    /// <c>$X.DoWork(...)</c> can bind and unify on it.
+    /// </summary>
+    ILabyrinthMatchNode? Receiver => null;
 }
 
 /// <summary>
@@ -48,12 +58,17 @@ public sealed class LabyrinthMatchNode : ILabyrinthMatchNode
     /// <param name="nodeType">The semantic node type (e.g. <c>FunctionCall</c>).</param>
     /// <param name="name">The identifier text, if any.</param>
     /// <param name="arguments">The child nodes, in positional order.</param>
-    public LabyrinthMatchNode(string nodeType, string? name = null, IReadOnlyList<ILabyrinthMatchNode>? arguments = null)
+    public LabyrinthMatchNode(string nodeType, string? name = null, IReadOnlyList<ILabyrinthMatchNode>? arguments = null,
+        ILabyrinthMatchNode? receiver = null)
     {
         NodeType = nodeType;
         Name = name;
         Arguments = arguments ?? Array.Empty<ILabyrinthMatchNode>();
+        Receiver = receiver;
     }
+
+    /// <summary>The receiver of a dotted call or index node, or null (pattern v2, issue #247).</summary>
+    public ILabyrinthMatchNode? Receiver { get; }
 }
 
 /// <summary>

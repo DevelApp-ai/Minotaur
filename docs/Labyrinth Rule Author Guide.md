@@ -151,3 +151,130 @@ var reportable = baseline.Apply(findings, out int suppressed);
 
 Fingerprints are location-sensitive: editing the code around an accepted finding
 moves it and makes it reportable again, forcing re-review.
+
+## Pattern v2 shapes (receiver binding, operators, index access)
+
+Beyond the v1 shapes (plain calls, assignments with call right-hand sides,
+bare metavariables/identifiers), patterns support the following shapes. All v2
+matching works on `FunctionCall`, `Assignment` and `IndexAccess` nodes whose
+receivers and operator operands are materialized into the data-flow graph.
+
+### Receiver binding for dotted calls
+
+`$X.Method(...)` matches any dotted call whose callee name ends in
+`.Method` and binds `$X` to the *receiver node* (the expression before the
+dot) captured earlier in the statement:
+
+```yaml
+# source: the receiver of a maybe-null-returning call
+- pattern: "$RCV.FirstOrDefault(...)"
+# sink: a dereference of the same receiver through a captured variable
+- pattern: "$X.ToString()"
+```
+
+Because a v1 call match is *exact name equality* and a dotted call's node name
+is the full dotted name (`items.FirstOrDefault`), sources over dotted calls
+should be written with a metavariable receiver ($RCV above) rather than a bare
+callee (`FirstOrDefault(...)`), which would only match undotted calls.
+
+Literal receivers work too, e.g. the guard call sanitizer:
+
+```yaml
+sanitizers:
+  - pattern: "ArgumentNullException.ThrowIfNull($X)"
+```
+
+### Conditional access marker
+
+`x?.ToString()` materializes with node name `x?.ToString`: the `?.` survives
+inside the name. Consequences:
+
+- A deref sink `$X.ToString()` never matches a conditional access (the name
+  contains `?`), so `?.` is inherently safe against receiver-null sinks.
+- To match a conditional access explicitly, write the marker into the
+  pattern: `$X?.Method(...)`.
+
+### Operator node conventions
+
+Binary operators materialize as two-argument `FunctionCall` nodes with
+reserved names, and patterns use the surface syntax:
+
+| Surface pattern | Node | Arguments |
+| :--- | :--- | :--- |
+| `$A / $B` | `FunctionCall op:divide` | left, right |
+| `$A % $B` | `FunctionCall op:modulo` | left, right |
+| `$V as $T` | `FunctionCall op:as` | expression, type |
+| `$A ?? $B` | `FunctionCall op:coalesce` | left, right |
+
+Operands may be metavariables or plain identifiers.
+
+### Index access
+
+`$ARR[$I]` matches an `IndexAccess` node (name = array expression, index
+expression as sole argument, array node also bound as receiver) and binds
+both. Literal array names match by name equality: `data[$I]` matches an index
+into `data` with any index. Index nodes are also sink-capable without a
+metavariable receiver (`data[$I]`).
+
+### Relaxed assignment right-hand sides
+
+Assignment patterns accept more than call right-hand sides. All of these
+bind both sides:
+
+```yaml
+propagators:
+  - pattern: "$X = $Y"              # bare copy
+    from: $Y
+    to: $X
+  - pattern: "$SAFE = $A ?? $B"     # null-coalescing rescue
+  - pattern: "$X = $Y.DoWork()"     # call into a fresh variable
+  - pattern: "$V = $ARR[$I]"        # index read
+```
+
+### The unification rule for taint flows
+
+Metavariables unify across the whole rule, and the taint chain is
+document-order linear: a finding requires the sink to *reuse the same bound
+node* the propagator transferred taint to. In practice, write the propagator's
+`to:` metavariable with the same name the sink binds, e.g. for a null-deref
+rule:
+
+```yaml
+sources:
+  - pattern: "$RCV.FirstOrDefault(...)"
+propagators:
+  - pattern: "$X = $Y"        # $X is the same metavariable as the sink receiver
+    from: $Y
+    to: $X
+sinks:
+  - pattern: "$X.ToString()"
+```
+
+Here taint entering at `items.FirstOrDefault()` propagates to `x` via
+`$X = $Y` and the sink `$X.ToString()` matches at `x.ToString()` because the
+sink's `$X` must bind the very same node. A distinct variable
+(`other.Create(); y.ToString()`) fails receiver unification and is not
+reported.
+
+### Sanitizer flow semantics
+
+A sanitizer match prunes the taint state *at the matched node*, so a guard
+between source and sink removes the finding: `ArgumentNullException.ThrowIfNull(x)`
+between `var x = items.FirstOrDefault()` and `x.ToString()` yields no finding.
+The `??` operator can be modeled either as a propagator out of a rescue
+assignment (`$SAFE = $A ?? $B`) matching only the uncoalesced variable, or as a
+sanitizer on the coalesce node itself.
+
+### Known limitations (honest scope)
+
+- The data-flow graph is a **document-order linear chain**: no real control
+  flow, loops, or interprocedural edges. Findings require source-before-sink
+  in statement order.
+- Branch guards (`if (x == null) return;`) are **not materialized**; only call
+  guards such as `ThrowIfNull` work.
+- A sanitizer prunes the chain at the match point; if the same variable is
+  re-tainted only through a node *before* the sanitizer, the finding stays
+  suppressed (approximation, may cause false negatives after refactors).
+- Pattern shapes not supported in v2: middle-segment call patterns
+  (`M($A, ..., $B)` with dotted receivers where the receiver itself is a
+  call), ternaries, and compound assignments (`??=`, `+=`).
