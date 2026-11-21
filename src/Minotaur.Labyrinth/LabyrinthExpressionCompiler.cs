@@ -319,7 +319,7 @@ public sealed class LabyrinthExpressionCompiler
             "(supported: call, dotted call, assignment, bare metavariable or bare identifier, binary operator, index).");
     }
 
-    private static Expression BuildSingleExpression(LabyrinthPatternNode single, ParameterExpression node, ParameterExpression ctx)
+    private static Expression BuildSingleExpression(LabyrinthPatternNode single, Expression node, ParameterExpression ctx)
     {
         if (single.Kind == LabyrinthPatternNodeKind.Metavariable)
         {
