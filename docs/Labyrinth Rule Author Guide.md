@@ -57,7 +57,35 @@ StepLexer/StepParser pipeline:
 - **Ellipsis** — `...` matches any sequence of sibling nodes (zero or more),
   e.g. `ExecuteAction(..., $DATA, ...)`.
 - Node type conventions: `FunctionCall` (name = callee, arguments = arguments),
-  `Assignment` (argument 0 = left-hand side, argument 1 = assigned expression).
+  `Assignment` (argument 0 = left-hand side, argument 1 = assigned expression),
+  `Identifier` (name = identifier text).
+
+#### Pattern v2 shapes (issue #247)
+
+v1 shapes (bare calls, `Call($ARG)` argument lists, assignments to calls) keep
+their meaning. v2 adds the shapes needed for member accesses, indexing and
+operators:
+
+- **Member call with receiver** — `$X.DoWork($A)` binds `$X` to the receiver
+  node (`node.Receiver`, the `x` in `x.DoWork()`) and matches the callee name.
+  A plain `.` pattern matches only non-conditional accesses; the null-conditional
+  form `$X?.DoWork()` matches only safe derefs (`x?.DoWork()`), so a
+  null-deref sink written with a plain dot never fires on a safe deref.
+- **Index access** — `$ARR[$I]` matches an `IndexAccess` node: `$ARR` binds the
+  indexed expression (`a` in `a[i]`), the index expressions match positionally.
+- **Binary operators** — `$A / $Z`, `$A % $Z`, `$A as $B`, `$A ?? $B` match
+  operator nodes materialized as `FunctionCall` nodes named `op:divide`,
+  `op:modulo`, `op:as`, `op:coalesce` with the two operands as arguments.
+  Chains fold left-associatively: `$A / $B / $C` matches `($A / $B) / $C`.
+- **Assignment right-hand sides** — beyond `<lhs> = Call(<args>)`, the right
+  side can be a bare metavariable (`$TARGET = $DATA` — the standard taint
+  propagator), a bare identifier, a member call (`$T = $X.Find($V)`), an index
+  (`$T = $ARR[$I]`) or an operator (`$T = $A / $B`, `$T = $V as $T2`).
+
+Host materialization (the CLI scan host): `x.DoWork()` becomes a `FunctionCall`
+named `DoWork` whose receiver is the interned `x` identifier node, so taint bound
+to `$X` at the identifier carries to the receiver and back; `a[i]` becomes an
+`IndexAccess` node with `a` as its receiver; operators become `op:` nodes.
 
 ### Dynamic LINQ conditions
 

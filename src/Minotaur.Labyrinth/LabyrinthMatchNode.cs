@@ -12,8 +12,14 @@ namespace Minotaur.Labyrinth;
 /// <para>
 /// Node type conventions (Labyrinth matching model):
 /// <list type="bullet">
-/// <item><c>FunctionCall</c> — a call with <see cref="Name"/> = callee name and <see cref="Arguments"/> = argument nodes.</item>
+/// <item><c>FunctionCall</c> — a call with <see cref="Name"/> = callee name and <see cref="Arguments"/> = argument nodes;
+/// the receiver of a member call (<c>x.DoWork()</c>) is exposed via <see cref="Receiver"/> (pattern v2, issue #247).</item>
 /// <item><c>Assignment</c> — <see cref="Arguments"/>[0] = left-hand side, <see cref="Arguments"/>[1] = assigned expression.</item>
+/// <item><c>IndexAccess</c> — an indexing operation <c>a[i]</c>: <see cref="Receiver"/> = the array expression
+/// node, <see cref="Arguments"/> = the index expressions (pattern v2, issue #247).</item>
+/// <item>Binary operators (<c>/</c>, <c>%</c>, <c>as</c>, <c>??</c>) materialize as <c>FunctionCall</c> nodes with
+/// <see cref="Name"/> = <c>op:divide</c>, <c>op:modulo</c>, <c>op:as</c>, <c>op:coalesce</c> and the two operands
+/// as <see cref="Arguments"/> (pattern v2, issue #247).</item>
 /// </list>
 /// </para>
 /// </summary>
@@ -29,14 +35,17 @@ public interface ILabyrinthMatchNode
     IReadOnlyList<ILabyrinthMatchNode> Arguments { get; }
 
     /// <summary>
-    /// The receiver (explicit left-hand operand) of a dotted call or an index
-    /// expression, or <c>null</c> when the node has no receiver materialized
-    /// (pattern v2, issue #247). For <c>x.DoWork(...)</c> the Name stays the
-    /// full dotted string <c>x.DoWork</c> (v1 behaviour) while the receiver
-    /// carries the materialized <c>x</c> node so patterns like
-    /// <c>$X.DoWork(...)</c> can bind and unify on it.
+    /// The receiver of a member access: the <c>x</c> in <c>x.DoWork()</c>, the array in <c>a[i]</c>.
+    /// Null when the node has no receiver (pattern v2, issue #247). Default interface member:
+    /// existing implementations keep compiling unchanged and simply expose no receiver.
     /// </summary>
     ILabyrinthMatchNode? Receiver => null;
+
+    /// <summary>
+    /// True when the access is null-conditional (<c>x?.DoWork()</c>), i.e. the deref itself is
+    /// safe (pattern v2, issue #247). Default interface member: plain accesses report false.
+    /// </summary>
+    bool IsNullConditional => false;
 }
 
 /// <summary>
@@ -54,21 +63,27 @@ public sealed class LabyrinthMatchNode : ILabyrinthMatchNode
     /// <inheritdoc/>
     public IReadOnlyList<ILabyrinthMatchNode> Arguments { get; }
 
+    /// <inheritdoc/>
+    public ILabyrinthMatchNode? Receiver { get; }
+
+    /// <inheritdoc/>
+    public bool IsNullConditional { get; }
+
     /// <summary>Creates a match node.</summary>
     /// <param name="nodeType">The semantic node type (e.g. <c>FunctionCall</c>).</param>
     /// <param name="name">The identifier text, if any.</param>
     /// <param name="arguments">The child nodes, in positional order.</param>
+    /// <param name="receiver">The receiver node for member accesses / indexing, if any (pattern v2).</param>
+    /// <param name="isNullConditional">True when the access is null-conditional (<c>?.</c>, pattern v2).</param>
     public LabyrinthMatchNode(string nodeType, string? name = null, IReadOnlyList<ILabyrinthMatchNode>? arguments = null,
-        ILabyrinthMatchNode? receiver = null)
+        ILabyrinthMatchNode? receiver = null, bool isNullConditional = false)
     {
         NodeType = nodeType;
         Name = name;
         Arguments = arguments ?? Array.Empty<ILabyrinthMatchNode>();
         Receiver = receiver;
+        IsNullConditional = isNullConditional;
     }
-
-    /// <summary>The receiver of a dotted call or index node, or null (pattern v2, issue #247).</summary>
-    public ILabyrinthMatchNode? Receiver { get; }
 }
 
 /// <summary>

@@ -1,0 +1,18 @@
+# Minotaur-Labyrinth C# 10 rule pack (Minotaur epic #246, L2).
+#
+# Injection of unvalidated external input into an array index: the classic
+# index-out-of-range precursor. One-variable, document-order taint scope
+# (Minotaur #247): the source binds $TARGET to the interned identifier on
+# the assignment's left-hand side; the sink pattern's index operand must
+# bind that same node; a Parse(...) call over the variable clears it.
+rules:
+  - id: csharp-array-index-unvalidated-input
+    severity: ERROR
+    message: "Unvalidated external input flows into an array index; parse or range-check it before use."
+    type: taint
+    sources:
+      - pattern: "$TARGET = ReadLine(...)"
+    sanitizers:
+      - pattern: "Parse($TARGET)"
+    sinks:
+      - pattern: "$ARR[$TARGET]"
