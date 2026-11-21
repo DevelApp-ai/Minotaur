@@ -108,7 +108,7 @@ public sealed class LabyrinthPatternV2Tests
             }
         }
 
-        Assert.True(false, string.Join("\n", lines));
+        Assert.Fail(string.Join("\n", lines));
     }
 
     [Fact]
