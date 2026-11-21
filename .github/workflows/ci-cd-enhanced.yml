@@ -156,7 +156,7 @@ jobs:
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults/ \
           --logger "trx;LogFileName=test-results.trx" \
-          --logger "console;verbosity=normal" 2>&1 | tee /tmp/test-output.txt
+          --logger "console;verbosity=detailed" 2>&1 | tee /tmp/test-output.txt
         test_exit=${PIPESTATUS[0]}
         set -e
         # Surface failed tests in the job summary (GitHub does not annotate
@@ -174,12 +174,14 @@ jobs:
             printf '::error title=Failed test::%s\n' "$(printf '%s' "$line" | sed 's/^[[:space:]]*//' | tr -d '\r' | head -c 240)"
           done
           # Surface the assertion messages too (they follow "Error Message:"
-          # in the xunit console output), so unauthenticated PR viewers can
-          # see WHY each test failed, not only its name
-          grep -A 3 -E "Error Message:" /tmp/test-output.txt \
-            | grep -v -e "^--" -e "Error Message:" -e "Stack Trace:" -e "Assert Equal Failure" \
-            | sed 's/^[[:space:]]*//' | grep -v "^$" | head -20 | sort -u | while IFS= read -r line; do
-              printf '::error title=Test assertion detail::%s\n' "$(printf '%s' "$line" | tr -d '\r' | head -c 240)"
+          # in the detailed xunit console output), so unauthenticated PR
+          # viewers can see WHY each test failed, not only its name
+          awk '/^[[:space:]]*Failed [A-Za-z]/ { mode="failed"; next }
+               mode=="failed" && /Error Message:/ { mode="msg"; next }
+               mode=="msg" && /Stack Trace/ { mode=""; next }
+               mode=="msg" && NF>0 { line=$0; gsub(/^[[:space:]]+|[[:space:]]+$/, "", line); print line }' \
+            /tmp/test-output.txt | sed 's/\r$//' | head -25 | while IFS= read -r line; do
+              printf '::error title=Test assertion detail::%s\n' "$(printf '%s' "$line" | head -c 240)"
             done
           grep -E 'Test host process crashed|The active test run was aborted' /tmp/test-output.txt | head -3 | while IFS= read -r line; do
             printf '::error::%s\n' "$(printf '%s' "$line" | tr -d '\r' | head -c 240)"
