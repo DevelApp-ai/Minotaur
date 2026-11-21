@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.Classif
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.CaseStudyPilots", "Minotaur.Benchmarks.CaseStudyPilots\Minotaur.Benchmarks.CaseStudyPilots.csproj", "{5E4C3B48-D7C4-4E2F-B1DF-B5A8CC5A9F0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.EmbeddedDetection", "Minotaur.Benchmarks.EmbeddedDetection\Minotaur.Benchmarks.EmbeddedDetection.csproj", "{A1D8F6E3-47B2-4C95-8E0D-9F31B7C4D602}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{5E4C3B48-D7C4-4E2F-B1DF-B5A8CC5A9F0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E4C3B48-D7C4-4E2F-B1DF-B5A8CC5A9F0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E4C3B48-D7C4-4E2F-B1DF-B5A8CC5A9F0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1D8F6E3-47B2-4C95-8E0D-9F31B7C4D602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1D8F6E3-47B2-4C95-8E0D-9F31B7C4D602}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1D8F6E3-47B2-4C95-8E0D-9F31B7C4D602}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1D8F6E3-47B2-4C95-8E0D-9F31B7C4D602}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30B8FE56-2819-44F6-BF3D-34979B004C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30B8FE56-2819-44F6-BF3D-34979B004C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30B8FE56-2819-44F6-BF3D-34979B004C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
