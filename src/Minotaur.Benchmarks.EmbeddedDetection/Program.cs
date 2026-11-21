@@ -416,8 +416,6 @@ var formatByExt = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCas
     [".astro"] = "astro",
 };
 
-var htmlExts = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".html", ".htm", ".xhtml" };
-
 // Known fence info-tag first-words (lowercased) used for truth extraction.
 var tagLanguage = new Dictionary<string, string>(StringComparer.Ordinal)
 {
@@ -1311,7 +1309,7 @@ static async Task DownloadWithRetryAsync(HttpClient client, string url, string d
         }
         catch (Exception) when (attempt < 4)
         {
-            await Task.Delay(TimeSpan.FromSeconds(5 * attempt));
+            await Task.Delay(TimeSpan.FromSeconds(5.0 * attempt));
         }
     }
 }
