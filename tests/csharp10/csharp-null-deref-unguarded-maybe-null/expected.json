@@ -1,0 +1,9 @@
+{
+  "rule": "csharp-null-deref-unguarded-maybe-null",
+  "findings": [
+    {
+      "file": "vulnerable.cs",
+      "line": 10
+    }
+  ]
+}
