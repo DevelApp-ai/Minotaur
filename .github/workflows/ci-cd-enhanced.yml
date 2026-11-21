@@ -173,6 +173,14 @@ jobs:
           grep -E '^\s+Failed [A-Za-z]' /tmp/test-output.txt | head -10 | while IFS= read -r line; do
             printf '::error title=Failed test::%s\n' "$(printf '%s' "$line" | sed 's/^[[:space:]]*//' | tr -d '\r' | head -c 240)"
           done
+          # Surface the assertion messages too (they follow "Error Message:"
+          # in the xunit console output), so unauthenticated PR viewers can
+          # see WHY each test failed, not only its name
+          grep -A 3 -E "Error Message:" /tmp/test-output.txt \
+            | grep -v -e "^--" -e "Error Message:" -e "Stack Trace:" -e "Assert Equal Failure" \
+            | sed 's/^[[:space:]]*//' | grep -v "^$" | head -20 | sort -u | while IFS= read -r line; do
+              printf '::error title=Test assertion detail::%s\n' "$(printf '%s' "$line" | tr -d '\r' | head -c 240)"
+            done
           grep -E 'Test host process crashed|The active test run was aborted' /tmp/test-output.txt | head -3 | while IFS= read -r line; do
             printf '::error::%s\n' "$(printf '%s' "$line" | tr -d '\r' | head -c 240)"
           done
@@ -203,6 +211,35 @@ jobs:
       with:
         name: coverage-report
         path: CoverageReport/
+
+  labyrinth-corpus:
+    # Labyrinth rule corpus (Track GSE L2, Minotaur #246): runs the real
+    # engine over rules/ + tests/ via `minotaur labyrinth verify-corpus`,
+    # so every committed rule pack (rules/<grammar>/) and corpus case
+    # (tests/<grammar>/<rule-id>/) is machine-checked on every push and PR.
+    name: Labyrinth rule corpus (verify-corpus)
+    runs-on: ubuntu-latest
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    timeout-minutes: 30
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Build CLI (downloads Labyrinth target grammars at build time)
+      run: |
+        # Same NU1301 retry guard as build-and-test (GitHub Packages)
+        dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj || (sleep 20 && dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj) || (sleep 40 && dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj)
+        dotnet build src/Minotaur.Cli/Minotaur.Cli.csproj --configuration Release --no-restore
+
+    - name: Verify rule corpus
+      run: |
+        dotnet src/Minotaur.Cli/bin/Release/net8.0/Minotaur.Cli.dll labyrinth verify-corpus --rules rules --tests tests
 
   grammar-package-smoke:
     # Minotaur-Grammars #26: package-only round-trip smoke - every grammar in
