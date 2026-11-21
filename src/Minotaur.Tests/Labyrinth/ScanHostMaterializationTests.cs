@@ -147,6 +147,20 @@ public sealed class ScanHostMaterializationTests
     }
 
     [Fact]
+    public void CoalesceLexFork_MaterializesASingleOperatorNode()
+    {
+        // ?? lexes two ways in this grammar (one COALESCE token or two
+        // QMARKs), and the exploratory lexer emits both readings into the
+        // token union with overlapping spans. The longest-match tiling must
+        // collapse them: one folded operator, no stray '?'/literal nodes.
+        var (_, nodes) = Build("h = first ?? fallback;");
+
+        Assert.DoesNotContain(nodes, n => n.Name == "?");
+        var op = (ILabyrinthMatchNode)Find(nodes, "FunctionCall", "op:coalesce");
+        Assert.Equal(2, op.Arguments.Count);
+    }
+
+    [Fact]
     public void Division_ChainsLeftAssociatively()
     {
         var (_, nodes) = Build("x = a / b / c;");

@@ -136,7 +136,12 @@ public static class ScanHost
         engine.LoadGrammarFromContent(grammarContent, grammarName);
         var result = engine.Parse(source, filePath);
 
-        var tokens = result.Tokens.Where(t => !IsSkippable(t)).ToList();
+        // The exploratory lexer emits one token per matching rule fork into
+        // result.Tokens, so fragments that the target grammar can lex two
+        // ways (?? as one token or as two ?, ... as one ellipsis or as three
+        // dots) appear as overlapping readings in the union. Resolve to the
+        // deterministic longest-match tiling before materializing (issue #247).
+        var tokens = LabyrinthTokenTiling.Resolve(result.Tokens).Where(t => !IsSkippable(t)).ToList();
         var intern = new Dictionary<string, SourceMatchNode>(StringComparer.Ordinal);
         var all = new List<SourceMatchNode>();
         var i = 0;
@@ -451,7 +456,7 @@ public static class ScanHost
             else if (i < tokens.Count && IsIndexOpen(tokens, i))
             {
                 var conditionalIndex = tokens[i].Value != "[";
-                if (tokens[i].Value == "?" )
+                if (tokens[i].Value == "?")
                 {
                     i += 2; // the "? [" pair
                 }

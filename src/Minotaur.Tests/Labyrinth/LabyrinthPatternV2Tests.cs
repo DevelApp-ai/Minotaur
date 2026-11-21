@@ -352,14 +352,51 @@ public sealed class LabyrinthPatternV2Tests
     [Fact]
     public void Assignment_ReceiverCall_SanitizerStillSupported()
     {
-        // The sanitizer win for the rule pack: ThrowIfNull($X) is a plain
-        // call; a guard assign into the receiver keeps v1 call semantics.
+        // The sanitizer win for the rule pack: a guard call materializes as
+        // a member call named ThrowIfNull on the ArgumentNullException
+        // receiver, and the pattern binds its argument like any other
+        // receiver call.
         var matcher = new LabyrinthExpressionCompiler().Compile("r", Parse("ArgumentNullException.ThrowIfNull($X)"));
         var argument = Ident("svc");
-        var node = new LabyrinthMatchNode("FunctionCall", "ThrowIfNull", new[] { argument });
+        var node = new LabyrinthMatchNode("FunctionCall", "ThrowIfNull", new[] { argument }, Ident("ArgumentNullException"));
         var context = new LabyrinthMatchContext();
         Assert.True(matcher(node, context));
         Assert.True(context.TryGet("X", out var bound));
         Assert.Same(argument, bound);
+
+        // The guard is tied to its guard class: calls on another receiver do not match.
+        var other = new LabyrinthMatchNode("FunctionCall", "ThrowIfNull", new[] { argument }, Ident("OtherClass"));
+        Assert.False(matcher(other, new LabyrinthMatchContext()));
+    }
+
+    // ---------------------------------------------------------------------
+    // Ambiguous lexing: the exploratory lexer forks at every position where
+    // more than one token rule matches and emits ALL readings into the token
+    // union. Both readings must collapse to the longest-match tiling.
+    // ---------------------------------------------------------------------
+
+    [Fact]
+    public void AmbiguousLexUnion_CoalesceTilesToLongestMatch()
+    {
+        // '??' lexes two ways in this grammar (one COALESCE token or two
+        // QMARKs); the tiling must keep the single '??' token so the pattern
+        // compiles as a plain operator chain.
+        var ast = Parse("$A ?? $B");
+        Assert.Equal(3, ast.Nodes.Count);
+        Assert.Equal("$A", ast.Nodes[0].Value);
+        Assert.Equal("??", ast.Nodes[1].Value);
+        Assert.Equal("$B", ast.Nodes[2].Value);
+    }
+
+    [Fact]
+    public void AmbiguousLexUnion_EllipsisTilesOverDotForks()
+    {
+        // '...' lexes two ways once the grammar defines a DOT rule: one
+        // ellipsis token or three DOTs. The tiling keeps the single
+        // ellipsis, so the classic ellipsis sink pattern keeps its shape.
+        var ast = Parse("ExecuteAction(..., $DATA, ...)");
+        Assert.Equal(8, ast.Nodes.Count);
+        Assert.Equal(2, ast.Nodes.Count(n => n.Kind == LabyrinthPatternNodeKind.Ellipsis));
+        Assert.DoesNotContain(ast.Nodes, n => n.Kind == LabyrinthPatternNodeKind.Literal && n.Value == ".");
     }
 }

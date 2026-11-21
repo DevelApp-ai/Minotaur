@@ -17,6 +17,14 @@ namespace Minotaur.Labyrinth;
 /// cannot lex at all.
 /// </para>
 /// </summary>
+/// <remarks>
+/// The exploratory lexer emits one token per matching rule fork into the
+/// result's token union, so a pattern fragment that a target grammar can
+/// lex two ways (for example <c>??</c> as one token or as two <c>?</c>
+/// tokens, <c>...</c> as one ellipsis or as three dots) is resolved to the
+/// deterministic longest-match tiling via <see cref="LabyrinthTokenTiling"/>
+/// before the mini-AST is built (Minotaur issue #247).
+/// </remarks>
 public sealed class LabyrinthPatternParser : IDisposable
 {
     private readonly StepParserEngine _engine;
@@ -79,7 +87,7 @@ public sealed class LabyrinthPatternParser : IDisposable
         }
 
         var nodes = new List<LabyrinthPatternNode>(result.Tokens.Count);
-        foreach (var token in result.Tokens)
+        foreach (var token in LabyrinthTokenTiling.Resolve(result.Tokens))
         {
             var kind = token.Type switch
             {
