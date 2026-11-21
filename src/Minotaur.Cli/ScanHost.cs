@@ -12,11 +12,12 @@ namespace Minotaur.Cli;
 public sealed class SourceMatchNode : ILabyrinthMatchNode, ILabyrinthFindingLocation
 {
     public SourceMatchNode(string nodeType, string? name, IReadOnlyList<ILabyrinthMatchNode> arguments,
-        string filePath, int position, string source)
+        string filePath, int position, string source, ILabyrinthMatchNode? receiver = null)
     {
         NodeType = nodeType;
         Name = name;
         Arguments = arguments;
+        Receiver = receiver;
         FilePath = filePath;
         Position = position;
         var (line, col) = LineCol(source, position);
@@ -27,6 +28,7 @@ public sealed class SourceMatchNode : ILabyrinthMatchNode, ILabyrinthFindingLoca
     public string NodeType { get; }
     public string? Name { get; }
     public IReadOnlyList<ILabyrinthMatchNode> Arguments { get; }
+    public ILabyrinthMatchNode? Receiver { get; }
     public string FilePath { get; }
     public int StartLine { get; }
     public int StartColumn { get; }
@@ -244,6 +246,31 @@ public static class ScanHost
                 break;
             }
 
+            // Pattern v2 (#247): the `as` operator is lexed as an
+            // identifier-shaped token by most grammars. When a primary
+            // operand was just produced it is a binary operator, not an
+            // identifier occurrence: materialize op:as(left, right).
+            if (result.Count > 0 && token.Value == "as")
+            {
+                var asPos = token.StartPosition;
+                i++;
+                var rhsStopsAs = new HashSet<string>(StringComparer.Ordinal) { ",", ")", "]", ";" };
+                var rhs = ParseExpr(tokens, ref i, source, filePath, intern, all, rhsStopsAs);
+                if (rhs.Count > 0)
+                {
+                    var rhsNode = rhs.Count == 1
+                        ? rhs[0]
+                        : new SourceMatchNode("Expression", null, rhs, filePath, asPos, source);
+                    var op = new SourceMatchNode(
+                        "FunctionCall", "op:as",
+                        new ILabyrinthMatchNode[] { result[^1], rhsNode }, filePath, asPos, source);
+                    all.Add(op);
+                    result[^1] = op;
+                }
+
+                continue;
+            }
+
             if (!IsIdent(token))
             {
                 var literal = new SourceMatchNode(token.Type, token.Value, Array.Empty<ILabyrinthMatchNode>(), filePath, token.StartPosition, source);
@@ -254,17 +281,45 @@ public static class ScanHost
             }
 
             var parts = new List<string> { token.Value };
+            var condAccess = false;
             var startPos = token.StartPosition;
             i++;
-            while (i + 1 < tokens.Count && tokens[i].Value == "." && IsIdent(tokens[i + 1]))
+            // Pattern v2 (#247): dotted member access, with `?.`
+            // (conditional access) accepted as a marker that is kept in the
+            // materialized Name so rules can tell safe deref from plain.
+            while (i < tokens.Count)
             {
-                parts.Add(tokens[i + 1].Value);
-                i += 2;
+                if (i + 1 < tokens.Count && tokens[i].Value == "." && IsIdent(tokens[i + 1]))
+                {
+                    parts.Add(tokens[i + 1].Value);
+                    i += 2;
+                    continue;
+                }
+
+                // `?.` may lex as one token or as a "?" "." pair.
+                if (i + 1 < tokens.Count && tokens[i].Value == "?." && IsIdent(tokens[i + 1]))
+                {
+                    parts.Add(tokens[i + 1].Value);
+                    condAccess = true;
+                    i += 2;
+                    continue;
+                }
+
+                if (i + 2 < tokens.Count && tokens[i].Value == "?" && tokens[i + 1].Value == "." && IsIdent(tokens[i + 2]))
+                {
+                    parts.Add(tokens[i + 2].Value);
+                    condAccess = true;
+                    i += 3;
+                    continue;
+                }
+
+                break;
             }
 
             if (i < tokens.Count && (tokens[i].Value == "(" || tokens[i].Value == "["))
             {
-                var close = tokens[i].Value == "(" ? ")" : "]";
+                var isIndex = tokens[i].Value == "[";
+                var close = isIndex ? "]" : ")";
                 i++;
                 var callArgs = new List<ILabyrinthMatchNode>();
                 var argStops = new HashSet<string>(StringComparer.Ordinal) { ",", close };
@@ -293,9 +348,21 @@ public static class ScanHost
                     i++;
                 }
 
-                var call = new SourceMatchNode("FunctionCall", string.Join(".", parts), callArgs, filePath, startPos, source);
-                all.Add(call);
-                result.Add(call);
+                // Pattern v2 (#247): dotted calls keep the full dotted Name
+                // (v1 behaviour) and materialize the receiver so patterns can
+                // bind/unify on it; `?.` stays visible in the Name; index
+                // expressions become IndexAccess nodes with the array as
+                // the receiver. Plain (non-dotted) calls have no receiver.
+                var name = condAccess
+                    ? string.Join(".", parts.Take(parts.Count - 1)) + "?." + parts[^1]
+                    : string.Join(".", parts);
+                var receiver = parts.Count > 1 || isIndex
+                    ? Intern(parts.GetRange(0, Math.Max(1, parts.Count - 1)), source, filePath, intern, all, startPos)
+                    : null;
+                var node = new SourceMatchNode(
+                    isIndex ? "IndexAccess" : "FunctionCall", name, callArgs, filePath, startPos, source, receiver);
+                all.Add(node);
+                result.Add(WithBinaryOperatorTail(tokens, ref i, node, source, filePath, intern, all));
             }
             else if (i < tokens.Count && tokens[i].Value == "=")
             {
@@ -306,16 +373,85 @@ public static class ScanHost
                 var rhsNode = rhs.Count == 1
                     ? rhs[0]
                     : new SourceMatchNode("Expression", null, rhs, filePath, startPos, source);
-                var assignment = new SourceMatchNode("Assignment", null, new ILabyrinthMatchNode[] { lhs, rhsNode }, filePath, startPos, source);
+                // Pattern v2 (#247): the assignment sits at the START of its
+                // right-hand side in the document-order chain, after the
+                // RHS nodes, so taint produced by RHS sources (e.g. a
+                // maybe-null `FirstOrDefault()` value) reaches the
+                // assignment's propagator before flowing on.
+                var assignPos = startPos;
+                if (rhs.Count > 0 && rhs[0] is SourceMatchNode rhsFirst)
+                {
+                    assignPos = rhsFirst.Position;
+                }
+                var assignment = new SourceMatchNode("Assignment", null, new ILabyrinthMatchNode[] { lhs, rhsNode }, filePath, assignPos, source);
                 all.Add(assignment);
                 result.Add(assignment);
             }
             else
             {
-                result.Add(Intern(parts, source, filePath, intern, all, startPos));
+                result.Add(WithBinaryOperatorTail(
+                    tokens, ref i, Intern(parts, source, filePath, intern, all, startPos),
+                    source, filePath, intern, all));
             }
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Pattern v2 (#247): folds a left-associative chain of binary operators
+    /// (<c>/</c>, <c>%</c>, <c>??</c>) onto <paramref name="left"/> until no
+    /// operator token follows. Each operator materializes a
+    /// <c>FunctionCall</c> named <c>op:divide</c> / <c>op:modulo</c> /
+    /// <c>op:coalesce</c> whose two arguments are the operand nodes, so rules
+    /// can use them as sources, sanitizers and sinks.
+    /// </summary>
+    private static ILabyrinthMatchNode WithBinaryOperatorTail(
+        List<StepToken> tokens, ref int i, ILabyrinthMatchNode left,
+        string source, string filePath, Dictionary<string, SourceMatchNode> intern, List<SourceMatchNode> all)
+    {
+        while (true)
+        {
+            if (i >= tokens.Count)
+            {
+                break;
+            }
+
+            var v = tokens[i].Value;
+            var pair = v == "?" && i + 1 < tokens.Count && tokens[i + 1].Value == "?";
+            var opName = v switch
+            {
+                "/" => "op:divide",
+                "%" => "op:modulo",
+                "??" => "op:coalesce",
+                "?" when pair => "op:coalesce",
+                _ => null
+            };
+            if (opName is null)
+            {
+                break;
+            }
+
+            var opPos = tokens[i].StartPosition;
+            i += pair ? 2 : 1;
+            var operandStops = new HashSet<string>(StringComparer.Ordinal) { ",", ")", "]", ";" };
+            var before = i;
+            var rhs = ParseExpr(tokens, ref i, source, filePath, intern, all, operandStops);
+            if (i == before || rhs.Count == 0)
+            {
+                // No right operand after the operator: leave it be.
+                break;
+            }
+
+            var rhsNode = rhs.Count == 1
+                ? rhs[0]
+                : new SourceMatchNode("Expression", null, rhs, filePath, opPos, source);
+            var op = new SourceMatchNode(
+                "FunctionCall", opName, new ILabyrinthMatchNode[] { left, rhsNode }, filePath, opPos, source);
+            all.Add(op);
+            left = op;
+        }
+
+        return left;
     }
 }

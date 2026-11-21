@@ -79,11 +79,20 @@ public sealed class LabyrinthCompiledMatchers
 /// (System.Linq.Expressions) and further into native delegates at engine
 /// initialization — no runtime interpretation (issue #102).
 /// <para>
-/// Supported pattern shapes (v1):
+/// Supported pattern shapes (v1, issue #102):
 /// <list type="bullet">
 /// <item>Call: <c>ReceiveData($DATA)</c> ⇒ <c>node.NodeType == "FunctionCall" &amp;&amp; node.Name == "ReceiveData" &amp;&amp; …args</c></item>
 /// <item>Assignment: <c>$TARGET = FormatString($SRC)</c> ⇒ matches <c>Assignment</c> nodes, binding both sides.</item>
 /// <item>Bare metavariable <c>$DATA</c> (binds anything) or bare identifier <c>Require</c> (name equality).</item>
+/// </list>
+/// <para>
+/// Supported pattern shapes (v2, Minotaur issue #247):
+/// <list type="bullet">
+/// <item>Dotted metavariable call: <c>$X.DoWork($A)</c> ⇒ <c>FunctionCall</c> whose Name ends with <c>.DoWork</c>, binding <c>$X</c> to the call's Receiver; a literal receiver (<c> ArgumentNullException.ThrowIfNull($X)</c> alternatively without spaces) compiles to full name equality through the same shape.</item>
+/// <item>Conditional access: <c>$X?.DoWork(...)</c> ⇒ like the dotted call but the Name must end with <c>?.DoWork</c>.</item>
+/// <item>Binary operator: <c>$A / $B</c>, <c>$A % $B</c>, <c>$A as $B</c>, <c>$A ?? $B</c> ⇒ <c>FunctionCall</c> nodes named <c>op:divide</c>, <c>op:modulo</c>, <c>op:as</c>, <c>op:coalesce</c> with two bound operands.</item>
+/// <item>Index: <c>$ARR[$I]</c> ⇒ <c>IndexAccess</c> node binding the array through its Receiver.</item>
+/// <item>Assignment RHS is no longer restricted to call patterns: <c>$X = $Y</c>, <c>$X = $A op $B</c>, <c>$X = $Y.M(...)</c> and <c>$X = $A[$B]</c> are all writable.</item>
 /// </list>
 /// <para>
 /// Any pattern may carry an optional Dynamic LINQ condition (issue #104):
@@ -122,6 +131,21 @@ public sealed class LabyrinthExpressionCompiler
     private static readonly System.Reflection.PropertyInfo ItemProperty =
         typeof(IReadOnlyList<ILabyrinthMatchNode>).GetProperty("Item")
         ?? throw new InvalidOperationException("Item property is missing.");
+
+    // Pattern v2 (issue #247): receivers are a first-class part of the node
+    // contract, and metavariable receiver patterns check Name suffixes on
+    // the string type.
+    private static readonly System.Reflection.PropertyInfo ReceiverProperty =
+        typeof(ILabyrinthMatchNode).GetProperty(nameof(ILabyrinthMatchNode.Receiver))
+        ?? throw new InvalidOperationException("Receiver property is missing.");
+
+    private static readonly System.Reflection.MethodInfo StringEndsWithMethod =
+        typeof(string).GetMethod(nameof(string.EndsWith), new[] { typeof(string) })
+        ?? throw new InvalidOperationException("string.EndsWith is missing.");
+
+    private static readonly System.Reflection.MethodInfo StringContainsMethod =
+        typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })
+        ?? throw new InvalidOperationException("string.Contains is missing.");
 
     private readonly ConcurrentDictionary<string, Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>> _cache = new();
 
@@ -236,8 +260,15 @@ public sealed class LabyrinthExpressionCompiler
     {
         var nodes = pattern.Nodes;
 
-        // Assignment pattern: "<lhs> = <rhs>" at the top level.
+        // Assignment pattern: "<lhs> = <rhs>" at the top level. The EQUALS
+        // token type is the common one; value-based detection is a v2
+        // (#247) fallback for grammars that lex "=" under a different type.
         var equalsIndex = FindTopLevel(nodes, "EQUALS");
+        if (equalsIndex < 0)
+        {
+            equalsIndex = FindTopLevelByValue(nodes, "=");
+        }
+
         if (equalsIndex == 1 && nodes.Count > 2)
         {
             var lhs = nodes[0];
@@ -257,18 +288,38 @@ public sealed class LabyrinthExpressionCompiler
         }
 
         // Call pattern: "Name(<args>)".
-        if (nodes[0].TokenType == "IDENTIFIER" && nodes[1].TokenType == "LPAREN"
-            && nodes[^1].TokenType == "RPAREN" && nodes.Count >= 3)
+        if (IsIdentifierToken(nodes[0]) && IsOpenParen(nodes[1]) && IsCloseParen(nodes[^1]) && nodes.Count >= 3)
         {
             return BuildCallBody(nodes[0].Value, nodes.Skip(2).Take(nodes.Count - 3).ToList(), node, ctx);
         }
 
+        // Dotted call pattern (v2, #247): "$X.Method(<args>)" (receiver
+        // binding), "$X?.Method(<args>)" (conditional access), or
+        // "prefix.Name(<args>)" (dotted name equality).
+        if (TrySplitDottedCall(nodes, out var head, out var methodParts, out var condAccess, out var dottedArgs))
+        {
+            return BuildDottedCallBody(head, methodParts, condAccess, dottedArgs, node, ctx);
+        }
+
+        // Binary operator pattern (v2, #247): "$A / $B", "$A % $B",
+        // "$A as $B", "$A ?? $B".
+        if (TrySplitBinaryOperator(nodes, out var opLeft, out var opName, out var opRight))
+        {
+            return BuildBinaryOperatorBody(opLeft, opName, opRight, node, ctx);
+        }
+
+        // Index pattern (v2, #247): "$ARR[$I]".
+        if (TrySplitIndex(nodes, out var arrayNode, out var indexNode))
+        {
+            return BuildIndexBody(arrayNode, indexNode, node, ctx);
+        }
+
         throw new LabyrinthRuleException(
             $"Pattern '{pattern.Pattern}' has an unsupported shape for expression compilation " +
-            "(supported: call, assignment, bare metavariable or bare identifier).");
+            "(supported: call, dotted call, assignment, bare metavariable or bare identifier, binary operator, index).");
     }
 
-    private static Expression BuildSingleExpression(LabyrinthPatternNode single, ParameterExpression node, ParameterExpression ctx)
+    private static Expression BuildSingleExpression(LabyrinthPatternNode single, Expression node, ParameterExpression ctx)
     {
         if (single.Kind == LabyrinthPatternNodeKind.Metavariable)
         {
@@ -293,11 +344,10 @@ public sealed class LabyrinthExpressionCompiler
         }
 
         var rhsNodes = rhs.Nodes;
-        if (rhsNodes.Count < 3 || rhsNodes[0].TokenType != "IDENTIFIER"
-            || rhsNodes[1].TokenType != "LPAREN" || rhsNodes[^1].TokenType != "RPAREN")
+        if (rhsNodes.Count == 0)
         {
             throw new LabyrinthRuleException(
-                $"Assignment right-hand side '{rhs.Pattern}' is not a call pattern; only '<lhs> = Call(<args>)' is supported.");
+                $"Assignment right-hand side '{rhs.Pattern}' is empty.");
         }
 
         Expression body = Expression.Equal(
@@ -311,35 +361,76 @@ public sealed class LabyrinthExpressionCompiler
             ? Expression.Call(ctx, TryBindMethod, Expression.Constant(lhs.MetavariableName), left)
             : EqualName(left, lhs.Value));
 
-        // Right-hand side: a call pattern against Arguments[1].
+        // Right-hand side (v2, #247): any single-pattern shape, matched
+        // against Arguments[1] — no longer restricted to call patterns.
         var right = IndexArgumentAt(node, 1);
-        var callBody = BuildCallBody(rhsNodes[0].Value, rhsNodes.Skip(2).Take(rhsNodes.Count - 3).ToList(), right, ctx);
-        return AndAlso(body, callBody);
+        Expression rhsBody;
+        if (rhsNodes.Count == 1)
+        {
+            rhsBody = BuildSingleExpression(rhsNodes[0], right, ctx);
+        }
+        else if (IsIdentifierToken(rhsNodes[0]) && IsOpenParen(rhsNodes[1]) && IsCloseParen(rhsNodes[^1]) && rhsNodes.Count >= 3)
+        {
+            rhsBody = BuildCallBody(rhsNodes[0].Value, rhsNodes.Skip(2).Take(rhsNodes.Count - 3).ToList(), right, ctx);
+        }
+        else if (TrySplitDottedCall(rhsNodes, out var head, out var methodParts, out var condAccess, out var dottedArgs))
+        {
+            rhsBody = BuildDottedCallBody(head, methodParts, condAccess, dottedArgs, right, ctx);
+        }
+        else if (TrySplitBinaryOperator(rhsNodes, out var opLeft, out var opName, out var opRight))
+        {
+            rhsBody = BuildBinaryOperatorBody(opLeft, opName, opRight, right, ctx);
+        }
+        else if (TrySplitIndex(rhsNodes, out var arrayNode, out var indexNode))
+        {
+            rhsBody = BuildIndexBody(arrayNode, indexNode, right, ctx);
+        }
+        else
+        {
+            throw new LabyrinthRuleException(
+                $"Assignment right-hand side '{rhs.Pattern}' is not a supported shape " +
+                "(supported: bare metavariable/identifier, call, dotted call, binary operator, index).");
+        }
+
+        return AndAlso(body, rhsBody);
     }
 
     private static Expression BuildCallBody(
         string name, IReadOnlyList<LabyrinthPatternNode> argNodes, Expression callNode, ParameterExpression ctx)
     {
-        var args = SplitArguments(argNodes);
-
         Expression body = Expression.Equal(
             Expression.Property(callNode, nameof(ILabyrinthMatchNode.NodeType)),
             Expression.Constant(FunctionCallNodeType));
         body = AndAlso(body, Expression.Equal(
             Expression.Property(callNode, nameof(ILabyrinthMatchNode.Name)),
             Expression.Constant(name)));
+        return AndAlso(body, BuildArgumentList(argNodes, callNode, ctx));
+    }
+
+    /// <summary>
+    /// The argument-list matching half of a call pattern (fixed arity,
+    /// ellipsis prefix/middle/suffix), shared by the v1 call body and the v2
+    /// dotted-call bodies (issue #247).
+    /// </summary>
+    private static Expression BuildArgumentList(
+        IReadOnlyList<LabyrinthPatternNode> argNodes, Expression callNode, ParameterExpression ctx)
+    {
+        var args = SplitArguments(argNodes);
 
         var firstEllipsis = args.FindIndex(a => a.Kind == LabyrinthPatternNodeKind.Ellipsis);
         if (firstEllipsis < 0)
         {
             // Fixed arity: count must match exactly, then match positionally.
-            body = AndAlso(body, Expression.Equal(ArgumentsCount(callNode), Expression.Constant(args.Count)));
+            var terms = new List<Expression>
+            {
+                Expression.Equal(ArgumentsCount(callNode), Expression.Constant(args.Count))
+            };
             for (var i = 0; i < args.Count; i++)
             {
-                body = AndAlso(body, BuildArgExpression(args[i], IndexArgumentAt(callNode, i), ctx));
+                terms.Add(BuildArgExpression(args[i], IndexArgumentAt(callNode, i), ctx));
             }
 
-            return body;
+            return terms.Aggregate(AndAlso);
         }
 
         // Ellipsis present: prefix before the first ellipsis, suffix after the
@@ -351,16 +442,19 @@ public sealed class LabyrinthExpressionCompiler
         var suffix = args.Skip(lastEllipsis + 1).ToList();
 
         var minimum = prefix.Count + suffix.Count + (middle.Count > 0 ? middle.Count : 0);
-        body = AndAlso(body, Expression.GreaterThanOrEqual(ArgumentsCount(callNode), Expression.Constant(minimum)));
+        var ellipsis = new List<Expression>
+        {
+            Expression.GreaterThanOrEqual(ArgumentsCount(callNode), Expression.Constant(minimum))
+        };
 
         for (var i = 0; i < prefix.Count; i++)
         {
-            body = AndAlso(body, BuildArgExpression(prefix[i], IndexArgumentAt(callNode, i), ctx));
+            ellipsis.Add(BuildArgExpression(prefix[i], IndexArgumentAt(callNode, i), ctx));
         }
 
         for (var i = 0; i < suffix.Count; i++)
         {
-            body = AndAlso(body, BuildArgExpression(
+            ellipsis.Add(BuildArgExpression(
                 suffix[i],
                 IndexArgumentAt(callNode, Expression.Subtract(ArgumentsCount(callNode), Expression.Constant(suffix.Count - i))),
                 ctx));
@@ -376,10 +470,11 @@ public sealed class LabyrinthExpressionCompiler
         // bindings.
         if (middle.Count == 1 && middle[0].Kind == LabyrinthPatternNodeKind.Metavariable)
         {
-            return AndAlso(body, BuildArgExpression(
+            ellipsis.Add(BuildArgExpression(
                 middle[0],
                 IndexArgumentAt(callNode, prefix.Count),
                 ctx));
+            return ellipsis.Aggregate(AndAlso);
         }
 
         if (middle.Count > 0)
@@ -393,10 +488,10 @@ public sealed class LabyrinthExpressionCompiler
                 new[] { typeof(ILabyrinthMatchNode) },
                 Expression.Property(callNode, nameof(ILabyrinthMatchNode.Arguments)),
                 Expression.Lambda<Func<ILabyrinthMatchNode, bool>>(middleBody, candidate));
-            body = AndAlso(body, anyCall);
+            ellipsis.Add(anyCall);
         }
 
-        return body;
+        return ellipsis.Aggregate(AndAlso);
     }
 
     private static Expression BuildArgExpression(LabyrinthPatternNode arg, Expression argNode, ParameterExpression ctx)
@@ -409,6 +504,283 @@ public sealed class LabyrinthExpressionCompiler
                 "An ellipsis is only allowed as an argument of its own."),
             _ => EqualName(argNode, LiteralText(arg))
         };
+    }
+
+    // -----------------------------------------------------------------
+    // Pattern v2 shapes (Minotaur issue #247)
+    // -----------------------------------------------------------------
+
+    private static bool IsValue(LabyrinthPatternNode node, string value) =>
+        node.Kind == LabyrinthPatternNodeKind.Literal && node.Value == value;
+
+    private static bool IsIdentifierToken(LabyrinthPatternNode node) =>
+        node.Kind == LabyrinthPatternNodeKind.Literal
+        && (node.TokenType.ToUpperInvariant().Contains("IDENT") || node.TokenType == "NAME");
+
+    private static bool IsOpenParen(LabyrinthPatternNode node) =>
+        node.TokenType == "LPAREN" || IsValue(node, "(");
+
+    private static bool IsCloseParen(LabyrinthPatternNode node) =>
+        node.TokenType == "RPAREN" || IsValue(node, ")");
+
+    /// <summary>
+    /// Splits a dotted call pattern: a head (metavariable or identifier),
+    /// one or more member segments joined by "." or the "?." conditional
+    /// access pair, then a parenthesized argument list. Recognizes both
+    /// <c>$X.DoWork($A)</c> (receiver binding) and
+    /// <c>ArgumentNullException.ThrowIfNull($X)</c> (dotted name equality),
+    /// as well as the conditional access spelling <c>$X?.DoWork($A)</c>.
+    /// </summary>
+    private static bool TrySplitDottedCall(
+        IReadOnlyList<LabyrinthPatternNode> nodes,
+        out LabyrinthPatternNode head,
+        out List<string> methodParts,
+        out bool condAccess,
+        out List<LabyrinthPatternNode> args)
+    {
+        head = null!;
+        methodParts = null!;
+        condAccess = false;
+        args = null!;
+
+        if (nodes.Count < 5)
+        {
+            return false;
+        }
+
+        var headNode = nodes[0];
+        if (headNode.Kind != LabyrinthPatternNodeKind.Metavariable && !IsIdentifierToken(headNode))
+        {
+            return false;
+        }
+
+        var parts = new List<string>();
+        var conditional = false;
+        var k = 1;
+        while (k < nodes.Count && !IsOpenParen(nodes[k]))
+        {
+            if (k + 1 < nodes.Count && IsValue(nodes[k], ".") && IsIdentifierToken(nodes[k + 1]))
+            {
+                parts.Add(nodes[k + 1].Value);
+                k += 2;
+                continue;
+            }
+
+            // `?.` may lex as one token or as a "?" "." pair.
+            if (k + 1 < nodes.Count && IsValue(nodes[k], "?.") && IsIdentifierToken(nodes[k + 1]))
+            {
+                parts.Add(nodes[k + 1].Value);
+                conditional = true;
+                k += 2;
+                continue;
+            }
+
+            if (k + 2 < nodes.Count && IsValue(nodes[k], "?") && IsValue(nodes[k + 1], ".") && IsIdentifierToken(nodes[k + 2]))
+            {
+                parts.Add(nodes[k + 2].Value);
+                conditional = true;
+                k += 3;
+                continue;
+            }
+
+            return false;
+        }
+
+        if (parts.Count == 0 || k >= nodes.Count || !IsCloseParen(nodes[^1]) || k >= nodes.Count - 1)
+        {
+            return false;
+        }
+
+        head = headNode;
+        methodParts = parts;
+        condAccess = conditional;
+        args = nodes.Skip(k + 1).Take(nodes.Count - k - 2).ToList();
+        return true;
+    }
+
+    /// <summary>
+    /// Splits a binary operator pattern into its two operands and the
+    /// materialized operator name. Handles <c>/</c>, <c>%</c>, <c>as</c>, a
+    /// single <c>??</c> token, and the two-token <c>? ?</c> coalesce spelling.
+    /// </summary>
+    private static bool TrySplitBinaryOperator(
+        IReadOnlyList<LabyrinthPatternNode> nodes,
+        out LabyrinthPatternNode left,
+        out string opName,
+        out LabyrinthPatternNode right)
+    {
+        left = null!;
+        opName = null!;
+        right = null!;
+
+        if (nodes.Count != 3 && nodes.Count != 4)
+        {
+            return false;
+        }
+
+        var candidateLeft = nodes[0];
+        var mid = nodes[1];
+        var candidateRight = nodes.Count == 3 ? nodes[2] : nodes[3];
+        string? candidateOp = null;
+        if (nodes.Count == 3)
+        {
+            if (IsValue(mid, "/"))
+            {
+                candidateOp = "op:divide";
+            }
+            else if (IsValue(mid, "%"))
+            {
+                candidateOp = "op:modulo";
+            }
+            else if (IsValue(mid, "as"))
+            {
+                candidateOp = "op:as";
+            }
+            else if (IsValue(mid, "??"))
+            {
+                candidateOp = "op:coalesce";
+            }
+        }
+        else if (IsValue(mid, "?") && IsValue(nodes[2], "?"))
+        {
+            candidateOp = "op:coalesce";
+        }
+
+        if (candidateOp is null)
+        {
+            return false;
+        }
+
+        var operand = (LabyrinthPatternNode n) =>
+            n.Kind == LabyrinthPatternNodeKind.Metavariable || IsIdentifierToken(n);
+        if (!operand(candidateLeft) || !operand(candidateRight))
+        {
+            return false;
+        }
+
+        left = candidateLeft;
+        opName = candidateOp;
+        right = candidateRight;
+        return true;
+    }
+
+    /// <summary>Splits an index pattern: <c>$ARR[$I]</c> or <c>arr[$I]</c>.</summary>
+    private static bool TrySplitIndex(
+        IReadOnlyList<LabyrinthPatternNode> nodes,
+        out LabyrinthPatternNode array,
+        out LabyrinthPatternNode index)
+    {
+        array = null!;
+        index = null!;
+
+        if (nodes.Count != 4)
+        {
+            return false;
+        }
+
+        if (!(IsValue(nodes[1], "[") || nodes[1].TokenType == "LBRACKET"))
+        {
+            return false;
+        }
+
+        if (!(IsValue(nodes[3], "]") || nodes[3].TokenType == "RBRACKET"))
+        {
+            return false;
+        }
+
+        var arrayNode = nodes[0];
+        var indexNode = nodes[2];
+        var arrayOk = arrayNode.Kind == LabyrinthPatternNodeKind.Metavariable || IsIdentifierToken(arrayNode);
+        var indexOk = indexNode.Kind == LabyrinthPatternNodeKind.Metavariable || IsIdentifierToken(indexNode);
+        if (!arrayOk || !indexOk)
+        {
+            return false;
+        }
+
+        array = arrayNode;
+        index = indexNode;
+        return true;
+    }
+
+    private static Expression BuildDottedCallBody(
+        LabyrinthPatternNode head, IReadOnlyList<string> methodParts, bool condAccess,
+        List<LabyrinthPatternNode> argNodes, Expression callNode, ParameterExpression ctx)
+    {
+        var method = string.Join(".", methodParts);
+
+        // Literal receiver: plain (v1-compatible) name equality on the full
+        // dotted name, e.g. ArgumentNullException.ThrowIfNull($X).
+        if (head.Kind == LabyrinthPatternNodeKind.Literal)
+        {
+            if (condAccess)
+            {
+                throw new LabyrinthRuleException(
+                    $"Conditional access patterns need a metavariable receiver; '{head.Value}' is literal.");
+            }
+
+            return BuildCallBody(head.Value + "." + method, argNodes, callNode, ctx);
+        }
+
+        if (methodParts.Count != 1)
+        {
+            throw new LabyrinthRuleException(
+                "Dotted metavariable call patterns support a single method segment: $X.Method(...).");
+        }
+
+        var name = Expression.Property(callNode, nameof(ILabyrinthMatchNode.Name));
+        Expression body = Expression.Equal(
+            Expression.Property(callNode, nameof(ILabyrinthMatchNode.NodeType)),
+            Expression.Constant(FunctionCallNodeType));
+        body = AndAlso(body, Expression.NotEqual(name, Expression.Constant(null, typeof(string))));
+
+        // Plain deref: the Name ends with ".Method" and contains no "?";
+        // conditional access: the Name ends with "?.Method".
+        var suffix = Expression.Constant((condAccess ? "?." : ".") + method);
+        body = AndAlso(body, Expression.Call(name, StringEndsWithMethod, suffix));
+        var containsQuestion = Expression.Call(name, StringContainsMethod, Expression.Constant("?"));
+        body = AndAlso(body, condAccess ? containsQuestion : Expression.Not(containsQuestion));
+
+        // Receiver: present and bound to the head metavariable.
+        var receiver = Expression.Property(callNode, ReceiverProperty);
+        body = AndAlso(body, Expression.NotEqual(receiver, Expression.Constant(null, typeof(ILabyrinthMatchNode))));
+        body = AndAlso(body, Expression.Call(ctx, TryBindMethod, Expression.Constant(head.MetavariableName), receiver));
+
+        return AndAlso(body, BuildArgumentList(argNodes, callNode, ctx));
+    }
+
+    private static Expression BuildBinaryOperatorBody(
+        LabyrinthPatternNode left, string opName, LabyrinthPatternNode right, Expression node, ParameterExpression ctx)
+    {
+        Expression body = Expression.Equal(
+            Expression.Property(node, nameof(ILabyrinthMatchNode.NodeType)),
+            Expression.Constant(FunctionCallNodeType));
+        body = AndAlso(body, EqualName(node, opName));
+        body = AndAlso(body, Expression.Equal(ArgumentsCount(node), Expression.Constant(2)));
+        body = AndAlso(body, BuildArgExpression(left, IndexArgumentAt(node, 0), ctx));
+        body = AndAlso(body, BuildArgExpression(right, IndexArgumentAt(node, 1), ctx));
+        return body;
+    }
+
+    private static Expression BuildIndexBody(
+        LabyrinthPatternNode array, LabyrinthPatternNode index, Expression node, ParameterExpression ctx)
+    {
+        Expression body = Expression.Equal(
+            Expression.Property(node, nameof(ILabyrinthMatchNode.NodeType)),
+            Expression.Constant("IndexAccess"));
+
+        if (array.Kind == LabyrinthPatternNodeKind.Metavariable)
+        {
+            var receiver = Expression.Property(node, ReceiverProperty);
+            body = AndAlso(body, Expression.NotEqual(receiver, Expression.Constant(null, typeof(ILabyrinthMatchNode))));
+            body = AndAlso(body, Expression.Call(ctx, TryBindMethod, Expression.Constant(array.MetavariableName), receiver));
+        }
+        else
+        {
+            body = AndAlso(body, EqualName(node, array.Value));
+        }
+
+        body = AndAlso(body, Expression.Equal(ArgumentsCount(node), Expression.Constant(1)));
+        return AndAlso(body, BuildArgExpression(index, IndexArgumentAt(node, 0), ctx));
     }
 
     private static string LiteralText(LabyrinthPatternNode literal)
@@ -426,17 +798,21 @@ public sealed class LabyrinthExpressionCompiler
 
         foreach (var n in argNodes)
         {
-            switch (n.TokenType)
+            // v2 (#247): tokens are compared by type first (v1 behaviour)
+            // and by value, so grammars that lex "(" / ")" under different
+            // type names still nest correctly.
+            if (n.TokenType == "LPAREN" || IsValue(n, "("))
             {
-                case "LPAREN":
-                    depth++;
-                    break;
-                case "RPAREN":
-                    depth--;
-                    break;
-                case "COMMA" when depth == 0:
-                    AddCurrent(args, current);
-                    continue;
+                depth++;
+            }
+            else if (n.TokenType == "RPAREN" || IsValue(n, ")"))
+            {
+                depth--;
+            }
+            else if ((n.TokenType == "COMMA" || IsValue(n, ",")) && depth == 0)
+            {
+                AddCurrent(args, current);
+                continue;
             }
 
             current.Add(n);
@@ -484,6 +860,33 @@ public sealed class LabyrinthExpressionCompiler
                     }
 
                     break;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// v2 (#247): finds a top-level literal token by value, for grammars
+    /// that lex "=" under a type name other than EQUALS. The comparison is
+    /// exact, so "==" (comparison) tokens are not matched.
+    /// </summary>
+    private static int FindTopLevelByValue(IReadOnlyList<LabyrinthPatternNode> nodes, string value)
+    {
+        var depth = 0;
+        for (var i = 0; i < nodes.Count; i++)
+        {
+            if (nodes[i].TokenType == "LPAREN" || IsValue(nodes[i], "("))
+            {
+                depth++;
+            }
+            else if (nodes[i].TokenType == "RPAREN" || IsValue(nodes[i], ")"))
+            {
+                depth--;
+            }
+            else if (depth == 0 && IsValue(nodes[i], value))
+            {
+                return i;
             }
         }
 

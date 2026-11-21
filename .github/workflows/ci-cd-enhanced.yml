@@ -156,7 +156,7 @@ jobs:
           --collect:"XPlat Code Coverage" \
           --results-directory ./TestResults/ \
           --logger "trx;LogFileName=test-results.trx" \
-          --logger "console;verbosity=normal" 2>&1 | tee /tmp/test-output.txt
+          --logger "console;verbosity=detailed" 2>&1 | tee /tmp/test-output.txt
         test_exit=${PIPESTATUS[0]}
         set -e
         # Surface failed tests in the job summary (GitHub does not annotate
@@ -168,8 +168,18 @@ jobs:
             grep -B 2 -A 30 -E "^\s+Failed [A-Za-z].*|Test host process crashed|The active test run was aborted|Failed!|Failed:.*[1-9]" /tmp/test-output.txt | head -300
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          # GitHub annotations ARE visible on the public job page (the raw log
-          # and step summary are not), so surface the failed tests there too
+          # Surface the assertion messages (they follow "Error Message:" in
+          # the detailed xunit console output) BEFORE the plain failed-test
+          # names: GitHub stores at most 10 annotations per check run, so the
+          # most informative ones go first. Each message is prefixed with the
+          # failing test's name.
+          awk '/^[[:space:]]*Failed [A-Za-z]/ { name=$0; sub(/^[[:space:]]+/, "", name); sub(/ \[.*/, "", name); mode="failed"; next }
+               mode=="failed" && /Error Message:/ { mode="msg"; next }
+               mode=="msg" && /Stack Trace/ { mode=""; next }
+               mode=="msg" && NF>0 { line=$0; gsub(/^[[:space:]]+|[[:space:]]+$/, "", line); print name " => " line }' \
+            /tmp/test-output.txt | sed 's/\r$//' | head -10 | while IFS= read -r line; do
+              printf '::error title=Test failure detail::%s\n' "$(printf '%s' "$line" | head -c 240)"
+            done
           grep -E '^\s+Failed [A-Za-z]' /tmp/test-output.txt | head -10 | while IFS= read -r line; do
             printf '::error title=Failed test::%s\n' "$(printf '%s' "$line" | sed 's/^[[:space:]]*//' | tr -d '\r' | head -c 240)"
           done
@@ -203,6 +213,35 @@ jobs:
       with:
         name: coverage-report
         path: CoverageReport/
+
+  labyrinth-corpus:
+    # Labyrinth rule corpus (Track GSE L2, Minotaur #246): runs the real
+    # engine over rules/ + tests/ via `minotaur labyrinth verify-corpus`,
+    # so every committed rule pack (rules/<grammar>/) and corpus case
+    # (tests/<grammar>/<rule-id>/) is machine-checked on every push and PR.
+    name: Labyrinth rule corpus (verify-corpus)
+    runs-on: ubuntu-latest
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    timeout-minutes: 30
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Build CLI (downloads Labyrinth target grammars at build time)
+      run: |
+        # Same NU1301 retry guard as build-and-test (GitHub Packages)
+        dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj || (sleep 20 && dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj) || (sleep 40 && dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj)
+        dotnet build src/Minotaur.Cli/Minotaur.Cli.csproj --configuration Release --no-restore
+
+    - name: Verify rule corpus
+      run: |
+        dotnet src/Minotaur.Cli/bin/Release/net8.0/Minotaur.Cli.dll labyrinth verify-corpus --rules rules --tests tests
 
   grammar-package-smoke:
     # Minotaur-Grammars #26: package-only round-trip smoke - every grammar in
