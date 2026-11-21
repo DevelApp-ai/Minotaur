@@ -378,7 +378,11 @@ public static class ScanHost
                 // RHS nodes, so taint produced by RHS sources (e.g. a
                 // maybe-null `FirstOrDefault()` value) reaches the
                 // assignment's propagator before flowing on.
-                var assignPos = rhs.Count > 0 ? rhs[0].Position : startPos;
+                var assignPos = startPos;
+                if (rhs.Count > 0 && rhs[0] is SourceMatchNode rhsFirst)
+                {
+                    assignPos = rhsFirst.Position;
+                }
                 var assignment = new SourceMatchNode("Assignment", null, new ILabyrinthMatchNode[] { lhs, rhsNode }, filePath, assignPos, source);
                 all.Add(assignment);
                 result.Add(assignment);
