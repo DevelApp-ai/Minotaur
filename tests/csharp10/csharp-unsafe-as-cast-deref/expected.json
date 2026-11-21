@@ -1,0 +1,9 @@
+{
+  "rule": "csharp-unsafe-as-cast-deref",
+  "findings": [
+    {
+      "file": "vulnerable.cs",
+      "line": 6
+    }
+  ]
+}

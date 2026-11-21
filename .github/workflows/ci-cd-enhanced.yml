@@ -244,6 +244,50 @@ jobs:
           --configuration Release --no-build --no-restore \
           --filter "FullyQualifiedName~MarketplacePackageSmoke"
 
+  labyrinth-corpus:
+    # Minotaur-Labyrinth L2 (#246): the committed C# rule pack
+    # (rules/csharp10) and its regression corpus (tests/csharp10) must
+    # verify through the real CLI ('minotaur labyrinth verify-corpus'):
+    # every expected.json finding must fire on the vulnerable file and
+    # every safe counterpart must stay clean. This gates merges: a
+    # committed rule pack that stops verifying is dead weight for the
+    # graph-symbolic-execution / labyrinth-sast-rules / glr-semantic-
+    # integration article lane (research-article-builder #67).
+    name: Labyrinth rule-pack corpus
+    runs-on: ubuntu-latest
+    needs: calculate-version
+    permissions:
+      contents: read
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: |
+        # Retry: GitHub Packages restore intermittently fails (NU1301)
+        dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj || (sleep 20 && dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj) || (sleep 40 && dotnet restore src/Minotaur.Cli/Minotaur.Cli.csproj)
+
+    - name: Build CLI (target grammars download at build time)
+      run: |
+        dotnet build src/Minotaur.Cli/Minotaur.Cli.csproj \
+          --configuration Release \
+          --no-restore \
+          -p:Version=${{ needs.calculate-version.outputs.version }}
+
+    - name: Verify rule-pack corpus
+      run: |
+        dotnet run --project src/Minotaur.Cli/Minotaur.Cli.csproj \
+          --configuration Release \
+          --no-build \
+          -- labyrinth verify-corpus --rules rules --tests tests
+
   article-measurements:
     # Article-lane measurements (research-article-builder backlog): grammar
     # compilation by size (Minotaur#126 real grammars, Minotaur#131 synthetic

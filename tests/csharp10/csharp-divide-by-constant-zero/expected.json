@@ -1,0 +1,9 @@
+{
+  "rule": "csharp-divide-by-constant-zero",
+  "findings": [
+    {
+      "file": "vulnerable.cs",
+      "line": 5
+    }
+  ]
+}
