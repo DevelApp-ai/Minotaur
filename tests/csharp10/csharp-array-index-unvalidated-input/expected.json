@@ -1,0 +1,9 @@
+{
+  "rule": "csharp-array-index-unvalidated-input",
+  "findings": [
+    {
+      "file": "vulnerable.cs",
+      "line": 8
+    }
+  ]
+}

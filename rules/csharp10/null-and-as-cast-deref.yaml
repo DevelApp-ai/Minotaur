@@ -1,0 +1,47 @@
+# Minotaur-Labyrinth C# 10 rule pack (Minotaur epic #246, L2).
+#
+# Patterns are written against the csharp10 target grammar (Minotaur-Grammars
+# programming-languages/csharp10) in the v2 pattern language (Minotaur #247):
+# receiver-member calls ($X.Method(...)), index access ($ARR[$I]) and binary
+# operator chains ($A / $B, $V as $T, $A ?? $B).
+#
+# Unification semantics: within one rule a metavariable name refers to the
+# same captured node everywhere (sources bind $TARGET to the interned
+# identifier on the assignment's left-hand side; sinks and sanitizers must
+# bind the very same node). Sinks with plain '.' deliberately do not match
+# null-conditional accesses ($TARGET?.Method()): the conditional access
+# itself handles the null case.
+rules:
+  - id: csharp-null-deref-unguarded-maybe-null
+    severity: ERROR
+    message: "Value from a maybe-null API (FirstOrDefault/SingleOrDefault/Find) is dereferenced without a null guard."
+    type: taint
+    sources:
+      - pattern: "$TARGET = $DATA.FirstOrDefault(...)"
+      - pattern: "$TARGET = $DATA.SingleOrDefault(...)"
+      - pattern: "$TARGET = $DATA.Find(...)"
+    sanitizers:
+      - pattern: "ArgumentNullException.ThrowIfNull($TARGET)"
+      - pattern: "$TARGET = $TARGET ?? $FALLBACK"
+    sinks:
+      - pattern: "$TARGET.ToString()"
+      - pattern: "$TARGET.Equals(...)"
+      - pattern: "$TARGET.GetHashCode()"
+      - pattern: "$TARGET.Clone()"
+      - pattern: "$TARGET.Dispose()"
+
+  - id: csharp-unsafe-as-cast-deref
+    severity: ERROR
+    message: "Result of an 'as' cast is dereferenced without a null guard; 'as' yields null when the cast fails."
+    type: taint
+    sources:
+      - pattern: "$TARGET = $VALUE as $TYPE"
+    sanitizers:
+      - pattern: "ArgumentNullException.ThrowIfNull($TARGET)"
+      - pattern: "$TARGET = $TARGET ?? $FALLBACK"
+    sinks:
+      - pattern: "$TARGET.ToString()"
+      - pattern: "$TARGET.Equals(...)"
+      - pattern: "$TARGET.GetHashCode()"
+      - pattern: "$TARGET.Clone()"
+      - pattern: "$TARGET.Dispose()"

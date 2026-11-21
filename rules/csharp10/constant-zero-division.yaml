@@ -1,0 +1,18 @@
+# Minotaur-Labyrinth C# 10 rule pack (Minotaur epic #246, L2).
+#
+# Constant-zero denominators: infrastructure-level faults that a symbolic
+# execution pass must catch without any data-flow. Both rules are pure
+# search shapes over the v2 operand grammar (Minotaur #247): $A binds the
+# dividend/moduland operand, the constant 0 binds by value.
+rules:
+  - id: csharp-divide-by-constant-zero
+    severity: ERROR
+    message: "Division by the constant zero; the divisor literal is 0 and not data-dependent."
+    type: search
+    pattern: "$A / 0"
+
+  - id: csharp-modulo-by-constant-zero
+    severity: ERROR
+    message: "Remainder by the constant zero; the modulus literal is 0 and not data-dependent."
+    type: search
+    pattern: "$A % 0"
