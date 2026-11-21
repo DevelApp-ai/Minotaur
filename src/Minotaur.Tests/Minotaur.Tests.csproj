@@ -23,6 +23,7 @@
     <ProjectReference Include="..\Minotaur.Benchmarks.ParserRuntime\Minotaur.Benchmarks.ParserRuntime.csproj" />
     <ProjectReference Include="..\Minotaur.UI.Blazor\Minotaur.UI.Blazor.csproj" />
     <ProjectReference Include="..\Minotaur.Labyrinth\Minotaur.Labyrinth.csproj" />
+    <ProjectReference Include="..\Minotaur.Cli\Minotaur.Cli.csproj" />
 
   </ItemGroup>
 

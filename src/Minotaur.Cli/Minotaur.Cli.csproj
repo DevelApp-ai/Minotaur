@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>Minotaur CLI: 'labyrinth scan' runs Labyrinth SAST rule packs over source files; 'labyrinth verify-corpus' runs the Minotaur-Labyrinth test corpus.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Minotaur.Labyrinth\Minotaur.Labyrinth.csproj" />
+  </ItemGroup>
+
+</Project>

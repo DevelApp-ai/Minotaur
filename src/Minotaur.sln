@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Tests", "Minotaur.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Demo", "Minotaur.Demo\Minotaur.Demo.csproj", "{4863017D-411F-4F41-8BAC-03EA17DF696A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Cli", "Minotaur.Cli\Minotaur.Cli.csproj", "{7C9E1B2A-3D4F-4A5B-8C6D-1E2F3A4B5C6D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.LiveEditing", "Minotaur.Benchmarks.LiveEditing\Minotaur.Benchmarks.LiveEditing.csproj", "{CF279947-5D5F-48DF-992B-820570F9D9DD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minotaur.Benchmarks.GrammarCompilation", "Minotaur.Benchmarks.GrammarCompilation\Minotaur.Benchmarks.GrammarCompilation.csproj", "{9982F813-D300-4EEA-9974-C3FA9D659840}"
@@ -59,6 +61,10 @@ Global
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4863017D-411F-4F41-8BAC-03EA17DF696A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C9E1B2A-3D4F-4A5B-8C6D-1E2F3A4B5C6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C9E1B2A-3D4F-4A5B-8C6D-1E2F3A4B5C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C9E1B2A-3D4F-4A5B-8C6D-1E2F3A4B5C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C9E1B2A-3D4F-4A5B-8C6D-1E2F3A4B5C6D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A3C2E19-5B84-4D6A-9F01-2C5E8B7D4A90}.Release|Any CPU.ActiveCfg = Release|Any CPU
