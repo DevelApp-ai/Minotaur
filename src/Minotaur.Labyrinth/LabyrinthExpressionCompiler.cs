@@ -79,10 +79,22 @@ public sealed class LabyrinthCompiledMatchers
 /// (System.Linq.Expressions) and further into native delegates at engine
 /// initialization — no runtime interpretation (issue #102).
 /// <para>
-/// Supported pattern shapes (v1):
+/// Supported pattern shapes (v2, issue #247 — adds receiver binding, index
+/// accesses, binary operators and non-call assignment right-hand sides; all v1
+/// shapes keep their meaning):
 /// <list type="bullet">
 /// <item>Call: <c>ReceiveData($DATA)</c> ⇒ <c>node.NodeType == "FunctionCall" &amp;&amp; node.Name == "ReceiveData" &amp;&amp; …args</c></item>
-/// <item>Assignment: <c>$TARGET = FormatString($SRC)</c> ⇒ matches <c>Assignment</c> nodes, binding both sides.</item>
+/// <item>Member call with receiver binding: <c>$X.DoWork()</c> ⇒ <c>FunctionCall</c> with Name = <c>DoWork</c>,
+/// binding <c>$X</c> to <c>node.Receiver</c> (plain <c>.</c> requires a non-null-conditional access;
+/// <c>$X?.DoWork()</c> matches only null-conditional accesses).</item>
+/// <item>Index access: <c>$ARR[$I]</c> ⇒ <c>IndexAccess</c> node, binding <c>$ARR</c> to <c>node.Receiver</c>
+/// (the indexed expression) and matching the index expressions positionally.</item>
+/// <item>Binary operator: <c>$A / $Z</c>, <c>$A % $Z</c>, <c>$A as $B</c>, <c>$A ?? $B</c> ⇒ a
+/// <c>FunctionCall</c> named <c>op:divide</c>/<c>op:modulo</c>/<c>op:as</c>/<c>op:coalesce</c> with the two
+/// operands as arguments (left-associative: <c>$A / $B / $C</c> matches <c>(($A / $B) / $C)</c>).</item>
+/// <item>Assignment (any of the above, a bare call or a bare metavariable/identifier on the right):
+/// <c>$TARGET = FormatString($SRC)</c>, <c>$TARGET = $DATA</c>, <c>$T = $A as $B</c> ⇒ matches
+/// <c>Assignment</c> nodes, binding both sides.</item>
 /// <item>Bare metavariable <c>$DATA</c> (binds anything) or bare identifier <c>Require</c> (name equality).</item>
 /// </list>
 /// <para>
@@ -106,6 +118,31 @@ public sealed class LabyrinthExpressionCompiler
 {
     private const string FunctionCallNodeType = "FunctionCall";
     private const string AssignmentNodeType = "Assignment";
+    private const string IndexAccessNodeType = "IndexAccess";
+
+    /// <summary>
+    /// Binary operators materialized as op: FunctionCall nodes (pattern v2, issue #247):
+    /// pattern token value → materialized callee name.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string> OperatorNames =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["/"] = "op:divide",
+            ["%"] = "op:modulo",
+            ["as"] = "op:as",
+            ["??"] = "op:coalesce"
+        };
+
+    /// <summary>
+    /// Literal token values that are never identifier operands. Pattern shape
+    /// detection is value-based so the same shapes compile for every target
+    /// grammar regardless of how the grammar names its token rules
+    /// (e.g. <c>EQUALS</c> vs <c>OP_ASSIGN</c> for <c>=</c>).
+    /// </summary>
+    private static readonly HashSet<string> NonIdentifierValues = new(StringComparer.Ordinal)
+    {
+        "(", ")", "[", "]", ",", "=", "/", "%", "?", "??", ".", "as"
+    };
 
     private static readonly System.Reflection.MethodInfo TryBindMethod =
         typeof(LabyrinthMatchContext).GetMethod(nameof(LabyrinthMatchContext.TryBind),
@@ -236,12 +273,21 @@ public sealed class LabyrinthExpressionCompiler
     {
         var nodes = pattern.Nodes;
 
-        // Assignment pattern: "<lhs> = <rhs>" at the top level.
-        var equalsIndex = FindTopLevel(nodes, "EQUALS");
-        if (equalsIndex == 1 && nodes.Count > 2)
+        // Assignment pattern: "<lhs> = <rhs>" at the top level. Detection is
+        // value-based (v2): "=" may be tokenized as EQUALS or as any operator
+        // token rule, in whichever target grammar.
+        var equalsIndex = FindTopLevelEquals(nodes);
+        if (equalsIndex > 0 && equalsIndex < nodes.Count - 1)
         {
+            if (equalsIndex > 1)
+            {
+                throw new LabyrinthRuleException(
+                    $"Pattern '{pattern.Pattern}' has an unsupported assignment shape: " +
+                    "only '<metavariable-or-identifier> = <rhs>' is supported.");
+            }
+
             var lhs = nodes[0];
-            var rhs = new LabyrinthPatternAst(pattern.Pattern, nodes.Skip(2).ToArray());
+            var rhs = new LabyrinthPatternAst(pattern.Pattern, nodes.Skip(equalsIndex + 1).ToArray());
             return BuildAssignmentBody(lhs, rhs, node, ctx);
         }
 
@@ -250,22 +296,42 @@ public sealed class LabyrinthExpressionCompiler
             throw new LabyrinthRuleException($"Pattern '{pattern.Pattern}' is empty.");
         }
 
+        // Receiver-member call (v2): "$X.Method(...)", "list.Find($V)", "$X?.Method(...)".
+        if (TrySplitReceiverCall(nodes, out var callShape))
+        {
+            return BuildReceiverCallBody(callShape, node, ctx);
+        }
+
+        // Index access (v2): "$ARR[$I]".
+        if (TrySplitIndexAccess(nodes, out var indexShape))
+        {
+            return BuildIndexAccessBody(indexShape, node, ctx);
+        }
+
+        // Binary operator chain (v2): "$A / $Z", "$A as $B", "$A / $B / $C".
+        if (TrySplitBinaryOperator(nodes, out var opShape))
+        {
+            return BuildOperatorChainBody(opShape, node, ctx);
+        }
+
         // Bare pattern: a single metavariable or identifier.
         if (nodes.Count == 1)
         {
             return BuildSingleExpression(nodes[0], node, ctx);
         }
 
-        // Call pattern: "Name(<args>)".
-        if (nodes[0].TokenType == "IDENTIFIER" && nodes[1].TokenType == "LPAREN"
-            && nodes[^1].TokenType == "RPAREN" && nodes.Count >= 3)
+        // Call pattern: "Name(<args>)" (value-based identifier detection so
+        // target grammars with different token rule names work too).
+        if (IsIdentifierLiteral(nodes[0]) && IsOpenParen(nodes[1]) && IsCloseParen(nodes[^1]) && nodes.Count >= 3)
         {
             return BuildCallBody(nodes[0].Value, nodes.Skip(2).Take(nodes.Count - 3).ToList(), node, ctx);
         }
 
         throw new LabyrinthRuleException(
-            $"Pattern '{pattern.Pattern}' has an unsupported shape for expression compilation " +
-            "(supported: call, assignment, bare metavariable or bare identifier).");
+            $"Pattern '{pattern.Pattern}' has an unsupported shape for expression compilation. " +
+            "Supported: call, member call with receiver ('$X.Method(...)'), index access ('$ARR[$I]'), " +
+            "binary operators ('$A / $Z', '$A as $B', '$A ?? $B'), assignment ('<lhs> = <rhs>' with any of " +
+            "those forms or a bare identifier/metavariable on the right), bare metavariable or bare identifier.");
     }
 
     private static Expression BuildSingleExpression(LabyrinthPatternNode single, ParameterExpression node, ParameterExpression ctx)
@@ -292,14 +358,6 @@ public sealed class LabyrinthExpressionCompiler
             throw new LabyrinthRuleException("Assignment left-hand side cannot be an ellipsis.");
         }
 
-        var rhsNodes = rhs.Nodes;
-        if (rhsNodes.Count < 3 || rhsNodes[0].TokenType != "IDENTIFIER"
-            || rhsNodes[1].TokenType != "LPAREN" || rhsNodes[^1].TokenType != "RPAREN")
-        {
-            throw new LabyrinthRuleException(
-                $"Assignment right-hand side '{rhs.Pattern}' is not a call pattern; only '<lhs> = Call(<args>)' is supported.");
-        }
-
         Expression body = Expression.Equal(
             Expression.Property(node, nameof(ILabyrinthMatchNode.NodeType)),
             Expression.Constant(AssignmentNodeType));
@@ -311,23 +369,76 @@ public sealed class LabyrinthExpressionCompiler
             ? Expression.Call(ctx, TryBindMethod, Expression.Constant(lhs.MetavariableName), left)
             : EqualName(left, lhs.Value));
 
-        // Right-hand side: a call pattern against Arguments[1].
+        // Right-hand side (v2): any supported expression shape — a call, a
+        // member call with receiver, an index access, a binary operator chain,
+        // or a bare metavariable/identifier.
         var right = IndexArgumentAt(node, 1);
-        var callBody = BuildCallBody(rhsNodes[0].Value, rhsNodes.Skip(2).Take(rhsNodes.Count - 3).ToList(), right, ctx);
-        return AndAlso(body, callBody);
+        var rhsNodes = rhs.Nodes;
+        if (rhsNodes.Count == 0)
+        {
+            throw new LabyrinthRuleException(
+                $"Assignment right-hand side '{rhs.Pattern}' is empty.");
+        }
+
+        if (rhsNodes.Count == 1)
+        {
+            return AndAlso(body, BuildOperand(rhsNodes[0], right, ctx));
+        }
+
+        if (rhsNodes.Count >= 3 && IsIdentifierLiteral(rhsNodes[0])
+            && IsOpenParen(rhsNodes[1]) && IsCloseParen(rhsNodes[^1]))
+        {
+            var callBody = BuildCallBody(rhsNodes[0].Value, rhsNodes.Skip(2).Take(rhsNodes.Count - 3).ToList(), right, ctx);
+            return AndAlso(body, callBody);
+        }
+
+        if (TrySplitReceiverCall(rhsNodes, out var callShape))
+        {
+            return AndAlso(body, BuildReceiverCallBody(callShape, right, ctx));
+        }
+
+        if (TrySplitIndexAccess(rhsNodes, out var indexShape))
+        {
+            return AndAlso(body, BuildIndexAccessBody(indexShape, right, ctx));
+        }
+
+        if (TrySplitBinaryOperator(rhsNodes, out var opShape))
+        {
+            return AndAlso(body, BuildOperatorChainBody(opShape, right, ctx));
+        }
+
+        throw new LabyrinthRuleException(
+            $"Assignment right-hand side '{rhs.Pattern}' has an unsupported shape. Supported: " +
+            "'<lhs> = Call(<args>)', '<lhs> = $X.Method(<args>)', '<lhs> = $ARR[$I]', " +
+            "'<lhs> = $A / $B' (also %, as, ??), '<lhs> = $DATA', '<lhs> = <identifier>'.");
     }
 
     private static Expression BuildCallBody(
         string name, IReadOnlyList<LabyrinthPatternNode> argNodes, Expression callNode, ParameterExpression ctx)
     {
-        var args = SplitArguments(argNodes);
-
         Expression body = Expression.Equal(
             Expression.Property(callNode, nameof(ILabyrinthMatchNode.NodeType)),
             Expression.Constant(FunctionCallNodeType));
         body = AndAlso(body, Expression.Equal(
             Expression.Property(callNode, nameof(ILabyrinthMatchNode.Name)),
             Expression.Constant(name)));
+
+        return AndAlso(body, BuildArgumentsBody(argNodes, callNode, ctx));
+    }
+
+    /// <summary>
+    /// Matches a node's <see cref="ILabyrinthMatchNode.Arguments"/> against a
+    /// pattern argument list: fixed arity when no ellipsis is present, prefix /
+    /// middle / suffix segmentation otherwise. Shared by call, member-call and
+    /// index-access patterns (the index expressions of an <c>IndexAccess</c>
+    /// node live in the same argument slot).
+    /// </summary>
+    private static Expression BuildArgumentsBody(
+        IReadOnlyList<LabyrinthPatternNode> argNodes, Expression callNode, ParameterExpression ctx)
+    {
+        var args = SplitArguments(argNodes);
+
+        Expression body = Expression.Constant(true);
 
         var firstEllipsis = args.FindIndex(a => a.Kind == LabyrinthPatternNodeKind.Ellipsis);
         if (firstEllipsis < 0)
@@ -399,6 +510,271 @@ public sealed class LabyrinthExpressionCompiler
         return body;
     }
 
+    // ------------------------------------------------------------------
+    // Pattern v2 shapes (issue #247)
+    // ------------------------------------------------------------------
+
+    /// <summary>A parsed member-call pattern shape: <c>$X.Method(args)</c> or <c>$X?.Method(args)</c>.</summary>
+    private sealed record ReceiverCallShape(
+        LabyrinthPatternNode Receiver, string MethodName, IReadOnlyList<LabyrinthPatternNode> ArgNodes, bool NullConditional);
+
+    /// <summary>A parsed index-access pattern shape: <c>$ARR[$I]</c>.</summary>
+    private sealed record IndexAccessShape(
+        LabyrinthPatternNode Receiver, IReadOnlyList<LabyrinthPatternNode> ArgNodes);
+
+    /// <summary>A parsed binary-operator chain shape: <c>$A / $B / $C</c>.</summary>
+    private sealed record OperatorChainShape(
+        IReadOnlyList<LabyrinthPatternNode> Operands, IReadOnlyList<string> Operators);
+
+    private static bool IsValue(LabyrinthPatternNode node, string value) =>
+        node.Kind == LabyrinthPatternNodeKind.Literal && string.Equals(node.Value, value, StringComparison.Ordinal);
+
+    private static bool IsOpenParen(LabyrinthPatternNode node) =>
+        node.TokenType == "LPAREN" || IsValue(node, "(");
+
+    private static bool IsCloseParen(LabyrinthPatternNode node) =>
+        node.TokenType == "RPAREN" || IsValue(node, ")");
+
+    /// <summary>
+    /// True when the node is a literal that names an identifier/callee (as opposed to punctuation or an operator).
+    /// Value-based so patterns compile identically across target grammars.
+    /// </summary>
+    private static bool IsIdentifierLiteral(LabyrinthPatternNode node) =>
+        node.Kind == LabyrinthPatternNodeKind.Literal
+        && (node.TokenType == "IDENTIFIER" || !NonIdentifierValues.Contains(node.Value));
+
+    /// <summary>True when the node can start a pattern operand (a metavariable or an identifier literal).</summary>
+    private static bool IsOperand(LabyrinthPatternNode node) =>
+        node.Kind == LabyrinthPatternNodeKind.Metavariable || IsIdentifierLiteral(node);
+
+    /// <summary>
+    /// Recognizes <c>[$X|ident] (.|?.) Name ( args )</c>. The null-conditional
+    /// marker may lex as one token (<c>?.</c>) or as two (<c>? .</c>), depending
+    /// on the target grammar.
+    /// </summary>
+    private static bool TrySplitReceiverCall(IReadOnlyList<LabyrinthPatternNode> nodes, out ReceiverCallShape shape)
+    {
+        shape = null!;
+        if (nodes.Count < 5 || !IsOperand(nodes[0]))
+        {
+            return false;
+        }
+
+        var i = 1;
+        var nullConditional = false;
+        if (IsValue(nodes[i], "?."))
+        {
+            nullConditional = true;
+            i++;
+        }
+        else if (IsValue(nodes[i], "?") && i + 1 < nodes.Count && IsValue(nodes[i + 1], "."))
+        {
+            nullConditional = true;
+            i += 2;
+        }
+        else if (IsValue(nodes[i], "."))
+        {
+            i++;
+        }
+        else
+        {
+            return false;
+        }
+
+        if (i >= nodes.Count || !IsIdentifierLiteral(nodes[i]) || IsValue(nodes[i], "as"))
+        {
+            return false;
+        }
+
+        var methodName = nodes[i].Value;
+        i++;
+        if (i >= nodes.Count || !IsOpenParen(nodes[i]) || !IsCloseParen(nodes[^1]) || i == nodes.Count - 1)
+        {
+            return false;
+        }
+
+        var argNodes = nodes.Skip(i + 1).Take(nodes.Count - i - 2).ToList();
+        shape = new ReceiverCallShape(nodes[0], methodName, argNodes, nullConditional);
+        return true;
+    }
+
+    /// <summary>Recognizes <c>[$ARR|ident] [ args ]</c>.</summary>
+    private static bool TrySplitIndexAccess(IReadOnlyList<LabyrinthPatternNode> nodes, out IndexAccessShape shape)
+    {
+        shape = null!;
+        if (nodes.Count < 3 || !IsOperand(nodes[0]) || !IsValue(nodes[1], "[") || !IsValue(nodes[^1], "]"))
+        {
+            return false;
+        }
+
+        if (nodes.Count == 3)
+        {
+            shape = new IndexAccessShape(nodes[0], Array.Empty<LabyrinthPatternNode>());
+            return true;
+        }
+
+        var argNodes = nodes.Skip(2).Take(nodes.Count - 3).ToList();
+        shape = new IndexAccessShape(nodes[0], argNodes);
+        return true;
+    }
+
+    /// <summary>
+    /// Recognizes <c>operand (op operand)+</c> with op in <c>/</c>, <c>%</c>, <c>as</c>, <c>??</c>
+    /// (<c>??</c> may lex as one token or as two <c>?</c>). Operands must be single
+    /// tokens (metavariable or identifier); anything else is not an operator chain.
+    /// </summary>
+    private static bool TrySplitBinaryOperator(IReadOnlyList<LabyrinthPatternNode> nodes, out OperatorChainShape shape)
+    {
+        shape = null!;
+        if (nodes.Count < 3 || !IsOperand(nodes[0]))
+        {
+            return false;
+        }
+
+        var operands = new List<LabyrinthPatternNode> { nodes[0] };
+        var operators = new List<string>();
+        var i = 1;
+        while (i < nodes.Count)
+        {
+            string? opName = null;
+            if (IsValue(nodes[i], "??"))
+            {
+                opName = OperatorNames["??"];
+                i += 1;
+            }
+            else if (IsValue(nodes[i], "?") && i + 1 < nodes.Count && IsValue(nodes[i + 1], "?"))
+            {
+                opName = OperatorNames["??"];
+                i += 2;
+            }
+            else if (nodes[i].Kind == LabyrinthPatternNodeKind.Literal
+                && OperatorNames.TryGetValue(nodes[i].Value, out var mapped))
+            {
+                opName = mapped;
+                i += 1;
+            }
+
+            if (opName is null)
+            {
+                return false;
+            }
+
+            if (i >= nodes.Count || !IsOperand(nodes[i]))
+            {
+                return false;
+            }
+
+            operators.Add(opName);
+            operands.Add(nodes[i]);
+            i++;
+        }
+
+        shape = new OperatorChainShape(operands, operators);
+        return operators.Count > 0;
+    }
+
+    /// <summary>
+    /// Builds a member-call matcher: FunctionCall with the given method name,
+    /// receiver bound or name-compared, and (for plain <c>.</c> patterns)
+    /// <see cref="ILabyrinthMatchNode.IsNullConditional"/> == false;
+    /// <c>?.</c> patterns match only null-conditional accesses.
+    /// </summary>
+    private static Expression BuildReceiverCallBody(ReceiverCallShape shape, Expression callNode, ParameterExpression ctx)
+    {
+        Expression body = Expression.Equal(
+            Expression.Property(callNode, nameof(ILabyrinthMatchNode.NodeType)),
+            Expression.Constant(FunctionCallNodeType));
+        body = AndAlso(body, Expression.Equal(
+            Expression.Property(callNode, nameof(ILabyrinthMatchNode.Name)),
+            Expression.Constant(shape.MethodName)));
+        body = AndAlso(body, Expression.Equal(
+            Expression.Property(callNode, nameof(ILabyrinthMatchNode.IsNullConditional)),
+            Expression.Constant(shape.NullConditional)));
+
+        var receiver = Expression.Property(callNode, nameof(ILabyrinthMatchNode.Receiver));
+        body = AndAlso(body, Expression.NotEqual(
+            receiver,
+            Expression.Constant(null, typeof(ILabyrinthMatchNode))));
+        body = AndAlso(body, shape.Receiver.Kind == LabyrinthPatternNodeKind.Metavariable
+            ? Expression.Call(ctx, TryBindMethod, Expression.Constant(shape.Receiver.MetavariableName), receiver)
+            : EqualName(receiver, shape.Receiver.Value));
+
+        return AndAlso(body, BuildArgumentsBody(shape.ArgNodes, callNode, ctx));
+    }
+
+    /// <summary>
+    /// Builds an index-access matcher: an <c>IndexAccess</c> node whose
+    /// <see cref="ILabyrinthMatchNode.Receiver"/> is the indexed expression and
+    /// whose index expressions match the bracketed pattern positionally.
+    /// </summary>
+    private static Expression BuildIndexAccessBody(IndexAccessShape shape, Expression indexNode, ParameterExpression ctx)
+    {
+        Expression body = Expression.Equal(
+            Expression.Property(indexNode, nameof(ILabyrinthMatchNode.NodeType)),
+            Expression.Constant(IndexAccessNodeType));
+
+        var receiver = Expression.Property(indexNode, nameof(ILabyrinthMatchNode.Receiver));
+        body = AndAlso(body, Expression.NotEqual(
+            receiver,
+            Expression.Constant(null, typeof(ILabyrinthMatchNode))));
+        body = AndAlso(body, shape.Receiver.Kind == LabyrinthPatternNodeKind.Metavariable
+            ? Expression.Call(ctx, TryBindMethod, Expression.Constant(shape.Receiver.MetavariableName), receiver)
+            : EqualName(receiver, shape.Receiver.Value));
+
+        return AndAlso(body, BuildArgumentsBody(shape.ArgNodes, indexNode, ctx));
+    }
+
+    /// <summary>
+    /// Builds a left-associative operator-chain matcher: the pattern's last
+    /// operator is the outermost node; earlier operands fold into
+    /// <c>Arguments[0]</c>, the last operand matches <c>Arguments[1]</c>.
+    /// </summary>
+    private static Expression BuildOperatorChainBody(OperatorChainShape shape, Expression operandNode, ParameterExpression ctx)
+    {
+        if (shape.Operators.Count == 0)
+        {
+            return BuildOperand(shape.Operands[0], operandNode, ctx);
+        }
+
+        var op = shape.Operators[^1];
+        Expression body = Expression.Equal(
+            Expression.Property(operandNode, nameof(ILabyrinthMatchNode.NodeType)),
+            Expression.Constant(FunctionCallNodeType));
+        body = AndAlso(body, Expression.Equal(
+            Expression.Property(operandNode, nameof(ILabyrinthMatchNode.Name)),
+            Expression.Constant(op)));
+        body = AndAlso(body, Expression.Equal(ArgumentsCount(operandNode), Expression.Constant(2)));
+
+        var left = BuildOperatorChainBody(
+            new OperatorChainShape(
+                shape.Operands.Take(shape.Operands.Count - 1).ToList(),
+                shape.Operators.Take(shape.Operators.Count - 1).ToList()),
+            IndexArgumentAt(operandNode, 0),
+            ctx);
+        body = AndAlso(body, left);
+        return AndAlso(body, BuildOperand(shape.Operands[^1], IndexArgumentAt(operandNode, 1), ctx));
+    }
+
+    /// <summary>
+    /// Matches a single-token operand of an operator chain: a metavariable
+    /// (binds) or an identifier literal (name equality).
+    /// </summary>
+    private static Expression BuildOperand(LabyrinthPatternNode operand, Expression operandNode, ParameterExpression ctx)
+    {
+        if (operand.Kind == LabyrinthPatternNodeKind.Metavariable)
+        {
+            return Expression.Call(ctx, TryBindMethod, Expression.Constant(operand.MetavariableName), operandNode);
+        }
+
+        if (operand.Kind != LabyrinthPatternNodeKind.Literal)
+        {
+            throw new LabyrinthRuleException(
+                "Operator operands must be a single metavariable or an identifier literal.");
+        }
+
+        return EqualName(operandNode, LiteralText(operand));
+    }
+
     private static Expression BuildArgExpression(LabyrinthPatternNode arg, Expression argNode, ParameterExpression ctx)
     {
         return arg.Kind switch
@@ -464,26 +840,29 @@ public sealed class LabyrinthExpressionCompiler
         current.Clear();
     }
 
-    private static int FindTopLevel(IReadOnlyList<LabyrinthPatternNode> nodes, string tokenType)
+    /// <summary>
+    /// Finds the top-level assignment token ("="), tracking bracket depth.
+    /// Value-based (v2): the target grammar may tokenize "=" as EQUALS or as
+    /// any operator token rule; "==", "&gt;=" and friends have different values
+    /// and never match.
+    /// </summary>
+    private static int FindTopLevelEquals(IReadOnlyList<LabyrinthPatternNode> nodes)
     {
         var depth = 0;
         for (var i = 0; i < nodes.Count; i++)
         {
-            switch (nodes[i].TokenType)
+            var node = nodes[i];
+            if (IsOpenParen(node) || IsValue(node, "["))
             {
-                case "LPAREN":
-                    depth++;
-                    break;
-                case "RPAREN":
-                    depth--;
-                    break;
-                default:
-                    if (depth == 0 && nodes[i].TokenType == tokenType)
-                    {
-                        return i;
-                    }
-
-                    break;
+                depth++;
+            }
+            else if (IsCloseParen(node) || IsValue(node, "]"))
+            {
+                depth--;
+            }
+            else if (depth == 0 && (node.TokenType == "EQUALS" || IsValue(node, "=")))
+            {
+                return i;
             }
         }
 
