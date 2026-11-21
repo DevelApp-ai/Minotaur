@@ -88,7 +88,7 @@ var outputDir = args.Length > 0 && !string.IsNullOrWhiteSpace(args[0])
     ? args[0]
     : "docs/measurements/issue-133";
 var corpusRoot = Environment.GetEnvironmentVariable("CLASSACC_CACHE_DIR")
-    ?? Path.Combine(Path.GetTempPath(), "minotaur-classacc-corpus");
+    ?? Path.Join(Path.GetTempPath(), "minotaur-classacc-corpus");
 var grammarsDir = Environment.GetEnvironmentVariable("MINOTAUR_GRAMMARS_DIR");
 if (string.IsNullOrWhiteSpace(grammarsDir) || !Directory.Exists(grammarsDir))
 {
@@ -106,6 +106,18 @@ Console.WriteLine($"  corpusRoot: {corpusRoot}");
 Console.WriteLine($"  grammars:   {grammarsDir}");
 Console.WriteLine($"  perFileTimeoutMs: {perFileTimeoutMs}");
 Directory.CreateDirectory(outputDir);
+
+// Broad catches are DELIBERATE in this harness: the outcome taxonomy (header
+// comment) requires every failure mode to map to a taxonomy row. The
+// `when (Note(ex, ...))` filter keeps each catch exactly as broad as before
+// while making the swallowed exception visible on stderr (worker stderr is
+// drained by the parent), i.e. the diagnosability a bare `catch (Exception)`
+// would lose.
+bool Note(Exception ex, string context)
+{
+    Console.Error.WriteLine($"  [{context}] {ex.GetType().Name}: {ex.Message}");
+    return true;
+}
 
 // ================================ worker =====================================
 
@@ -133,7 +145,7 @@ async Task<int> RunWorker(string htmlGrammarPath, string mdGrammarPath)
         {
             writer.WriteLine($"A\t{path}");
         }
-        catch (Exception)
+        catch (Exception ex) when (Note(ex, "worker ack write failed, parent likely gone"))
         {
             return 0; // parent gone
         }
@@ -173,7 +185,7 @@ async Task<int> RunWorker(string htmlGrammarPath, string mdGrammarPath)
         {
             outcome = "engine-oom";
         }
-        catch (Exception)
+        catch (Exception ex) when (Note(ex, $"worker parse crashed for {path}"))
         {
             outcome = "engine-error";
         }
@@ -188,7 +200,7 @@ async Task<int> RunWorker(string htmlGrammarPath, string mdGrammarPath)
         {
             writer.WriteLine(response.ToJsonString());
         }
-        catch (Exception)
+        catch (Exception ex) when (Note(ex, $"worker result write failed for {path}, parent likely gone"))
         {
             return 0;
         }
@@ -217,12 +229,12 @@ http.DefaultRequestHeaders.UserAgent.ParseAdd("Minotaur-Benchmarks/1.0");
 var repoRoots = new List<(string Repo, string Root)>();
 foreach (var (name, url) in repos)
 {
-    var root = Path.Combine(corpusRoot, name);
-    var marker = Path.Combine(corpusRoot, name + ".done");
+    var root = Path.Join(corpusRoot, name);
+    var marker = Path.Join(corpusRoot, name + ".done");
     if (!File.Exists(marker))
     {
         Console.WriteLine($"downloading corpus: {name} ...");
-        var tgz = Path.Combine(corpusRoot, name + ".tgz");
+        var tgz = Path.Join(corpusRoot, name + ".tgz");
         if (!File.Exists(tgz))
         {
             await DownloadWithRetryAsync(http, url, tgz);
@@ -236,7 +248,7 @@ foreach (var (name, url) in repos)
         {
             if (entry.EntryType is TarEntryType.RegularFile && !string.IsNullOrEmpty(entry.Name))
             {
-                var dest = Path.GetFullPath(Path.Combine(root, entry.Name));
+                var dest = Path.GetFullPath(Path.Join(root, entry.Name));
                 // Defend against path traversal outside the corpus dir.
                 if (!dest.StartsWith(Path.GetFullPath(root) + Path.DirectorySeparatorChar, StringComparison.Ordinal))
                 {
@@ -252,15 +264,15 @@ foreach (var (name, url) in repos)
     }
 
     // codeload tarballs contain a single top-level directory.
-    var inner = Directory.GetDirectories(Path.Combine(corpusRoot, name)).Single();
+    var inner = Directory.GetDirectories(Path.Join(corpusRoot, name)).Single();
     repoRoots.Add((name, inner));
     Console.WriteLine($"  {name}: {Directory.GetFiles(inner, "*", SearchOption.AllDirectories).Length} files");
 }
 
 // =========================== grammar resolution =============================
 
-var grammarIndexPath = Path.Combine(grammarsDir, "grammar-index.json");
-var markdownDirectPath = Path.Combine(grammarsDir, "specialized", "markdown", "Markdown.grammar");
+var grammarIndexPath = Path.Join(grammarsDir, "grammar-index.json");
+var markdownDirectPath = Path.Join(grammarsDir, "specialized", "markdown", "Markdown.grammar");
 var htmlEmbeddedGrammarPath = ResolveGrammar("HTMLEmbedded.grammar");
 
 // Markdown.grammar is NOT referenced by grammar-index.json (verified against
@@ -279,7 +291,7 @@ if (File.Exists(grammarIndexPath))
             mdIndexNote = "Markdown.grammar is referenced by grammar-index.json (registry-mapped).";
         }
     }
-    catch (Exception)
+    catch (Exception ex) when (Note(ex, "grammar-index.json unparsable, direct-path behavior applies"))
     {
         // index unparsable: direct-path behavior applies
     }
@@ -307,15 +319,15 @@ string ResolveGrammar(string fileName)
             if (JsonNode.Parse(File.ReadAllText(grammarIndexPath))?["grammars"] is JsonObject gobj &&
                 gobj[fileName] is JsonNode relNode && relNode.GetValue<string>() is string rel)
             {
-                return Path.Combine(grammarsDir, rel.Replace('/', Path.DirectorySeparatorChar));
+                return Path.Join(grammarsDir, rel.Replace('/', Path.DirectorySeparatorChar));
             }
         }
-        catch (Exception)
+        catch (Exception ex) when (Note(ex, $"grammar-index entry unparsable for {fileName}"))
         {
             // fall through to conventional path
         }
     }
-    return Path.Combine(grammarsDir, "programming-languages",
+    return Path.Join(grammarsDir, "programming-languages",
         fileName.Equals("Markdown.grammar", StringComparison.OrdinalIgnoreCase) ? "markdown" : "htmlembedded",
         fileName);
 }
@@ -341,14 +353,14 @@ if (File.Exists(grammarIndexPath))
             }
         }
     }
-    catch (Exception)
+    catch (Exception ex) when (Note(ex, "grammar-index inventory scan failed, audit reports none shipped"))
     {
         // inventory stays empty; audit then reports "none shipped" for all
     }
 }
 try
 {
-    var mdMetaPath = Path.Combine(grammarsDir, "specialized", "markdown", "minotaur-metadata.json");
+    var mdMetaPath = Path.Join(grammarsDir, "specialized", "markdown", "minotaur-metadata.json");
     if (File.Exists(mdMetaPath) &&
         JsonNode.Parse(await File.ReadAllTextAsync(mdMetaPath))?["Name"]?.GetValue<string>() is string mdName)
     {
@@ -356,7 +368,7 @@ try
             markdownIndexed ? "specialized/markdown/Markdown.grammar" : "Markdown.grammar (not in grammar-index.json)");
     }
 }
-catch (Exception)
+catch (Exception ex) when (Note(ex, "minotaur-metadata.json read failed, markdown assumed unmapped"))
 {
     corpusLanguages.TryAdd("markdown", "Markdown.grammar (not in grammar-index.json)");
 }
@@ -737,7 +749,7 @@ void KillWorker()
         }
         worker.Dispose();
     }
-    catch (Exception)
+    catch (Exception ex) when (Note(ex, "worker kill race, process already gone"))
     {
         // already gone
     }
@@ -811,7 +823,7 @@ void EnsureWorker()
                 }
             }
         }
-        catch (Exception)
+        catch (Exception ex) when (Note(ex, "worker stderr drain ended as worker died"))
         {
             // worker died; parent classifies via ack/result handling
         }
@@ -828,7 +840,7 @@ async Task<(string Outcome, List<WToken> Tokens)> ParseViaWorker(
         await w.StandardInput.WriteLineAsync($"{absolutePath}\t{format}");
         await w.StandardInput.FlushAsync();
     }
-    catch (Exception)
+    catch (Exception ex) when (Note(ex, $"stdin write failed for {absolutePath}"))
     {
         KillWorker();
         return ("parse-crash", []);
@@ -889,7 +901,7 @@ async Task<(string Outcome, List<WToken> Tokens)> ParseViaWorker(
         }
         return (outcome, tokens);
     }
-    catch (Exception)
+    catch (Exception ex) when (Note(ex, $"result line unparseable for {absolutePath}"))
     {
         KillWorker();
         return ("parse-crash", []);
@@ -900,7 +912,7 @@ async Task<(string Outcome, List<WToken> Tokens)> ParseViaWorker(
 // Env resets and bash time caps interrupted full runs repeatedly during
 // bring-up; the append-mode cache makes runs resumable file-by-file.
 
-var cachePath = Path.Combine(outputDir, "embedded-partial-cache.jsonl");
+var cachePath = Path.Join(outputDir, "embedded-partial-cache.jsonl");
 var cache = new Dictionary<string, FileRow>();
 if (File.Exists(cachePath))
 {
@@ -918,7 +930,7 @@ if (File.Exists(cachePath))
                 cache[$"{row.Repo}:{row.Path}"] = row;
             }
         }
-        catch (Exception)
+        catch (Exception ex) when (Note(ex, "resume-cache line skipped, torn last line after an interrupted run"))
         {
             // tolerate a torn last line after an interrupted run
         }
@@ -926,7 +938,7 @@ if (File.Exists(cachePath))
     Console.WriteLine($"  resume cache: {cache.Count} rows loaded from {cachePath}");
 }
 
-var cacheWriter = new StreamWriter(cachePath, append: true) { AutoFlush = true };
+using var cacheWriter = new StreamWriter(cachePath, append: true) { AutoFlush = true };
 
 // ============================== file loop ===================================
 
@@ -958,7 +970,7 @@ foreach (var (repo, root) in repoRoots)
             bytes = await File.ReadAllBytesAsync(file);
             text = Encoding.UTF8.GetString(bytes);
         }
-        catch (Exception)
+        catch (Exception ex) when (Note(ex, $"corpus file unreadable: {file}"))
         {
             var rf = FileRow.ReadFailure(repo, rel, format);
             rows.Add(rf);
@@ -1108,7 +1120,6 @@ foreach (var (repo, root) in repoRoots)
 }
 
 cacheWriter.Flush();
-cacheWriter.Dispose();
 KillWorker();
 
 Console.WriteLine($"  {rows.Count} container files processed ({processed} parsed this run, {rows.Count - processed} resumed)");
@@ -1280,11 +1291,11 @@ var payload = new JsonObject
 
 var jsonOpts = new JsonSerializerOptions { WriteIndented = true };
 await File.WriteAllTextAsync(
-    Path.Combine(outputDir, "embedded-results.json"),
+    Path.Join(outputDir, "embedded-results.json"),
     payload.ToJsonString(jsonOpts));
 
 await File.WriteAllTextAsync(
-    Path.Combine(outputDir, "embedded-files.csv"),
+    Path.Join(outputDir, "embedded-files.csv"),
     BuildFilesCsv(rows));
 
 await WriteResultsMdAsync(outputDir, payload);
@@ -1613,7 +1624,7 @@ async Task WriteResultsMdAsync(string dir, JsonObject payload)
     md.AppendLine("- Deterministic reruns: the harness writes an append-mode resume cache (`embedded-partial-cache.jsonl`); resumed runs skip already-processed file keys, and a torn final line after an interrupted run is tolerated (dropped).");
     md.AppendLine();
 
-    await File.WriteAllTextAsync(Path.Combine(dir, "embedded-RESULTS.md"), md.ToString());
+    await File.WriteAllTextAsync(Path.Join(dir, "embedded-RESULTS.md"), md.ToString());
 }
 
 // ============================== records =====================================
