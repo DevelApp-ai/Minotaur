@@ -119,7 +119,15 @@ public static class ScanHost
         var intern = new Dictionary<string, SourceMatchNode>(StringComparer.Ordinal);
         var all = new List<SourceMatchNode>();
         var i = 0;
-        ParseExpr(tokens, ref i, source, filePath, intern, all, new HashSet<string>(StringComparer.Ordinal) { ";" });
+        var topStops = new HashSet<string>(StringComparer.Ordinal) { ";" };
+        while (i < tokens.Count)
+        {
+            ParseExpr(tokens, ref i, source, filePath, intern, all, topStops);
+            if (i < tokens.Count && tokens[i].Value == ";")
+            {
+                i++;
+            }
+        }
 
         var graph = new LabyrinthDataFlowGraph();
         SourceMatchNode? prev = null;
@@ -268,7 +276,13 @@ public static class ScanHost
                         continue;
                     }
 
+                    var before = i;
                     var arg = ParseExpr(tokens, ref i, source, filePath, intern, all, argStops);
+                    if (i == before)
+                    {
+                        i++;
+                    }
+
                     callArgs.Add(arg.Count == 1
                         ? arg[0]
                         : new SourceMatchNode("Expression", null, arg, filePath, startPos, source));
