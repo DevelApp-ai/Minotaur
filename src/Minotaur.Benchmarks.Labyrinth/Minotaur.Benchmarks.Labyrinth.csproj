@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reuses the CLI's ScanHost: the same grammar resolution, parse pipeline
+         and rule-execution path 'minotaur labyrinth scan/verify-corpus' uses. -->
+    <ProjectReference Include="..\Minotaur.Cli\Minotaur.Cli.csproj" />
+  </ItemGroup>
+
+</Project>

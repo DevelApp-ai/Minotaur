@@ -313,14 +313,16 @@ jobs:
     # and transcribed into docs/measurements/; this job never gates merges.
     # (The embedded-detection run parses ~1,200 container files through
     # worker-process isolation with per-file kills, so the job needs a
-    # longer budget than the default builds.)
+    # longer budget than the default builds. The Labyrinth #246 run scans
+    # 200 parse+scan pairs per rep at seconds each, so the budget was raised
+    # again when that step was added.)
     name: Article-lane measurements (benchmarks)
     runs-on: ubuntu-latest
     needs: [calculate-version]
     permissions:
       contents: read
       pull-requests: write
-    timeout-minutes: 90
+    timeout-minutes: 150
     steps:
     - name: Checkout Minotaur
       uses: actions/checkout@v5
@@ -344,11 +346,13 @@ jobs:
         dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj
         dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj
         dotnet restore src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj
+        dotnet restore src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj
         dotnet build src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj --configuration Release --no-restore
+        dotnet build src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj --configuration Release --no-restore
 
     - name: Grammar compilation by size (issue #126, real grammars)
       env:
@@ -421,6 +425,22 @@ jobs:
         --configuration Release --no-build --
         logs ${{ github.workspace }}/measurement-artifacts
 
+    - name: Labyrinth rule-pack detection + timing (issue #246, GSE L3)
+      # Full shipped csharp10 rule pack over the deterministic detection
+      # corpus: detection vs exact ground truth, per-file parse/scan cost
+      # and per-rule attribution. The production scan path resolves and
+      # compiles the grammar once per file, so one parse+scan pair costs
+      # seconds; pairs 10 x reps 3 keeps the lane comfortably inside its
+      # budget. Exit code 2 (detection below 100% or any false positive)
+      # fails this step, which never gates merges but surfaces regressions.
+      env:
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.Labyrinth
+        --configuration Release --no-build --
+        ${{ github.workspace }}/measurement-artifacts/issue-246
+        --pairs 10 --reps 3 --write-corpus
+
     - name: Post measurements to the PR (article-lane visibility)
       if: github.event_name == 'pull_request'
       env:
@@ -488,6 +508,18 @@ jobs:
           echo
           echo '```csv'
           cat measurement-artifacts/issue-132/log-battery.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "### Minotaur #246 — Labyrinth csharp10 rule pack: detection + timing (GSE L3)"
+          echo
+          cat measurement-artifacts/issue-246/RESULTS.md
+          echo
+          echo "<details><summary>ground-truth.json (#246)</summary>"
+          echo
+          echo '```json'
+          cat measurement-artifacts/issue-246/ground-truth.json
           echo '```'
           echo
           echo "</details>"
