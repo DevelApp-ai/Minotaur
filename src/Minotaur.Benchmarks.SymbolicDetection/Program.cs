@@ -164,7 +164,7 @@ var ruleIds = new[] { RuleNullDeref, RuleAsCast, RuleArrayIndex, RuleDivide, Rul
 var csharpRulesDir = Path.Combine(rulesRoot, "csharp10");
 if (!Directory.Exists(csharpRulesDir))
 {
-    Console.Error.WriteLine($"Rules directory not found: {csharpRulesDir} (set MINOTAUR_RULES_ROOT to the rules root)." );
+    Console.Error.WriteLine($"Rules directory not found: {csharpRulesDir} (set MINOTAUR_RULES_ROOT to the rules root).");
     return 2;
 }
 
@@ -778,7 +778,7 @@ var collected = perFile.Count(p => p.Report.Outcome == "success");
 md.AppendLine($"{collected} of {perFile.Count} programs scanned successfully" +
     (collected == perFile.Count
         ? "."
-        : $" (non-success outcomes: {string.Join(", ", perFile.Where(p => p.Report.Outcome != "success").Select(p => $"{p.Report.Name}={p.Report.Outcome"))})."));
+        : $" (non-success outcomes: {string.Join(", ", perFile.Where(p => p.Report.Outcome != "success").Select(p => $"{p.Report.Name}={p.Report.Outcome}"))})."));
 md.AppendLine();
 md.AppendLine("| rule | files | truth findings | TP | FP | FN | precision % | recall % |");
 md.AppendLine("| --- | --- | --- | --- | --- | --- | --- | --- |");
