@@ -18,28 +18,28 @@ using Minotaur.Benchmarks.Labyrinth;
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
     Console.WriteLine("""
-        Usage: dotnet run -c Release --project src/Minotaur.Benchmarks.Labyrinth -- <outdir> [options]
+        Usage: dotnet run - c Release--project src / Minotaur.Benchmarks.Labyrinth-- < outdir > [options]
 
         Options:
-          --pairs N        vulnerable/safe program pairs per rule (default 10;
-                           the committed reference and the CI lane use 10)
-          --reps R         measurement repetitions; medians are reported and
-                           correctness uses the last repetition (default 3)
-          --rules DIR      rule pack root containing csharp10/ (default: the
-                           repository checkout this binary lives in)
-          --only-rule ID   smoke mode: measure only rule ID (its corpus,
+          --pairs N        vulnerable / safe program pairs per rule(default 10;
+    the committed reference and the CI lane use 10)
+          --reps R measurement repetitions; medians are reported and
+                           correctness uses the last repetition(default 3)
+          --rules DIR      rule pack root containing csharp10 / (default: the
+                            repository checkout this binary lives in)
+          --only - rule ID smoke mode: measure only rule ID(its corpus,
                            pack filtered to that rule, attribution skipped)
-          --corpus-only    emit ground-truth.json and corpus/ without scanning
-                           (deterministic generator, no grammar needed)
-          --write-corpus   also emit the generated programs under
-                           <outdir>/corpus/<rule-id>/
+          --corpus - only    emit ground-truth.json and corpus/ without scanning
+                             (deterministic generator, no grammar needed)
+            --write - corpus   also emit the generated programs under
+                               <outdir>/ corpus /< rule - id >/
 
-        Outputs into <outdir>: results.json, RESULTS.md, ground-truth.json.
-        MINOTAUR_COMMIT (set by CI) is recorded in results.json and RESULTS.md.
-        The production 'minotaur labyrinth scan' path resolves and compiles the
-        grammar once per file, and this harness reports the same per-file cost.
-        Exit code 2 when detection is not 100% or any safe program reports a
-        finding, so a CI measurement lane fails loudly on a regression.
+            Outputs into<outdir>: results.json, RESULTS.md, ground - truth.json.
+           MINOTAUR_COMMIT(set by CI) is recorded in results.json and RESULTS.md.
+          The production 'minotaur labyrinth scan' path resolves and compiles the
+          grammar once per file, and this harness reports the same per - file cost.
+        Exit code 2 when detection is not 100 % or any safe program reports a
+         finding, so a CI measurement lane fails loudly on a regression.
         """);
     return 0;
 }

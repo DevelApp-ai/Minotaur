@@ -92,208 +92,208 @@ public static class CorpusGenerator
         switch (ruleId)
         {
             case "csharp-null-deref-unguarded-maybe-null":
-            {
-                // Rotate the maybe-null source constructor across instances.
-                var source = (index % 3) switch
                 {
-                    0 => $"items.FirstOrDefault()",
-                    1 => $"items.SingleOrDefault()",
-                    _ => $"items.Find(null)",
-                };
-                // Rotate the sink across the rule's sink patterns.
-                var sink = (index % 5) switch
-                {
-                    0 => "ToString()",
-                    1 => "Equals(null)",
-                    2 => "GetHashCode()",
-                    3 => "Clone()",
-                    _ => "Dispose()",
-                };
-                Add($"    public string Inspect{index:D4}(List<object> items)");
-                Add("    {");
-                Add($"        var item = {source};");
-                // Distractor: a deref of a different (guaranteed) value must not fire.
-                Add("        var fallback = \"steady\";");
-                Add("        var noise = fallback.Length;");
-                if (vulnerable)
-                {
-                    violationLine = lines.Count + 1;
-                    Add($"        return item.{sink};");
-                }
-                else
-                {
-                    // Safe: rotate across the rule's three guard families.
-                    switch (index % 3)
+                    // Rotate the maybe-null source constructor across instances.
+                    var source = (index % 3) switch
                     {
-                        case 0:
-                            Add("        ArgumentNullException.ThrowIfNull(item);");
-                            Add($"        var text = item.{sink};");
-                            Add("        return text;");
-                            break;
-                        case 1:
-                            Add("        item = item ?? fallback;");
-                            Add($"        var text = item.{sink};");
-                            Add("        return text;");
-                            break;
-                        default:
-                            // Null-conditional deref only: the plain sink
-                            // pattern must not match, ever, in this variant.
-                            Add("        var probe = item?.ToString();");
-                            Add("        var ignored = probe ?? \"-\";");
-                            Add("        return ignored.Trim();");
-                            break;
+                        0 => $"items.FirstOrDefault()",
+                        1 => $"items.SingleOrDefault()",
+                        _ => $"items.Find(null)",
+                    };
+                    // Rotate the sink across the rule's sink patterns.
+                    var sink = (index % 5) switch
+                    {
+                        0 => "ToString()",
+                        1 => "Equals(null)",
+                        2 => "GetHashCode()",
+                        3 => "Clone()",
+                        _ => "Dispose()",
+                    };
+                    Add($"    public string Inspect{index:D4}(List<object> items)");
+                    Add("    {");
+                    Add($"        var item = {source};");
+                    // Distractor: a deref of a different (guaranteed) value must not fire.
+                    Add("        var fallback = \"steady\";");
+                    Add("        var noise = fallback.Length;");
+                    if (vulnerable)
+                    {
+                        violationLine = lines.Count + 1;
+                        Add($"        return item.{sink};");
                     }
-                }
+                    else
+                    {
+                        // Safe: rotate across the rule's three guard families.
+                        switch (index % 3)
+                        {
+                            case 0:
+                                Add("        ArgumentNullException.ThrowIfNull(item);");
+                                Add($"        var text = item.{sink};");
+                                Add("        return text;");
+                                break;
+                            case 1:
+                                Add("        item = item ?? fallback;");
+                                Add($"        var text = item.{sink};");
+                                Add("        return text;");
+                                break;
+                            default:
+                                // Null-conditional deref only: the plain sink
+                                // pattern must not match, ever, in this variant.
+                                Add("        var probe = item?.ToString();");
+                                Add("        var ignored = probe ?? \"-\";");
+                                Add("        return ignored.Trim();");
+                                break;
+                        }
+                    }
 
-                Add("    }");
-                break;
-            }
+                    Add("    }");
+                    break;
+                }
 
             case "csharp-unsafe-as-cast-deref":
-            {
-                var sink = (index % 5) switch
                 {
-                    0 => "ToString()",
-                    1 => "Equals(null)",
-                    2 => "GetHashCode()",
-                    3 => "Clone()",
-                    _ => "Dispose()",
-                };
-                var type = (index % 4) switch
-                {
-                    0 => "string",
-                    1 => "System.IComparable",
-                    2 => "object",
-                    _ => "System.Text.StringBuilder",
-                };
-                Add($"    public string Unbox{index:D4}(object value)");
-                Add("    {");
-                Add($"        var item = value as {type};");
-                Add("        var noise = value.ToString();");
-                if (vulnerable)
-                {
-                    violationLine = lines.Count + 1;
-                    Add($"        return item.{sink};");
-                }
-                else
-                {
-                    switch (index % 3)
+                    var sink = (index % 5) switch
                     {
-                        case 0:
-                            Add("        ArgumentNullException.ThrowIfNull(item);");
-                            Add($"        var text = item.{sink};");
-                            Add("        return text;");
-                            break;
-                        case 1:
-                            Add("        item = item ?? \"empty\";");
-                            Add($"        var text = item.{sink};");
-                            Add("        return text;");
-                            break;
-                        default:
-                            // Null-conditional deref only: the plain sink
-                            // pattern must not match, ever, in this variant.
-                            Add("        var probe = item?.GetHashCode();");
-                            Add("        var ignored = probe ?? 0;");
-                            Add("        return ignored.Value.ToString();");
-                            break;
+                        0 => "ToString()",
+                        1 => "Equals(null)",
+                        2 => "GetHashCode()",
+                        3 => "Clone()",
+                        _ => "Dispose()",
+                    };
+                    var type = (index % 4) switch
+                    {
+                        0 => "string",
+                        1 => "System.IComparable",
+                        2 => "object",
+                        _ => "System.Text.StringBuilder",
+                    };
+                    Add($"    public string Unbox{index:D4}(object value)");
+                    Add("    {");
+                    Add($"        var item = value as {type};");
+                    Add("        var noise = value.ToString();");
+                    if (vulnerable)
+                    {
+                        violationLine = lines.Count + 1;
+                        Add($"        return item.{sink};");
                     }
-                }
+                    else
+                    {
+                        switch (index % 3)
+                        {
+                            case 0:
+                                Add("        ArgumentNullException.ThrowIfNull(item);");
+                                Add($"        var text = item.{sink};");
+                                Add("        return text;");
+                                break;
+                            case 1:
+                                Add("        item = item ?? \"empty\";");
+                                Add($"        var text = item.{sink};");
+                                Add("        return text;");
+                                break;
+                            default:
+                                // Null-conditional deref only: the plain sink
+                                // pattern must not match, ever, in this variant.
+                                Add("        var probe = item?.GetHashCode();");
+                                Add("        var ignored = probe ?? 0;");
+                                Add("        return ignored.Value.ToString();");
+                                break;
+                        }
+                    }
 
-                Add("    }");
-                break;
-            }
+                    Add("    }");
+                    break;
+                }
 
             case "csharp-array-index-unvalidated-input":
-            {
-                Add($"    public char Slot{index:D4}(string[] data)");
-                Add("    {");
-                Add($"        var input = Console.ReadLine();");
-                Add("        var noise = data.Length;");
-                if (vulnerable)
                 {
-                    violationLine = lines.Count + 1;
-                    Add("        return data[input];");
-                }
-                else
-                {
-                    switch (index % 2)
+                    Add($"    public char Slot{index:D4}(string[] data)");
+                    Add("    {");
+                    Add($"        var input = Console.ReadLine();");
+                    Add("        var noise = data.Length;");
+                    if (vulnerable)
                     {
-                        case 0:
-                            // Sanitizer binds the same captured node (Parse(input)).
-                            Add("        var parsed = int.Parse(input);");
-                            Add("        var offset = parsed % noise;");
-                            Add("        return data[offset];");
-                            break;
-                        default:
-                            Add("        int index2;");
-                            Add("        int.TryParse(input, out index2);");
-                            Add("        var bounded = Math.Clamp(index2, 0, noise - 1);");
-                            Add("        return data[bounded];");
-                            break;
+                        violationLine = lines.Count + 1;
+                        Add("        return data[input];");
                     }
-                }
+                    else
+                    {
+                        switch (index % 2)
+                        {
+                            case 0:
+                                // Sanitizer binds the same captured node (Parse(input)).
+                                Add("        var parsed = int.Parse(input);");
+                                Add("        var offset = parsed % noise;");
+                                Add("        return data[offset];");
+                                break;
+                            default:
+                                Add("        int index2;");
+                                Add("        int.TryParse(input, out index2);");
+                                Add("        var bounded = Math.Clamp(index2, 0, noise - 1);");
+                                Add("        return data[bounded];");
+                                break;
+                        }
+                    }
 
-                Add("    }");
-                break;
-            }
+                    Add("    }");
+                    break;
+                }
 
             case "csharp-divide-by-constant-zero":
-            {
-                Add($"    public int Ratio{index:D4}(int total)");
-                Add("    {");
-                Add("        var parts = 3;");
-                Add("        var noise = total / parts;");
-                if (vulnerable)
                 {
-                    violationLine = lines.Count + 1;
-                    Add("        return noise / 0;");
-                }
-                else
-                {
-                    switch (index % 2)
+                    Add($"    public int Ratio{index:D4}(int total)");
+                    Add("    {");
+                    Add("        var parts = 3;");
+                    Add("        var noise = total / parts;");
+                    if (vulnerable)
                     {
-                        case 0:
-                            Add("        var guard = parts - total % parts;");
-                            Add("        return noise / guard;");
-                            break;
-                        default:
-                            Add("        return parts == 0 ? 0 : noise / parts;");
-                            break;
+                        violationLine = lines.Count + 1;
+                        Add("        return noise / 0;");
                     }
-                }
+                    else
+                    {
+                        switch (index % 2)
+                        {
+                            case 0:
+                                Add("        var guard = parts - total % parts;");
+                                Add("        return noise / guard;");
+                                break;
+                            default:
+                                Add("        return parts == 0 ? 0 : noise / parts;");
+                                break;
+                        }
+                    }
 
-                Add("    }");
-                break;
-            }
+                    Add("    }");
+                    break;
+                }
 
             case "csharp-modulo-by-constant-zero":
-            {
-                Add($"    public int Rest{index:D4}(int total)");
-                Add("    {");
-                Add("        var parts = 4;");
-                Add("        var noise = total % parts;");
-                if (vulnerable)
                 {
-                    violationLine = lines.Count + 1;
-                    Add("        return noise % 0;");
-                }
-                else
-                {
-                    switch (index % 2)
+                    Add($"    public int Rest{index:D4}(int total)");
+                    Add("    {");
+                    Add("        var parts = 4;");
+                    Add("        var noise = total % parts;");
+                    if (vulnerable)
                     {
-                        case 0:
-                            Add("        var guard = parts * 2;");
-                            Add("        return noise % guard;");
-                            break;
-                        default:
-                            Add("        return parts == 0 ? 0 : noise % parts;");
-                            break;
+                        violationLine = lines.Count + 1;
+                        Add("        return noise % 0;");
                     }
-                }
+                    else
+                    {
+                        switch (index % 2)
+                        {
+                            case 0:
+                                Add("        var guard = parts * 2;");
+                                Add("        return noise % guard;");
+                                break;
+                            default:
+                                Add("        return parts == 0 ? 0 : noise % parts;");
+                                break;
+                        }
+                    }
 
-                Add("    }");
-                break;
-            }
+                    Add("    }");
+                    break;
+                }
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(ruleId), ruleId, "generator template missing");
