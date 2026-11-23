@@ -79,13 +79,13 @@ jobs:
             # Pull request to main -> use beta
             if [[ "$PRERELEASE" == "PullRequest" ]]; then
               PRERELEASE="beta"
-              FULL_VERSION="${{ VERSION }}-beta.PR${{ github.event.number }}"
+              FULL_VERSION="${VERSION}-beta.PR${{ github.event.number }}"
             fi
           else
             # Pull request to other branches -> use alpha
             if [[ "$PRERELEASE" == "PullRequest" ]]; then
               PRERELEASE="alpha"
-              FULL_VERSION="${{ VERSION }}-alpha.PR${{ github.event.number }}"
+              FULL_VERSION="${VERSION}-alpha.PR${{ github.event.number }}"
             fi
           fi
         fi
@@ -157,7 +157,7 @@ jobs:
           --results-directory ./TestResults/ \
           --logger "trx;LogFileName=test-results.trx" \
           --logger "console;verbosity=normal" 2>&1 | tee /tmp/test-output.txt
-        test_exit=${{ PIPESTATUS[0] }}
+        test_exit=${PIPESTATUS[0]}
         set -e
         # Surface failed tests in the job summary (GitHub does not annotate
         # dotnet test failures, and the raw log is truncated for large runs)
@@ -367,7 +367,7 @@ jobs:
       env:
         MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
         MINOTAUR_COMMIT: ${{ github.sha }}
-        PROJECTLOAD_INCLUDE_50K: '1'
+        PROJECTLOAD_INCLUDE_50K: 1
       run: >
         dotnet run --project src/Minotaur.Benchmarks.ProjectLoad
         --configuration Release --no-build --
@@ -762,8 +762,7 @@ jobs:
         if ($fp -notmatch '^[0-9A-Fa-f]{64}$') { throw 'Certificate fingerprint must be exactly 64 hex characters (CODE_SIGNING_CERT_FINGERPRINT_SHA256 org secret, decision #73 amendment).' }
         $uri = $null
         if (-not [Uri]::TryCreate($env:CERTUM_SIMPLYSIGN_OTP_URI, [UriKind]::Absolute, [ref]$uri) -or
-            $uri.Scheme -ne 'otpauth' -or
-            $uri.Host -ne 'totp' -or
+            $uri.Scheme -ne 'otpauth' -or $uri.Host -ne 'totp' -or
             $uri.Query -notmatch '[?&]secret=[A-Za-z2-7]+=*(&|$)') {
           throw 'CERTUM_SIMPLYSIGN_OTP_URI must be the full otpauth://totp provisioning URI (org secrets setup, decision #38).'
         }
@@ -1078,7 +1077,7 @@ jobs:
           - **Enhanced Location Tracking**: Precise APIs for syntax tree navigation and manipulation
           - **Context-Aware Editing**: Advanced context-aware editing capabilities for intelligent code generation
 
-          ### Developer Experience  
+          ### Developer Experience
           - **Comprehensive Testing**: 157 unit tests covering all functionality with 100% pass rate
           - **CI/CD Pipeline**: Fully automated builds, testing, quality checks, and releases
           - **Rich Documentation**: Complete API documentation with examples and integration guides
@@ -1129,8 +1128,8 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          failed_jobs="$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs?per_page=100" --jq '[.jobs[] | select(.conclusion=="failure") | .name] | join(", ")' || echo "unknown")"
-          printf 'The push run for %s failed.\n\nFailed jobs: %s\n\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\n' "${{ github.sha }}" "$failed_jobs" "${{ github.repository }}" "${{ github.run_id }}" > /tmp/body.md
+          failed_jobs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs?per_page=100" --jq '[.jobs[] | select(.conclusion=="failure") | .name] | join(", ")' || echo "unknown")"
+          printf 'The push run for %s failed.\n\nFailed jobs: %s\n\nRun: https://github.com/%s/actions/runs/%s\n' "${{ github.sha }}" "$failed_jobs" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > /tmp/body.md
           gh issue create --repo "$GITHUB_REPOSITORY" --title "ci: main push run failed (${{ github.sha }})" --body-file /tmp/body.md || echo "issue creation failed (report manually)"
 
   cleanup:
