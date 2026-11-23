@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Minotaur.Cli;
 using Minotaur.Labyrinth;
@@ -601,12 +602,14 @@ foreach (var (report, meta, tp, fp, fn, truth, _, _) in perFile)
     overallStats[4] += fn;
 }
 
+// Per-file medians for one rule, or for every rule when rid is "*" (the
+// overall row); negative size matches every size.
 List<double> MediansOf(string rid, int size)
 {
     var medians = new List<double>();
     foreach (var (report, meta, _, _, _, _, _, _) in perFile)
     {
-        if (report.Outcome == "success" && meta.Rule == rid && (size < 0 || meta.Size == size))
+        if (report.Outcome == "success" && (meta.Rule == rid || rid == "*") && (size < 0 || meta.Size == size))
         {
             medians.Add(Median(report.TimesMs));
         }
@@ -637,7 +640,7 @@ csv.AppendLine(string.Join(',',
     "overall", overallStats[0], overallStats[1], overallStats[2], overallStats[3], overallStats[4],
     FormatPct(overallStats[2], overallStats[2] + overallStats[3]),
     FormatPct(overallStats[2], overallStats[2] + overallStats[4]),
-    FormatMsList(MediansOf("*", -2))));
+    FormatMsList(MediansOf("*", -1))));
 
 // ---- timing.csv ----
 var timingCsv = new StringBuilder();
@@ -794,7 +797,7 @@ foreach (var rid in ruleIds)
 {
     md.AppendLine($"| {rid} | {FormatMsList(MediansOf(rid, 10))} | {FormatMsList(MediansOf(rid, 25))} | {FormatMsList(MediansOf(rid, 50))} | {FormatMsList(MediansOf(rid, 100))} |");
 }
-md.AppendLine($"| overall median across all {corpusFiles.Count} programs | {FormatMsList(MediansOf("*", -2))} |  |  |  |");
+md.AppendLine($"| overall median across all {corpusFiles.Count} programs | {FormatMsList(MediansOf("*", -1))} |  |  |  |");
 md.AppendLine();
 md.AppendLine("## Environment record");
 md.AppendLine();
@@ -834,7 +837,7 @@ foreach (var rid in ruleIds)
     var s = ruleStats[rid];
     Console.WriteLine($"    {rid}: tp={s[2]} fp={s[3]} fn={s[4]} precision={FormatPct(s[2], s[2] + s[3])}% recall={FormatPct(s[2], s[2] + s[4])}%");
 }
-Console.WriteLine($"  analysis time: overall median {FormatMsList(MediansOf("*", -2))} ms per file");
+Console.WriteLine($"  analysis time: overall median {FormatMsList(MediansOf("*", -1))} ms per file");
 Console.WriteLine($"  wrote results.json, RESULTS.md, detection.csv, timing.csv, ground-truth.json, corpus/*.cs to {outputDir}");
 return 0;
 
@@ -999,8 +1002,8 @@ CorpusFile GenerateFile(string rule, int size, string variant)
         }
     }
 
-    // Filler statements: arithmetic only (no sinks, no operators, no indexing),
-    // padded to the declared statement count.
+    // Filler statements: arithmetic only (no sinks, no v2 operators, no
+    // indexing), padded to the declared statement count.
     var filler = Math.Max(0, size - statements);
     if (filler > 0)
     {
@@ -1052,7 +1055,3 @@ sealed record FileReportData(
     List<double> TimesMs,
     List<DetectedFinding> Detected,
     List<ExpectedFinding> Expected);
-
-// ======================== local: worker protocol =============================
-
-// ================== generated corpus construction (helpers) ==================

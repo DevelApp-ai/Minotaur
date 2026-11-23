@@ -46,9 +46,9 @@ jobs:
   calculate-version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.final-version.outputs.version }}
-      prerelease: ${{ steps.final-version.outputs.prerelease }}
-      full-version: ${{ steps.final-version.outputs.full-version }}
+      version: ${{{ steps.final-version.outputs.version }}
+      prerelease: ${{{ steps.final-version.outputs.prerelease }}
+      full-version: ${{{ steps.final-version.outputs.full-version }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -67,25 +67,25 @@ jobs:
     - name: Adjust version for pull requests
       id: final-version
       run: |
-        VERSION="${{ steps.gitversion.outputs.SemVer }}"
-        PRERELEASE="${{ steps.gitversion.outputs.PreReleaseTag }}"
+        VERSION="${{{ steps.gitversion.outputs.SemVer }}"
+        PRERELEASE="${{{ steps.gitversion.outputs.PreReleaseTag }}"
         # Use SemVer (without build metadata) for package version to ensure NuGet.org compatibility
         # FullSemVer includes build metadata like +37 which causes issues on NuGet.org
         FULL_VERSION="$VERSION"
         
         # Check if this is a pull request and adjust version accordingly
-        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-          if [[ "${{ github.base_ref }}" == "main" ]]; then
+        if [[ "${{{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{{ github.base_ref }}" == "main" ]]; then
             # Pull request to main -> use beta
             if [[ "$PRERELEASE" == "PullRequest" ]]; then
               PRERELEASE="beta"
-              FULL_VERSION="${VERSION}-beta.PR${{ github.event.number }}"
+              FULL_VERSION="${{{ VERSION }}-beta.PR${{{ github.event.number }}"
             fi
           else
             # Pull request to other branches -> use alpha
             if [[ "$PRERELEASE" == "PullRequest" ]]; then
               PRERELEASE="alpha"
-              FULL_VERSION="${VERSION}-alpha.PR${{ github.event.number }}"
+              FULL_VERSION="${{{ VERSION }}-alpha.PR${{{ github.event.number }}"
             fi
           fi
         fi
@@ -97,8 +97,8 @@ jobs:
         # "prerelease == ''" gate skip every push to main (no releases since
         # v1.5.25, 2026-11-01). Stable cuts on main use the clean MajorMinorPatch
         # (still exactly one patch increment per merge into main, as with 5.x).
-        if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" && "${{ steps.gitversion.outputs.PreReleaseLabel }}" == "" ]]; then
-          VERSION="${{ steps.gitversion.outputs.MajorMinorPatch }}"
+        if [[ "${{{ github.event_name }}" == "push" && "${{{ github.ref }}" == "refs/heads/main" && "${{{ steps.gitversion.outputs.PreReleaseLabel }}" == "" ]]; then
+          VERSION="${{{ steps.gitversion.outputs.MajorMinorPatch }}"
           PRERELEASE=""
           FULL_VERSION="$VERSION"
         fi
@@ -109,18 +109,18 @@ jobs:
 
     - name: Display Version
       run: |
-        echo "Version: ${{ steps.final-version.outputs.version }}"
-        echo "PreReleaseTag: ${{ steps.final-version.outputs.prerelease }}"
-        echo "FullSemVer: ${{ steps.final-version.outputs.full-version }}"
+        echo "Version: ${{{ steps.final-version.outputs.version }}"
+        echo "PreReleaseTag: ${{{ steps.final-version.outputs.prerelease }}"
+        echo "FullSemVer: ${{{ steps.final-version.outputs.full-version }}"
 
   build-and-test:
     runs-on: ubuntu-latest
     needs: calculate-version
     outputs:
-      test-results: ${{ steps.test.outputs.test-results }}
-      coverage-results: ${{ steps.test.outputs.coverage-results }}
+      test-results: ${{{ steps.test.outputs.test-results }}
+      coverage-results: ${{{ steps.test.outputs.coverage-results }}
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -128,20 +128,20 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
       run: |
         # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
-        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
+        dotnet restore ${{{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{{ env.SOLUTION_PATH }})
 
     - name: Build solution
       run: |
-        dotnet build ${{ env.SOLUTION_PATH }} \
+        dotnet build ${{{ env.SOLUTION_PATH }} \
           --configuration Release \
           --no-restore \
-          -p:Version=${{ needs.calculate-version.outputs.version }} \
-          -p:PackageVersion=${{ needs.calculate-version.outputs.full-version }}
+          -p:Version=${{{ needs.calculate-version.outputs.version }} \
+          -p:PackageVersion=${{{ needs.calculate-version.outputs.full-version }}
 
     - name: Run tests with coverage
       id: test
@@ -149,7 +149,7 @@ jobs:
         # --no-restore: the build above already restored; the implicit restore here
         # can hit the same transient GitHub Packages NU1301 issues the lint job guards against
         set +e
-        dotnet test ${{ env.SOLUTION_PATH }} \
+        dotnet test ${{{ env.SOLUTION_PATH }} \
           --configuration Release \
           --no-build \
           --no-restore \
@@ -157,7 +157,7 @@ jobs:
           --results-directory ./TestResults/ \
           --logger "trx;LogFileName=test-results.trx" \
           --logger "console;verbosity=normal" 2>&1 | tee /tmp/test-output.txt
-        test_exit=${PIPESTATUS[0]}
+        test_exit=${{{ PIPESTATUS[0] }}
         set -e
         # Surface failed tests in the job summary (GitHub does not annotate
         # dotnet test failures, and the raw log is truncated for large runs)
@@ -228,7 +228,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
 
     - name: Restore and build test project
       run: |
@@ -237,8 +237,8 @@ jobs:
 
     - name: Package every repo grammar (no publish)
       env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
+        NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
+        MINOTAUR_GRAMMARS_DIR: ${{{ github.workspace }}/grammars
       run: |
         dotnet test src/Minotaur.Tests/Minotaur.Tests.csproj \
           --configuration Release --no-build --no-restore \
@@ -259,7 +259,7 @@ jobs:
     permissions:
       contents: read
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -267,7 +267,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
       run: |
@@ -279,7 +279,7 @@ jobs:
         dotnet build src/Minotaur.Cli/Minotaur.Cli.csproj \
           --configuration Release \
           --no-restore \
-          -p:Version=${{ needs.calculate-version.outputs.version }}
+          -p:Version=${{{ needs.calculate-version.outputs.version }}
 
     - name: Verify rule-pack corpus
       run: |
@@ -295,15 +295,18 @@ jobs:
     # project-load curves (Minotaur#134), extension-classification
     # accuracy on real polyglot repositories vs the Linguist extension map
     # (Minotaur#133) plus embedded-language detection at parse time on the
-    # polyglot-container subset (Minotaur#133 item 5), and the
+    # polyglot-container subset (Minotaur#133 item 5), the Labyrinth
+    # rule-pack detection corpus at article scale with precision/recall and
+    # analysis-time numbers (Minotaur#246 L3, sub-issue #252), and the
     # grammar-vs-hand case-study pilots for the
     # configuration DSL (Minotaur#128) and FIX 4.4 + nginx/syslog/logfmt
     # (Minotaur#132). Results are uploaded as artifacts
     # Results are uploaded as artifacts
     # and transcribed into docs/measurements/; this job never gates merges.
     # (The embedded-detection run parses ~1,200 container files through
-    # worker-process isolation with per-file kills, so the job needs a
-    # longer budget than the default builds.)
+    # worker-process isolation with per-file kills, and the L3
+    # symbolic-detection run scans a 40-program generated C# 10 corpus the
+    # same way, so the job needs a longer budget than the default builds.)
     name: Article-lane measurements (benchmarks)
     runs-on: ubuntu-latest
     needs: [calculate-version]
@@ -325,7 +328,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
 
     - name: Build benchmark harnesses
       run: |
@@ -334,94 +337,105 @@ jobs:
         dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj
         dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj
         dotnet restore src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj
+        dotnet restore src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj
         dotnet build src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj --configuration Release --no-restore
+        dotnet build src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj --configuration Release --no-restore
 
     - name: Grammar compilation by size (issue #126, real grammars)
       env:
-        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
-        MINOTAUR_COMMIT: ${{ github.sha }}
+        MINOTAUR_GRAMMARS_DIR: ${{{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{{ github.sha }}
       run: >
         dotnet run --project src/Minotaur.Benchmarks.GrammarCompilation
         --configuration Release --no-build --
-        ${{ github.workspace }}/measurement-artifacts/issue-126
+        ${{{ github.workspace }}/measurement-artifacts/issue-126
 
     - name: Grammar compilation by rule-count bin (issue #131, synthetic corpus)
       env:
-        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
-        MINOTAUR_COMMIT: ${{ github.sha }}
+        MINOTAUR_GRAMMARS_DIR: ${{{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{{ github.sha }}
       run: >
         dotnet run --project src/Minotaur.Benchmarks.GrammarCompilation
         --configuration Release --no-build --
-        --synthetic ${{ github.workspace }}/measurement-artifacts/issue-131
+        --synthetic ${{{ github.workspace }}/measurement-artifacts/issue-131
 
     - name: Project-load curves (issue #134)
       env:
-        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
-        MINOTAUR_COMMIT: ${{ github.sha }}
-        PROJECTLOAD_INCLUDE_50K: 1
+        MINOTAUR_GRAMMARS_DIR: ${{{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{{ github.sha }}
+        PROJECTLOAD_INCLUDE_50K: '1'
       run: >
         dotnet run --project src/Minotaur.Benchmarks.ProjectLoad
         --configuration Release --no-build --
-        ${{ github.workspace }}/measurement-artifacts/issue-134
+        ${{{ github.workspace }}/measurement-artifacts/issue-134
 
     - name: Classification accuracy on real polyglot repos (issue #133)
       env:
-        MINOTAUR_COMMIT: ${{ github.sha }}
-        CLASSACC_CACHE_DIR: ${{ runner.temp }}/classacc-corpus
+        MINOTAUR_COMMIT: ${{{ github.sha }}
+        CLASSACC_CACHE_DIR: ${{{ runner.temp }}/classacc-corpus
       run: >
         dotnet run --project src/Minotaur.Benchmarks.ClassificationAccuracy
         --configuration Release --no-build --
-        ${{ github.workspace }}/measurement-artifacts/issue-133
+        ${{{ github.workspace }}/measurement-artifacts/issue-133
 
     - name: Embedded-language detection (issue #133 item 5)
       env:
-        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
-        CLASSACC_CACHE_DIR: ${{ runner.temp }}/classacc-corpus
-        MINOTAUR_COMMIT: ${{ github.sha }}
+        MINOTAUR_GRAMMARS_DIR: ${{{ github.workspace }}/grammars
+        CLASSACC_CACHE_DIR: ${{{ runner.temp }}/classacc-corpus
+        MINOTAUR_COMMIT: ${{{ github.sha }}
       run: >
         dotnet run --project src/Minotaur.Benchmarks.EmbeddedDetection
         --configuration Release --no-build --
-        ${{ github.workspace }}/measurement-artifacts/issue-133-embedded
+        ${{{ github.workspace }}/measurement-artifacts/issue-133-embedded
+
+    - name: Symbolic-detection corpus at article scale (Labyrinth L3, issues #246/#252)
+      env:
+        MINOTAUR_GRAMMARS_DIR: ${{{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.SymbolicDetection
+        --configuration Release --no-build --
+        ${{{ github.workspace }}/measurement-artifacts/issue-246
 
     - name: Case-study pilot, configuration DSL (issue #128)
       env:
-        MINOTAUR_COMMIT: ${{ github.sha }}
+        MINOTAUR_COMMIT: ${{{ github.sha }}
       run: >
         dotnet run --project src/Minotaur.Benchmarks.CaseStudyPilots
         --configuration Release --no-build --
-        dsl ${{ github.workspace }}/measurement-artifacts
+        dsl ${{{ github.workspace }}/measurement-artifacts
 
     - name: Case-study pilot, FIX 4.4 (issue #132, part 1/2)
       env:
-        MINOTAUR_COMMIT: ${{ github.sha }}
+        MINOTAUR_COMMIT: ${{{ github.sha }}
       run: >
         dotnet run --project src/Minotaur.Benchmarks.CaseStudyPilots
         --configuration Release --no-build --
-        fix ${{ github.workspace }}/measurement-artifacts
+        fix ${{{ github.workspace }}/measurement-artifacts
 
     - name: Case-study pilot, nginx/syslog/logfmt (issue #132, part 2/2)
       env:
-        MINOTAUR_COMMIT: ${{ github.sha }}
+        MINOTAUR_COMMIT: ${{{ github.sha }}
       run: >
         dotnet run --project src/Minotaur.Benchmarks.CaseStudyPilots
         --configuration Release --no-build --
-        logs ${{ github.workspace }}/measurement-artifacts
+        logs ${{{ github.workspace }}/measurement-artifacts
 
     - name: Post measurements to the PR (article-lane visibility)
       if: github.event_name == 'pull_request'
       env:
-        GH_TOKEN: ${{ github.token }}
-        PR_NUMBER: ${{ github.event.pull_request.number }}
+        GH_TOKEN: ${{{ github.token }}
+        PR_NUMBER: ${{{ github.event.pull_request.number }}
       run: |
         {
-          echo "## Article-lane measurements — run #${{ github.run_number }} @ \`${{ github.sha }}\`"
+          echo "## Article-lane measurements — run #${{{ github.run_number }} @ \`${{{ github.sha }}\`"
           echo
           echo "Fresh run of the article-measurement harnesses on this head commit"
-          echo "(ubuntu-latest, \`.NET ${{ env.DOTNET_VERSION }}\`). On non-PR runs the"
+          echo "(ubuntu-latest, \`.NET ${{{ env.DOTNET_VERSION }}\`). On non-PR runs the"
           echo "full data is only in the \`article-measurements\` artifact."
           echo
           echo "### Minotaur #134 — project-load curves (incl. 50K scale)"
@@ -513,6 +527,34 @@ jobs:
           echo '```'
           echo
           echo "</details>"
+          echo
+          echo "### DevelApp-ai/Minotaur L3 (#246, sub-issue #252) — symbolic-detection corpus: per-rule precision/recall + analysis time (C# 10 rule pack)"
+          echo
+          cat measurement-artifacts/issue-246/RESULTS.md
+          echo
+          echo "<details><summary>detection.csv (#246 L3, per-rule TP/FP/FN + precision/recall)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-246/detection.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "<details><summary>timing.csv (#246 L3, per-file scan wall-clock, 3 repetitions)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-246/timing.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "<details><summary>ground-truth.json (#246 L3, expected findings per generated program + corpus fingerprint)</summary>"
+          echo
+          echo '```json'
+          cat measurement-artifacts/issue-246/ground-truth.json
+          echo '```'
+          echo
+          echo "</details>"
         } > measurement-artifacts/pr-comment-body.md
         gh pr comment "$PR_NUMBER" --body-file measurement-artifacts/pr-comment-body.md
 
@@ -521,7 +563,7 @@ jobs:
       uses: actions/upload-artifact@v6
       with:
         name: article-measurements
-        path: ${{ github.workspace }}/measurement-artifacts
+        path: ${{{ github.workspace }}/measurement-artifacts
         if-no-files-found: warn
 
   code-quality:
@@ -529,7 +571,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [calculate-version, build-and-test]
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -539,35 +581,35 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
     
     - name: Restore dependencies
       run: |
         # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
-        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
+        dotnet restore ${{{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{{ env.SOLUTION_PATH }})
     
     - name: Build for analysis
       run: |
-        dotnet build ${{ env.SOLUTION_PATH }} \
+        dotnet build ${{{ env.SOLUTION_PATH }} \
           --no-restore \
           --configuration Release \
-          -p:Version=${{ needs.calculate-version.outputs.version }} \
-          -p:PackageVersion=${{ needs.calculate-version.outputs.full-version }}
+          -p:Version=${{{ needs.calculate-version.outputs.version }} \
+          -p:PackageVersion=${{{ needs.calculate-version.outputs.full-version }}
     
     - name: Run security analysis
       run: |
-        dotnet list ${{ env.SOLUTION_PATH }} package --vulnerable --include-transitive || true
+        dotnet list ${{{ env.SOLUTION_PATH }} package --vulnerable --include-transitive || true
     
     - name: Check for outdated packages
       run: |
-        dotnet list ${{ env.SOLUTION_PATH }} package --outdated || true
+        dotnet list ${{{ env.SOLUTION_PATH }} package --outdated || true
 
   lint-and-format:
     name: Lint and Format Check
     runs-on: ubuntu-latest
     needs: calculate-version
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -575,7 +617,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
     
     - name: Install dotnet format tool
       run: dotnet tool install -g dotnet-format
@@ -583,22 +625,22 @@ jobs:
     - name: Restore dependencies
       run: |
         # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
-        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
+        dotnet restore ${{{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{{ env.SOLUTION_PATH }})
     
     - name: Check code formatting
-      run: dotnet format ${{ env.SOLUTION_PATH }} --verify-no-changes --verbosity diagnostic --exclude examples/
+      run: dotnet format ${{{ env.SOLUTION_PATH }} --verify-no-changes --verbosity diagnostic --exclude examples/
     
     - name: Run static analysis
       run: |
         # --no-restore: use the retried restore above; an implicit restore here can hit
         # transient GitHub Packages issues whose NU warnings become errors under TreatWarningsAsErrors
-        dotnet build ${{ env.SOLUTION_PATH }} \
+        dotnet build ${{{ env.SOLUTION_PATH }} \
           --no-restore \
           --configuration Release \
           --verbosity normal \
           -p:TreatWarningsAsErrors=true \
-          -p:Version=${{ needs.calculate-version.outputs.version }} \
-          -p:PackageVersion=${{ needs.calculate-version.outputs.full-version }}
+          -p:Version=${{{ needs.calculate-version.outputs.version }} \
+          -p:PackageVersion=${{{ needs.calculate-version.outputs.full-version }}
 
   performance-test:
     name: Performance Tests
@@ -606,7 +648,7 @@ jobs:
     needs: [calculate-version, build-and-test]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -614,20 +656,20 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
     
     - name: Restore dependencies
       run: |
         # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
-        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
+        dotnet restore ${{{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{{ env.SOLUTION_PATH }})
     
     - name: Build solution
       run: |
-        dotnet build ${{ env.SOLUTION_PATH }} \
+        dotnet build ${{{ env.SOLUTION_PATH }} \
           --no-restore \
           --configuration Release \
-          -p:Version=${{ needs.calculate-version.outputs.version }} \
-          -p:PackageVersion=${{ needs.calculate-version.outputs.full-version }}
+          -p:Version=${{{ needs.calculate-version.outputs.version }} \
+          -p:PackageVersion=${{{ needs.calculate-version.outputs.full-version }}
     
     - name: Run demo application for performance testing
       run: |
@@ -642,9 +684,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [calculate-version, build-and-test, code-quality, lint-and-format]
     outputs:
-      package-path: ${{ steps.package.outputs.package-path }}
+      package-path: ${{{ steps.package.outputs.package-path }}
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -652,29 +694,29 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
       run: |
         # Retry: GitHub Packages restore intermittently fails (NU1301) on Windows runners
-        dotnet restore ${{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{ env.SOLUTION_PATH }})
+        dotnet restore ${{{ env.SOLUTION_PATH }} || (sleep 20 && dotnet restore ${{{ env.SOLUTION_PATH }}) || (sleep 40 && dotnet restore ${{{ env.SOLUTION_PATH }})
 
     - name: Build for packaging
       run: |
-        dotnet build ${{ env.SOLUTION_PATH }} \
+        dotnet build ${{{ env.SOLUTION_PATH }} \
           --configuration Release \
           --no-restore \
-          -p:Version=${{ needs.calculate-version.outputs.version }} \
-          -p:PackageVersion=${{ needs.calculate-version.outputs.full-version }}
+          -p:Version=${{{ needs.calculate-version.outputs.version }} \
+          -p:PackageVersion=${{{ needs.calculate-version.outputs.full-version }}
 
     - name: Create NuGet package
       id: package
       run: |
-        dotnet pack ${{ env.PROJECT_PATH }} \
+        dotnet pack ${{{ env.PROJECT_PATH }} \
           --configuration Release \
           --no-build \
           --output ./packages \
-          -p:PackageVersion=${{ needs.calculate-version.outputs.full-version }}
+          -p:PackageVersion=${{{ needs.calculate-version.outputs.full-version }}
         echo "package-path=./packages" >> $GITHUB_OUTPUT
 
     - name: Upload packages as artifacts
@@ -704,10 +746,10 @@ jobs:
       # (values are never echoed).
       shell: pwsh
       env:
-        CERTUM_SIMPLYSIGN_USERID: ${{ secrets.CERTUM_SIMPLYSIGN_USERID }}
-        CERTUM_SIMPLYSIGN_OTP_URI: ${{ secrets.CERTUM_SIMPLYSIGN_OTP_URI }}
-        CERTUM_THUMBPRINT: ${{ secrets.CODE_SIGNING_CERT_THUMBPRINT }}
-        CERTUM_FINGERPRINT_SHA256: ${{ secrets.CODE_SIGNING_CERT_FINGERPRINT_SHA256 }}
+        CERTUM_SIMPLYSIGN_USERID: ${{{ secrets.CERTUM_SIMPLYSIGN_USERID }}
+        CERTUM_SIMPLYSIGN_OTP_URI: ${{{ secrets.CERTUM_SIMPLYSIGN_OTP_URI }}
+        CERTUM_THUMBPRINT: ${{{ secrets.CODE_SIGNING_CERT_THUMBPRINT }}
+        CERTUM_FINGERPRINT_SHA256: ${{{ secrets.CODE_SIGNING_CERT_FINGERPRINT_SHA256 }}
       run: |
         foreach ($name in @('CERTUM_SIMPLYSIGN_USERID','CERTUM_SIMPLYSIGN_OTP_URI','CERTUM_THUMBPRINT','CERTUM_FINGERPRINT_SHA256')) {
           if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
@@ -720,7 +762,8 @@ jobs:
         if ($fp -notmatch '^[0-9A-Fa-f]{64}$') { throw 'Certificate fingerprint must be exactly 64 hex characters (CODE_SIGNING_CERT_FINGERPRINT_SHA256 org secret, decision #73 amendment).' }
         $uri = $null
         if (-not [Uri]::TryCreate($env:CERTUM_SIMPLYSIGN_OTP_URI, [UriKind]::Absolute, [ref]$uri) -or
-            $uri.Scheme -ne 'otpauth' -or $uri.Host -ne 'totp' -or
+            $uri.Scheme -ne 'otpauth' -or
+            $uri.Host -ne 'totp' -or
             $uri.Query -notmatch '[?&]secret=[A-Za-z2-7]+=*(&|$)') {
           throw 'CERTUM_SIMPLYSIGN_OTP_URI must be the full otpauth://totp provisioning URI (org secrets setup, decision #38).'
         }
@@ -731,9 +774,9 @@ jobs:
       # CERTUM_SIMPLYSIGN_PASSWORD - that secret stays dormant.
       uses: dismine/windows-app-signing-setup-action@89ae3b032d4bc7a5b98d1a42a34e61ecb6faad64
       with:
-        certum-username: ${{ secrets.CERTUM_SIMPLYSIGN_USERID }}
-        certum-otp-uri: ${{ secrets.CERTUM_SIMPLYSIGN_OTP_URI }}
-        certum-key-id: ${{ secrets.CODE_SIGNING_CERT_THUMBPRINT }}
+        certum-username: ${{{ secrets.CERTUM_SIMPLYSIGN_USERID }}
+        certum-otp-uri: ${{{ secrets.CERTUM_SIMPLYSIGN_OTP_URI }}
+        certum-key-id: ${{{ secrets.CODE_SIGNING_CERT_THUMBPRINT }}
         capture-diagnostics: 'false'
 
     - name: Sign NuGet package
@@ -741,7 +784,7 @@ jobs:
       # works identically on .NET 9 and .NET 10 SDKs; no SDK pin needed.
       shell: pwsh
       env:
-        CERTUM_FINGERPRINT_SHA256: ${{ secrets.CODE_SIGNING_CERT_FINGERPRINT_SHA256 }}
+        CERTUM_FINGERPRINT_SHA256: ${{{ secrets.CODE_SIGNING_CERT_FINGERPRINT_SHA256 }}
       run: |
         $fp = ($env:CERTUM_FINGERPRINT_SHA256 -replace '\s','').ToUpperInvariant()
         $packages = @(Get-ChildItem packages/*.nupkg)
@@ -784,11 +827,11 @@ jobs:
     - name: Publish to GitHub Packages
       run: |
         dotnet nuget push ./packages/*.nupkg \
-          --api-key ${{ secrets.GITHUB_TOKEN }} \
-          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          --api-key ${{{ secrets.GITHUB_TOKEN }} \
+          --source https://nuget.pkg.github.com/${{{ github.repository_owner }}/index.json \
           --skip-duplicate
       env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
 
   prerelease:
     runs-on: ubuntu-latest
@@ -814,14 +857,14 @@ jobs:
     - name: Create Pre-release
       uses: softprops/action-gh-release@v3
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ needs.calculate-version.outputs.full-version }}
-        name: Minotaur v${{ needs.calculate-version.outputs.full-version }}
+        tag_name: v${{{ needs.calculate-version.outputs.full-version }}
+        name: Minotaur v${{{ needs.calculate-version.outputs.full-version }}
         body: |
-          ## Minotaur Pre-release v${{ needs.calculate-version.outputs.full-version }}
+          ## Minotaur Pre-release v${{{ needs.calculate-version.outputs.full-version }}
           
-          This is a pre-release version generated from branch: ${{ github.ref_name }}
+          This is a pre-release version generated from branch: ${{{ github.ref_name }}
           
           ### Changes
           - Enhanced location tracking precision APIs
@@ -831,7 +874,7 @@ jobs:
           
           ### Installation
           ```bash
-          dotnet add package DevelApp.Minotaur --version ${{ needs.calculate-version.outputs.full-version }}
+          dotnet add package DevelApp.Minotaur --version ${{{ needs.calculate-version.outputs.full-version }}
           ```
           
           **Note**: This is a pre-release version intended for testing.
@@ -864,7 +907,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
 
     - name: Download signed packages
       uses: actions/download-artifact@v7
@@ -878,12 +921,12 @@ jobs:
         (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
       uses: softprops/action-gh-release@v3
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
-        name: "Minotaur v${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }} - Stable Release"
+        tag_name: v${{{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
+        name: "Minotaur v${{{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }} - Stable Release"
         body: |
-          # Minotaur v${{ needs.calculate-version.outputs.version }} - Stable Release
+          # Minotaur v${{{ needs.calculate-version.outputs.version }} - Stable Release
 
           ## What's New
 
@@ -905,7 +948,7 @@ jobs:
           ### Installation
 
           ```bash
-          dotnet add package DevelApp.Minotaur --version ${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
+          dotnet add package DevelApp.Minotaur --version ${{{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}
           ```
 
           ### Requirements
@@ -921,11 +964,11 @@ jobs:
       run: |
         echo "Publishing to GitHub Packages..."
         dotnet nuget push ./packages/*.nupkg \
-          --api-key ${{ secrets.GITHUB_TOKEN }} \
-          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          --api-key ${{{ secrets.GITHUB_TOKEN }} \
+          --source https://nuget.pkg.github.com/${{{ github.repository_owner }}/index.json \
           --skip-duplicate
       env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
 
     # Publishing targets (cf. #72): GitHub Packages remains the primary feed
     # for DevelApp consumers (Golem authenticates to
@@ -941,12 +984,12 @@ jobs:
         # - release published -> the release's own tag
         # - workflow_dispatch stable release -> v1.0.0
         # - push to main -> the GitVersion-derived tag
-        tag_name: ${{ github.event.release.tag_name || (github.event_name == 'workflow_dispatch' && '1.0.0' || format('v{0}', needs.calculate-version.outputs.version)) }}
+        tag_name: ${{{ github.event.release.tag_name || (github.event_name == 'workflow_dispatch' && '1.0.0' || format('v{0}', needs.calculate-version.outputs.version)) }}
         # Re-uploading the same nupkg to an existing release overwrites instead of 422-ing
         overwrite_files: true
         files: ./packages/*.nupkg
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
 
     - name: Chain the sbob-publish + sbob-choco release lanes
       # Publishing a release with GITHUB_TOKEN does NOT fire the 'release'
@@ -959,11 +1002,11 @@ jobs:
         (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
         (github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true')
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{{ github.token }}
       shell: bash
       run: |
         set -euo pipefail
-        tag="v${{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}"
+        tag="v${{{ github.event_name == 'workflow_dispatch' && '1.0.0' || needs.calculate-version.outputs.version }}"
         gh workflow run sbob-publish.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$tag"
         gh workflow run sbob-choco.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$tag"
         echo "dispatched sbob-publish + sbob-choco for $tag"
@@ -980,19 +1023,19 @@ jobs:
       # NUGET_USER = the nuget.org profile name of the owning account (NOT an
       # email address). The login runs close to the push (the temp key is
       # short-lived). Fails loudly if the policy is not (yet) registered.
-      if: ${{ !github.event.release.prerelease }}
+      if: ${{{ !github.event.release.prerelease }}
       id: nuget-login
       uses: NuGet/login@v1
       with:
-        user: ${{ secrets.NUGET_USER }}
+        user: ${{{ secrets.NUGET_USER }}
 
     - name: Publish to NuGet.org (stable releases only)
       # #73 order: GitHub Packages -> Release assets -> NuGet.org LAST, so a
       # NuGet.org failure can never block the org feed or the release; it is a
       # visible red job and report-push-failure opens an issue. Prereleases
       # (release events with prerelease=true) never reach NuGet.org.
-      if: ${{ !github.event.release.prerelease }}
-      run: dotnet nuget push ./packages/*.nupkg --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      if: ${{{ !github.event.release.prerelease }}
+      run: dotnet nuget push ./packages/*.nupkg --api-key ${{{ steps.nuget-login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   # Manual job to create v1.0.0 release from main branch
   create-stable-release:
@@ -1000,7 +1043,7 @@ jobs:
     needs: [calculate-version, build-and-test, code-quality, lint-and-format]
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.create_stable_release == 'true'
     env:
-      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -1008,13 +1051,13 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        dotnet-version: ${{{ env.DOTNET_VERSION }}
 
     - name: Build and Package v1.0.0
       run: |
-        dotnet restore ${{ env.SOLUTION_PATH }}
-        dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore -p:Version=1.0.0 -p:PackageVersion=1.0.0
-        dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ./packages -p:PackageVersion=1.0.0
+        dotnet restore ${{{ env.SOLUTION_PATH }}
+        dotnet build ${{{ env.SOLUTION_PATH }} --configuration Release --no-restore -p:Version=1.0.0 -p:PackageVersion=1.0.0
+        dotnet pack ${{{ env.PROJECT_PATH }} --configuration Release --no-build --output ./packages -p:PackageVersion=1.0.0
 
     - name: Create v1.0.0 Release
       uses: softprops/action-gh-release@v3
@@ -1035,7 +1078,7 @@ jobs:
           - **Enhanced Location Tracking**: Precise APIs for syntax tree navigation and manipulation
           - **Context-Aware Editing**: Advanced context-aware editing capabilities for intelligent code generation
 
-          ### Developer Experience
+          ### Developer Experience  
           - **Comprehensive Testing**: 157 unit tests covering all functionality with 100% pass rate
           - **CI/CD Pipeline**: Fully automated builds, testing, quality checks, and releases
           - **Rich Documentation**: Complete API documentation with examples and integration guides
@@ -1056,17 +1099,17 @@ jobs:
         prerelease: false
         files: ./packages/*.nupkg
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
 
     - name: Publish v1.0.0 to GitHub Packages
       run: |
         echo "Publishing v1.0.0 to GitHub Packages..."
         dotnet nuget push ./packages/*.nupkg \
-          --api-key ${{ secrets.GITHUB_TOKEN }} \
-          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+          --api-key ${{{ secrets.GITHUB_TOKEN }} \
+          --source https://nuget.pkg.github.com/${{{ github.repository_owner }}/index.json \
           --skip-duplicate
       env:
-        NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NUGET_AUTH_TOKEN: ${{{ secrets.GITHUB_TOKEN }}
 
   # Failure-context convention (cf. sbob-choco.yml PR-comment step and
   # SBOB-Forge ci.yml): push runs to main have no PR to comment on, so a
@@ -1082,13 +1125,13 @@ jobs:
     steps:
       - name: Open a failure report issue
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{{ github.token }}
         shell: bash
         run: |
           set -uo pipefail
-          failed_jobs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/jobs?per_page=100" --jq '[.jobs[] | select(.conclusion=="failure") | .name] | join(", ")' || echo "unknown")"
-          printf 'The push run for %s failed.\n\nFailed jobs: %s\n\nRun: https://github.com/%s/actions/runs/%s\n' "${{ github.sha }}" "$failed_jobs" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > /tmp/body.md
-          gh issue create --repo "$GITHUB_REPOSITORY" --title "ci: main push run failed (${{ github.sha }})" --body-file /tmp/body.md || echo "issue creation failed (report manually)"
+          failed_jobs="$(gh api "repos/${{{ github.repository }}/actions/runs/${{{ github.run_id }}/jobs?per_page=100" --jq '[.jobs[] | select(.conclusion=="failure") | .name] | join(", ")' || echo "unknown")"
+          printf 'The push run for %s failed.\n\nFailed jobs: %s\n\nRun: https://github.com/${{{ github.repository }}/actions/runs/${{{ github.run_id }}\n' "${{{ github.sha }}" "$failed_jobs" "${{{ github.repository }}" "${{{ github.run_id }}" > /tmp/body.md
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "ci: main push run failed (${{{ github.sha }})" --body-file /tmp/body.md || echo "issue creation failed (report manually)"
 
   cleanup:
     runs-on: ubuntu-latest
