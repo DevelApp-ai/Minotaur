@@ -172,9 +172,9 @@ public sealed class LabyrinthExpressionCompiler
     {
         ArgumentNullException.ThrowIfNull(rule);
 
-        var sources = rule.Sources.Select(e => Compile(rule.Rule.Id, e.Pattern, e.Condition)).ToArray();
-        var sinks = rule.Sinks.Select(e => Compile(rule.Rule.Id, e.Pattern, e.Condition)).ToArray();
-        var sanitizers = rule.Sanitizers.Select(e => Compile(rule.Rule.Id, e.Pattern, e.Condition)).ToArray();
+        var sources = rule.Sources.Select(e => CompileEntry(rule.Rule.Id, e)).ToArray();
+        var sinks = rule.Sinks.Select(e => CompileEntry(rule.Rule.Id, e)).ToArray();
+        var sanitizers = rule.Sanitizers.Select(e => CompileEntry(rule.Rule.Id, e)).ToArray();
         var propagators = rule.Propagators
             .Select(p => new LabyrinthCompiledPropagator(Compile(rule.Rule.Id, p.Pattern, p.Condition), p.From, p.To))
             .ToArray();
@@ -184,6 +184,33 @@ public sealed class LabyrinthExpressionCompiler
             : Compile(rule.Rule.Id, rule.SearchPattern, rule.SearchCondition);
 
         return new LabyrinthCompiledMatchers(rule.Rule, search, sources, sinks, sanitizers, propagators);
+    }
+
+    /// <summary>
+    /// Compile one pattern entry into a matcher. A <c>pattern-either</c> entry compiles
+    /// to the OR of its alternatives (any alternative matching makes the entry match);
+    /// the entry condition applies to every alternative.
+    /// </summary>
+    private Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool> CompileEntry(string ruleId, CompiledLabyrinthPatternEntry entry)
+    {
+        var compiled = entry.Alternatives.Select(a => Compile(ruleId, a, entry.Condition)).ToArray();
+        if (compiled.Length == 1)
+        {
+            return compiled[0];
+        }
+
+        return (node, ctx) =>
+        {
+            foreach (var f in compiled)
+            {
+                if (f(node, ctx))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
     }
 
     /// <summary>
