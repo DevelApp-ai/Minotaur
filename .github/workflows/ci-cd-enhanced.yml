@@ -393,6 +393,19 @@ jobs:
         ${{ github.workspace }}/measurement-artifacts/issue-246
         --pairs 10 --reps 3 --write-corpus
 
+    - name: Upload issue-246 measurement artifacts (early; survives lane timeout)
+      # The lane's later harnesses (#126/#131/#134/#133...) can run past the
+      # 150-minute job timeout, and a timeout-cancelled job does not run its
+      # final upload step. Upload the #246 outputs right after they are
+      # produced so results.json / surface-report.json / RESULTS.md /
+      # ground-truth.json are always retrievable (#263).
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: article-measurements-issue-246
+        path: ${{ github.workspace }}/measurement-artifacts/issue-246
+        if-no-files-found: warn
+
     - name: Grammar compilation by size (issue #126, real grammars)
       env:
         MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
