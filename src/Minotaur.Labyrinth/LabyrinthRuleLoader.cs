@@ -226,11 +226,42 @@ public sealed class LabyrinthRuleLoader
         for (var i = 0; i < entries.Count; i++)
         {
             var entry = entries[i];
-            if (entry is null || string.IsNullOrWhiteSpace(entry.Pattern))
+            var entryLabel = $"{label}.{ruleId}.{key}[{i}]";
+            if (entry is null)
             {
-                errors.Add($"{label}.{ruleId}.{key}[{i}]: 'pattern' is required.");
+                errors.Add($"{entryLabel}: 'pattern' is required.");
+                continue;
             }
 
+            var hasPattern = !string.IsNullOrWhiteSpace(entry.Pattern);
+            var hasEither = entry.PatternEither is { Count: > 0 };
+            if (hasPattern && hasEither)
+            {
+                errors.Add($"{entryLabel}: 'pattern' and 'pattern-either' are mutually exclusive.");
+                continue;
+            }
+
+            if (!hasPattern && !hasEither)
+            {
+                errors.Add($"{entryLabel}: 'pattern' is required.");
+                continue;
+            }
+
+            if (hasEither)
+            {
+                for (var j = 0; j < entry.PatternEither!.Count; j++)
+                {
+                    var alt = entry.PatternEither[j];
+                    if (alt is null || string.IsNullOrWhiteSpace(alt.Pattern))
+                    {
+                        errors.Add($"{entryLabel}.pattern-either[{j}]: 'pattern' is required.");
+                    }
+                    else if (alt.PatternEither is { Count: > 0 })
+                    {
+                        errors.Add($"{entryLabel}.pattern-either[{j}]: nested pattern-either is not supported.");
+                    }
+                }
+            }
         }
     }
 

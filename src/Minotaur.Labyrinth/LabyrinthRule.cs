@@ -34,6 +34,13 @@ public sealed class LabyrinthPatternEntry
     public string Pattern { get; set; } = string.Empty;
 
     /// <summary>
+    /// Alternatives for this entry (YAML <c>pattern-either:</c>): the entry matches when
+    /// ANY of the listed sub-patterns matches. Mutually exclusive with
+    /// <see cref="Pattern"/>; sub-entries may not themselves nest pattern-either.
+    /// </summary>
+    public List<LabyrinthPatternEntry>? PatternEither { get; set; }
+
+    /// <summary>
     /// Optional Dynamic LINQ condition (System.Linq.Dynamic.Core syntax) evaluated
     /// against the matched node. Example: <c>node.Arguments[0].Value &gt; 1024</c>
     /// </summary>
@@ -177,9 +184,25 @@ public sealed class LabyrinthRuleSet
 
             foreach (var e in list)
             {
-                if (e?.Pattern is not null)
+                if (e is null)
+                {
+                    continue;
+                }
+
+                if (e.Pattern is not null)
                 {
                     yield return e.Pattern;
+                }
+
+                if (e.PatternEither is not null)
+                {
+                    foreach (var alt in e.PatternEither)
+                    {
+                        if (alt?.Pattern is not null)
+                        {
+                            yield return alt.Pattern;
+                        }
+                    }
                 }
             }
         }

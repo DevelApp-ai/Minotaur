@@ -39,15 +39,22 @@ public sealed class CompiledLabyrinthPropagator
 /// </summary>
 public sealed class CompiledLabyrinthPatternEntry
 {
-    /// <summary>The parsed pattern.</summary>
-    public LabyrinthPatternAst Pattern { get; }
+    /// <summary>
+    /// The parsed patterns of this entry: a single element for a plain
+    /// <c>pattern:</c> entry, or all alternatives of a <c>pattern-either:</c> entry.
+    /// The entry matches when ANY alternative matches.
+    /// </summary>
+    public IReadOnlyList<LabyrinthPatternAst> Alternatives { get; }
+
+    /// <summary>The parsed pattern (first alternative; kept for compatibility).</summary>
+    public LabyrinthPatternAst Pattern => Alternatives[0];
 
     /// <summary>The entry's optional Dynamic LINQ condition; null when absent.</summary>
     public string? Condition { get; }
 
-    internal CompiledLabyrinthPatternEntry(LabyrinthPatternAst pattern, string? condition)
+    internal CompiledLabyrinthPatternEntry(IReadOnlyList<LabyrinthPatternAst> alternatives, string? condition)
     {
-        Pattern = pattern;
+        Alternatives = alternatives;
         Condition = condition;
     }
 }
@@ -193,7 +200,7 @@ public static class LabyrinthRuleCompiler
         var propagators = CompilePropagators(rule.Propagators, parser);
 
         var metavariables = CollectMetavariables(
-            sources.Concat(sinks).Concat(sanitizers).SelectMany(e => e.Pattern.Metavariables)
+            sources.Concat(sinks).Concat(sanitizers).SelectMany(e => e.Alternatives.SelectMany(a => a.Metavariables))
                 .Concat(propagators.SelectMany(p => p.Pattern.Metavariables)),
             out var occurrences);
 
@@ -227,7 +234,11 @@ public static class LabyrinthRuleCompiler
 
             try
             {
-                asts.Add(new CompiledLabyrinthPatternEntry(parser.ParsePattern(entry.Pattern), entry.Condition));
+                var patterns = entry.PatternEither is { Count: > 0 }
+                    ? entry.PatternEither.Select(alt => alt.Pattern).ToList()
+                    : new List<string> { entry.Pattern };
+                var alternatives = patterns.Select(pat => parser.ParsePattern(pat)).ToList();
+                asts.Add(new CompiledLabyrinthPatternEntry(alternatives, entry.Condition));
             }
             catch (LabyrinthRuleException ex)
             {
