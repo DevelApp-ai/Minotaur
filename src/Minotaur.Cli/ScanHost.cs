@@ -205,9 +205,11 @@ public static class ScanHost
                     {
                         // focus-metavariable: report at the bound node when declared.
                         var reportNode = matchers.ResolveReportNode(node, context);
+                        // fix: interpolate the rule's fix suggestion against the bindings.
+                        var fix = string.IsNullOrEmpty(rule.Fix) ? null : LabyrinthFixInterpolator.Interpolate(rule.Fix, context);
                         findings.Add(new LabyrinthTaintFinding(
                             rule.Id, rule.SeverityValue, rule.EffectiveMessage, reportNode, reportNode,
-                            new ILabyrinthMatchNode[] { reportNode }));
+                            new ILabyrinthMatchNode[] { reportNode }, fix));
                     }
                 }
             }

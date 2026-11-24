@@ -184,6 +184,28 @@ and no exclude glob — **exclude wins**. Rules without `paths:` apply to every
 file. The CLI (`minotaur labyrinth scan`), the corpus verifier and the
 benchmarks pass the scanned file's path, so filters take effect there.
 
+### Fix suggestions: `fix:`
+
+A rule may carry a fix suggestion — a replacement snippet in the target
+grammar's syntax with metavariable interpolation:
+
+```yaml
+- id: null-deref
+  type: taint
+  sources:
+    - pattern: "FirstOrDefault($ITEMS)"
+  sinks:
+    - pattern: "$X.DoWork()"
+  fix: "$X?.DoWork()"
+```
+
+Every `$NAME` in the fix must occur in the rule's patterns (load-time error
+otherwise). At report time each `$NAME` is replaced by the bound node's text
+(its identifier/callee name); an unbound reference is left as-is. The
+interpolated fix is carried on the finding (`finding.Fix`) and printed by the
+console reporter as a `Fix:` line. v1: console output only (SARIF `fixes` are
+not emitted yet).
+
 ## Loading rule packs
 
 A rule pack is a directory of `.yaml`/`.yml` rule files (scanned recursively):
