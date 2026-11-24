@@ -1,0 +1,252 @@
+[
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0000.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0001.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0002.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0003.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0004.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0005.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0006.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0007.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0008.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-null-deref-unguarded-maybe-null",
+    "file": "csharp-null-deref-unguarded-maybe-null-v0009.cs",
+    "line": 14
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0000.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0001.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0002.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0003.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0004.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0005.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0006.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0007.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0008.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-unsafe-as-cast-deref",
+    "file": "csharp-unsafe-as-cast-deref-v0009.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0000.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0001.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0002.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0003.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0004.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0005.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0006.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0007.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0008.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-array-index-unvalidated-input",
+    "file": "csharp-array-index-unvalidated-input-v0009.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0000.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0001.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0002.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0003.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0004.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0005.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0006.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0007.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0008.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-divide-by-constant-zero",
+    "file": "csharp-divide-by-constant-zero-v0009.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0000.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0001.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0002.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0003.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0004.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0005.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0006.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0007.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0008.cs",
+    "line": 13
+  },
+  {
+    "rule": "csharp-modulo-by-constant-zero",
+    "file": "csharp-modulo-by-constant-zero-v0009.cs",
+    "line": 13
+  }
+]

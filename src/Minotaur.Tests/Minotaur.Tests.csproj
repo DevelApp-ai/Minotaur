@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Minotaur.UI.Blazor\Minotaur.UI.Blazor.csproj" />
     <ProjectReference Include="..\Minotaur.Labyrinth\Minotaur.Labyrinth.csproj" />
     <ProjectReference Include="..\Minotaur.Cli\Minotaur.Cli.csproj" />
+    <ProjectReference Include="..\Minotaur.Benchmarks.Labyrinth\Minotaur.Benchmarks.Labyrinth.csproj" />
 
   </ItemGroup>
 
