@@ -119,6 +119,13 @@ public sealed class CompiledLabyrinthRule
     /// <summary>Search rule ancestor filters (YAML <c>pattern-inside:</c>); the search pattern must be inside a match of each.</summary>
     public IReadOnlyList<LabyrinthPatternAst> SearchInsidePatterns { get; }
 
+    /// <summary>
+    /// The rule's focus metavariable (YAML <c>focus-metavariable:</c>), normalized
+    /// (no leading <c>$</c>); null when absent. The finding is reported at the node
+    /// bound to this metavariable instead of the whole matched node.
+    /// </summary>
+    public string? FocusMetavariable { get; }
+
     /// <summary>The parsed taint source patterns with their optional conditions.</summary>
     public IReadOnlyList<CompiledLabyrinthPatternEntry> Sources { get; }
 
@@ -151,6 +158,7 @@ public sealed class CompiledLabyrinthRule
         string? searchCondition,
         IReadOnlyList<LabyrinthPatternAst>? searchNotPatterns,
         IReadOnlyList<LabyrinthPatternAst>? searchInsidePatterns,
+        string? focusMetavariable,
         IReadOnlyList<CompiledLabyrinthPatternEntry> sources,
         IReadOnlyList<CompiledLabyrinthPatternEntry> sinks,
         IReadOnlyList<CompiledLabyrinthPatternEntry> sanitizers,
@@ -163,6 +171,7 @@ public sealed class CompiledLabyrinthRule
         SearchCondition = searchCondition;
         SearchNotPatterns = searchNotPatterns ?? Array.Empty<LabyrinthPatternAst>();
         SearchInsidePatterns = searchInsidePatterns ?? Array.Empty<LabyrinthPatternAst>();
+        FocusMetavariable = string.IsNullOrWhiteSpace(focusMetavariable) ? null : focusMetavariable.Trim().TrimStart('$');
         Sources = sources;
         Sinks = sinks;
         Sanitizers = sanitizers;
@@ -236,6 +245,7 @@ public static class LabyrinthRuleCompiler
             searchCondition: rule.Condition,
             searchNotPatterns: searchNots,
             searchInsidePatterns: searchInsides,
+            focusMetavariable: rule.FocusMetavariable,
             sources: Array.Empty<CompiledLabyrinthPatternEntry>(),
             sinks: Array.Empty<CompiledLabyrinthPatternEntry>(),
             sanitizers: Array.Empty<CompiledLabyrinthPatternEntry>(),
@@ -283,6 +293,7 @@ public static class LabyrinthRuleCompiler
             searchCondition: null,
             searchNotPatterns: null,
             searchInsidePatterns: null,
+            focusMetavariable: rule.FocusMetavariable,
             sources,
             sinks,
             sanitizers,

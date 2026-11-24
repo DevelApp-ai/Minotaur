@@ -184,7 +184,8 @@ public static class ScanHost
         var parentMap = LabyrinthMatchContext.BuildParentMap(nodes);
         foreach (var rule in ruleSet.Rules)
         {
-            var matchers = expressionCompiler.CompileRule(LabyrinthRuleCompiler.Compile(rule, parser));
+            var compiled = LabyrinthRuleCompiler.Compile(rule, parser);
+            var matchers = expressionCompiler.CompileRule(compiled);
             if (rule.TypeValue == LabyrinthRuleType.Taint)
             {
                 findings.AddRange(new LabyrinthTaintEngine(matchers, graph).Analyze());
@@ -197,9 +198,11 @@ public static class ScanHost
                     context.Clear();
                     if (matchers.SearchPattern is not null && matchers.SearchPattern(node, context))
                     {
+                        // focus-metavariable: report at the bound node when declared.
+                        var reportNode = matchers.ResolveReportNode(node, context);
                         findings.Add(new LabyrinthTaintFinding(
-                            rule.Id, rule.SeverityValue, rule.EffectiveMessage, node, node,
-                            new ILabyrinthMatchNode[] { node }));
+                            rule.Id, rule.SeverityValue, rule.EffectiveMessage, reportNode, reportNode,
+                            new ILabyrinthMatchNode[] { reportNode }));
                     }
                 }
             }

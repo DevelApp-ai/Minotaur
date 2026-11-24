@@ -151,12 +151,14 @@ public sealed class LabyrinthTaintEngine
                     if (MatchesAny(_matchers.Sinks, successor, incomingBindings, context)
                         && reported.Add((origin, successor)))
                     {
+                        // focus-metavariable: report the sink at the bound node when declared.
+                        var sinkNode = _matchers.ResolveReportNode(successor, context);
                         findings.Add(new LabyrinthTaintFinding(
                             _matchers.Rule.Id,
                             _matchers.Rule.SeverityValue,
                             _matchers.Rule.EffectiveMessage,
                             origin,
-                            successor,
+                            sinkNode,
                             states[successor].Paths[origin].Materialize()));
                     }
 

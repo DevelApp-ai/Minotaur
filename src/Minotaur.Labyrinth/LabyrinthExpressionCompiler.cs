@@ -57,21 +57,40 @@ public sealed class LabyrinthCompiledMatchers
     /// <summary>The compiled taint propagators.</summary>
     public IReadOnlyList<LabyrinthCompiledPropagator> Propagators { get; }
 
+    /// <summary>
+    /// The rule's focus metavariable (YAML <c>focus-metavariable:</c>), normalized
+    /// (no leading <c>$</c>); null when absent. See <see cref="ResolveReportNode"/>.
+    /// </summary>
+    public string? FocusMetavariable { get; }
+
     internal LabyrinthCompiledMatchers(
         LabyrinthRule rule,
         Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>? searchPattern,
         IReadOnlyList<Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>> sources,
         IReadOnlyList<Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>> sinks,
         IReadOnlyList<Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>> sanitizers,
-        IReadOnlyList<LabyrinthCompiledPropagator> propagators)
+        IReadOnlyList<LabyrinthCompiledPropagator> propagators,
+        string? focusMetavariable = null)
     {
         Rule = rule;
         SearchPattern = searchPattern;
+        FocusMetavariable = focusMetavariable;
         Sources = sources;
         Sinks = sinks;
         Sanitizers = sanitizers;
         Propagators = propagators;
     }
+
+    /// <summary>
+    /// Resolves the node a finding is reported at: when the rule declares
+    /// <c>focus-metavariable</c> and the match bound it, the bound node wins;
+    /// otherwise the whole matched node is reported (fallback, also when the
+    /// metavariable is somehow unbound).
+    /// </summary>
+    public ILabyrinthMatchNode ResolveReportNode(ILabyrinthMatchNode matched, LabyrinthMatchContext context)
+        => FocusMetavariable is { } focus && context.TryGet(focus, out var focused)
+            ? focused
+            : matched;
 }
 
 /// <summary>
@@ -184,7 +203,8 @@ public sealed class LabyrinthExpressionCompiler
             : CompileAlternative(rule.Rule.Id, rule.SearchPattern, rule.SearchCondition,
                 rule.SearchNotPatterns, rule.SearchInsidePatterns);
 
-        return new LabyrinthCompiledMatchers(rule.Rule, search, sources, sinks, sanitizers, propagators);
+        return new LabyrinthCompiledMatchers(rule.Rule, search, sources, sinks, sanitizers, propagators,
+            focusMetavariable: rule.FocusMetavariable);
     }
 
     /// <summary>
