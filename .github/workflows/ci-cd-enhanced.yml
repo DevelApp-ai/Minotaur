@@ -327,7 +327,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    timeout-minutes: 150
+    timeout-minutes: 240
     steps:
     - name: Checkout Minotaur
       uses: actions/checkout@v5
