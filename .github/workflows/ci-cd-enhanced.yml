@@ -361,19 +361,6 @@ jobs:
         dotnet build src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj --configuration Release --no-restore
 
-    - name: Symbolic-detection corpus at article scale (Labyrinth L3, issues #246/#252)
-      # Non-gating measurement step: a failure (exit 2) must not skip the
-      # later Labyrinth rule-pack step, which emits surface-report.json for
-      # the LAB harness (#263) into the same artifacts directory.
-      continue-on-error: true
-      env:
-        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
-        MINOTAUR_COMMIT: ${{ github.sha }}
-      run: >
-        dotnet run --project src/Minotaur.Benchmarks.SymbolicDetection
-        --configuration Release --no-build --
-        ${{ github.workspace }}/measurement-artifacts/issue-246
-
     - name: Labyrinth rule-pack detection + timing (issue #246, GSE L3)
       # Full shipped csharp10 rule pack over the deterministic detection
       # corpus: detection vs exact ground truth, per-file parse/scan cost
@@ -405,6 +392,19 @@ jobs:
         name: article-measurements-issue-246
         path: ${{ github.workspace }}/measurement-artifacts/issue-246
         if-no-files-found: warn
+
+    - name: Symbolic-detection corpus at article scale (Labyrinth L3, issues #246/#252)
+      # Non-gating measurement step: a failure (exit 2) must not skip the
+      # later Labyrinth rule-pack step, which emits surface-report.json for
+      # the LAB harness (#263) into the same artifacts directory.
+      continue-on-error: true
+      env:
+        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.SymbolicDetection
+        --configuration Release --no-build --
+        ${{ github.workspace }}/measurement-artifacts/issue-246
 
     - name: Grammar compilation by size (issue #126, real grammars)
       env:
