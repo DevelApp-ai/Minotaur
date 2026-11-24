@@ -85,8 +85,13 @@ var grammarContent = File.ReadAllText(ScanHost.GrammarFilePath(grammarsRoot, tar
 var grammarName = target.Directory;
 
 // Engine-side rule-language surface report (LAB harness, #263): feature usage and
-// per-rule compile cost / delegate counts for the pack under measurement.
+// per-rule compile cost / delegate counts for the pack under measurement. Written
+// immediately (compile-time only, independent of the scan) so the file survives
+// even if a later scan phase is cancelled.
 var surfaceReport = LabyrinthRuleSurfaceReport.Build(pack, grammarContent, grammarName);
+Directory.CreateDirectory(outdir);
+File.WriteAllText(Path.Combine(outdir, "surface-report.json"),
+    LabyrinthRuleSurfaceReport.ToJson(surfaceReport) + "\n");
 
 var cases = CorpusGenerator.Generate(pairs);
 if (onlyRule is not null)
