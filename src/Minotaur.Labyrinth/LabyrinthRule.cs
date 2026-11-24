@@ -154,6 +154,14 @@ public sealed class LabyrinthRule
     /// </summary>
     public LabyrinthPathFilter? Paths { get; set; }
 
+    /// <summary>
+    /// Optional fix suggestion (YAML <c>fix:</c>): a replacement snippet in the target
+    /// grammar's syntax with metavariable interpolation (<c>$X</c> is replaced by the
+    /// bound node's text). Every metavariable in the fix must occur in the rule's
+    /// patterns (load-time validation). Carried on each finding as <c>Fix</c>.
+    /// </summary>
+    public string? Fix { get; set; }
+
     /// <summary>Parsed severity value.</summary>
     public LabyrinthSeverity SeverityValue => ParseSeverity(Severity);
 

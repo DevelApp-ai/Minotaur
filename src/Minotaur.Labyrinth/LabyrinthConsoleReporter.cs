@@ -84,6 +84,11 @@ public sealed class LabyrinthConsoleReporter
 
         sb.AppendLine();
         sb.Append("  ").AppendLine(finding.Message);
+        if (!string.IsNullOrEmpty(finding.Fix))
+        {
+            sb.Append("  Fix: ").AppendLine(finding.Fix);
+        }
+
         sb.Append("  Path:").AppendLine();
         foreach (var line in LabyrinthPathRenderer.RenderPath(finding).Split('\n'))
         {

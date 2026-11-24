@@ -147,6 +147,19 @@ public sealed class LabyrinthRuleLoader
             {
                 ValidatePathFilter(rule.Paths, label, rule.Id, errors);
             }
+
+            if (!string.IsNullOrWhiteSpace(rule.Fix))
+            {
+                // Every metavariable referenced by the fix must be bindable by the rule.
+                var defined = new HashSet<string>(LabyrinthRuleSet.DefinedMetavariables(rule), StringComparer.Ordinal);
+                foreach (var name in LabyrinthFixInterpolator.MetavariablesIn(rule.Fix))
+                {
+                    if (!defined.Contains(name))
+                    {
+                        errors.Add($"{label} ({rule.Id}): 'fix' references '${name}' which does not occur in any pattern of the rule.");
+                    }
+                }
+            }
         }
 
         return new LabyrinthValidationResult { Errors = errors };

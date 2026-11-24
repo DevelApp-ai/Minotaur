@@ -153,13 +153,18 @@ public sealed class LabyrinthTaintEngine
                     {
                         // focus-metavariable: report the sink at the bound node when declared.
                         var sinkNode = _matchers.ResolveReportNode(successor, context);
+                        // fix: interpolate the rule's fix suggestion against the bindings.
+                        var fix = string.IsNullOrEmpty(_matchers.Rule.Fix)
+                            ? null
+                            : LabyrinthFixInterpolator.Interpolate(_matchers.Rule.Fix, context);
                         findings.Add(new LabyrinthTaintFinding(
                             _matchers.Rule.Id,
                             _matchers.Rule.SeverityValue,
                             _matchers.Rule.EffectiveMessage,
                             origin,
                             sinkNode,
-                            states[successor].Paths[origin].Materialize()));
+                            states[successor].Paths[origin].Materialize(),
+                            fix));
                     }
 
                     // 4. Propagator application: also transfer/duplicate the
