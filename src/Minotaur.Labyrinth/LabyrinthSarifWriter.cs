@@ -17,8 +17,15 @@ public static class LabyrinthSarifWriter
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    /// <summary>Serializes findings to a SARIF 2.1.0 log document.</summary>
-    public static string Write(IReadOnlyList<LabyrinthTaintFinding> findings, string? root = null)
+    /// <summary>
+    /// Serializes findings to a SARIF 2.1.0 log document. When
+    /// <paramref name="rulesById"/> is given, each rule's <c>metadata:</c> map is
+    /// emitted into the rule's <c>properties</c> (Semgrep-style metadata blocks).
+    /// </summary>
+    public static string Write(
+        IReadOnlyList<LabyrinthTaintFinding> findings,
+        string? root = null,
+        IReadOnlyDictionary<string, LabyrinthRule>? rulesById = null)
     {
         if (findings is null)
         {
@@ -39,7 +46,7 @@ public static class LabyrinthSarifWriter
             writer.WriteString("name", "Minotaur.Labyrinth");
             writer.WriteString("informationUri", "https://github.com/DevelApp-ai/Minotaur");
             writer.WriteString("version", typeof(LabyrinthSarifWriter).Assembly.GetName().Version?.ToString(3) ?? "0.0.0");
-            WriteRules(writer, findings);
+            WriteRules(writer, findings, rulesById);
             writer.WriteEndObject(); // driver
             writer.WriteEndObject(); // tool
 
@@ -68,7 +75,10 @@ public static class LabyrinthSarifWriter
         return System.Text.Encoding.UTF8.GetString(stream.ToArray());
     }
 
-    private static void WriteRules(Utf8JsonWriter writer, IReadOnlyList<LabyrinthTaintFinding> findings)
+    private static void WriteRules(
+        Utf8JsonWriter writer,
+        IReadOnlyList<LabyrinthTaintFinding> findings,
+        IReadOnlyDictionary<string, LabyrinthRule>? rulesById)
     {
         var rules = findings
             .GroupBy(f => f.RuleId, StringComparer.Ordinal)
@@ -82,6 +92,16 @@ public static class LabyrinthSarifWriter
             writer.WriteString("id", group.Key);
             writer.WriteStartObject("properties");
             writer.WriteString("tags", "security");
+            if (rulesById is not null
+                && rulesById.TryGetValue(group.Key, out var rule)
+                && rule.Metadata is { Count: > 0 })
+            {
+                foreach (var (key, value) in rule.Metadata)
+                {
+                    WritePropertyValue(writer, key, value);
+                }
+            }
+
             writer.WriteEndObject();
             writer.WriteStartObject("defaultConfiguration");
             writer.WriteString("level", SarifLevel(group.First().Severity));
@@ -90,6 +110,35 @@ public static class LabyrinthSarifWriter
         }
 
         writer.WriteEndArray();
+    }
+
+    private static void WritePropertyValue(Utf8JsonWriter writer, string key, object? value)
+    {
+        switch (value)
+        {
+            case null:
+                writer.WriteNull(key);
+                break;
+            case string s:
+                writer.WriteString(key, s);
+                break;
+            case bool b:
+                writer.WriteBoolean(key, b);
+                break;
+            case int i:
+                writer.WriteNumber(key, i);
+                break;
+            case long l:
+                writer.WriteNumber(key, l);
+                break;
+            case double d:
+                writer.WriteNumber(key, d);
+                break;
+            default:
+                writer.WritePropertyName(key);
+                writer.WriteRawValue(JsonSerializer.Serialize(value));
+                break;
+        }
     }
 
     private static void WriteResult(Utf8JsonWriter writer, LabyrinthTaintFinding finding, string? root)

@@ -44,6 +44,11 @@ rules:
 | `sources` / `sinks` | taint | pattern entry list | Where untrusted data enters / arrives |
 | `sanitizers` | no | pattern entry list | Matches that prune taint state |
 | `propagators` | no | pattern + `from`/`to` | Transfers taint between metavariables |
+| `pattern-not` / `pattern-inside` | no | pattern | Negation / ancestor filters on an entry (or search rule) |
+| `focus-metavariable` | no | `$NAME` | Report the finding at the node bound to `$NAME` |
+| `paths` | no | `include:`/`exclude:` globs | Restrict the rule to matching file paths |
+| `fix` | no | target-grammar snippet with `$NAME` | Fix suggestion carried on each finding |
+| `metadata` | no | free-form map | Rule metadata (e.g. `cwe`, `owasp`); emitted into SARIF rule properties |
 
 ### Patterns
 
