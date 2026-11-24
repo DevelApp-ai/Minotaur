@@ -138,9 +138,13 @@ public static class LabyrinthRuleSurfaceReport
         return data;
     }
 
-    /// <summary>Serializes a report to indented JSON (for committed artifacts).</summary>
+    /// <summary>Serializes a report to indented camelCase JSON (for committed artifacts).</summary>
     public static string ToJson(LabyrinthRuleSurfaceReportData data) =>
-        JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+        JsonSerializer.Serialize(data, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        });
 
     /// <summary>The rule-language features a single rule exercises.</summary>
     public static IReadOnlyList<string> DetectFeatures(LabyrinthRule rule)

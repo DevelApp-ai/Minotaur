@@ -149,7 +149,8 @@ public sealed class LabyrinthRuleSurfaceReportTests
 
         Assert.True(report.RuleCount >= 3, $"expected the shipped csharp10 rules, got {report.RuleCount}");
         Assert.All(report.Rules, r => Assert.True(r.CompiledDelegates > 0, $"{r.RuleId} compiled no delegates"));
-        Assert.All(report.Rules, r => Assert.Contains("taint", r.Features));
+        Assert.Contains(report.Rules, r => r.Features.Contains("taint")); // null-deref / as-cast rules
+        Assert.Contains(report.Rules, r => r.Features.Contains("search-pattern")); // constant-zero-division rule
         Assert.Contains("sanitizers", report.FeaturesUsed);
         Assert.True(report.TotalPatterns > 0);
 
