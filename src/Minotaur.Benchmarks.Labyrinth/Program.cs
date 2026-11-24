@@ -135,7 +135,7 @@ for (int r = 0; r < reps; r++)
         parseSamples[r].Add(parseWatch.Elapsed.TotalMilliseconds);
 
         var packWatch = Stopwatch.StartNew();
-        var findings = ScanHost.RunRules(pack, grammarContent, grammarName, graph, nodes);
+        var findings = ScanHost.RunRules(pack, grammarContent, grammarName, graph, nodes, file.FileName);
         packWatch.Stop();
         packSamples[r].Add(packWatch.Elapsed.TotalMilliseconds);
         lastFindings.AddRange(findings);
@@ -223,7 +223,7 @@ else
         foreach (var file in kase.Files)
         {
             var graph = ScanHost.BuildGraph(file.Content, file.FileName, grammarContent, grammarName, out var nodes);
-            ScanHost.RunRules(single, grammarContent, grammarName, graph, nodes);
+            ScanHost.RunRules(single, grammarContent, grammarName, graph, nodes, file.FileName);
         }
 
         ruleWatch.Stop();

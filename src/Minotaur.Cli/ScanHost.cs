@@ -172,17 +172,22 @@ public static class ScanHost
         return graph;
     }
 
-    /// <summary>Compiles every rule of the pack against the target grammar and runs them over the graph.</summary>
+    /// <summary>
+    /// Compiles every rule of the pack against the target grammar and runs them over
+    /// the graph. When <paramref name="filePath"/> is given, rules with a
+    /// <c>paths:</c> include/exclude filter only apply when the filter matches it.
+    /// </summary>
     public static List<LabyrinthTaintFinding> RunRules(
         LabyrinthRuleSet ruleSet, string grammarContent, string grammarName,
-        LabyrinthDataFlowGraph graph, IReadOnlyList<ILabyrinthMatchNode> nodes)
+        LabyrinthDataFlowGraph graph, IReadOnlyList<ILabyrinthMatchNode> nodes,
+        string? filePath = null)
     {
         var findings = new List<LabyrinthTaintFinding>();
         using var parser = new LabyrinthPatternParser(grammarContent, grammarName);
         var expressionCompiler = new LabyrinthExpressionCompiler();
         // Child-to-parent map over the materialized node tree, enabling pattern-inside.
         var parentMap = LabyrinthMatchContext.BuildParentMap(nodes);
-        foreach (var rule in ruleSet.Rules)
+        foreach (var rule in ruleSet.RulesForPath(filePath))
         {
             var compiled = LabyrinthRuleCompiler.Compile(rule, parser);
             var matchers = expressionCompiler.CompileRule(compiled);

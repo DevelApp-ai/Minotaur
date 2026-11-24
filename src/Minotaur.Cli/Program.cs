@@ -107,7 +107,7 @@ public static class Program
         {
             var source = File.ReadAllText(file);
             var graph = ScanHost.BuildGraph(source, file, grammarContent, target.Directory, out var nodes);
-            findings.AddRange(ScanHost.RunRules(pack.RuleSet, grammarContent, target.Directory, graph, nodes));
+            findings.AddRange(ScanHost.RunRules(pack.RuleSet, grammarContent, target.Directory, graph, nodes, file));
         }
 
         if (options.TryGetValue("write-baseline", out var writeBaseline))
