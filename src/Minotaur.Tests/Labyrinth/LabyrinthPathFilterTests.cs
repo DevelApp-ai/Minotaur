@@ -114,8 +114,10 @@ public sealed class LabyrinthPathFilterTests
         Assert.Equal(new[] { "tests/fixtures/**" }, limited.Paths.Exclude);
         Assert.Null(ruleSet.Rules[1].Paths);
 
-        Assert.Single(ruleSet.RulesForPath("tests/unit/a.cs"));
-        Assert.Equal(2, ruleSet.RulesForPath("src/app.cs").Count());
+        Assert.Equal(2, ruleSet.RulesForPath("tests/unit/a.cs").Count()); // limited (include hit) + unrestricted
+        var outside = ruleSet.RulesForPath("src/app.cs").ToList();
+        Assert.Single(outside); // only the unrestricted rule
+        Assert.Equal("unrestricted", outside[0].Id);
         Assert.Single(ruleSet.RulesForPath(null)); // only the unrestricted rule
     }
 
