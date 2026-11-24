@@ -160,14 +160,14 @@ public sealed class LabyrinthRuleLoader
         }
         else
         {
-            ValidateFocusMetavariable(rule, label, LabyrinthMetavariables.DistinctNamesIn(rule.Pattern), "the search pattern", errors);
+            ValidateFocusMetavariable(rule, label, new[] { rule.Pattern }, "the search pattern", errors);
         }
     }
 
     /// <summary>
-    /// Validates <c>focus-metavariable</c>: when set it must occur in
-    /// <paramref name="allowedPatterns"/> (the search pattern, or the taint sink
-    /// positive patterns), otherwise the focus could never bind.
+    /// Validates <c>focus-metavariable</c>: when set it must occur in one of
+    /// <paramref name="allowedPatterns"/> (raw pattern texts: the search pattern, or
+    /// the taint sink positive patterns), otherwise the focus could never bind.
     /// </summary>
     private static void ValidateFocusMetavariable(
         LabyrinthRule rule, string label, IEnumerable<string> allowedPatterns, string scope, List<string> errors)
