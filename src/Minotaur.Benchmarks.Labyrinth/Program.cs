@@ -12,7 +12,10 @@ using Minotaur.Benchmarks.Labyrinth;
 // contract): parse cost (ScanHost.BuildGraph), full-pack scan cost
 // (ScanHost.RunRules), and per-rule attribution (single-rule scans over that
 // rule's own corpus), against exact-by-construction expected findings.
-// Emits results.json, RESULTS.md and ground-truth.json into the outdir.
+// Also emits the engine-side rule-language surface report (LAB harness #263:
+// LabyrinthRuleSurfaceReport — feature usage + per-rule compile cost).
+// Emits results.json, surface-report.json, RESULTS.md and ground-truth.json
+// into the outdir.
 // Pass --only-rule <id> for a fast single-rule smoke of the same protocol.
 
 if (args.Length == 0 || args[0] is "-h" or "--help")
@@ -34,7 +37,7 @@ if (args.Length == 0 || args[0] is "-h" or "--help")
           --write-corpus   also emit the generated programs under
                            <outdir>/corpus/<rule-id>/
 
-        Outputs into <outdir>: results.json, RESULTS.md, ground-truth.json.
+        Outputs into <outdir>: results.json, surface-report.json, RESULTS.md, ground-truth.json.
         MINOTAUR_COMMIT (set by CI) is recorded in results.json and RESULTS.md.
         The production 'minotaur labyrinth scan' path resolves and compiles the
         grammar once per file, and this harness reports the same per-file cost.
@@ -80,6 +83,10 @@ var grammarsRoot = ScanHost.FindGrammarsRoot();
 var target = ScanHost.ResolveTarget("csharp10");
 var grammarContent = File.ReadAllText(ScanHost.GrammarFilePath(grammarsRoot, target));
 var grammarName = target.Directory;
+
+// Engine-side rule-language surface report (LAB harness, #263): feature usage and
+// per-rule compile cost / delegate counts for the pack under measurement.
+var surfaceReport = LabyrinthRuleSurfaceReport.Build(pack, grammarContent, grammarName);
 
 var cases = CorpusGenerator.Generate(pairs);
 if (onlyRule is not null)
@@ -286,11 +293,32 @@ var report = new
         detectionRate = Math.Round(detectionRate, 1),
         precision = Math.Round(precision, 1),
     },
+    ruleSurface = new
+    {
+        featuresUsed = surfaceReport.FeaturesUsed.ToArray(),
+        totalPatterns = surfaceReport.TotalPatterns,
+        totalCompiledDelegates = surfaceReport.TotalCompiledDelegates,
+        totalCompileMs = Math.Round(surfaceReport.TotalCompileMs, 3),
+        perRule = surfaceReport.Rules.Select(r => new
+        {
+            rule = r.RuleId,
+            type = r.Type,
+            entries = r.Entries,
+            patterns = r.Patterns,
+            metavariables = r.Metavariables,
+            compiledDelegates = r.CompiledDelegates,
+            compileMs = Math.Round(r.CompileMs, 3),
+            features = r.Features.ToArray(),
+        }).ToArray(),
+    },
     timing,
 };
 
 File.WriteAllText(Path.Combine(outdir, "results.json"),
     JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+
+File.WriteAllText(Path.Combine(outdir, "surface-report.json"),
+    LabyrinthRuleSurfaceReport.ToJson(surfaceReport) + "\n");
 
 EmitGroundTruth(outdir, cases);
 
@@ -300,7 +328,7 @@ if (writeCorpus)
 }
 
 File.WriteAllText(Path.Combine(outdir, "RESULTS.md"), BuildResultsMarkdown());
-Console.WriteLine($"wrote results.json, RESULTS.md, ground-truth.json to {outdir}");
+Console.WriteLine($"wrote results.json, surface-report.json, RESULTS.md, ground-truth.json to {outdir}");
 Console.WriteLine($"detection {truePositives}/{totalExpected} ({report.overall.detectionRate}%), false positives {falsePositives}, precision {report.overall.precision}%");
 
 return detectionRate < 100.0 || falsePositives > 0 ? 2 : 0;
@@ -397,6 +425,21 @@ string BuildResultsMarkdown()
     sb.AppendLine();
     sb.AppendLine($"Wall clock for {reps} full repetitions over {allFiles.Count} programs: {timing.wallClockMs} ms.");
     sb.AppendLine($"Managed allocation across those repetitions: {timing.allocatedBytes} bytes.");
+    sb.AppendLine();
+    sb.AppendLine("## Rule-language surface (engine-side, LAB harness #263)");
+    sb.AppendLine();
+    sb.AppendLine("Features used by the pack: "
+        + string.Join(", ", surfaceReport.FeaturesUsed.Select(f => $"`{f}`")) + ".");
+    sb.AppendLine();
+    sb.AppendLine("| Rule | Type | Entries | Patterns | Metavars | Delegates | Compile ms | Features |");
+    sb.AppendLine("| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |");
+    foreach (var r in surfaceReport.Rules)
+    {
+        sb.AppendLine($"| `{r.RuleId}` | {r.Type} | {r.Entries} | {r.Patterns} | {r.Metavariables} | {r.CompiledDelegates} | {r.CompileMs:F3} | {string.Join(", ", r.Features.Select(f => $"`{f}`"))} |");
+    }
+
+    sb.AppendLine();
+    sb.AppendLine($"Pack totals: {surfaceReport.TotalPatterns} patterns, {surfaceReport.TotalCompiledDelegates} compiled delegates, {surfaceReport.TotalCompileMs:F3} ms compile time. Full detail in `surface-report.json`.");
     return sb.ToString();
 }
 
