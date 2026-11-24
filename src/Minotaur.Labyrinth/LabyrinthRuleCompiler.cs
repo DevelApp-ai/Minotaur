@@ -32,6 +32,40 @@ public sealed class CompiledLabyrinthPropagator
 }
 
 /// <summary>
+/// One alternative of a pattern entry: the parsed positive pattern plus its
+/// optional negation (<c>pattern-not</c>) and ancestor (<c>pattern-inside</c>)
+/// filters and its own Dynamic LINQ condition. The alternative matches when the
+/// positive pattern matches, NO not-pattern matches the same node, and EVERY
+/// inside-pattern matches some ancestor of the node.
+/// </summary>
+public sealed class CompiledLabyrinthAlternative
+{
+    /// <summary>The parsed positive pattern.</summary>
+    public LabyrinthPatternAst Pattern { get; }
+
+    /// <summary>This alternative's own condition; falls back to the entry condition when null.</summary>
+    public string? Condition { get; }
+
+    /// <summary>Negation filters (YAML <c>pattern-not:</c>); the alternative fails when any matches the node.</summary>
+    public IReadOnlyList<LabyrinthPatternAst> NotPatterns { get; }
+
+    /// <summary>Ancestor filters (YAML <c>pattern-inside:</c>); the alternative requires each to match some ancestor.</summary>
+    public IReadOnlyList<LabyrinthPatternAst> InsidePatterns { get; }
+
+    internal CompiledLabyrinthAlternative(
+        LabyrinthPatternAst pattern,
+        string? condition,
+        IReadOnlyList<LabyrinthPatternAst> notPatterns,
+        IReadOnlyList<LabyrinthPatternAst> insidePatterns)
+    {
+        Pattern = pattern;
+        Condition = condition;
+        NotPatterns = notPatterns;
+        InsidePatterns = insidePatterns;
+    }
+}
+
+/// <summary>
 /// A parsed taint pattern entry with its optional Dynamic LINQ condition
 /// (issue #104): the pattern mini-AST plus the <c>condition</c> string of the
 /// YAML entry, kept together so the expression compiler can merge both into
@@ -40,19 +74,19 @@ public sealed class CompiledLabyrinthPropagator
 public sealed class CompiledLabyrinthPatternEntry
 {
     /// <summary>
-    /// The parsed patterns of this entry: a single element for a plain
+    /// The parsed alternatives of this entry: a single element for a plain
     /// <c>pattern:</c> entry, or all alternatives of a <c>pattern-either:</c> entry.
     /// The entry matches when ANY alternative matches.
     /// </summary>
-    public IReadOnlyList<LabyrinthPatternAst> Alternatives { get; }
+    public IReadOnlyList<CompiledLabyrinthAlternative> Alternatives { get; }
 
-    /// <summary>The parsed pattern (first alternative; kept for compatibility).</summary>
-    public LabyrinthPatternAst Pattern => Alternatives[0];
+    /// <summary>The parsed pattern (first alternative's pattern; kept for compatibility).</summary>
+    public LabyrinthPatternAst Pattern => Alternatives[0].Pattern;
 
-    /// <summary>The entry's optional Dynamic LINQ condition; null when absent.</summary>
+    /// <summary>The entry's optional Dynamic LINQ condition; applies to every alternative; null when absent.</summary>
     public string? Condition { get; }
 
-    internal CompiledLabyrinthPatternEntry(IReadOnlyList<LabyrinthPatternAst> alternatives, string? condition)
+    internal CompiledLabyrinthPatternEntry(IReadOnlyList<CompiledLabyrinthAlternative> alternatives, string? condition)
     {
         Alternatives = alternatives;
         Condition = condition;
@@ -78,6 +112,12 @@ public sealed class CompiledLabyrinthRule
     /// The search rule's optional Dynamic LINQ condition (issue #104); null when absent.
     /// </summary>
     public string? SearchCondition { get; }
+
+    /// <summary>Search rule negation filters (YAML <c>pattern-not:</c>); the search pattern must not match them.</summary>
+    public IReadOnlyList<LabyrinthPatternAst> SearchNotPatterns { get; }
+
+    /// <summary>Search rule ancestor filters (YAML <c>pattern-inside:</c>); the search pattern must be inside a match of each.</summary>
+    public IReadOnlyList<LabyrinthPatternAst> SearchInsidePatterns { get; }
 
     /// <summary>The parsed taint source patterns with their optional conditions.</summary>
     public IReadOnlyList<CompiledLabyrinthPatternEntry> Sources { get; }
@@ -109,6 +149,8 @@ public sealed class CompiledLabyrinthRule
         LabyrinthRule rule,
         LabyrinthPatternAst? searchPattern,
         string? searchCondition,
+        IReadOnlyList<LabyrinthPatternAst>? searchNotPatterns,
+        IReadOnlyList<LabyrinthPatternAst>? searchInsidePatterns,
         IReadOnlyList<CompiledLabyrinthPatternEntry> sources,
         IReadOnlyList<CompiledLabyrinthPatternEntry> sinks,
         IReadOnlyList<CompiledLabyrinthPatternEntry> sanitizers,
@@ -119,6 +161,8 @@ public sealed class CompiledLabyrinthRule
         Rule = rule;
         SearchPattern = searchPattern;
         SearchCondition = searchCondition;
+        SearchNotPatterns = searchNotPatterns ?? Array.Empty<LabyrinthPatternAst>();
+        SearchInsidePatterns = searchInsidePatterns ?? Array.Empty<LabyrinthPatternAst>();
         Sources = sources;
         Sinks = sinks;
         Sanitizers = sanitizers;
@@ -178,18 +222,44 @@ public static class LabyrinthRuleCompiler
         }
 
         var searchPattern = parser.ParsePattern(rule.Pattern);
-        var metavariables = CollectMetavariables(searchPattern.Metavariables, out var occurrences);
+        var searchNots = ParseOptionalPatterns(rule.PatternNot, "pattern-not", parser);
+        var searchInsides = ParseOptionalPatterns(rule.PatternInside, "pattern-inside", parser);
+        var metavariables = CollectMetavariables(
+            searchPattern.Metavariables
+                .Concat(searchNots.SelectMany(p => p.Metavariables))
+                .Concat(searchInsides.SelectMany(p => p.Metavariables)),
+            out var occurrences);
 
         return new CompiledLabyrinthRule(
             rule,
             searchPattern,
             searchCondition: rule.Condition,
+            searchNotPatterns: searchNots,
+            searchInsidePatterns: searchInsides,
             sources: Array.Empty<CompiledLabyrinthPatternEntry>(),
             sinks: Array.Empty<CompiledLabyrinthPatternEntry>(),
             sanitizers: Array.Empty<CompiledLabyrinthPatternEntry>(),
             propagators: Array.Empty<CompiledLabyrinthPropagator>(),
             metavariables,
             occurrences);
+    }
+
+    private static IReadOnlyList<LabyrinthPatternAst> ParseOptionalPatterns(
+        string? pattern, string key, LabyrinthPatternParser parser)
+    {
+        if (string.IsNullOrWhiteSpace(pattern))
+        {
+            return Array.Empty<LabyrinthPatternAst>();
+        }
+
+        try
+        {
+            return new[] { parser.ParsePattern(pattern) };
+        }
+        catch (LabyrinthRuleException ex)
+        {
+            throw new LabyrinthRuleException($"Invalid search '{key}' pattern: {ex.Message}", ex);
+        }
     }
 
     private static CompiledLabyrinthRule CompileTaint(LabyrinthRule rule, LabyrinthPatternParser parser)
@@ -200,7 +270,10 @@ public static class LabyrinthRuleCompiler
         var propagators = CompilePropagators(rule.Propagators, parser);
 
         var metavariables = CollectMetavariables(
-            sources.Concat(sinks).Concat(sanitizers).SelectMany(e => e.Alternatives.SelectMany(a => a.Metavariables))
+            sources.Concat(sinks).Concat(sanitizers).SelectMany(e => e.Alternatives.SelectMany(a =>
+                a.Pattern.Metavariables
+                    .Concat(a.NotPatterns.SelectMany(n => n.Metavariables))
+                    .Concat(a.InsidePatterns.SelectMany(n => n.Metavariables))))
                 .Concat(propagators.SelectMany(p => p.Pattern.Metavariables)),
             out var occurrences);
 
@@ -208,6 +281,8 @@ public static class LabyrinthRuleCompiler
             rule,
             searchPattern: null,
             searchCondition: null,
+            searchNotPatterns: null,
+            searchInsidePatterns: null,
             sources,
             sinks,
             sanitizers,
@@ -234,10 +309,9 @@ public static class LabyrinthRuleCompiler
 
             try
             {
-                var patterns = entry.PatternEither is { Count: > 0 }
-                    ? entry.PatternEither.Select(alt => alt.Pattern).ToList()
-                    : new List<string> { entry.Pattern };
-                var alternatives = patterns.Select(pat => parser.ParsePattern(pat)).ToList();
+                var alternatives = entry.PatternEither is { Count: > 0 }
+                    ? entry.PatternEither.Select(alt => ParseAlternative(alt, parser)).ToList()
+                    : new List<CompiledLabyrinthAlternative> { ParseAlternative(entry, parser) };
                 asts.Add(new CompiledLabyrinthPatternEntry(alternatives, entry.Condition));
             }
             catch (LabyrinthRuleException ex)
@@ -247,6 +321,23 @@ public static class LabyrinthRuleCompiler
         }
 
         return asts;
+    }
+
+    private static CompiledLabyrinthAlternative ParseAlternative(LabyrinthPatternEntry? entry, LabyrinthPatternParser parser)
+    {
+        if (entry is null || string.IsNullOrWhiteSpace(entry.Pattern))
+        {
+            throw new LabyrinthRuleException("'pattern' is required.");
+        }
+
+        var pattern = parser.ParsePattern(entry.Pattern);
+        var nots = string.IsNullOrWhiteSpace(entry.PatternNot)
+            ? (IReadOnlyList<LabyrinthPatternAst>)Array.Empty<LabyrinthPatternAst>()
+            : new[] { parser.ParsePattern(entry.PatternNot) };
+        var insides = string.IsNullOrWhiteSpace(entry.PatternInside)
+            ? (IReadOnlyList<LabyrinthPatternAst>)Array.Empty<LabyrinthPatternAst>()
+            : new[] { parser.ParsePattern(entry.PatternInside) };
+        return new CompiledLabyrinthAlternative(pattern, entry.Condition, nots, insides);
     }
 
     private static IReadOnlyList<CompiledLabyrinthPropagator> CompilePropagators(

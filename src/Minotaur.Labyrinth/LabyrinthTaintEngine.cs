@@ -112,6 +112,8 @@ public sealed class LabyrinthTaintEngine
         var findings = new List<LabyrinthTaintFinding>();
         var reported = new HashSet<(ILabyrinthMatchNode Source, ILabyrinthMatchNode Sink)>();
         var context = new LabyrinthMatchContext(); // reused; cleared before each matcher call
+        // Child-to-parent map over the graph's materialized node tree, enabling pattern-inside.
+        context.ParentMap = LabyrinthMatchContext.BuildParentMap(_graph.Nodes);
 
         SeedSources(states, worklist, context);
 

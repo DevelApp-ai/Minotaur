@@ -180,6 +180,8 @@ public static class ScanHost
         var findings = new List<LabyrinthTaintFinding>();
         using var parser = new LabyrinthPatternParser(grammarContent, grammarName);
         var expressionCompiler = new LabyrinthExpressionCompiler();
+        // Child-to-parent map over the materialized node tree, enabling pattern-inside.
+        var parentMap = LabyrinthMatchContext.BuildParentMap(nodes);
         foreach (var rule in ruleSet.Rules)
         {
             var matchers = expressionCompiler.CompileRule(LabyrinthRuleCompiler.Compile(rule, parser));
@@ -189,7 +191,7 @@ public static class ScanHost
             }
             else
             {
-                var context = new LabyrinthMatchContext();
+                var context = new LabyrinthMatchContext { ParentMap = parentMap };
                 foreach (var node in nodes)
                 {
                     context.Clear();

@@ -247,6 +247,14 @@ public sealed class LabyrinthRuleLoader
                 continue;
             }
 
+            if (hasEither
+                && (!string.IsNullOrWhiteSpace(entry.PatternNot) || !string.IsNullOrWhiteSpace(entry.PatternInside)))
+            {
+                errors.Add(
+                    $"{entryLabel}: 'pattern-not'/'pattern-inside' must be placed inside the pattern-either alternatives, not beside 'pattern-either'.");
+                continue;
+            }
+
             if (hasEither)
             {
                 for (var j = 0; j < entry.PatternEither!.Count; j++)
