@@ -125,6 +125,14 @@ public sealed class LabyrinthRule
     /// <summary>Search-mode ancestor filter (YAML <c>pattern-inside:</c>): the search pattern only fires inside a node matching this pattern.</summary>
     public string? PatternInside { get; set; }
 
+    /// <summary>
+    /// Focus metavariable (YAML <c>focus-metavariable: $X</c>): the finding is reported
+    /// at the node bound to <c>$X</c> instead of the whole matched node. For search rules
+    /// it must occur in <see cref="Pattern"/>; for taint rules in a sink pattern (the
+    /// finding's sink is focused).
+    /// </summary>
+    public string? FocusMetavariable { get; set; }
+
     /// <summary>Search-mode Dynamic LINQ condition.</summary>
     public string? Condition { get; set; }
 

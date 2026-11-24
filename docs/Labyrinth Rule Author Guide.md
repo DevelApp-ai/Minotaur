@@ -138,6 +138,28 @@ inside `pattern-not`/`pattern-inside` are evaluated on a scratch context and do
 **not** unify with the rule's scope (v1); use `condition:` on the positive
 pattern for cross-node constraints.
 
+### Focusing a finding: `focus-metavariable`
+
+By default a finding is reported at the whole matched node. With
+`focus-metavariable: $X` the finding is reported at the node **bound to `$X`**
+instead — e.g. report a tainted dereference at the tainted receiver rather than
+at the whole call:
+
+```yaml
+- id: null-deref
+  type: taint
+  sources:
+    - pattern: "FirstOrDefault($ITEMS)"
+  sinks:
+    - pattern: "$X.DoWork()"
+  focus-metavariable: $X
+```
+
+For search rules the metavariable must occur in `pattern:`; for taint rules in a
+sink pattern (the sink is focused). A `focus-metavariable` that occurs nowhere
+there is a load-time error. When the metavariable is somehow unbound at report
+time, the finding falls back to the whole matched node.
+
 ## Loading rule packs
 
 A rule pack is a directory of `.yaml`/`.yml` rule files (scanned recursively):
