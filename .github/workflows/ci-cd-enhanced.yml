@@ -361,6 +361,29 @@ jobs:
         dotnet build src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj --configuration Release --no-restore
 
+    - name: Labyrinth rule-surface report (fast, LAB #263)
+      # The surface report is compile-time only (feature usage, delegate counts,
+      # compile ms), so a tiny scan (pairs 1 x reps 1) produces the identical
+      # surface-report.json in minutes; the full reference-scale run follows
+      # below. continue-on-error: measurement-only, never gates merges.
+      continue-on-error: true
+      env:
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.Labyrinth
+        --configuration Release --no-build --
+        ${{ github.workspace }}/measurement-artifacts/issue-246-surface
+        --pairs 1 --reps 1
+
+    - name: Upload issue-246 surface report (early)
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: article-measurements-issue-246-surface
+        path: ${{ github.workspace }}/measurement-artifacts/issue-246-surface
+        if-no-files-found: warn
+
+
     - name: Labyrinth rule-pack detection + timing (issue #246, GSE L3)
       # Full shipped csharp10 rule pack over the deterministic detection
       # corpus: detection vs exact ground truth, per-file parse/scan cost
