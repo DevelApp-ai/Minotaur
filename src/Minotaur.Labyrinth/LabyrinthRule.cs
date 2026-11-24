@@ -41,6 +41,23 @@ public sealed class LabyrinthPatternEntry
     public List<LabyrinthPatternEntry>? PatternEither { get; set; }
 
     /// <summary>
+    /// Negation filter (YAML <c>pattern-not:</c>): the entry only matches when this
+    /// pattern does NOT match the same node. Only valid beside <see cref="Pattern"/>
+    /// (when <see cref="PatternEither"/> is used, put pattern-not inside each alternative).
+    /// Metavariables in a pattern-not are not unified with the entry scope (v1).
+    /// </summary>
+    public string? PatternNot { get; set; }
+
+    /// <summary>
+    /// Ancestor filter (YAML <c>pattern-inside:</c>): the entry only matches when some
+    /// ancestor of the matched node (in the materialized match-node tree) matches this
+    /// pattern. Only valid beside <see cref="Pattern"/> (with <see cref="PatternEither"/>,
+    /// put pattern-inside inside each alternative). Metavariables in a pattern-inside
+    /// are not unified with the entry scope (v1).
+    /// </summary>
+    public string? PatternInside { get; set; }
+
+    /// <summary>
     /// Optional Dynamic LINQ condition (System.Linq.Dynamic.Core syntax) evaluated
     /// against the matched node. Example: <c>node.Arguments[0].Value &gt; 1024</c>
     /// </summary>
@@ -101,6 +118,12 @@ public sealed class LabyrinthRule
 
     /// <summary>Search-mode pattern (mutually exclusive with taint keys).</summary>
     public string? Pattern { get; set; }
+
+    /// <summary>Search-mode negation filter (YAML <c>pattern-not:</c>): the search pattern only fires when this pattern does not match the same node.</summary>
+    public string? PatternNot { get; set; }
+
+    /// <summary>Search-mode ancestor filter (YAML <c>pattern-inside:</c>): the search pattern only fires inside a node matching this pattern.</summary>
+    public string? PatternInside { get; set; }
 
     /// <summary>Search-mode Dynamic LINQ condition.</summary>
     public string? Condition { get; set; }
@@ -175,6 +198,16 @@ public sealed class LabyrinthRuleSet
             yield return rule.Pattern;
         }
 
+        if (!string.IsNullOrWhiteSpace(rule.PatternNot))
+        {
+            yield return rule.PatternNot;
+        }
+
+        if (!string.IsNullOrWhiteSpace(rule.PatternInside))
+        {
+            yield return rule.PatternInside;
+        }
+
         foreach (var list in new[] { rule.Sources, rule.Sinks, rule.Sanitizers })
         {
             if (list is null)
@@ -194,13 +227,38 @@ public sealed class LabyrinthRuleSet
                     yield return e.Pattern;
                 }
 
+                if (!string.IsNullOrWhiteSpace(e.PatternNot))
+                {
+                    yield return e.PatternNot;
+                }
+
+                if (!string.IsNullOrWhiteSpace(e.PatternInside))
+                {
+                    yield return e.PatternInside;
+                }
+
                 if (e.PatternEither is not null)
                 {
                     foreach (var alt in e.PatternEither)
                     {
-                        if (alt?.Pattern is not null)
+                        if (alt is null)
+                        {
+                            continue;
+                        }
+
+                        if (alt.Pattern is not null)
                         {
                             yield return alt.Pattern;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(alt.PatternNot))
+                        {
+                            yield return alt.PatternNot;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(alt.PatternInside))
+                        {
+                            yield return alt.PatternInside;
                         }
                     }
                 }

@@ -103,6 +103,41 @@ syntax) evaluated against the matched node. Example:
 
 Malformed conditions fail fast at rule load time with a rule error naming the rule.
 
+### Pattern combinators: `pattern-either`, `pattern-not`, `pattern-inside`
+
+Every pattern entry (search `pattern`, taint `sources`/`sinks`/`sanitizers`) can
+combine its positive pattern with alternatives and filters:
+
+- **`pattern-either:`** — a list of sub-entries used *instead of* `pattern:`.
+  The entry matches when **any** alternative matches. Sub-entries are full
+  entries (they may carry their own `pattern-not`/`pattern-inside`/`condition`),
+  but may not nest another `pattern-either`. `pattern` and `pattern-either`
+  on the same entry are rejected at load time.
+- **`pattern-not:`** — the entry only matches when this pattern does **not**
+  match the same node. Example: a source `ReadFile($PATH)` with
+  `pattern-not: "ReadFile(\"safe.txt\")"` skips the known-safe file.
+- **`pattern-inside:`** — the entry only matches when **some ancestor** of the
+  matched node in the materialized match-node tree matches this pattern
+  (e.g. only fire inside `Try(...)`). The scan host and the taint engine build
+  the parent map automatically; with no ancestor information an inside filter
+  fails closed (the entry does not match).
+
+```yaml
+- id: unsafe-read-outside-try
+  type: search
+  pattern: "ReadFile($PATH)"
+  pattern-not: "ReadFile(\"safe.txt\")"
+  pattern-inside: "Try(...)"
+```
+
+Rules of composition: `pattern-not`/`pattern-inside` sit beside `pattern:`; when
+`pattern-either:` is used, put them **inside each alternative** (an entry-level
+filter beside `pattern-either` is a load error). The entry-level `condition:`
+applies to every alternative unless an alternative has its own. Metavariables
+inside `pattern-not`/`pattern-inside` are evaluated on a scratch context and do
+**not** unify with the rule's scope (v1); use `condition:` on the positive
+pattern for cross-node constraints.
+
 ## Loading rule packs
 
 A rule pack is a directory of `.yaml`/`.yml` rule files (scanned recursively):
