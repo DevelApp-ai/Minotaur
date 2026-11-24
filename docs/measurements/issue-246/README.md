@@ -5,6 +5,10 @@ pack (L1/L2) into measured engineering artifacts: detection performance
 against an exact ground truth, per-file parse and scan cost over the shipped
 scan path, and per-rule cost attribution.
 
+The Track LAB artifacts (rule-language expressiveness matrix and the
+per-rule surface report emitted by every CI measurement run) live in
+[`labyrinth/`](labyrinth/README.md).
+
 Contents:
 
 - `ground-truth.json`: the exact (rule, file, line) triples the corpus
