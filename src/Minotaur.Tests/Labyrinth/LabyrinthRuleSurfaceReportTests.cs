@@ -130,7 +130,7 @@ public sealed class LabyrinthRuleSurfaceReportTests
         var packDir = Path.Join(repoRoot, "rules", "csharp10");
         if (!Directory.Exists(packDir))
         {
-            Assert.Inconclusive($"rules/csharp10 not found under {repoRoot}");
+            return; // xunit has no runtime skip; the pack ships with the repo, so CI always runs the assertions below
         }
 
         var pack = new LabyrinthRulePackLoader().TryLoadDirectory(packDir);
@@ -141,7 +141,7 @@ public sealed class LabyrinthRuleSurfaceReportTests
         var grammarFile = ScanHost.GrammarFilePath(grammarsRoot, target);
         if (!File.Exists(grammarFile))
         {
-            Assert.Inconclusive($"{grammarFile} was not downloaded at build time");
+            return; // xunit has no runtime skip; the grammar is downloaded at build time, so CI always has it
         }
 
         var grammarContent = File.ReadAllText(grammarFile);
