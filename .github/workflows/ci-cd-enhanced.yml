@@ -305,15 +305,18 @@ jobs:
     # project-load curves (Minotaur#134), extension-classification
     # accuracy on real polyglot repositories vs the Linguist extension map
     # (Minotaur#133) plus embedded-language detection at parse time on the
-    # polyglot-container subset (Minotaur#133 item 5), and the
+    # polyglot-container subset (Minotaur#133 item 5), the Labyrinth
+    # rule-pack detection corpus at article scale with precision/recall and
+    # analysis-time numbers (Minotaur#246 L3, sub-issue #252), and the
     # grammar-vs-hand case-study pilots for the
     # configuration DSL (Minotaur#128) and FIX 4.4 + nginx/syslog/logfmt
     # (Minotaur#132). Results are uploaded as artifacts
     # Results are uploaded as artifacts
     # and transcribed into docs/measurements/; this job never gates merges.
     # (The embedded-detection run parses ~1,200 container files through
-    # worker-process isolation with per-file kills, so the job needs a
-    # longer budget than the default builds.)
+    # worker-process isolation with per-file kills, and the L3
+    # symbolic-detection run scans a 40-program generated C# 10 corpus the
+    # same way, so the job needs a longer budget than the default builds.)
     name: Article-lane measurements (benchmarks)
     runs-on: ubuntu-latest
     needs: [calculate-version]
@@ -344,11 +347,13 @@ jobs:
         dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj
         dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj
         dotnet restore src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj
+        dotnet restore src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj
         dotnet build src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj --configuration Release --no-restore
+        dotnet build src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj --configuration Release --no-restore
 
     - name: Grammar compilation by size (issue #126, real grammars)
       env:
@@ -396,6 +401,15 @@ jobs:
         dotnet run --project src/Minotaur.Benchmarks.EmbeddedDetection
         --configuration Release --no-build --
         ${{ github.workspace }}/measurement-artifacts/issue-133-embedded
+
+    - name: Symbolic-detection corpus at article scale (Labyrinth L3, issues #246/#252)
+      env:
+        MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
+        MINOTAUR_COMMIT: ${{ github.sha }}
+      run: >
+        dotnet run --project src/Minotaur.Benchmarks.SymbolicDetection
+        --configuration Release --no-build --
+        ${{ github.workspace }}/measurement-artifacts/issue-246
 
     - name: Case-study pilot, configuration DSL (issue #128)
       env:
@@ -520,6 +534,34 @@ jobs:
           echo
           echo '```csv'
           cat measurement-artifacts/issue-133-embedded/embedded-files.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "### DevelApp-ai/Minotaur L3 (#246, sub-issue #252) — symbolic-detection corpus: per-rule precision/recall + analysis time (C# 10 rule pack)"
+          echo
+          cat measurement-artifacts/issue-246/RESULTS.md
+          echo
+          echo "<details><summary>detection.csv (#246 L3, per-rule TP/FP/FN + precision/recall)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-246/detection.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "<details><summary>timing.csv (#246 L3, per-file scan wall-clock, 3 repetitions)</summary>"
+          echo
+          echo '```csv'
+          cat measurement-artifacts/issue-246/timing.csv
+          echo '```'
+          echo
+          echo "</details>"
+          echo
+          echo "<details><summary>ground-truth.json (#246 L3, expected findings per generated program + corpus fingerprint)</summary>"
+          echo
+          echo '```json'
+          cat measurement-artifacts/issue-246/ground-truth.json
           echo '```'
           echo
           echo "</details>"
