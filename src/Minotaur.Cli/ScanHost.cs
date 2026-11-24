@@ -102,9 +102,29 @@ public static class ScanHost
         return match;
     }
 
-    /// <summary>The downloaded grammar file for a target grammar.</summary>
-    public static string GrammarFilePath(string grammarsRoot, LabyrinthTargetGrammar target) =>
-        Path.Combine(grammarsRoot, "targets", target.Directory.Replace('/', Path.DirectorySeparatorChar), target.MainFile);
+    /// <summary>The grammar file for a target grammar, in either grammar-root layout.
+    /// <para>
+    /// Both Labyrinth grammar-root layouts are resolved:
+    /// the build-output download layout ("<c>Grammars/targets/&lt;dir&gt;/&lt;file&gt;</c>",
+    /// populated by the <c>DownloadLabyrinthGrammars</c> target) and the
+    /// Minotaur-Grammars checkout layout ("<c>&lt;dir&gt;/&lt;file&gt;</c>", used by the
+    /// article-lane harnesses, which point <c>MINOTAUR_GRAMMARS_DIR</c> at a
+    /// working copy). When the grammar exists in neither, the canonical
+    /// download-layout path is returned so callers report a consistent
+    /// "not found" location.
+    /// </para></summary>
+    public static string GrammarFilePath(string grammarsRoot, LabyrinthTargetGrammar target)
+    {
+        var relative = target.Directory.Replace('/', Path.DirectorySeparatorChar);
+        var downloaded = Path.Combine(grammarsRoot, "targets", relative, target.MainFile);
+        if (File.Exists(downloaded))
+        {
+            return downloaded;
+        }
+
+        var checkedOut = Path.Combine(grammarsRoot, relative, target.MainFile);
+        return File.Exists(checkedOut) ? checkedOut : downloaded;
+    }
 
     /// <summary>
     /// Parses one source file with the target grammar and builds the data-flow
