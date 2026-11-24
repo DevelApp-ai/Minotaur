@@ -409,6 +409,10 @@ jobs:
         ${{ github.workspace }}/measurement-artifacts/issue-133-embedded
 
     - name: Symbolic-detection corpus at article scale (Labyrinth L3, issues #246/#252)
+      # Non-gating measurement step: a failure (exit 2) must not skip the
+      # later Labyrinth rule-pack step, which emits surface-report.json for
+      # the LAB harness (#263) into the same artifacts directory.
+      continue-on-error: true
       env:
         MINOTAUR_GRAMMARS_DIR: ${{ github.workspace }}/grammars
         MINOTAUR_COMMIT: ${{ github.sha }}
@@ -448,7 +452,10 @@ jobs:
       # compiles the grammar once per file, so one parse+scan pair costs
       # seconds; pairs 10 x reps 3 keeps the lane comfortably inside its
       # budget. Exit code 2 (detection below 100% or any false positive)
-      # fails this step, which never gates merges but surfaces regressions.
+      # never gates merges but surfaces regressions; continue-on-error keeps
+      # the PR-comment and artifact-upload steps running so the emitted
+      # surface-report.json (LAB harness, #263) is always collected.
+      continue-on-error: true
       env:
         MINOTAUR_COMMIT: ${{ github.sha }}
       run: >
