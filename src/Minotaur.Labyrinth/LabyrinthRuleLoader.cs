@@ -160,6 +160,17 @@ public sealed class LabyrinthRuleLoader
                     }
                 }
             }
+
+            if (rule.Metadata is not null)
+            {
+                foreach (var key in rule.Metadata.Keys)
+                {
+                    if (string.IsNullOrWhiteSpace(key))
+                    {
+                        errors.Add($"{label} ({rule.Id}): 'metadata' keys must be non-empty.");
+                    }
+                }
+            }
         }
 
         return new LabyrinthValidationResult { Errors = errors };

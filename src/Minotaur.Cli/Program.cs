@@ -124,7 +124,10 @@ public static class Program
 
         if (options.TryGetValue("sarif", out var sarifPath))
         {
-            File.WriteAllText(sarifPath, LabyrinthSarifWriter.Write(reportable));
+            var rulesById = pack.RuleSet.Rules
+                .GroupBy(r => r.Id, StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
+            File.WriteAllText(sarifPath, LabyrinthSarifWriter.Write(reportable, rulesById: rulesById));
         }
 
         return new LabyrinthConsoleReporter(Console.Out).Report(reportable, suppressed);

@@ -162,6 +162,13 @@ public sealed class LabyrinthRule
     /// </summary>
     public string? Fix { get; set; }
 
+    /// <summary>
+    /// Arbitrary rule metadata (YAML <c>metadata:</c> map, Semgrep-style): free-form
+    /// key/value pairs (e.g. <c>cwe</c>, <c>owasp</c>, <c>confidence</c>). Surfaced in
+    /// SARIF rule properties when the writer is given the rule table.
+    /// </summary>
+    public Dictionary<string, object?>? Metadata { get; set; }
+
     /// <summary>Parsed severity value.</summary>
     public LabyrinthSeverity SeverityValue => ParseSeverity(Severity);
 
