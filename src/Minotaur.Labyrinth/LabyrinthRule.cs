@@ -148,6 +148,12 @@ public sealed class LabyrinthRule
     /// <summary>Taint propagators (optional).</summary>
     public List<LabyrinthPropagatorEntry>? Propagators { get; set; }
 
+    /// <summary>
+    /// Optional file-path filter (YAML <c>paths:</c> with include/exclude globs):
+    /// the rule only applies to scanned files whose path matches. Null = all files.
+    /// </summary>
+    public LabyrinthPathFilter? Paths { get; set; }
+
     /// <summary>Parsed severity value.</summary>
     public LabyrinthSeverity SeverityValue => ParseSeverity(Severity);
 
@@ -179,6 +185,14 @@ public sealed class LabyrinthRuleSet
 
     /// <summary>The rules loaded from a single YAML file.</summary>
     public List<LabyrinthRule> Rules { get; set; } = new();
+
+    /// <summary>
+    /// The rules that apply to a scanned file path: rules without a <c>paths:</c>
+    /// filter always apply; rules with one apply when the filter matches.
+    /// Null path (unknown): only unfiltered rules apply.
+    /// </summary>
+    public IEnumerable<LabyrinthRule> RulesForPath(string? filePath) =>
+        Rules.Where(r => r.Paths is null || r.Paths.Matches(filePath));
 
     /// <summary>
     /// All metavariable names defined across the rule's pattern entries,

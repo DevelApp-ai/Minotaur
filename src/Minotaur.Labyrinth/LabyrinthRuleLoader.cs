@@ -142,9 +142,28 @@ public sealed class LabyrinthRuleLoader
             {
                 ValidateTaintRule(rule, label, errors);
             }
+
+            if (rule.Paths is not null)
+            {
+                ValidatePathFilter(rule.Paths, label, rule.Id, errors);
+            }
         }
 
         return new LabyrinthValidationResult { Errors = errors };
+    }
+
+    private static void ValidatePathFilter(LabyrinthPathFilter paths, string label, string ruleId, List<string> errors)
+    {
+        foreach (var (list, key) in new[] { (paths.Include, "include"), (paths.Exclude, "exclude") })
+        {
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(list[i]))
+                {
+                    errors.Add($"{label} ({ruleId}): 'paths.{key}[{i}]' must be a non-empty glob.");
+                }
+            }
+        }
     }
 
     private static void ValidateSearchRule(LabyrinthRule rule, string label, List<string> errors)

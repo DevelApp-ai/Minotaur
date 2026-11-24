@@ -160,6 +160,30 @@ sink pattern (the sink is focused). A `focus-metavariable` that occurs nowhere
 there is a load-time error. When the metavariable is somehow unbound at report
 time, the finding falls back to the whole matched node.
 
+### Path filters: `paths:` include/exclude globs
+
+A rule can restrict which scanned files it applies to:
+
+```yaml
+- id: only-tests
+  type: search
+  pattern: "Do($X)"
+  paths:
+    include:
+      - "tests/**"
+      - "**/*.test.cs"
+    exclude:
+      - "tests/fixtures/**"
+```
+
+Semantics (v1, gitignore-flavored): `*` within a path segment, `?` one
+character, `**` across segments (`**/x` also matches a root-level `x`); all
+patterns root-anchored, matched against the forward-slash normalized path.
+A file matches when it hits at least one include glob (or include is empty)
+and no exclude glob — **exclude wins**. Rules without `paths:` apply to every
+file. The CLI (`minotaur labyrinth scan`), the corpus verifier and the
+benchmarks pass the scanned file's path, so filters take effect there.
+
 ## Loading rule packs
 
 A rule pack is a directory of `.yaml`/`.yml` rule files (scanned recursively):
