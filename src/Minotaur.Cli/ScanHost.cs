@@ -192,32 +192,44 @@ public static class ScanHost
         return graph;
     }
 
-    /// <summary>Compiles every rule of the pack against the target grammar and runs them over the graph.</summary>
+    /// <summary>
+    /// Compiles every rule of the pack against the target grammar and runs them over
+    /// the graph. When <paramref name="filePath"/> is given, rules with a
+    /// <c>paths:</c> include/exclude filter only apply when the filter matches it.
+    /// </summary>
     public static List<LabyrinthTaintFinding> RunRules(
         LabyrinthRuleSet ruleSet, string grammarContent, string grammarName,
-        LabyrinthDataFlowGraph graph, IReadOnlyList<ILabyrinthMatchNode> nodes)
+        LabyrinthDataFlowGraph graph, IReadOnlyList<ILabyrinthMatchNode> nodes,
+        string? filePath = null)
     {
         var findings = new List<LabyrinthTaintFinding>();
         using var parser = new LabyrinthPatternParser(grammarContent, grammarName);
         var expressionCompiler = new LabyrinthExpressionCompiler();
-        foreach (var rule in ruleSet.Rules)
+        // Child-to-parent map over the materialized node tree, enabling pattern-inside.
+        var parentMap = LabyrinthMatchContext.BuildParentMap(nodes);
+        foreach (var rule in ruleSet.RulesForPath(filePath))
         {
-            var matchers = expressionCompiler.CompileRule(LabyrinthRuleCompiler.Compile(rule, parser));
+            var compiled = LabyrinthRuleCompiler.Compile(rule, parser);
+            var matchers = expressionCompiler.CompileRule(compiled);
             if (rule.TypeValue == LabyrinthRuleType.Taint)
             {
                 findings.AddRange(new LabyrinthTaintEngine(matchers, graph).Analyze());
             }
             else
             {
-                var context = new LabyrinthMatchContext();
+                var context = new LabyrinthMatchContext { ParentMap = parentMap };
                 foreach (var node in nodes)
                 {
                     context.Clear();
                     if (matchers.SearchPattern is not null && matchers.SearchPattern(node, context))
                     {
+                        // focus-metavariable: report at the bound node when declared.
+                        var reportNode = matchers.ResolveReportNode(node, context);
+                        // fix: interpolate the rule's fix suggestion against the bindings.
+                        var fix = string.IsNullOrEmpty(rule.Fix) ? null : LabyrinthFixInterpolator.Interpolate(rule.Fix, context);
                         findings.Add(new LabyrinthTaintFinding(
-                            rule.Id, rule.SeverityValue, rule.EffectiveMessage, node, node,
-                            new ILabyrinthMatchNode[] { node }));
+                            rule.Id, rule.SeverityValue, rule.EffectiveMessage, reportNode, reportNode,
+                            new ILabyrinthMatchNode[] { reportNode }, fix));
                     }
                 }
             }

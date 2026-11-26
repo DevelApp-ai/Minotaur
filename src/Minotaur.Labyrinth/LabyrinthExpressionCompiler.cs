@@ -57,21 +57,40 @@ public sealed class LabyrinthCompiledMatchers
     /// <summary>The compiled taint propagators.</summary>
     public IReadOnlyList<LabyrinthCompiledPropagator> Propagators { get; }
 
+    /// <summary>
+    /// The rule's focus metavariable (YAML <c>focus-metavariable:</c>), normalized
+    /// (no leading <c>$</c>); null when absent. See <see cref="ResolveReportNode"/>.
+    /// </summary>
+    public string? FocusMetavariable { get; }
+
     internal LabyrinthCompiledMatchers(
         LabyrinthRule rule,
         Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>? searchPattern,
         IReadOnlyList<Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>> sources,
         IReadOnlyList<Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>> sinks,
         IReadOnlyList<Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool>> sanitizers,
-        IReadOnlyList<LabyrinthCompiledPropagator> propagators)
+        IReadOnlyList<LabyrinthCompiledPropagator> propagators,
+        string? focusMetavariable = null)
     {
         Rule = rule;
         SearchPattern = searchPattern;
+        FocusMetavariable = focusMetavariable;
         Sources = sources;
         Sinks = sinks;
         Sanitizers = sanitizers;
         Propagators = propagators;
     }
+
+    /// <summary>
+    /// Resolves the node a finding is reported at: when the rule declares
+    /// <c>focus-metavariable</c> and the match bound it, the bound node wins;
+    /// otherwise the whole matched node is reported (fallback, also when the
+    /// metavariable is somehow unbound).
+    /// </summary>
+    public ILabyrinthMatchNode ResolveReportNode(ILabyrinthMatchNode matched, LabyrinthMatchContext context)
+        => FocusMetavariable is { } focus && context.TryGet(focus, out var focused)
+            ? focused
+            : matched;
 }
 
 /// <summary>
@@ -181,19 +200,24 @@ public sealed class LabyrinthExpressionCompiler
 
         var search = rule.SearchPattern is null
             ? null
-            : Compile(rule.Rule.Id, rule.SearchPattern, rule.SearchCondition);
+            : CompileAlternative(rule.Rule.Id, rule.SearchPattern, rule.SearchCondition,
+                rule.SearchNotPatterns, rule.SearchInsidePatterns);
 
-        return new LabyrinthCompiledMatchers(rule.Rule, search, sources, sinks, sanitizers, propagators);
+        return new LabyrinthCompiledMatchers(rule.Rule, search, sources, sinks, sanitizers, propagators,
+            focusMetavariable: rule.FocusMetavariable);
     }
 
     /// <summary>
     /// Compile one pattern entry into a matcher. A <c>pattern-either</c> entry compiles
     /// to the OR of its alternatives (any alternative matching makes the entry match);
-    /// the entry condition applies to every alternative.
+    /// the entry condition applies to every alternative unless the alternative has
+    /// its own condition.
     /// </summary>
     private Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool> CompileEntry(string ruleId, CompiledLabyrinthPatternEntry entry)
     {
-        var compiled = entry.Alternatives.Select(a => Compile(ruleId, a, entry.Condition)).ToArray();
+        var compiled = entry.Alternatives
+            .Select(a => CompileAlternative(ruleId, a.Pattern, a.Condition ?? entry.Condition, a.NotPatterns, a.InsidePatterns))
+            .ToArray();
         if (compiled.Length == 1)
         {
             return compiled[0];
@@ -210,6 +234,67 @@ public sealed class LabyrinthExpressionCompiler
             }
 
             return false;
+        };
+    }
+
+    /// <summary>
+    /// Compile one alternative (positive pattern + optional condition + optional
+    /// pattern-not / pattern-inside filters) into a single matcher. The filters wrap
+    /// the positive delegate: <c>pattern-not</c> fails the alternative when it matches
+    /// the same node; <c>pattern-inside</c> requires some ancestor of the node to match.
+    /// Filter patterns run on a scratch context so their metavariables never leak into
+    /// the entry's unification scope (v1 simplification).
+    /// </summary>
+    private Func<ILabyrinthMatchNode, LabyrinthMatchContext, bool> CompileAlternative(
+        string ruleId,
+        LabyrinthPatternAst pattern,
+        string? condition,
+        IReadOnlyList<LabyrinthPatternAst> notPatterns,
+        IReadOnlyList<LabyrinthPatternAst> insidePatterns)
+    {
+        var positive = Compile(ruleId, pattern, condition);
+        if (notPatterns.Count == 0 && insidePatterns.Count == 0)
+        {
+            return positive;
+        }
+
+        var nots = notPatterns.Select(p => Compile(ruleId, p, null)).ToArray();
+        var insides = insidePatterns.Select(p => Compile(ruleId, p, null)).ToArray();
+
+        return (node, ctx) =>
+        {
+            if (!positive(node, ctx))
+            {
+                return false;
+            }
+
+            foreach (var not in nots)
+            {
+                if (not(node, new LabyrinthMatchContext()))
+                {
+                    return false;
+                }
+            }
+
+            foreach (var inside in insides)
+            {
+                var found = false;
+                foreach (var ancestor in ctx.AncestorsOf(node))
+                {
+                    if (inside(ancestor, new LabyrinthMatchContext()))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         };
     }
 

@@ -31,6 +31,12 @@ public sealed class LabyrinthTaintFinding
     public IReadOnlyList<ILabyrinthMatchNode> Path { get; }
 
     /// <summary>
+    /// The rule's fix suggestion with metavariables interpolated against this
+    /// finding's bindings (YAML <c>fix:</c>); null when the rule declares none.
+    /// </summary>
+    public string? Fix { get; }
+
+    /// <summary>
     /// Creates a finding. Public so hosts and the reporting layer (issue #105)
     /// can construct findings — e.g. from a persisted scan — without going
     /// through the taint engine.
@@ -41,7 +47,8 @@ public sealed class LabyrinthTaintFinding
         string message,
         ILabyrinthMatchNode source,
         ILabyrinthMatchNode sink,
-        IReadOnlyList<ILabyrinthMatchNode> path)
+        IReadOnlyList<ILabyrinthMatchNode> path,
+        string? fix = null)
     {
         RuleId = ruleId;
         Severity = severity;
@@ -49,5 +56,6 @@ public sealed class LabyrinthTaintFinding
         Source = source;
         Sink = sink;
         Path = path;
+        Fix = fix;
     }
 }

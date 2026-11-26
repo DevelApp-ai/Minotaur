@@ -100,6 +100,60 @@ public sealed class LabyrinthMatchContext
     public IReadOnlyDictionary<string, ILabyrinthMatchNode> Bindings => _bindings;
 
     /// <summary>
+    /// Optional child-to-parent map over the materialized match-node tree, set once
+    /// per scan by the host (see <see cref="BuildParentMap"/>). Enables
+    /// <c>pattern-inside</c> evaluation via <see cref="AncestorsOf"/>. Not cleared
+    /// by <see cref="Clear"/>: it is per-scan state, not per-match state.
+    /// </summary>
+    public IReadOnlyDictionary<ILabyrinthMatchNode, ILabyrinthMatchNode?>? ParentMap { get; set; }
+
+    /// <summary>
+    /// The ancestors of <paramref name="node"/> (nearest first) according to
+    /// <see cref="ParentMap"/>. Empty when no parent map is set.
+    /// </summary>
+    public IEnumerable<ILabyrinthMatchNode> AncestorsOf(ILabyrinthMatchNode node)
+    {
+        if (ParentMap is null)
+        {
+            yield break;
+        }
+
+        var seen = new HashSet<ILabyrinthMatchNode>(ReferenceEqualityComparer.Instance);
+        var current = node;
+        while (ParentMap.TryGetValue(current, out var parent) && parent is not null && seen.Add(parent))
+        {
+            yield return parent;
+            current = parent;
+        }
+    }
+
+    /// <summary>
+    /// Builds a child-to-parent map over the match-node tree reachable from
+    /// <paramref name="nodes"/> by walking <see cref="ILabyrinthMatchNode.Receiver"/>
+    /// and <see cref="ILabyrinthMatchNode.Arguments"/>. Pass every materialized node
+    /// (not just roots): each node then contributes its own children as entries.
+    /// </summary>
+    public static IReadOnlyDictionary<ILabyrinthMatchNode, ILabyrinthMatchNode?> BuildParentMap(
+        IEnumerable<ILabyrinthMatchNode> nodes)
+    {
+        var map = new Dictionary<ILabyrinthMatchNode, ILabyrinthMatchNode?>(ReferenceEqualityComparer.Instance);
+        foreach (var node in nodes)
+        {
+            if (node.Receiver is { } receiver)
+            {
+                map[receiver] = node;
+            }
+
+            foreach (var argument in node.Arguments)
+            {
+                map[argument] = node;
+            }
+        }
+
+        return map;
+    }
+
+    /// <summary>
     /// Binds <paramref name="metavariable"/> to <paramref name="node"/>, or — when
     /// the metavariable is already bound — succeeds only if it is bound to the
     /// very same node (unification: one metavariable, one capture per rule).

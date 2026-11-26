@@ -134,6 +134,6 @@ public static class CorpusVerifier
     {
         var source = File.ReadAllText(path);
         var graph = ScanHost.BuildGraph(source, path, grammarContent, grammarName, out var nodes);
-        return ScanHost.RunRules(rules, grammarContent, grammarName, graph, nodes);
+        return ScanHost.RunRules(rules, grammarContent, grammarName, graph, nodes, path);
     }
 }

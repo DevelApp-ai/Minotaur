@@ -112,6 +112,8 @@ public sealed class LabyrinthTaintEngine
         var findings = new List<LabyrinthTaintFinding>();
         var reported = new HashSet<(ILabyrinthMatchNode Source, ILabyrinthMatchNode Sink)>();
         var context = new LabyrinthMatchContext(); // reused; cleared before each matcher call
+        // Child-to-parent map over the graph's materialized node tree, enabling pattern-inside.
+        context.ParentMap = LabyrinthMatchContext.BuildParentMap(_graph.Nodes);
 
         SeedSources(states, worklist, context);
 
@@ -149,13 +151,20 @@ public sealed class LabyrinthTaintEngine
                     if (MatchesAny(_matchers.Sinks, successor, incomingBindings, context)
                         && reported.Add((origin, successor)))
                     {
+                        // focus-metavariable: report the sink at the bound node when declared.
+                        var sinkNode = _matchers.ResolveReportNode(successor, context);
+                        // fix: interpolate the rule's fix suggestion against the bindings.
+                        var fix = string.IsNullOrEmpty(_matchers.Rule.Fix)
+                            ? null
+                            : LabyrinthFixInterpolator.Interpolate(_matchers.Rule.Fix, context);
                         findings.Add(new LabyrinthTaintFinding(
                             _matchers.Rule.Id,
                             _matchers.Rule.SeverityValue,
                             _matchers.Rule.EffectiveMessage,
                             origin,
-                            successor,
-                            states[successor].Paths[origin].Materialize()));
+                            sinkNode,
+                            states[successor].Paths[origin].Materialize(),
+                            fix));
                     }
 
                     // 4. Propagator application: also transfer/duplicate the

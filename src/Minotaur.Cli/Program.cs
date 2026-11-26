@@ -107,7 +107,7 @@ public static class Program
         {
             var source = File.ReadAllText(file);
             var graph = ScanHost.BuildGraph(source, file, grammarContent, target.Directory, out var nodes);
-            findings.AddRange(ScanHost.RunRules(pack.RuleSet, grammarContent, target.Directory, graph, nodes));
+            findings.AddRange(ScanHost.RunRules(pack.RuleSet, grammarContent, target.Directory, graph, nodes, file));
         }
 
         if (options.TryGetValue("write-baseline", out var writeBaseline))
@@ -124,7 +124,10 @@ public static class Program
 
         if (options.TryGetValue("sarif", out var sarifPath))
         {
-            File.WriteAllText(sarifPath, LabyrinthSarifWriter.Write(reportable));
+            var rulesById = pack.RuleSet.Rules
+                .GroupBy(r => r.Id, StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
+            File.WriteAllText(sarifPath, LabyrinthSarifWriter.Write(reportable, rulesById: rulesById));
         }
 
         return new LabyrinthConsoleReporter(Console.Out).Report(reportable, suppressed);

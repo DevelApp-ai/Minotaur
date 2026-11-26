@@ -174,10 +174,10 @@ public sealed class LabyrinthPatternEitherTests
 
         var entry = Assert.Single(compiled.Sources);
         Assert.Equal(2, entry.Alternatives.Count);
-        Assert.Equal("ReceiveData($DATA)", entry.Alternatives[0].Pattern);
-        Assert.Equal("ReadFile($DATA)", entry.Alternatives[1].Pattern);
-        // Compatibility shim: Pattern is the first alternative.
-        Assert.Same(entry.Alternatives[0], entry.Pattern);
+        Assert.Equal("ReceiveData($DATA)", entry.Alternatives[0].Pattern.Pattern);
+        Assert.Equal("ReadFile($DATA)", entry.Alternatives[1].Pattern.Pattern);
+        // Compatibility shim: Pattern is the first alternative's pattern.
+        Assert.Same(entry.Alternatives[0].Pattern, entry.Pattern);
     }
 
     [Fact]

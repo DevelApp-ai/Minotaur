@@ -44,6 +44,11 @@ rules:
 | `sources` / `sinks` | taint | pattern entry list | Where untrusted data enters / arrives |
 | `sanitizers` | no | pattern entry list | Matches that prune taint state |
 | `propagators` | no | pattern + `from`/`to` | Transfers taint between metavariables |
+| `pattern-not` / `pattern-inside` | no | pattern | Negation / ancestor filters on an entry (or search rule) |
+| `focus-metavariable` | no | `$NAME` | Report the finding at the node bound to `$NAME` |
+| `paths` | no | `include:`/`exclude:` globs | Restrict the rule to matching file paths |
+| `fix` | no | target-grammar snippet with `$NAME` | Fix suggestion carried on each finding |
+| `metadata` | no | free-form map | Rule metadata (e.g. `cwe`, `owasp`); emitted into SARIF rule properties |
 
 ### Patterns
 
@@ -102,6 +107,109 @@ syntax) evaluated against the matched node. Example:
 ```
 
 Malformed conditions fail fast at rule load time with a rule error naming the rule.
+
+### Pattern combinators: `pattern-either`, `pattern-not`, `pattern-inside`
+
+Every pattern entry (search `pattern`, taint `sources`/`sinks`/`sanitizers`) can
+combine its positive pattern with alternatives and filters:
+
+- **`pattern-either:`** — a list of sub-entries used *instead of* `pattern:`.
+  The entry matches when **any** alternative matches. Sub-entries are full
+  entries (they may carry their own `pattern-not`/`pattern-inside`/`condition`),
+  but may not nest another `pattern-either`. `pattern` and `pattern-either`
+  on the same entry are rejected at load time.
+- **`pattern-not:`** — the entry only matches when this pattern does **not**
+  match the same node. Example: a source `ReadFile($PATH)` with
+  `pattern-not: "ReadFile(\"safe.txt\")"` skips the known-safe file.
+- **`pattern-inside:`** — the entry only matches when **some ancestor** of the
+  matched node in the materialized match-node tree matches this pattern
+  (e.g. only fire inside `Try(...)`). The scan host and the taint engine build
+  the parent map automatically; with no ancestor information an inside filter
+  fails closed (the entry does not match).
+
+```yaml
+- id: unsafe-read-outside-try
+  type: search
+  pattern: "ReadFile($PATH)"
+  pattern-not: "ReadFile(\"safe.txt\")"
+  pattern-inside: "Try(...)"
+```
+
+Rules of composition: `pattern-not`/`pattern-inside` sit beside `pattern:`; when
+`pattern-either:` is used, put them **inside each alternative** (an entry-level
+filter beside `pattern-either` is a load error). The entry-level `condition:`
+applies to every alternative unless an alternative has its own. Metavariables
+inside `pattern-not`/`pattern-inside` are evaluated on a scratch context and do
+**not** unify with the rule's scope (v1); use `condition:` on the positive
+pattern for cross-node constraints.
+
+### Focusing a finding: `focus-metavariable`
+
+By default a finding is reported at the whole matched node. With
+`focus-metavariable: $X` the finding is reported at the node **bound to `$X`**
+instead — e.g. report a tainted dereference at the tainted receiver rather than
+at the whole call:
+
+```yaml
+- id: null-deref
+  type: taint
+  sources:
+    - pattern: "FirstOrDefault($ITEMS)"
+  sinks:
+    - pattern: "$X.DoWork()"
+  focus-metavariable: $X
+```
+
+For search rules the metavariable must occur in `pattern:`; for taint rules in a
+sink pattern (the sink is focused). A `focus-metavariable` that occurs nowhere
+there is a load-time error. When the metavariable is somehow unbound at report
+time, the finding falls back to the whole matched node.
+
+### Path filters: `paths:` include/exclude globs
+
+A rule can restrict which scanned files it applies to:
+
+```yaml
+- id: only-tests
+  type: search
+  pattern: "Do($X)"
+  paths:
+    include:
+      - "tests/**"
+      - "**/*.test.cs"
+    exclude:
+      - "tests/fixtures/**"
+```
+
+Semantics (v1, gitignore-flavored): `*` within a path segment, `?` one
+character, `**` across segments (`**/x` also matches a root-level `x`); all
+patterns root-anchored, matched against the forward-slash normalized path.
+A file matches when it hits at least one include glob (or include is empty)
+and no exclude glob — **exclude wins**. Rules without `paths:` apply to every
+file. The CLI (`minotaur labyrinth scan`), the corpus verifier and the
+benchmarks pass the scanned file's path, so filters take effect there.
+
+### Fix suggestions: `fix:`
+
+A rule may carry a fix suggestion — a replacement snippet in the target
+grammar's syntax with metavariable interpolation:
+
+```yaml
+- id: null-deref
+  type: taint
+  sources:
+    - pattern: "FirstOrDefault($ITEMS)"
+  sinks:
+    - pattern: "$X.DoWork()"
+  fix: "$X?.DoWork()"
+```
+
+Every `$NAME` in the fix must occur in the rule's patterns (load-time error
+otherwise). At report time each `$NAME` is replaced by the bound node's text
+(its identifier/callee name); an unbound reference is left as-is. The
+interpolated fix is carried on the finding (`finding.Fix`) and printed by the
+console reporter as a `Fix:` line. v1: console output only (SARIF `fixes` are
+not emitted yet).
 
 ## Loading rule packs
 
