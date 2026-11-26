@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -33,8 +34,8 @@
     <!-- <PackageReference Include="DevelApp.CognitiveGraph.Editor" Version="2.0.0" /> -->
     <PackageReference Include="DevelApp.RuntimePluggableClassFactory.Interface" Version="2.0.1" />
     <PackageReference Include="DevelApp.RuntimePluggableClassFactory" Version="2.0.1" />
-    <PackageReference Include="DevelApp.StepLexer" Version="1.91.0" />
-    <PackageReference Include="DevelApp.StepParser" Version="1.91.0" />
+    <PackageReference Include="DevelApp.StepLexer" Version="1.100.1" />
+    <PackageReference Include="DevelApp.StepParser" Version="1.100.1" />
     <PackageReference Include="System.Memory" Version="4.6.3" />
     <PackageReference Include="System.Text.Json" Version="9.0.9" />
   </ItemGroup>
