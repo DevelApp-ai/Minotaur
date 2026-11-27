@@ -105,6 +105,40 @@ public sealed class LabyrinthPatternV2Tests
         Assert.Equal("y", boundB.Name);
     }
 
+    [Fact]
+    public void IndexAccess_ReceiverChain_MatchesJoinedReceiverName()
+    {
+        // Minotaur#278 item 2: Request.Query[$DATA] materializes with the
+        // interned receiver Identifier "Request.Query".
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", Parse("Request.Query[$DATA]"));
+        var hit = new LabyrinthMatchNode(
+            "IndexAccess", null, new ILabyrinthMatchNode[] { Ident("id") }, receiver: Ident("Request.Query"));
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(hit, context));
+        Assert.True(context.TryGet("DATA", out var bound));
+        Assert.Equal("id", bound.Name);
+
+        var miss = new LabyrinthMatchNode(
+            "IndexAccess", null, new ILabyrinthMatchNode[] { Ident("id") }, receiver: Ident("Request.Form"));
+        Assert.False(matcher(miss, new LabyrinthMatchContext()));
+    }
+
+    [Fact]
+    public void IndexAccess_BareReceiver_StillWorks()
+    {
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", Parse("$ARR[$I]"));
+        var node = new LabyrinthMatchNode(
+            "IndexAccess", null, new ILabyrinthMatchNode[] { Ident("i") }, receiver: Ident("data"));
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(node, context));
+        Assert.True(context.TryGet("ARR", out var arr));
+        Assert.Equal("data", arr.Name);
+        Assert.True(context.TryGet("I", out var idx));
+        Assert.Equal("i", idx.Name);
+    }
+
     // ---------------------------------------------------------------------
     // Receiver-member call patterns: $X.Method(...)
     // ---------------------------------------------------------------------
