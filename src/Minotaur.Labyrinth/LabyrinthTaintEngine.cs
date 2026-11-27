@@ -164,7 +164,10 @@ public sealed class LabyrinthTaintEngine
                             origin,
                             sinkNode,
                             states[successor].Paths[origin].Materialize(),
-                            fix));
+                            fix,
+                            _matchers.Rule.Source,
+                            _matchers.Rule.SourceUrl,
+                            _matchers.Rule.License));
                     }
 
                     // 4. Propagator application: also transfer/duplicate the

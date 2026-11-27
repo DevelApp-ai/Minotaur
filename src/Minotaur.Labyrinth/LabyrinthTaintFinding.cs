@@ -37,6 +37,22 @@ public sealed class LabyrinthTaintFinding
     public string? Fix { get; }
 
     /// <summary>
+    /// Attribution: where the rule that produced this finding comes from
+    /// (rule YAML <c>source:</c>, e.g. <c>gitleaks</c> or
+    /// <c>cve:CVE-2024-12345</c>); null when the rule declares none.
+    /// Presented with the finding in the console and SARIF output so
+    /// harvested rules keep their provenance where the pattern is found
+    /// (Minotaur issue #283).
+    /// </summary>
+    public string? ProvenanceSource { get; }
+
+    /// <summary>Attribution URL (rule YAML <c>source-url:</c>); null when absent.</summary>
+    public string? ProvenanceSourceUrl { get; }
+
+    /// <summary>SPDX license of the rule content (rule YAML <c>license:</c>); null when absent.</summary>
+    public string? ProvenanceLicense { get; }
+
+    /// <summary>
     /// Creates a finding. Public so hosts and the reporting layer (issue #105)
     /// can construct findings — e.g. from a persisted scan — without going
     /// through the taint engine.
@@ -48,7 +64,10 @@ public sealed class LabyrinthTaintFinding
         ILabyrinthMatchNode source,
         ILabyrinthMatchNode sink,
         IReadOnlyList<ILabyrinthMatchNode> path,
-        string? fix = null)
+        string? fix = null,
+        string? provenanceSource = null,
+        string? provenanceSourceUrl = null,
+        string? provenanceLicense = null)
     {
         RuleId = ruleId;
         Severity = severity;
@@ -57,5 +76,8 @@ public sealed class LabyrinthTaintFinding
         Sink = sink;
         Path = path;
         Fix = fix;
+        ProvenanceSource = provenanceSource;
+        ProvenanceSourceUrl = provenanceSourceUrl;
+        ProvenanceLicense = provenanceLicense;
     }
 }
