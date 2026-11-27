@@ -54,6 +54,57 @@ public sealed class LabyrinthPatternV2Tests
     private static ILabyrinthMatchNode Assignment(ILabyrinthMatchNode target, ILabyrinthMatchNode value) =>
         new LabyrinthMatchNode("Assignment", null, new[] { target, value });
 
+    [Fact]
+    public void CallPattern_MultipleMetavarArgs_SplitOnComma()
+    {
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", Parse("strcpy($DST, $SRC)"));
+        var node = new LabyrinthMatchNode(
+            "FunctionCall", "strcpy", new ILabyrinthMatchNode[] { Ident("buf"), Ident("in") });
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(node, context));
+        Assert.True(context.TryGet("DST", out var boundDst));
+        Assert.Equal("buf", boundDst.Name);
+        Assert.True(context.TryGet("SRC", out var boundSrc));
+        Assert.Equal("in", boundSrc.Name);
+    }
+
+    [Fact]
+    public void CallPattern_CommaTokenTypeIsGrammarSpecific()
+    {
+        // Regression for Minotaur#278 item 3: real target grammars (Cpp20,
+        // Java17, CSharp10) do not all name the comma token "COMMA", so
+        // argument splitting must be value-based, not token-type-based.
+        // This mini grammar names the comma token PUNCT to simulate them
+        // (the class grammar names it COMMA, which is why unit tests alone
+        // never caught this).
+        const string punctGrammar = """
+            Grammar: TestLangPunct
+            FormatType: EBNF
+
+            <WS> ::= /[ \t\r\n]+/ => { skip(); }
+            <IDENTIFIER> ::= /[a-zA-Z_][a-zA-Z0-9_]*/
+            <LPAREN> ::= "("
+            <RPAREN> ::= ")"
+            <PUNCT> ::= ","
+
+            <expr> ::= <term> ;
+            <term> ::= IDENTIFIER | LPAREN | RPAREN | PUNCT ;
+            """;
+        using var punctParser = new LabyrinthPatternParser(punctGrammar, "TestLangPunct");
+
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", punctParser.ParsePattern("f($A, $B)"));
+        var node = new LabyrinthMatchNode(
+            "FunctionCall", "f", new ILabyrinthMatchNode[] { Ident("x"), Ident("y") });
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(node, context));
+        Assert.True(context.TryGet("A", out var boundA));
+        Assert.Equal("x", boundA.Name);
+        Assert.True(context.TryGet("B", out var boundB));
+        Assert.Equal("y", boundB.Name);
+    }
+
     // ---------------------------------------------------------------------
     // Receiver-member call patterns: $X.Method(...)
     // ---------------------------------------------------------------------
