@@ -172,25 +172,63 @@ public static class ScanHost
         return graph;
     }
 
+    // In-process compile caches (Minotaur issue #283): scanning many files
+    // with one rule pack must not recompile the pack per file. The pattern
+    // parser (grammar load) is cached per grammar name; compiled rules are
+    // cached per (rule instance, grammar); matchers per compiled rule. The
+    // grammar content is assumed stable per grammar name within the process —
+    // true for a CLI run, which resolves one grammar per scan.
+    private static readonly object CompileGate = new();
+    private static readonly Dictionary<string, LabyrinthPatternParser> PatternParsers = new(StringComparer.Ordinal);
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<LabyrinthRule, Dictionary<string, CompiledLabyrinthRule>> CompiledRules = new();
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<CompiledLabyrinthRule, LabyrinthCompiledMatchers> Matchers = new();
+
     /// <summary>
     /// Compiles every rule of the pack against the target grammar and runs them over
     /// the graph. When <paramref name="filePath"/> is given, rules with a
     /// <c>paths:</c> include/exclude filter only apply when the filter matches it.
+    /// Compilation is cached in-process (issue #283): the grammar parses once
+    /// per grammar name and each rule compiles once per run, not once per file.
     /// </summary>
     public static List<LabyrinthTaintFinding> RunRules(
         LabyrinthRuleSet ruleSet, string grammarContent, string grammarName,
         LabyrinthDataFlowGraph graph, IReadOnlyList<ILabyrinthMatchNode> nodes,
         string? filePath = null)
     {
+        var parser = PatternParserFor(grammarContent, grammarName);
+        var compiled = new List<CompiledLabyrinthRule>();
+        foreach (var rule in ruleSet.RulesForPath(filePath))
+        {
+            compiled.Add(CompiledRuleFor(rule, parser, grammarName));
+        }
+
+        return RunCompiledRules(compiled, graph, nodes, filePath);
+    }
+
+    /// <summary>
+    /// Runs already-compiled rules (from a binary rule pack or a prior
+    /// <see cref="RunRules"/> compile) over the graph — no grammar and no
+    /// pattern parsing involved (issue #283, P2). Delegates compile on first
+    /// use and are cached per compiled rule for the process lifetime.
+    /// </summary>
+    public static List<LabyrinthTaintFinding> RunCompiledRules(
+        IReadOnlyList<CompiledLabyrinthRule> compiledRules,
+        LabyrinthDataFlowGraph graph, IReadOnlyList<ILabyrinthMatchNode> nodes,
+        string? filePath = null)
+    {
         var findings = new List<LabyrinthTaintFinding>();
-        using var parser = new LabyrinthPatternParser(grammarContent, grammarName);
         var expressionCompiler = new LabyrinthExpressionCompiler();
         // Child-to-parent map over the materialized node tree, enabling pattern-inside.
         var parentMap = LabyrinthMatchContext.BuildParentMap(nodes);
-        foreach (var rule in ruleSet.RulesForPath(filePath))
+        foreach (var compiled in compiledRules)
         {
-            var compiled = LabyrinthRuleCompiler.Compile(rule, parser);
-            var matchers = expressionCompiler.CompileRule(compiled);
+            var rule = compiled.Rule;
+            if (rule.Paths is not null && !rule.Paths.Matches(filePath))
+            {
+                continue;
+            }
+
+            var matchers = Matchers.GetValue(compiled, _ => expressionCompiler.CompileRule(compiled));
             if (rule.TypeValue == LabyrinthRuleType.Taint)
             {
                 findings.AddRange(new LabyrinthTaintEngine(matchers, graph).Analyze());
@@ -209,13 +247,43 @@ public static class ScanHost
                         var fix = string.IsNullOrEmpty(rule.Fix) ? null : LabyrinthFixInterpolator.Interpolate(rule.Fix, context);
                         findings.Add(new LabyrinthTaintFinding(
                             rule.Id, rule.SeverityValue, rule.EffectiveMessage, reportNode, reportNode,
-                            new ILabyrinthMatchNode[] { reportNode }, fix));
+                            new ILabyrinthMatchNode[] { reportNode }, fix,
+                            rule.Source, rule.SourceUrl, rule.License));
                     }
                 }
             }
         }
 
         return findings;
+    }
+
+    private static LabyrinthPatternParser PatternParserFor(string grammarContent, string grammarName)
+    {
+        lock (CompileGate)
+        {
+            if (!PatternParsers.TryGetValue(grammarName, out var parser))
+            {
+                parser = new LabyrinthPatternParser(grammarContent, grammarName);
+                PatternParsers.Add(grammarName, parser);
+            }
+
+            return parser;
+        }
+    }
+
+    private static CompiledLabyrinthRule CompiledRuleFor(LabyrinthRule rule, LabyrinthPatternParser parser, string grammarName)
+    {
+        var perGrammar = CompiledRules.GetOrCreateValue(rule);
+        lock (perGrammar)
+        {
+            if (!perGrammar.TryGetValue(grammarName, out var compiled))
+            {
+                compiled = LabyrinthRuleCompiler.Compile(rule, parser);
+                perGrammar[grammarName] = compiled;
+            }
+
+            return compiled;
+        }
     }
 
     private static bool IsSkippable(StepToken token)
