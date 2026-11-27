@@ -16,6 +16,8 @@ rules:
     severity: ERROR
     message: "Value from a maybe-null API (FirstOrDefault/SingleOrDefault/Find) is dereferenced without a null guard."
     type: taint
+    source: minotaur-in-house
+    license: MIT
     sources:
       - pattern: "$TARGET = $DATA.FirstOrDefault(...)"
       - pattern: "$TARGET = $DATA.SingleOrDefault(...)"
@@ -34,6 +36,8 @@ rules:
     severity: ERROR
     message: "Result of an 'as' cast is dereferenced without a null guard; 'as' yields null when the cast fails."
     type: taint
+    source: minotaur-in-house
+    license: MIT
     sources:
       - pattern: "$TARGET = $VALUE as $TYPE"
     sanitizers:
