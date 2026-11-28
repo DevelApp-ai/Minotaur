@@ -630,9 +630,10 @@ public sealed class LabyrinthExpressionCompiler
     private sealed record ReceiverCallShape(
         LabyrinthPatternNode Receiver, string MethodName, IReadOnlyList<LabyrinthPatternNode> ArgNodes, bool NullConditional);
 
-    /// <summary>A parsed index-access pattern shape: <c>$ARR[$I]</c>.</summary>
+    /// <summary>A parsed index-access pattern shape: <c>$ARR[$I]</c> or a receiver
+    /// chain <c>a.b[$I]</c> (Minotaur#278 item 2).</summary>
     private sealed record IndexAccessShape(
-        LabyrinthPatternNode Receiver, IReadOnlyList<LabyrinthPatternNode> ArgNodes);
+        IReadOnlyList<LabyrinthPatternNode> Receiver, IReadOnlyList<LabyrinthPatternNode> ArgNodes);
 
     /// <summary>A parsed binary-operator chain shape: <c>$A / $B / $C</c>.</summary>
     private sealed record OperatorChainShape(
@@ -710,23 +711,85 @@ public sealed class LabyrinthExpressionCompiler
         return true;
     }
 
-    /// <summary>Recognizes <c>[$ARR|ident] [ args ]</c>.</summary>
+    /// <summary>Recognizes <c>[$ARR|ident|a.b.c] [ args ]</c>: a bare operand or an
+    /// identifier receiver chain followed by the bracketed index arguments
+    /// (Minotaur#278 item 2: <c>Request.Query[$DATA]</c>).</summary>
     private static bool TrySplitIndexAccess(IReadOnlyList<LabyrinthPatternNode> nodes, out IndexAccessShape shape)
     {
         shape = null!;
-        if (nodes.Count < 3 || !IsOperand(nodes[0]) || !IsValue(nodes[1], "[") || !IsValue(nodes[^1], "]"))
+        if (nodes.Count < 3 || !IsValue(nodes[^1], "]"))
         {
             return false;
         }
 
-        if (nodes.Count == 3)
+        var bracket = -1;
+        for (var i = 1; i < nodes.Count - 1; i++)
         {
-            shape = new IndexAccessShape(nodes[0], Array.Empty<LabyrinthPatternNode>());
-            return true;
+            if (IsValue(nodes[i], "["))
+            {
+                bracket = i;
+                break;
+            }
         }
 
-        var argNodes = nodes.Skip(2).Take(nodes.Count - 3).ToList();
-        shape = new IndexAccessShape(nodes[0], argNodes);
+        if (bracket < 1)
+        {
+            return false;
+        }
+
+        var receiverNodes = nodes.Take(bracket).ToList();
+        if (!IsReceiverChain(receiverNodes))
+        {
+            return false;
+        }
+
+        var argNodes = nodes.Skip(bracket + 1).Take(nodes.Count - bracket - 2).ToList();
+        shape = new IndexAccessShape(receiverNodes, argNodes);
+        return true;
+    }
+
+    /// <summary>True for a bare operand or an identifier chain <c>a.b</c> / <c>a?.b</c>
+    /// (<c>?.</c> may lex as one token or as <c>? .</c>).</summary>
+    private static bool IsReceiverChain(IReadOnlyList<LabyrinthPatternNode> nodes)
+    {
+        if (nodes.Count == 1)
+        {
+            return IsOperand(nodes[0]);
+        }
+
+        if (!IsIdentifierLiteral(nodes[0]))
+        {
+            return false;
+        }
+
+        var i = 1;
+        while (i < nodes.Count)
+        {
+            if (IsValue(nodes[i], "."))
+            {
+                i++;
+            }
+            else if (IsValue(nodes[i], "?."))
+            {
+                i++;
+            }
+            else if (IsValue(nodes[i], "?") && i + 1 < nodes.Count && IsValue(nodes[i + 1], "."))
+            {
+                i += 2;
+            }
+            else
+            {
+                return false;
+            }
+
+            if (i >= nodes.Count || !IsIdentifierLiteral(nodes[i]))
+            {
+                return false;
+            }
+
+            i++;
+        }
+
         return true;
     }
 
@@ -829,9 +892,11 @@ public sealed class LabyrinthExpressionCompiler
         body = AndAlso(body, Expression.NotEqual(
             receiver,
             Expression.Constant(null, typeof(ILabyrinthMatchNode))));
-        body = AndAlso(body, shape.Receiver.Kind == LabyrinthPatternNodeKind.Metavariable
-            ? Expression.Call(ctx, TryBindMethod, Expression.Constant(shape.Receiver.MetavariableName), receiver)
-            : EqualName(receiver, shape.Receiver.Value));
+        // A single metavariable receiver binds; an identifier chain (a.b.c)
+        // compares by its dot-joined name, matching ScanHost's interning.
+        body = AndAlso(body, shape.Receiver.Count == 1 && shape.Receiver[0].Kind == LabyrinthPatternNodeKind.Metavariable
+            ? Expression.Call(ctx, TryBindMethod, Expression.Constant(shape.Receiver[0].MetavariableName), receiver)
+            : EqualName(receiver, string.Join(".", shape.Receiver.Where(IsIdentifierLiteral).Select(n => n.Value))));
 
         return AndAlso(body, BuildArgumentsBody(shape.ArgNodes, indexNode, ctx));
     }
@@ -914,17 +979,22 @@ public sealed class LabyrinthExpressionCompiler
 
         foreach (var n in argNodes)
         {
-            switch (n.TokenType)
+            // Value-based (v2, Minotaur#278 item 3): target grammars do not all
+            // name these tokens LPAREN/RPAREN/COMMA (Cpp20/Java17/CSharp10 lex
+            // "," with grammar-specific token types), so match on the token
+            // value like the rest of the v2 compiler.
+            if (IsOpenParen(n))
             {
-                case "LPAREN":
-                    depth++;
-                    break;
-                case "RPAREN":
-                    depth--;
-                    break;
-                case "COMMA" when depth == 0:
-                    AddCurrent(args, current);
-                    continue;
+                depth++;
+            }
+            else if (IsCloseParen(n))
+            {
+                depth--;
+            }
+            else if (depth == 0 && IsValue(n, ","))
+            {
+                AddCurrent(args, current);
+                continue;
             }
 
             current.Add(n);

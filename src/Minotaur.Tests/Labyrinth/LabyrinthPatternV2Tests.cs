@@ -54,6 +54,123 @@ public sealed class LabyrinthPatternV2Tests
     private static ILabyrinthMatchNode Assignment(ILabyrinthMatchNode target, ILabyrinthMatchNode value) =>
         new LabyrinthMatchNode("Assignment", null, new[] { target, value });
 
+    [Fact]
+    public void CallPattern_MultipleMetavarArgs_SplitOnComma()
+    {
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", Parse("strcpy($DST, $SRC)"));
+        var node = new LabyrinthMatchNode(
+            "FunctionCall", "strcpy", new ILabyrinthMatchNode[] { Ident("buf"), Ident("in") });
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(node, context));
+        Assert.True(context.TryGet("DST", out var boundDst));
+        Assert.Equal("buf", boundDst.Name);
+        Assert.True(context.TryGet("SRC", out var boundSrc));
+        Assert.Equal("in", boundSrc.Name);
+    }
+
+    [Fact]
+    public void CallPattern_CommaTokenTypeIsGrammarSpecific()
+    {
+        // Regression for Minotaur#278 item 3: real target grammars (Cpp20,
+        // Java17, CSharp10) do not all name the comma token "COMMA", so
+        // argument splitting must be value-based, not token-type-based.
+        // This mini grammar names the comma token PUNCT to simulate them
+        // (the class grammar names it COMMA, which is why unit tests alone
+        // never caught this).
+        const string punctGrammar = """
+            Grammar: TestLangPunct
+            FormatType: EBNF
+
+            <WS> ::= /[ \t\r\n]+/ => { skip(); }
+            <IDENTIFIER> ::= /[a-zA-Z_][a-zA-Z0-9_]*/
+            <LPAREN> ::= "("
+            <RPAREN> ::= ")"
+            <PUNCT> ::= ","
+
+            <expr> ::= <term> ;
+            <term> ::= IDENTIFIER | LPAREN | RPAREN | PUNCT ;
+            """;
+        using var punctParser = new LabyrinthPatternParser(punctGrammar, "TestLangPunct");
+
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", punctParser.ParsePattern("f($A, $B)"));
+        var node = new LabyrinthMatchNode(
+            "FunctionCall", "f", new ILabyrinthMatchNode[] { Ident("x"), Ident("y") });
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(node, context));
+        Assert.True(context.TryGet("A", out var boundA));
+        Assert.Equal("x", boundA.Name);
+        Assert.True(context.TryGet("B", out var boundB));
+        Assert.Equal("y", boundB.Name);
+    }
+
+    [Fact]
+    public void IndexAccess_ReceiverChain_MatchesJoinedReceiverName()
+    {
+        // Minotaur#278 item 2: Request.Query[$DATA] materializes with the
+        // interned receiver Identifier "Request.Query".
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", Parse("Request.Query[$DATA]"));
+        var hit = new LabyrinthMatchNode(
+            "IndexAccess", null, new ILabyrinthMatchNode[] { Ident("id") }, receiver: Ident("Request.Query"));
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(hit, context));
+        Assert.True(context.TryGet("DATA", out var bound));
+        Assert.Equal("id", bound.Name);
+
+        var miss = new LabyrinthMatchNode(
+            "IndexAccess", null, new ILabyrinthMatchNode[] { Ident("id") }, receiver: Ident("Request.Form"));
+        Assert.False(matcher(miss, new LabyrinthMatchContext()));
+    }
+
+    [Fact]
+    public void IndexAccess_BareReceiver_StillWorks()
+    {
+        var matcher = new LabyrinthExpressionCompiler().Compile("r", Parse("$ARR[$I]"));
+        var node = new LabyrinthMatchNode(
+            "IndexAccess", null, new ILabyrinthMatchNode[] { Ident("i") }, receiver: Ident("data"));
+
+        var context = new LabyrinthMatchContext();
+        Assert.True(matcher(node, context));
+        Assert.True(context.TryGet("ARR", out var arr));
+        Assert.Equal("data", arr.Name);
+        Assert.True(context.TryGet("I", out var idx));
+        Assert.Equal("i", idx.Name);
+    }
+
+    [Fact]
+    public void PatternTokens_WinTiesOverDollarIdentifiers()
+    {
+        // Minotaur#281: in grammars whose identifiers may contain '$'
+        // (JavaScript/TypeScript/Java allow `$DATA` as an identifier), the
+        // METAVARIABLE pattern token and the IDENTIFIER reading of `$DATA`
+        // tie exactly (same start+length). The pattern token must win, or
+        // metavariables silently stop binding under those grammars (js/ts/java
+        // corpus cases regressed this way after the canonical tiling
+        // tie-break). This mini grammar allows '$' in identifiers to
+        // reproduce the tie.
+        const string dollarIdentGrammar = """
+            Grammar: TestLangDollar
+            FormatType: EBNF
+
+            <WS> ::= /[ \t\r\n]+/ => { skip(); }
+            <IDENTIFIER> ::= /[$a-zA-Z_][$a-zA-Z0-9_]*/
+            <EQUALS> ::= "="
+
+            <expr> ::= <term> ;
+            <term> ::= IDENTIFIER | EQUALS ;
+            """;
+        using var dollarParser = new LabyrinthPatternParser(dollarIdentGrammar, "TestLangDollar");
+
+        var ast = dollarParser.ParsePattern("$A = $B");
+        Assert.Equal(2, ast.Metavariables.Count);
+        Assert.Contains("A", ast.Metavariables);
+        Assert.Contains("B", ast.Metavariables);
+        Assert.All(ast.Nodes.Where(n => n.Value.StartsWith('$')), n =>
+            Assert.Equal(LabyrinthPatternNodeKind.Metavariable, n.Kind));
+    }
+
     // ---------------------------------------------------------------------
     // Receiver-member call patterns: $X.Method(...)
     // ---------------------------------------------------------------------

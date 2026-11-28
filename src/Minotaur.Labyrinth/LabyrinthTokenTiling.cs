@@ -1,4 +1,5 @@
 using DevelApp.StepLexer;
+using DevelApp.StepParser;
 
 namespace Minotaur.Labyrinth;
 
@@ -20,16 +21,20 @@ namespace Minotaur.Labyrinth;
 /// <para>
 /// This class selects a deterministic longest-match tiling from the union:
 /// tokens are ordered by start position (longest first at equal starts,
-/// identifier-like token type first on exact start+length ties) and a token
-/// is kept when its span does not overlap an already-kept token. The
+/// then by a canonical token-class priority on exact start+length ties) and a
+/// token is kept when its span does not overlap an already-kept token. The
 /// identifier tie-break is canonical instead of relying on the exploratory
 /// union order, which changed across StepLexer versions (1.91 -> 1.95+,
 /// deterministic lexer path budget) and flipped keyword-vs-identifier ties
 /// like the C# 10 contextual keyword <c>value</c>, breaking identifier
-/// materialization (csharp-unsafe-as-cast-deref corpus regression). The
-/// result is one token per covered span, in document order, so the pattern
-/// side and the source-materialization side always see the same token shape
-/// for a given grammar.
+/// materialization (csharp-unsafe-as-cast-deref corpus regression).
+/// Pattern tokens (metavariable/ellipsis) outrank identifiers, because in
+/// grammars whose identifiers may contain <c>$</c> (JavaScript, TypeScript,
+/// Java) <c>$DATA</c> ties exactly with the IDENTIFIER reading and the
+/// pattern token must win or metavariables silently stop binding
+/// (Minotaur#281). The result is one token per covered span, in document
+/// order, so the pattern side and the source-materialization side always see
+/// the same token shape for a given grammar.
 /// </para>
 /// </summary>
 public static class LabyrinthTokenTiling
@@ -48,7 +53,7 @@ public static class LabyrinthTokenTiling
         var ordered = tokens
             .OrderBy(t => t.StartPosition)
             .ThenByDescending(t => t.Length)
-            .ThenBy(t => IsIdentifierLike(t.Type) ? 0 : 1)
+            .ThenBy(t => TokenPriority(t.Type))
             .ToList();
         var kept = new List<StepToken>(ordered.Count);
         long coveredEnd = long.MinValue;
@@ -75,5 +80,19 @@ public static class LabyrinthTokenTiling
     {
         var t = type.ToUpperInvariant();
         return t.Contains("IDENT") || t == "NAME";
+    }
+
+    /// <summary>Canonical tie-break priority on exact start+length ties:
+    /// pattern tokens (metavariable/ellipsis) first, then identifier-like,
+    /// then everything else (keywords, operators, punctuation).</summary>
+    private static int TokenPriority(string type)
+    {
+        var t = type.ToUpperInvariant();
+        if (t == PatternTokens.MetavariableTokenName || t == PatternTokens.EllipsisTokenName)
+        {
+            return 0;
+        }
+
+        return IsIdentifierLike(t) ? 1 : 2;
     }
 }
