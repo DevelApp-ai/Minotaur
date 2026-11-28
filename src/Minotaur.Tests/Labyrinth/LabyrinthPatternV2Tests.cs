@@ -139,6 +139,38 @@ public sealed class LabyrinthPatternV2Tests
         Assert.Equal("i", idx.Name);
     }
 
+    [Fact]
+    public void PatternTokens_WinTiesOverDollarIdentifiers()
+    {
+        // Minotaur#281: in grammars whose identifiers may contain '$'
+        // (JavaScript/TypeScript/Java allow `$DATA` as an identifier), the
+        // METAVARIABLE pattern token and the IDENTIFIER reading of `$DATA`
+        // tie exactly (same start+length). The pattern token must win, or
+        // metavariables silently stop binding under those grammars (js/ts/java
+        // corpus cases regressed this way after the canonical tiling
+        // tie-break). This mini grammar allows '$' in identifiers to
+        // reproduce the tie.
+        const string dollarIdentGrammar = """
+            Grammar: TestLangDollar
+            FormatType: EBNF
+
+            <WS> ::= /[ \t\r\n]+/ => { skip(); }
+            <IDENTIFIER> ::= /[$a-zA-Z_][$a-zA-Z0-9_]*/
+            <EQUALS> ::= "="
+
+            <expr> ::= <term> ;
+            <term> ::= IDENTIFIER | EQUALS ;
+            """;
+        using var dollarParser = new LabyrinthPatternParser(dollarIdentGrammar, "TestLangDollar");
+
+        var ast = dollarParser.ParsePattern("$A = $B");
+        Assert.Equal(2, ast.Metavariables.Count);
+        Assert.Contains("A", ast.Metavariables);
+        Assert.Contains("B", ast.Metavariables);
+        Assert.All(ast.Nodes.Where(n => n.Value.StartsWith('$')), n =>
+            Assert.Equal(LabyrinthPatternNodeKind.Metavariable, n.Kind));
+    }
+
     // ---------------------------------------------------------------------
     // Receiver-member call patterns: $X.Method(...)
     // ---------------------------------------------------------------------
