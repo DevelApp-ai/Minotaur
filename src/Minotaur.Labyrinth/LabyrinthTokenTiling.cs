@@ -19,11 +19,17 @@ namespace Minotaur.Labyrinth;
 /// </para>
 /// <para>
 /// This class selects a deterministic longest-match tiling from the union:
-/// tokens are ordered by start position (longest first at equal starts, union
-/// order as the final tie-break) and a token is kept when its span does not
-/// overlap an already-kept token. The result is one token per covered span,
-/// in document order, so the pattern side and the source-materialization side
-/// always see the same token shape for a given grammar.
+/// tokens are ordered by start position (longest first at equal starts,
+/// identifier-like token type first on exact start+length ties) and a token
+/// is kept when its span does not overlap an already-kept token. The
+/// identifier tie-break is canonical instead of relying on the exploratory
+/// union order, which changed across StepLexer versions (1.91 -> 1.95+,
+/// deterministic lexer path budget) and flipped keyword-vs-identifier ties
+/// like the C# 10 contextual keyword <c>value</c>, breaking identifier
+/// materialization (csharp-unsafe-as-cast-deref corpus regression). The
+/// result is one token per covered span, in document order, so the pattern
+/// side and the source-materialization side always see the same token shape
+/// for a given grammar.
 /// </para>
 /// </summary>
 public static class LabyrinthTokenTiling
@@ -42,6 +48,7 @@ public static class LabyrinthTokenTiling
         var ordered = tokens
             .OrderBy(t => t.StartPosition)
             .ThenByDescending(t => t.Length)
+            .ThenBy(t => IsIdentifierLike(t.Type) ? 0 : 1)
             .ToList();
         var kept = new List<StepToken>(ordered.Count);
         long coveredEnd = long.MinValue;
@@ -60,5 +67,13 @@ public static class LabyrinthTokenTiling
         }
 
         return kept;
+    }
+
+    /// <summary>True for the identifier-ish token types (identifier/NAME) that
+    /// materialization interns as bindable identifier nodes.</summary>
+    private static bool IsIdentifierLike(string type)
+    {
+        var t = type.ToUpperInvariant();
+        return t.Contains("IDENT") || t == "NAME";
     }
 }
