@@ -10,6 +10,10 @@ namespace Minotaur.Cli;
 /// </summary>
 public static class CorpusVerifier
 {
+    /// <summary>Hard per-case timeout: a case that exceeds it is failed (not hung),
+    /// so one pathological input cannot stall the whole corpus run for hours.</summary>
+    private static readonly TimeSpan CaseTimeout = TimeSpan.FromSeconds(120);
+
     public static int Verify(string rulesRoot, string testsRoot)
     {
         var grammarsRoot = ScanHost.FindGrammarsRoot();
@@ -23,9 +27,24 @@ public static class CorpusVerifier
                 cases++;
                 var ruleId = Path.GetFileName(caseDir);
                 var label = $"{grammarDirName}/{ruleId}";
+                Console.WriteLine($"RUN {label}");
                 try
                 {
-                    if (!VerifyCase(grammarsRoot, rulesRoot, grammarDirName, caseDir, ruleId))
+                    // LongRunning: the abandoned task (on timeout) keeps its own
+                    // thread instead of starving the thread pool for later cases.
+                    var task = Task.Factory.StartNew(
+                        () => VerifyCase(grammarsRoot, rulesRoot, grammarDirName, caseDir, ruleId),
+                        TaskCreationOptions.LongRunning);
+                    if (!task.Wait(CaseTimeout))
+                    {
+                        failures++;
+                        Console.WriteLine(
+                            $"FAIL {label}: timeout after {(int)CaseTimeout.TotalSeconds}s " +
+                            "(engine hang suspected — see DevelApp-ai/Minotaur#246)");
+                        continue;
+                    }
+
+                    if (!task.Result)
                     {
                         failures++;
                         Console.WriteLine($"FAIL {label}");
@@ -34,6 +53,11 @@ public static class CorpusVerifier
                     {
                         Console.WriteLine($"PASS {label}");
                     }
+                }
+                catch (AggregateException agg) when (agg.InnerException is not null)
+                {
+                    failures++;
+                    Console.WriteLine($"FAIL {label}: {agg.InnerException.Message}");
                 }
                 catch (Exception ex)
                 {
@@ -132,8 +156,13 @@ public static class CorpusVerifier
 
     private static List<LabyrinthTaintFinding> ScanFile(LabyrinthRuleSet rules, string grammarContent, string grammarName, string path)
     {
+        var name = Path.GetFileName(path);
         var source = File.ReadAllText(path);
+        Console.Error.WriteLine($"  [{name}] load grammar + parse + materialize...");
         var graph = ScanHost.BuildGraph(source, path, grammarContent, grammarName, out var nodes);
-        return ScanHost.RunRules(rules, grammarContent, grammarName, graph, nodes, path);
+        Console.Error.WriteLine($"  [{name}] graph built ({nodes.Count} node(s)); compile rules + run...");
+        var findings = ScanHost.RunRules(rules, grammarContent, grammarName, graph, nodes, path);
+        Console.Error.WriteLine($"  [{name}] done: {findings.Count} finding(s)");
+        return findings;
     }
 }
