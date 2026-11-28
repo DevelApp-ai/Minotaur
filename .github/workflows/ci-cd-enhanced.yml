@@ -327,7 +327,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    timeout-minutes: 150
+    env:
+      NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    timeout-minutes: 300
     steps:
     - name: Checkout Minotaur
       uses: actions/checkout@v5
@@ -346,13 +348,13 @@ jobs:
 
     - name: Build benchmark harnesses
       run: |
-        dotnet restore src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj
-        dotnet restore src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj
-        dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj
-        dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj
-        dotnet restore src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj
-        dotnet restore src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj
-        dotnet restore src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj
+        dotnet restore src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj || (sleep 20 && dotnet restore src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj) || (sleep 40 && dotnet restore src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj)
+        dotnet restore src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj || (sleep 20 && dotnet restore src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj) || (sleep 40 && dotnet restore src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj)
+        dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj || (sleep 20 && dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj) || (sleep 40 && dotnet restore src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj)
+        dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj || (sleep 20 && dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj) || (sleep 40 && dotnet restore src/Minotaur.Benchmarks.CaseStudyPilots/Minotaur.Benchmarks.CaseStudyPilots.csproj)
+        dotnet restore src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj || (sleep 20 && dotnet restore src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj) || (sleep 40 && dotnet restore src/Minotaur.Benchmarks.EmbeddedDetection/Minotaur.Benchmarks.EmbeddedDetection.csproj)
+        dotnet restore src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj || (sleep 20 && dotnet restore src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj) || (sleep 40 && dotnet restore src/Minotaur.Benchmarks.SymbolicDetection/Minotaur.Benchmarks.SymbolicDetection.csproj)
+        dotnet restore src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj || (sleep 20 && dotnet restore src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj) || (sleep 40 && dotnet restore src/Minotaur.Benchmarks.Labyrinth/Minotaur.Benchmarks.Labyrinth.csproj)
         dotnet build src/Minotaur.Benchmarks.GrammarCompilation/Minotaur.Benchmarks.GrammarCompilation.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ProjectLoad/Minotaur.Benchmarks.ProjectLoad.csproj --configuration Release --no-restore
         dotnet build src/Minotaur.Benchmarks.ClassificationAccuracy/Minotaur.Benchmarks.ClassificationAccuracy.csproj --configuration Release --no-restore
