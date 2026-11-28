@@ -914,17 +914,22 @@ public sealed class LabyrinthExpressionCompiler
 
         foreach (var n in argNodes)
         {
-            switch (n.TokenType)
+            // Value-based (v2, Minotaur#278 item 3): target grammars do not all
+            // name these tokens LPAREN/RPAREN/COMMA (Cpp20/Java17/CSharp10 lex
+            // "," with grammar-specific token types), so match on the token
+            // value like the rest of the v2 compiler.
+            if (IsOpenParen(n))
             {
-                case "LPAREN":
-                    depth++;
-                    break;
-                case "RPAREN":
-                    depth--;
-                    break;
-                case "COMMA" when depth == 0:
-                    AddCurrent(args, current);
-                    continue;
+                depth++;
+            }
+            else if (IsCloseParen(n))
+            {
+                depth--;
+            }
+            else if (depth == 0 && IsValue(n, ","))
+            {
+                AddCurrent(args, current);
+                continue;
             }
 
             current.Add(n);
