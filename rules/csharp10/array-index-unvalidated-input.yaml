@@ -10,6 +10,8 @@ rules:
     severity: ERROR
     message: "Unvalidated external input flows into an array index; parse or range-check it before use."
     type: taint
+    source: minotaur-in-house
+    license: MIT
     sources:
       - pattern: "$TARGET = ReadLine(...)"
     sanitizers:

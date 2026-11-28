@@ -90,15 +90,39 @@ public static class LabyrinthSarifWriter
         {
             writer.WriteStartObject();
             writer.WriteString("id", group.Key);
+            if (rulesById is not null
+                && rulesById.TryGetValue(group.Key, out var rule)
+                && !string.IsNullOrWhiteSpace(rule.SourceUrl))
+            {
+                writer.WriteString("helpUri", rule.SourceUrl);
+            }
+
             writer.WriteStartObject("properties");
             writer.WriteString("tags", "security");
             if (rulesById is not null
-                && rulesById.TryGetValue(group.Key, out var rule)
-                && rule.Metadata is { Count: > 0 })
+                && rulesById.TryGetValue(group.Key, out var provenanceRule))
             {
-                foreach (var (key, value) in rule.Metadata)
+                if (!string.IsNullOrWhiteSpace(provenanceRule.Source))
                 {
-                    WritePropertyValue(writer, key, value);
+                    writer.WriteString("source", provenanceRule.Source);
+                }
+
+                if (!string.IsNullOrWhiteSpace(provenanceRule.SourceUrl))
+                {
+                    writer.WriteString("sourceUrl", provenanceRule.SourceUrl);
+                }
+
+                if (!string.IsNullOrWhiteSpace(provenanceRule.License))
+                {
+                    writer.WriteString("license", provenanceRule.License);
+                }
+
+                if (provenanceRule.Metadata is { Count: > 0 })
+                {
+                    foreach (var (key, value) in provenanceRule.Metadata)
+                    {
+                        WritePropertyValue(writer, key, value);
+                    }
                 }
             }
 
@@ -149,8 +173,40 @@ public static class LabyrinthSarifWriter
         writer.WriteStartObject("message");
         writer.WriteString("text", finding.Message);
         writer.WriteEndObject();
+        WriteProvenanceProperties(writer, finding);
         WriteLocations(writer, finding, root);
         WriteCodeFlows(writer, finding, root);
+        writer.WriteEndObject();
+    }
+
+    /// <summary>
+    /// Emits the rule's attribution (source, sourceUrl, license) on the result
+    /// itself, so the provenance is presented where the pattern is found, not
+    /// only in the rule table (issue #283).
+    /// </summary>
+    private static void WriteProvenanceProperties(Utf8JsonWriter writer, LabyrinthTaintFinding finding)
+    {
+        if (finding.ProvenanceSource is null && finding.ProvenanceSourceUrl is null && finding.ProvenanceLicense is null)
+        {
+            return;
+        }
+
+        writer.WriteStartObject("properties");
+        if (finding.ProvenanceSource is not null)
+        {
+            writer.WriteString("source", finding.ProvenanceSource);
+        }
+
+        if (finding.ProvenanceSourceUrl is not null)
+        {
+            writer.WriteString("sourceUrl", finding.ProvenanceSourceUrl);
+        }
+
+        if (finding.ProvenanceLicense is not null)
+        {
+            writer.WriteString("license", finding.ProvenanceLicense);
+        }
+
         writer.WriteEndObject();
     }
 

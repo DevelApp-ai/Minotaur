@@ -9,10 +9,14 @@ rules:
     severity: ERROR
     message: "Division by the constant zero; the divisor literal is 0 and not data-dependent."
     type: search
+    source: minotaur-in-house
+    license: MIT
     pattern: "$A / 0"
 
   - id: csharp-modulo-by-constant-zero
     severity: ERROR
     message: "Remainder by the constant zero; the modulus literal is 0 and not data-dependent."
     type: search
+    source: minotaur-in-house
+    license: MIT
     pattern: "$A % 0"

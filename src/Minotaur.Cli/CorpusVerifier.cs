@@ -7,6 +7,14 @@ namespace Minotaur.Cli;
 /// Runs the Minotaur-Labyrinth test corpus (tests/&lt;grammar&gt;/&lt;rule-id&gt;/)
 /// through the real Labyrinth engine and checks each case's expected.json:
 /// the vulnerable file must produce the expected findings, the safe file none.
+/// <para>
+/// <c>--rules</c> may be a directory of YAML rule files (the classic path) or
+/// a binary rule pack file built by <c>pack build</c> (Minotaur issue #283):
+/// then every case is verified through the packed rules — YAML parse, pattern
+/// tokenization and pattern mini-AST building are skipped, and the pack's
+/// grammar hash is checked against the resolved grammar file so the corpus
+/// can never silently drift from the pack it was built from.
+/// </para>
 /// </summary>
 public static class CorpusVerifier
 {
@@ -17,6 +25,29 @@ public static class CorpusVerifier
     public static int Verify(string rulesRoot, string testsRoot)
     {
         var grammarsRoot = ScanHost.FindGrammarsRoot();
+
+        // Binary rule pack mode (issue #283): load once, verify every case
+        // through the packed rules.
+        LabyrinthRulePackFileResult? packed = null;
+        if (File.Exists(rulesRoot) && !Directory.Exists(rulesRoot))
+        {
+            packed = LabyrinthRulePack.TryRead(rulesRoot);
+            if (!packed.IsValid)
+            {
+                Console.Error.WriteLine($"labyrinth: rule pack '{rulesRoot}' is invalid ({packed.Errors.Count} error(s)):");
+                foreach (var error in packed.Errors)
+                {
+                    Console.Error.WriteLine($"  - {error}");
+                }
+
+                return LabyrinthExitCodes.ConfigurationError;
+            }
+
+            Console.WriteLine(
+                $"labyrinth: using binary rule pack '{rulesRoot}' ({packed.Manifest?.RuleCount} rule(s), " +
+                $"target grammar {packed.Manifest?.TargetGrammarName}).");
+        }
+
         var cases = 0;
         var failures = 0;
         foreach (var grammarDir in Directory.GetDirectories(testsRoot).OrderBy(d => d, StringComparer.Ordinal))
@@ -33,7 +64,7 @@ public static class CorpusVerifier
                     // LongRunning: the abandoned task (on timeout) keeps its own
                     // thread instead of starving the thread pool for later cases.
                     var task = Task.Factory.StartNew(
-                        () => VerifyCase(grammarsRoot, rulesRoot, grammarDirName, caseDir, ruleId),
+                        () => VerifyCase(grammarsRoot, rulesRoot, grammarDirName, caseDir, ruleId, packed),
                         TaskCreationOptions.LongRunning);
                     if (!task.Wait(CaseTimeout))
                     {
@@ -73,7 +104,9 @@ public static class CorpusVerifier
         return failures == 0 ? LabyrinthExitCodes.Success : LabyrinthExitCodes.Findings;
     }
 
-    private static bool VerifyCase(string grammarsRoot, string rulesRoot, string grammarDirName, string caseDir, string ruleId)
+    private static bool VerifyCase(
+        string grammarsRoot, string rulesRoot, string grammarDirName, string caseDir, string ruleId,
+        LabyrinthRulePackFileResult? packed)
     {
         var vulnerable = Directory.GetFiles(caseDir, "vulnerable.*").FirstOrDefault();
         var safe = Directory.GetFiles(caseDir, "safe.*").FirstOrDefault();
@@ -101,25 +134,66 @@ public static class CorpusVerifier
         var target = ScanHost.ResolveTarget(targetName);
         var grammarContent = File.ReadAllText(ScanHost.GrammarFilePath(grammarsRoot, target));
 
-        var rulesDir = Path.Combine(rulesRoot, grammarDirName);
-        var pack = new LabyrinthRulePackLoader().TryLoadDirectory(rulesDir);
-        if (!pack.IsValid)
+        // Resolve the rule under verification: from the binary pack, or from
+        // the YAML rule directory (the classic path).
+        LabyrinthRule rule;
+        IReadOnlyList<CompiledLabyrinthRule> compiledCaseRules;
+        LabyrinthRuleSet? yamlCaseRules = null;
+        if (packed is not null)
         {
-            Console.Error.WriteLine($"{grammarDirName}/{ruleId}: invalid rule pack: {string.Join("; ", pack.Errors)}");
-            return false;
+            var manifest = packed.Manifest!;
+            if (!string.Equals(manifest.TargetGrammarName, target.Directory, StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine(
+                    $"{grammarDirName}/{ruleId}: rule pack was built for target grammar '{manifest.TargetGrammarName}', not '{target.Directory}'");
+                return false;
+            }
+
+            var grammarHash = LabyrinthRulePack.GrammarSha256(grammarContent);
+            if (!string.Equals(manifest.GrammarSha256, grammarHash, StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine(
+                    $"{grammarDirName}/{ruleId}: rule pack was built against different grammar content " +
+                    $"({manifest.GrammarSha256[..12]}... vs current {grammarHash[..12]}...); rebuild the pack");
+                return false;
+            }
+
+            var compiledRule = packed.Rules.FirstOrDefault(r =>
+                string.Equals(r.Rule.Id, ruleId, StringComparison.Ordinal));
+            if (compiledRule is null)
+            {
+                Console.Error.WriteLine(
+                    $"{grammarDirName}/{ruleId}: rule '{ruleId}' not found in rule pack '{rulesRoot}'");
+                return false;
+            }
+
+            rule = compiledRule.Rule;
+            compiledCaseRules = new[] { compiledRule };
+        }
+        else
+        {
+            var rulesDir = Path.Combine(rulesRoot, grammarDirName);
+            var pack = new LabyrinthRulePackLoader().TryLoadDirectory(rulesDir);
+            if (!pack.IsValid)
+            {
+                Console.Error.WriteLine($"{grammarDirName}/{ruleId}: invalid rule pack: {string.Join("; ", pack.Errors)}");
+                return false;
+            }
+
+            var yamlRule = pack.RuleSet.Rules.FirstOrDefault(r => r.Id == ruleId);
+            if (yamlRule is null)
+            {
+                Console.Error.WriteLine($"{grammarDirName}/{ruleId}: rule '{ruleId}' not found in {rulesDir}");
+                return false;
+            }
+
+            rule = yamlRule;
+            yamlCaseRules = new LabyrinthRuleSet();
+            yamlCaseRules.Rules.Add(yamlRule);
+            compiledCaseRules = Array.Empty<CompiledLabyrinthRule>();
         }
 
-        var rule = pack.RuleSet.Rules.FirstOrDefault(r => r.Id == ruleId);
-        if (rule is null)
-        {
-            Console.Error.WriteLine($"{grammarDirName}/{ruleId}: rule '{ruleId}' not found in {rulesDir}");
-            return false;
-        }
-
-        var single = new LabyrinthRuleSet();
-        single.Rules.Add(rule);
-
-        var findings = ScanFile(single, grammarContent, target.Directory, vulnerable);
+        var findings = ScanFile(compiledCaseRules, yamlCaseRules, grammarContent, target.Directory, vulnerable);
         foreach (var (file, line) in expectedFindings)
         {
             var hit = findings.Any(f =>
@@ -136,7 +210,7 @@ public static class CorpusVerifier
             }
         }
 
-        var safeFindings = ScanFile(single, grammarContent, target.Directory, safe)
+        var safeFindings = ScanFile(compiledCaseRules, yamlCaseRules, grammarContent, target.Directory, safe)
             .Where(f => f.RuleId == ruleId)
             .ToList();
         if (safeFindings.Count > 0)
@@ -154,14 +228,21 @@ public static class CorpusVerifier
             ? $"{finding.RuleId} @{Path.GetFileName(loc.FilePath)}:{loc.StartLine}"
             : $"{finding.RuleId} @<no location>";
 
-    private static List<LabyrinthTaintFinding> ScanFile(LabyrinthRuleSet rules, string grammarContent, string grammarName, string path)
+    private static List<LabyrinthTaintFinding> ScanFile(
+        IReadOnlyList<CompiledLabyrinthRule> compiledRules,
+        LabyrinthRuleSet? yamlRules,
+        string grammarContent,
+        string grammarName,
+        string path)
     {
         var name = Path.GetFileName(path);
         var source = File.ReadAllText(path);
         Console.Error.WriteLine($"  [{name}] load grammar + parse + materialize...");
         var graph = ScanHost.BuildGraph(source, path, grammarContent, grammarName, out var nodes);
         Console.Error.WriteLine($"  [{name}] graph built ({nodes.Count} node(s)); compile rules + run...");
-        var findings = ScanHost.RunRules(rules, grammarContent, grammarName, graph, nodes, path);
+        var findings = compiledRules.Count > 0
+            ? ScanHost.RunCompiledRules(compiledRules, graph, nodes, path)
+            : ScanHost.RunRules(yamlRules!, grammarContent, grammarName, graph, nodes, path);
         Console.Error.WriteLine($"  [{name}] done: {findings.Count} finding(s)");
         return findings;
     }

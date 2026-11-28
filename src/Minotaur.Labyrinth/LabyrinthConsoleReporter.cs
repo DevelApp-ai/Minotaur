@@ -89,6 +89,24 @@ public sealed class LabyrinthConsoleReporter
             sb.Append("  Fix: ").AppendLine(finding.Fix);
         }
 
+        // Attribution is presented where the pattern is found (issue #283):
+        // one line naming where the rule comes from, with its license.
+        if (!string.IsNullOrEmpty(finding.ProvenanceSource))
+        {
+            var attribution = new StringBuilder("  Rule source: ").Append(finding.ProvenanceSource);
+            if (!string.IsNullOrEmpty(finding.ProvenanceLicense))
+            {
+                attribution.Append(" (license: ").Append(finding.ProvenanceLicense).Append(')');
+            }
+
+            if (!string.IsNullOrEmpty(finding.ProvenanceSourceUrl))
+            {
+                attribution.Append(" ").Append(finding.ProvenanceSourceUrl);
+            }
+
+            sb.AppendLine(attribution.ToString());
+        }
+
         sb.Append("  Path:").AppendLine();
         foreach (var line in LabyrinthPathRenderer.RenderPath(finding).Split('\n'))
         {

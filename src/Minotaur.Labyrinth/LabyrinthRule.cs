@@ -169,6 +169,29 @@ public sealed class LabyrinthRule
     /// </summary>
     public Dictionary<string, object?>? Metadata { get; set; }
 
+    /// <summary>
+    /// Attribution: where the rule comes from (YAML <c>source:</c>), e.g.
+    /// <c>minotaur-in-house</c>, <c>gitleaks</c> or <c>cve:CVE-2024-12345</c>.
+    /// Carried in the binary pack and presented with every finding (console,
+    /// SARIF), so harvested rules keep their provenance where the pattern is
+    /// found (Minotaur issue #283).
+    /// </summary>
+    public string? Source { get; set; }
+
+    /// <summary>
+    /// Attribution URL (YAML <c>source-url:</c>): the advisory, registry entry
+    /// or upstream rule the rule was harvested from. Emitted as the SARIF
+    /// rule <c>helpUri</c>.
+    /// </summary>
+    public string? SourceUrl { get; set; }
+
+    /// <summary>
+    /// SPDX license of the rule content (YAML <c>license:</c>), e.g.
+    /// <c>MIT</c> or <c>CC-BY-4.0</c>. Required for harvested rules per the
+    /// license-record gate of the registry-scale issue (#284).
+    /// </summary>
+    public string? License { get; set; }
+
     /// <summary>Parsed severity value.</summary>
     public LabyrinthSeverity SeverityValue => ParseSeverity(Severity);
 

@@ -65,9 +65,54 @@ public static class Program
         {
             "scan" => Scan(options),
             "verify-corpus" => CorpusVerifier.Verify(Required(options, "rules"), Required(options, "tests")),
+            "pack" => Pack(options),
             "grammars" => ListGrammars(),
             _ => Usage(),
         };
+    }
+
+    /// <summary>
+    /// Builds a binary rule pack (issue #283): loads the YAML rule directory,
+    /// compiles every pattern against the target grammar once, and writes the
+    /// compact pack file that <c>scan --rules</c> and
+    /// <c>verify-corpus --rules</c> accept in place of the directory.
+    /// </summary>
+    private static int Pack(Dictionary<string, string> options)
+    {
+        var rules = Required(options, "rules");
+        var grammarName = Required(options, "grammar");
+        var output = Required(options, "out");
+
+        var grammarsRoot = ScanHost.FindGrammarsRoot();
+        var target = ScanHost.ResolveTarget(grammarName);
+        var grammarPath = ScanHost.GrammarFilePath(grammarsRoot, target);
+        if (!File.Exists(grammarPath))
+        {
+            Console.Error.WriteLine($"minotaur: error: grammar file not found: {grammarPath}");
+            return LabyrinthExitCodes.ConfigurationError;
+        }
+
+        var grammarContent = File.ReadAllText(grammarPath);
+        var result = LabyrinthRulePack.Build(
+            rules, grammarContent, target.Directory, output,
+            options.TryGetValue("id", out var id) ? id : null);
+        if (!result.IsValid)
+        {
+            Console.Error.WriteLine($"minotaur: error: rule pack build failed ({result.Errors.Count} error(s)):");
+            foreach (var error in result.Errors)
+            {
+                Console.Error.WriteLine($"  - {error}");
+            }
+
+            return LabyrinthExitCodes.ConfigurationError;
+        }
+
+        var manifest = result.Manifest!;
+        var packInfo = new FileInfo(output);
+        Console.WriteLine(
+            $"labyrinth pack: wrote {manifest.RuleCount} rule(s) for target grammar '{manifest.TargetGrammarName}' " +
+            $"to '{output}' ({packInfo.Length} bytes, grammar sha256 {manifest.GrammarSha256[..12]}...).");
+        return LabyrinthExitCodes.Success;
     }
 
     private static int Scan(Dictionary<string, string> options)
@@ -87,12 +132,37 @@ public static class Program
 
         var grammarContent = File.ReadAllText(grammarPath);
 
-        // A pack root with a per-grammar subdirectory (Minotaur-Labyrinth layout) scans with just that subdir.
-        var rulesDir = Directory.Exists(Path.Combine(rules, grammarName)) ? Path.Combine(rules, grammarName) : rules;
-        var pack = new LabyrinthRulePackLoader().TryLoadDirectory(rulesDir);
-        if (!pack.IsValid)
+        // --rules may be a binary pack file (.labyrinthpack, issue #283) or a
+        // directory of YAML rule files; a pack root with a per-grammar
+        // subdirectory (Minotaur-Labyrinth layout) scans with just that subdir.
+        List<CompiledLabyrinthRule>? compiledRules = null;
+        LabyrinthRulePackResult? yamlPack = null;
+        if (File.Exists(rules) && !Directory.Exists(rules))
         {
-            return new LabyrinthConsoleReporter(Console.Error).ReportConfigurationError(pack);
+            var packed = LabyrinthRulePack.TryRead(
+                rules, expectedTargetGrammarName: target.Directory,
+                expectedGrammarSha256: LabyrinthRulePack.GrammarSha256(grammarContent));
+            if (!packed.IsValid)
+            {
+                Console.Error.WriteLine($"minotaur: error: rule pack '{rules}' is invalid ({packed.Errors.Count} error(s)):");
+                foreach (var error in packed.Errors)
+                {
+                    Console.Error.WriteLine($"  - {error}");
+                }
+
+                return LabyrinthExitCodes.ConfigurationError;
+            }
+
+            compiledRules = packed.Rules.ToList();
+        }
+        else
+        {
+            var rulesDir = Directory.Exists(Path.Combine(rules, grammarName)) ? Path.Combine(rules, grammarName) : rules;
+            yamlPack = new LabyrinthRulePackLoader().TryLoadDirectory(rulesDir);
+            if (!yamlPack.IsValid)
+            {
+                return new LabyrinthConsoleReporter(Console.Error).ReportConfigurationError(yamlPack);
+            }
         }
 
         var files = CollectFiles(src, grammarName, options);
@@ -107,7 +177,9 @@ public static class Program
         {
             var source = File.ReadAllText(file);
             var graph = ScanHost.BuildGraph(source, file, grammarContent, target.Directory, out var nodes);
-            findings.AddRange(ScanHost.RunRules(pack.RuleSet, grammarContent, target.Directory, graph, nodes, file));
+            findings.AddRange(compiledRules is not null
+                ? ScanHost.RunCompiledRules(compiledRules, graph, nodes, file)
+                : ScanHost.RunRules(yamlPack!.RuleSet, grammarContent, target.Directory, graph, nodes, file));
         }
 
         if (options.TryGetValue("write-baseline", out var writeBaseline))
@@ -124,7 +196,10 @@ public static class Program
 
         if (options.TryGetValue("sarif", out var sarifPath))
         {
-            var rulesById = pack.RuleSet.Rules
+            var allRules = compiledRules is not null
+                ? compiledRules.Select(c => c.Rule)
+                : yamlPack!.RuleSet.Rules;
+            var rulesById = allRules
                 .GroupBy(r => r.Id, StringComparer.Ordinal)
                 .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
             File.WriteAllText(sarifPath, LabyrinthSarifWriter.Write(reportable, rulesById: rulesById));
@@ -185,17 +260,25 @@ public static class Program
             Minotaur CLI — Labyrinth SAST scanning.
 
             Usage:
-              minotaur labyrinth scan --rules <dir> --grammar <name> --src <file|dir>
+              minotaur labyrinth scan --rules <dir|pack> --grammar <name> --src <file|dir>
                   [--ext .cs,.py] [--sarif out.sarif] [--baseline b.json] [--write-baseline b.json]
-              minotaur labyrinth verify-corpus --rules <dir> --tests <dir>
+              minotaur labyrinth verify-corpus --rules <dir|pack> --tests <dir>
+              minotaur labyrinth pack build --rules <dir> --grammar <name> --out <file> [--id <packId>]
               minotaur labyrinth grammars
 
             scan          Scan source files with a Labyrinth rule pack. --rules may be a pack
                           root with per-grammar subdirectories (then only rules/<grammar> is
-                          used) or a single pack directory. Exit codes: 0 no findings,
-                          1 findings, 2 configuration error.
+                          used), a single pack directory, or a binary rule pack file built by
+                          'pack build' (patterns pre-compiled; the pack is refused when the
+                          target grammar content changed since it was built). Exit codes: 0 no
+                          findings, 1 findings, 2 configuration error.
             verify-corpus Run the Minotaur-Labyrinth tests/ corpus through the engine and
                           check every case's expected.json (used by Minotaur-Labyrinth CI).
+                          --rules may also be a binary rule pack file.
+            pack build    Compile a YAML rule directory against the target grammar once and
+                          write the compact binary rule pack (patterns parsed at build time;
+                          attribution source/source-url/license of each rule is carried inside
+                          and presented with every finding).
             grammars      List the Labyrinth target grammars.
             """);
         return LabyrinthExitCodes.Success;
